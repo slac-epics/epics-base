@@ -22,6 +22,3 @@
 # EPICS BASE_MODULE_VERSION is always current when building EPICS base
 BASE_MODULE_VERSION=current
 
-## Include site configuration
-include $(TOP)/../../RELEASE_SITE
-
