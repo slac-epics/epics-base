@@ -143,7 +143,7 @@ HOST_OPT=YES
 
 #  Cross build optimization
 #	must be either YES or NO
-CROSS_OPT=NO
+CROSS_OPT=YES
 
 #  Generate Verbose Compiler Warnings for Host builds
 #	must be either YES or NO
