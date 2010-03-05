@@ -498,9 +498,9 @@ static void register_new_client ( osiSockAddr & from,
 
 
 /*
- *  ca_repeater ()
+ *  ca_repeater_func ()
  */
-void ca_repeater () 
+static int ca_repeater_func () 
 {
     tsFreeList < repeaterClient, 0x20 > freeList;
     int size;
@@ -522,7 +522,7 @@ void ca_repeater ()
         if ( SOCKERRNO == SOCK_EADDRINUSE ) {
             osiSockRelease ();
             debugPrintf ( ( "CA Repeater: exiting because a repeater is already running\n" ) );
-            return;
+            return (0);
         }
         char sockErrBuf[64];
         epicsSocketConvertErrnoToString ( 
@@ -531,7 +531,7 @@ void ca_repeater ()
             __FILE__, sockErrBuf );
         osiSockRelease ();
         delete [] pBuf;
-        return;
+        return (0);
     }
 
     debugPrintf ( ( "CA Repeater: Attached and initialized\n" ) );
@@ -590,6 +590,16 @@ void ca_repeater ()
 
         fanOut ( from, pMsg, size, freeList ); 
     }
+    return -1;
+}
+
+/*
+ *  ca_repeater ()
+ */
+void ca_repeater(void)
+{
+    if ( 0 == ca_repeater_func() )
+        exit(0);
 }
 
 /*
@@ -598,7 +608,8 @@ void ca_repeater ()
 extern "C" void caRepeaterThread ( void * /* pDummy */ )
 {
     taskwdInsert ( epicsThreadGetIdSelf(), NULL, NULL );
-    ca_repeater ();
+    if ( 0 == ca_repeater_func () )
+        taskwdRemove( epicsThreadGetIdSelf() );
 }
 
 

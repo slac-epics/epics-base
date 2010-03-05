@@ -16,13 +16,18 @@ char *env_nfsPath;
 char *env_nfsMountPoint;
 
 #if defined(HAVE_MOTLOAD)
+
+#ifndef BSP_NVRAM_BASE_ADDR
+#define BSP_NVRAM_BASE_ADDR (GT64260_DEV1_BASE + 0x10000)
+#endif
+
 /*
  * Motorola MOTLOAD NVRAM Access
  */
 static char *
 gev(const char *parm)
 {
-    volatile char *nvp = (volatile unsigned char *)(GT64260_DEV1_BASE + 0x10000 + 0x70F8);
+    volatile char *nvp = (volatile unsigned char *)(BSP_NVRAM_BASE_ADDR + 0x70F8);
     const char *val;
     const char *name;
     char *ret;

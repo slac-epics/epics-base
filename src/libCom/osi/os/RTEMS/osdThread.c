@@ -398,7 +398,7 @@ const char *epicsThreadGetNameSelf(void)
 
     rtems_task_get_note (RTEMS_SELF, RTEMS_NOTEPAD_TASKVAR, &note);
     v = (void *)note;
-    return v->name;
+    return v ? v->name : "<NULL>";
 }
 
 void epicsThreadGetName (epicsThreadId id, char *name, size_t size)
@@ -532,7 +532,7 @@ void * epicsThreadPrivateGet (epicsThreadPrivateId id)
 
     rtems_task_get_note (RTEMS_SELF, RTEMS_NOTEPAD_TASKVAR, &note);
     v = (struct taskVar *)note;
-    if (varIndex >= v->threadVariableCapacity)
+    if (!v || varIndex >= v->threadVariableCapacity)
         return NULL;
     return v->threadVariables[varIndex];
 }

@@ -22,8 +22,10 @@ vpath bpt%.data $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
 
 # dbExpand
 INSTALL_DBDFLAGS += -I $(INSTALL_LOCATION)/dbd
+INSTALL_DBFLAGS  += -I $(INSTALL_LOCATION)/db
+RELEASE_DBFLAGS  += $(patsubst %/dbd,%/db, $(RELEASE_DBDFLAGS))
 DBDFLAGS = $(USR_DBDFLAGS) -I . -I .. $(INSTALL_DBDFLAGS) $(RELEASE_DBDFLAGS)
-DBFLAGS = $($*_DBFLAGS) $(USR_DBFLAGS) -I. $(GENERIC_SRC_INCLUDES)
+DBFLAGS  = $($*_DBFLAGS) $(USR_DBFLAGS) -I. $(GENERIC_SRC_INCLUDES) $(INSTALL_DBFLAGS) $(RELEASE_DBFLAGS)
 DBFLAGS += -I$(COMMON_DIR)
 
 #####################################################  Targets
@@ -78,7 +80,7 @@ COMMON_DBDINC += $(addprefix $(COMMON_DIR),$(HINC))
 DBDDEPENDS_FILES += $(addsuffix $(DEP),$(COMMON_DBDS) \
                     $(COMMON_DBDINC) $(COMMON_DBS))
 
-DBDDEPENDS_FLAGS = $(subst -I,,$(filter-out -S%,$(DBDFLAGS)))
+DBDDEPENDS_FLAGS = $(filter .%,$(subst -I,,$(filter-out -S%,$(DBDFLAGS))))
 DBDDEPENDS_CMD = -$(MKMF) -m $@$(DEP) $(DBDDEPENDS_FLAGS) $@ $<
 
 MAKEDBDEPENDS = $(PERL) $(TOOLS)/makeDbDepends.pl
@@ -309,4 +311,24 @@ dbInstalls:  $(DB_INSTALLS)
 .PRECIOUS: %_registerRecordDeviceDriver.cpp
 
 ##################################################### END OF FILE
+
+#####================ CA security stuff=======================
+$(INSTALL_DB)/%.acf: %.acf
+	@echo "Installing $@"
+	@$(INSTALL) -d -m 644 $(@F) $(@D)
+
+%.acf: ../%.acf
+	@$(CP) $< $@
+
+%.acf: %.acs
+	gcc -E -x c -undef -nostdinc $(ACFLAGS) $(EPICS_DBFLAGS) -o$@ -c $<
+	ascheck -S"P=$(IOCNAME)" <$@
+
+$(INSTALL_DB)/%.acs: %.acs
+	@echo "Installing $@"
+	@$(INSTALL) -d -m 644 $(@F) $(@D)
+
+%.acs: ../%.acs
+	@$(CP) $< $@
+#=============================================================
 

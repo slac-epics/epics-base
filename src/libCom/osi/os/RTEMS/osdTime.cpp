@@ -14,6 +14,7 @@
 /*
  * ANSI C
  */
+#include <stdio.h>
 #include <time.h>
 #include <limits.h>
 
@@ -23,13 +24,24 @@
 #include <rtems.h>
 
 /*
+* SSRLAPPS
+*/
+#include <sys/timex.h>
+ 
+/*
  * EPICS
  */
 #define epicsExportSharedSymbols
 #include "epicsTime.h"
 #include "errlog.h"
+#include "cantProceed.h"
+#include "iocClock.h"
 
 extern "C" {
+
+extern int ntp_gettime(struct ntptimeval *pDest)
+      __attribute__(( weak, alias("epicsTimeGetRTEMSSysclk") ));
+
 /*
  * RTEMS clock rate
  */
@@ -43,14 +55,64 @@ double rtemsTicksPerSecond_double;
  * FIXME: How to handle daylight-savings time?
  */
 #define EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH ((366+365)*86400)
+#define POSIX_TIME_SECONDS_1970_THROUGH_1988 \
+  (((1987 - 1970 + 1)  * TOD_SECONDS_PER_NON_LEAP_YEAR) + \
+       (4 * TOD_SECONDS_PER_DAY))
+
 static unsigned long timeoffset;
 
+typedef struct iocClockPvt {
+    pepicsTimeGetCurrent getCurrent;
+    pepicsTimeGetEvent getEvent;
+}iocClockPvt;
+static iocClockPvt *piocClockPvt = 0;
+
+void iocClockInit()
+{
+    if(piocClockPvt) return;
+    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockInit");
+    piocClockPvt->getCurrent = rtemsIocClockGetCurrent;
+    piocClockPvt->getEvent = rtemsIocClockGetEvent;
+    return;
+}
+
+void iocClockRegister(pepicsTimeGetCurrent getCurrent,
+    pepicsTimeGetEvent getEvent)
+{
+    if(piocClockPvt) {
+        printf("iocClockRegister: iocClock already initialized\n");
+        return;
+    }
+    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockRegister");
+    piocClockPvt->getCurrent = getCurrent;
+    piocClockPvt->getEvent = getEvent;
+}
+
+int epicsTimeGetCurrent (epicsTimeStamp *pDest)
+{
+    if(!piocClockPvt) {
+        iocClockInit();
+    }
+    if(piocClockPvt->getCurrent) return((*piocClockPvt->getCurrent)(pDest));
+    return(epicsTimeERROR);
+}
+
+int epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
+{
+    if(!piocClockPvt) {
+        iocClockInit();
+    }
+    if(piocClockPvt->getEvent)
+        return((*piocClockPvt->getEvent)(pDest,eventNumber));
+    return(epicsTimeERROR);
+}
+
 /*
- * Get current time
+ * Get current RTEMS systemclock time
  * Allow for this to be called before clockInit() and before
  * system time and date have been initialized.
  */
-int epicsTimeGetCurrent (epicsTimeStamp *pDest)
+int epicsTimeGetRTEMSSysclk (struct ntptimeval *pDest)
 {
     struct timeval curtime;
     rtems_interval t;
@@ -67,15 +129,31 @@ int epicsTimeGetCurrent (epicsTimeStamp *pDest)
 	    return epicsTimeERROR;
 	rtems_task_wake_after (t);
     }
-    pDest->nsec = curtime.tv_usec * 1000;
-    pDest->secPastEpoch = curtime.tv_sec - timeoffset;
-   return epicsTimeOK;
+    pDest->time.tv_nsec = curtime.tv_usec * 1000;
+    pDest->time.tv_sec  = curtime.tv_sec + POSIX_TIME_SECONDS_1970_THROUGH_1988;
+    return epicsTimeOK;
+}
+
+/* get current time via NTP if possible.
+ * ntp_gettime is a weak alias for epicsTimeGetRTEMSSysclk which
+ * will be used if the linker (or CEXP) doesn't find ntp_gettime
+ */
+int rtemsIocClockGetCurrent (epicsTimeStamp *pDest)
+{
+struct ntptimeval ntv;
+
+	if ( ntp_gettime( &ntv ) &&
+		( ntp_gettime == epicsTimeGetRTEMSSysclk || epicsTimeGetRTEMSSysclk( &ntv )) )
+		return epicsTimeERROR;
+	pDest->nsec         = ntv.time.tv_nsec;
+	pDest->secPastEpoch = ntv.time.tv_sec - timeoffset;
+	return epicsTimeOK;
 }
 	
 /*
- * epicsTimeGetEvent ()
+ * rtemsIocClockTimeGetEvent ()
  */
-int epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
+int rtemsIocClockGetEvent (epicsTimeStamp *pDest, int eventNumber)
 {
     if (eventNumber==epicsTimeEventCurrentTime) {
         return epicsTimeGetCurrent (pDest);
@@ -87,7 +165,8 @@ int epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
 
 void clockInit(void)
 {
-	timeoffset = EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH;
+	timeoffset  = EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH;
+	timeoffset += POSIX_TIME_SECONDS_1970_THROUGH_1988;
 	rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &rtemsTicksPerSecond);
 	rtemsTicksPerSecond_double = rtemsTicksPerSecond;
 }

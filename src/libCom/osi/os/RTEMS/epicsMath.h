@@ -11,17 +11,6 @@
 #define epicsMathh
 
 #include <math.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int isnan(double);
-int finite(double);
-int isinf(double);
-
-#ifdef __cplusplus
-}
-#endif
+#include <ieeefp.h>
 
 #endif /* epicsMathh */

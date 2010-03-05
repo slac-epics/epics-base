@@ -53,6 +53,11 @@ CHECK_RELEASE_WARN = warnRelease
 INSTALL_LOCATION            = $(TOP)
 TOOLS                       = $(CONFIG)/tools
 
+# SLAC Specific Install locations
+INSTALL_DISPLAY		    = $(INSTALL_LOCATION)/display
+INSTALL_RESTORE             = $(INSTALL_LOCATION)/restore
+
+
 INSTALL_LOCATION_LIB        = $(INSTALL_LOCATION)/lib
 INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
 

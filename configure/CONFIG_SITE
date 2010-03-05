@@ -68,11 +68,17 @@
 #       vxWorks-68060
 #       vxWorks-pentium
 #       vxWorks-ppc603
+#       vxWorks63-ppc603
 #       vxWorks-ppc603_long
+#       vxWorks63-ppc603_long
 #       vxWorks-ppc604
+#       vxWorks63-ppc604
 #       vxWorks-ppc604_long
+#       vxWorks63-ppc604_long
 #       vxWorks-ppc604_altivec
+#       vxWorks63-ppc604_altivec
 #       vxWorks-mpc8540
+#       vxWorks63-mpc8540
 #       RTEMS-gen68360
 #       RTEMS-mcp750
 #       RTEMS-mvme167
@@ -81,14 +87,15 @@
 #       RTEMS-pc386
 #       RTEMS-psim
 #       RTEMS-uC5282
-#
+#       RTEMS-pmc405
 
 # Definitions of CROSS_COMPILER_TARGET_ARCHS in
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
-CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
+#CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks6-ppc604_long
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-uC5282 RTEMS-pc586
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
@@ -132,11 +139,11 @@ HDEPENDS=YES
 
 #  Host build optimization
 #	must be either YES or NO
-HOST_OPT=YES
+HOST_OPT=NO
 
 #  Cross build optimization
 #	must be either YES or NO
-CROSS_OPT=YES
+CROSS_OPT=NO
 
 #  Generate Verbose Compiler Warnings for Host builds
 #	must be either YES or NO
@@ -152,7 +159,7 @@ CROSS_WARN=YES
 #  NOTE: Set to YES only if you have existing R3.13 extensions to be
 #  built with this base
 #
-#COMPAT_TOOLS_313=YES
+COMPAT_TOOLS_313=YES
 
 #  Create and/or install files for R3.13 ioc application and extension builds?
 #  must be either YES or NO
@@ -160,7 +167,7 @@ CROSS_WARN=YES
 #  NOTE: Set to YES only if you have existing R3.13 ioc applications
 #  and extensions to be built with this base
 #
-COMPAT_313=NO
+COMPAT_313=YES
 
 #  Installation directory
 # If you don't want to install into $(TOP) dir then
@@ -168,9 +175,9 @@ COMPAT_313=NO
 #INSTALL_LOCATION=<fullpathname>
 
 # Use POSIX thread priority scheduling (YES or NO)
-USE_POSIX_THREAD_PRIORITY_SCHEDULING = NO
+USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-EPICS_SITE_VERSION =
+EPICS_SITE_VERSION = lcls1
 

@@ -15,7 +15,7 @@ include $(CONFIG)/RULES_DIRS
 
 UNINSTALL_DIRS += $(INSTALL_DBD) $(INSTALL_INCLUDE) $(INSTALL_DOC)\
         $(INSTALL_HTML) $(INSTALL_JAVA) $(INSTALL_TEMPLATES) \
-        $(INSTALL_DB)
+        $(INSTALL_DB) $(INSTALL_DISPLAY) $(INSTALL_RESTORE)
 
 uninstallArchTargets = $(foreach arch,$(BUILD_ARCHS), uninstall$(DIVIDER)$(arch))
 archPart = $(word 2, $(subst $(DIVIDER), ,$@))

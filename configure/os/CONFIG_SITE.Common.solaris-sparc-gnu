@@ -8,3 +8,4 @@
 # Include definitions common to all solaris-sparc-gnu target archs
 include $(CONFIG)/os/CONFIG_SITE.Common.solaris-sparc
 
+GNU_DIR = /usr/local

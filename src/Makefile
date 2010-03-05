@@ -15,14 +15,11 @@ include $(TOP)/configure/CONFIG
 
 DIRS += libCom
 DIRS += ca
-DIRS += RTEMS
-DIRS += libCom/test
 DIRS += toolsComm
 DIRS += dbStatic
 DIRS += registry
 DIRS += bpt
 DIRS += db
-DIRS += db/test
 DIRS += as
 DIRS += util
 DIRS += dbtools
@@ -32,6 +29,9 @@ DIRS += rec
 DIRS += dev
 DIRS += misc
 DIRS += iocsh
+DIRS += RTEMS
+DIRS += libCom/test
+DIRS += db/test
 DIRS += vxWorks
 DIRS += softIoc
 DIRS += gdd

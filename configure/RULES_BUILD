@@ -67,6 +67,10 @@ all:	install
 
 -include $(CONFIG)/RULES.Db
 
+-include $(CONFIG)/RULES.Display
+ 	 
+-include $(CONFIG)/RULES.Restore
+
 -include $(CONFIG)/RULES_JAVA
 
 ifneq (,$(strip $(HDEPENDS_FILES)))

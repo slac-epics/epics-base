@@ -17,5 +17,9 @@
  */
 epicsShareFunc int epicsShareAPI osiSufficentSpaceInPool ( size_t contiguousBlockSize )
 {
-    return (malloc_free_space() > 50000 + contiguousBlockSize);
+	/* T.S.: malloc_free_space() doesn't know that our PPC boards
+	 *       can obtain more memory via sbrk() [transparently invoked
+	 *       by malloc].
+	 */
+    return 1!=0; /* (malloc_free_space() > 50000 + contiguousBlockSize); */
 }
