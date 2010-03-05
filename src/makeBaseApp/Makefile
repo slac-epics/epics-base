@@ -20,6 +20,7 @@ TEMPLATES += top/configure/Makefile
 TEMPLATES += top/configure/RELEASE
 TEMPLATES += top/configure/RULES
 TEMPLATES += top/configure/RULES.ioc
+TEMPLATES += top/configure/RULES.copy
 TEMPLATES += top/configure/RULES_DIRS
 TEMPLATES += top/configure/RULES_TOP
 
@@ -169,7 +170,69 @@ TEMPLATES += top/lclsBoot/ioc/README@vxWorks6
 ## End Changes needed for LCLS ==============
 ## ==========================================
 
+######################################################################
+# PCDS templates: 'pcdsApp' and 'pcdsBoot'.
+# Author: Jason Tiller
+######################################################################
 
+# pcdsApp - based on lclsApp.  Also includes a 'srcProtocol' directory
+# for managing streamDevice's protocol files.
+
+TEMPLATES += top/pcdsApp/Makefile
+TEMPLATES += top/pcdsApp/Db/Makefile
+TEMPLATES += top/pcdsApp/Db/dbExample1.db
+TEMPLATES += top/pcdsApp/Db/dbExample2.db
+TEMPLATES += top/pcdsApp/Db/dbSubExample.db
+TEMPLATES += top/pcdsApp/src/Makefile
+TEMPLATES += top/pcdsApp/src/xxxRecord.dbd
+TEMPLATES += top/pcdsApp/src/xxxRecord.c
+TEMPLATES += top/pcdsApp/src/devXxxSoft.c
+TEMPLATES += top/pcdsApp/src/xxxSupport.dbd
+TEMPLATES += top/pcdsApp/src/sncExample.stt
+TEMPLATES += top/pcdsApp/src/sncProgram.st
+TEMPLATES += top/pcdsApp/src/sncExample.dbd
+TEMPLATES += top/pcdsApp/src/dbSubExample.c
+TEMPLATES += top/pcdsApp/src/dbSubExample.dbd
+TEMPLATES += top/pcdsApp/src/_APPNAME_Main.cpp
+TEMPLATES += top/pcdsApp/src/_APPNAME_Hello.c
+TEMPLATES += top/pcdsApp/src/_APPNAME_Hello.dbd
+
+TEMPLATES += top/pcdsApp/srcDisplay/Makefile
+TEMPLATES += top/pcdsApp/srcDisplay/example.edl
+
+TEMPLATES += top/pcdsApp/srcProtocol/Makefile
+TEMPLATES += top/pcdsApp/srcProtocol/example.proto
+
+# pcdsBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsBoot/Makefile
+
+TEMPLATES += top/pcdsBoot/nfsCommands@vxWorks
+TEMPLATES += top/pcdsBoot/nfsCommands@vxWorks6
+
+TEMPLATES += top/pcdsBoot/nfsCommands@RTEMS
+TEMPLATES += top/pcdsBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsBoot/ioc/Makefile@vxWorks
+TEMPLATES += top/pcdsBoot/ioc/Makefile@vxWorks6
+
+TEMPLATES += top/pcdsBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsBoot/ioc/st.cmd@Cross
+
+TEMPLATES += top/pcdsBoot/ioc/st.cmd@vxWorks
+TEMPLATES += top/pcdsBoot/ioc/st.cmd@vxWorks6
+
+TEMPLATES += top/pcdsBoot/ioc/st.cmd@RTEMS
+TEMPLATES += top/pcdsBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsBoot/ioc/README@vxWorks
+TEMPLATES += top/pcdsBoot/ioc/README@vxWorks6
+
+######################################################################
+# End of PCDS additions
+######################################################################
 
 SCRIPTS_HOST += makeBaseApp.pl
 

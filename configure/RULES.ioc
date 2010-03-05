@@ -16,12 +16,12 @@ install: buildInstall
 ifneq ($(findstring $(ARCH),$(BUILD_ARCHS)),)
 buildInstall: $(TARGETS)
 
-clean:
+clean::
 	$(RM) cdCommands envPaths
 
 else 
 buildInstall:
-clean:
+clean::
 endif
 
 envPaths cdCommands: $(wildcard $(TOP)/configure/RELEASE*) \

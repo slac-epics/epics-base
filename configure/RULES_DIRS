@@ -12,7 +12,12 @@
 
 
 ARCHS += $(BUILD_ARCHS)
-ACTIONS += inc build install buildInstall clean realclean archclean runtests
+# Jason Tiller, 7-13-09:
+#    Removed 'clean' from this variable because it generates a
+#    single-colon 'clean:' rule, which conflicts the other
+#    double-colon 'clean::' rules that we use.
+# ACTIONS += inc build install buildInstall clean realclean archclean runtests
+ACTIONS += inc build install buildInstall realclean archclean runtests
 
 dirPart = $(word 1, $(subst $(DIVIDER), ,$@))
 actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$@)), \
