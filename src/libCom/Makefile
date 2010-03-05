@@ -168,6 +168,7 @@ INC += osdThread.h
 INC += epicsThread.h
 INC += epicsTime.h
 INC += osdTime.h
+INC += iocClock.h
 INC += epicsSignal.h
 INC += osiProcess.h
 INC += osiUnistd.h
@@ -236,7 +237,6 @@ INC += tsDefs.h
 SRCS += tsDefs.c
 
 # For vxWorks a clock
-INC_vxWorks += iocClock.h
 SRCS_vxWorks += iocClock.c
 #For vxWorks special reboot hook
 SRCS_vxWorks += atReboot.cpp

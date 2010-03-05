@@ -19,16 +19,42 @@
 #include <string.h>
 
 #include "osiSock.h"
+#include "iocClock.h"
 #include "cantProceed.h"
 
 #define epicsExportSharedSymbols
 #include "epicsTime.h"
 
+typedef struct iocClockPvt {
+    pepicsTimeGetCurrent getCurrent;
+    pepicsTimeGetEvent getEvent;
+}iocClockPvt;
+static iocClockPvt *piocClockPvt = 0;
+
+extern "C" epicsShareFunc void iocClockInit()
+{
+    if(piocClockPvt) return;
+    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockInit");
+    piocClockPvt->getCurrent = systemTimeGetCurrent;
+    piocClockPvt->getEvent = systemTimeGetEvent;
+    return;
+}
+
+extern "C" epicsShareFunc void iocClockRegister(pepicsTimeGetCurrent getCurrent, pepicsTimeGetEvent getEvent)
+{
+    if(piocClockPvt) {
+        printf("iocClockRegister: iocClock already initialized\n");
+        return;
+    }
+    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockRegister");
+    piocClockPvt->getCurrent = getCurrent;
+    piocClockPvt->getEvent = getEvent;
+}
 
 //
 // epicsTime::osdGetCurrent ()
 //
-extern "C" epicsShareFunc int epicsShareAPI epicsTimeGetCurrent (epicsTimeStamp *pDest)
+extern "C" epicsShareFunc int epicsShareAPI systemTimeGetCurrent (epicsTimeStamp *pDest)
 {
 #   ifdef CLOCK_REALTIME
         struct timespec ts;
@@ -58,12 +84,31 @@ extern "C" epicsShareFunc int epicsShareAPI epicsTimeGetCurrent (epicsTimeStamp 
 //
 // epicsTimeGetEvent ()
 //
-extern "C" epicsShareFunc int epicsShareAPI epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
+extern "C" epicsShareFunc int epicsShareAPI systemTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
 {
     if (eventNumber==epicsTimeEventCurrentTime) {
-        return epicsTimeGetCurrent (pDest);
+        return systemTimeGetCurrent (pDest);
     }
     return epicsTimeERROR;
+}
+
+extern "C" epicsShareFunc int epicsTimeGetCurrent (epicsTimeStamp *pDest)
+{
+    if(!piocClockPvt) {
+        iocClockInit();
+    }
+    if(piocClockPvt->getCurrent) return((*piocClockPvt->getCurrent)(pDest));
+    return(epicsTimeERROR);
+}
+
+extern "C" epicsShareFunc int epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
+{
+    if(!piocClockPvt) {
+        iocClockInit();
+    }
+    if(piocClockPvt->getEvent)
+        return((*piocClockPvt->getEvent)(pDest,eventNumber));
+    return(epicsTimeERROR);
 }
 
 int epicsTime_gmtime ( const time_t *pAnsiTime, // X aCC 361

@@ -71,8 +71,8 @@ void iocClockInit()
 {
     if(piocClockPvt) return;
     piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockInit");
-    piocClockPvt->getCurrent = rtemsIocClockGetCurrent;
-    piocClockPvt->getEvent = rtemsIocClockGetEvent;
+    piocClockPvt->getCurrent = systemTimeGetCurrent;
+    piocClockPvt->getEvent = systemTimeGetEvent;
     return;
 }
 
@@ -138,7 +138,7 @@ int epicsTimeGetRTEMSSysclk (struct ntptimeval *pDest)
  * ntp_gettime is a weak alias for epicsTimeGetRTEMSSysclk which
  * will be used if the linker (or CEXP) doesn't find ntp_gettime
  */
-int rtemsIocClockGetCurrent (epicsTimeStamp *pDest)
+int systemTimeGetCurrent (epicsTimeStamp *pDest)
 {
 struct ntptimeval ntv;
 
@@ -153,7 +153,7 @@ struct ntptimeval ntv;
 /*
  * rtemsIocClockTimeGetEvent ()
  */
-int rtemsIocClockGetEvent (epicsTimeStamp *pDest, int eventNumber)
+int systemTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
 {
     if (eventNumber==epicsTimeEventCurrentTime) {
         return epicsTimeGetCurrent (pDest);
