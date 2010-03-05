@@ -61,8 +61,8 @@ install: $(INSTALL_FILES)
 buildInstall: $(INSTALL_FILES)
 
 $(INSTALL_FILES): $(COPY_FILES)
-	@echo "RULES.copy: Installing $< -> $(@D)"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	@echo "RULES.copy: Installing $(@F) -> $(@D)"
+	@$(INSTALL) -d -m 644 $(@F) $(@D)
 
 clean::
 	@echo RULES.copy: Cleaning $(INSTALL_DIR)
@@ -88,8 +88,8 @@ install: $(INSTALL_FILES)
 buildInstall: $(INSTALL_FILES)
 
 $(INSTALL_FILES): $(COPY_FILES)
-	@echo "RULES.copy: Installing $< -> $(@D)"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	@echo "RULES.copy: Installing $(@F) -> $(@D)"
+	@$(INSTALL) -d -m 644 $(@F) $(@D)
 
 clean::
 	@echo RULES.copy: Cleaning $(INSTALL_DIR)
