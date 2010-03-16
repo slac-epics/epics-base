@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *  online_notify.c,v 1.57.2.12 2006/11/18 00:29:04 jhill Exp
+ *  online_notify.c,v 1.57.2.15 2008/09/19 23:27:52 jhill Exp
  *
  *  tell CA clients this a server has joined the network
  *
@@ -68,7 +68,7 @@ void rsrv_online_notify_task(void *pParm)
     caHdr                       msg;
     int                         status;
     SOCKET                      sock;
-    int                         true = TRUE;
+    int                         intTrue = TRUE;
     unsigned short              port;
     ca_uint32_t                 beaconCounter = 0;
     char                        * pStr;
@@ -109,7 +109,7 @@ void rsrv_online_notify_task(void *pParm)
     }
     
     status = setsockopt (sock, SOL_SOCKET, SO_BROADCAST, 
-                (char *)&true, sizeof(true));
+                (char *)&intTrue, sizeof(intTrue));
     if (status<0) {
         errlogPrintf ("CAS: online socket set up error\n");
         epicsThreadSuspendSelf ();
@@ -205,7 +205,7 @@ void rsrv_online_notify_task(void *pParm)
          * add in the configured addresses
          */
         addAddrToChannelAccessAddressList (
-            &autoAddrList, pParam, port);
+            &autoAddrList, pParam, port,  pParam == &EPICS_CA_ADDR_LIST );
     }
  
     removeDuplicateAddresses ( &beaconAddrList, &autoAddrList, 0 );
@@ -223,18 +223,24 @@ void rsrv_online_notify_task(void *pParm)
         priorityOfUDP = priorityOfSelf;
     }
 
+    casudp_startStopEvent = epicsEventMustCreate(epicsEventEmpty);
+    casudp_ctl = ctlPause;
+
     tid = epicsThreadCreate ( "CAS-UDP", priorityOfUDP,
         epicsThreadGetStackSize (epicsThreadStackMedium),
         cast_server, 0 );
     if ( tid == 0 ) {
         epicsPrintf ( "CAS: unable to start UDP daemon thread\n" );
     }
-    
-    while (TRUE) {  
+
+    epicsEventMustWait(casudp_startStopEvent);
+    epicsEventSignal(beacon_startStopEvent);
+
+    while (TRUE) {
         pNode = (osiSockAddrNode *) ellFirst (&beaconAddrList);
         while (pNode) {
             char buf[64];
- 
+
             status = connect (sock, &pNode->addr.sa, 
                 sizeof(pNode->addr.sa));
             if (status<0) {
@@ -285,6 +291,11 @@ void rsrv_online_notify_task(void *pParm)
         }
 
         beaconCounter++; /* expected to overflow */
+
+        while (beacon_ctl == ctlPause) {
+            epicsThreadSleep(0.1);
+            delay = 0.02; /* Restart beacon timing if paused */
+        }
     }
 }
 

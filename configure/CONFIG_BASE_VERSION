@@ -1,5 +1,5 @@
 #*************************************************************************
-# Copyright (c) 2006 UChicago Argonne LLC, as Operator of Argonne
+# Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  CONFIG_BASE_VERSION,v 1.10.2.19 2007/02/05 16:31:45 jba Exp
+#  CONFIG_BASE_VERSION,v 1.10.2.32 2009/08/28 18:47:36 jba Exp
 #
 #  EPICS Version information
 #
@@ -19,17 +19,27 @@
 
 BASE_3_14=YES
 
+# EPICS_VERSION must be a number >0 and <256 
 EPICS_VERSION = 3
+
+# EPICS_REVISION must be a number >=0 and <256 
 EPICS_REVISION = 14
 
-# This part may contain letters, eg 0beta1
-EPICS_MODIFICATION = 9
+# EPICS_MODIFICATION must be a number >=0 and <256 
+EPICS_MODIFICATION = 11
 
+# EPICS_PATCH_LEVEL must be a number  (win32 resource file requirement)
 # Not included if zero
 EPICS_PATCH_LEVEL = 0
 
-# This will be -CVS or empty at an official release point
+# This will end in -CVS between official releases
 #EPICS_CVS_SNAPSHOT=-CVS
+#EPICS_CVS_SNAPSHOT=-pre1
+#EPICS_CVS_SNAPSHOT=-pre1-CVS
+#EPICS_CVS_SNAPSHOT=-RC1
+#EPICS_CVS_SNAPSHOT=-RC1-CVS
+#EPICS_CVS_SNAPSHOT=-RC2
+#EPICS_CVS_SNAPSHOT=-RC2-CVS
 EPICS_CVS_SNAPSHOT=
 
 # No changes should be needed below here
@@ -46,5 +56,5 @@ EPICS_SHORT_VERSION=$(EPICS_VERSION).$(EPICS_REVISION).$(EPICS_MODIFICATION)$(EP
 EPICS_VERSION_NUMBER=$(EPICS_SHORT_VERSION)$(EPICS_CVS_SNAPSHOT)$(EPICS_SITE_VSTRING)
 EPICS_VERSION_STRING="EPICS Version $(EPICS_VERSION_NUMBER)"
 
-CVS_DATE="\$2007/02/05 16:31:45$"
-CVS_TAG="\$R3-14-9$"
+CVS_DATE="\$2009/08/28 18:47:36$"
+CVS_TAG="\$R3-14-11$"

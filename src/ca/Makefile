@@ -74,7 +74,7 @@ LIBSRCS_vxWorks += templateInstances.cpp
 
 LIBRARY=ca
 
-ca_RCS_WIN32 = ca.rc
+ca_RCS = ca.rc
 
 # For R3.13 compatibility only
 ifeq ($(strip $(COMPAT_313)),YES)
@@ -92,8 +92,7 @@ PROD_LIBS = ca Com
 PROD_SYS_LIBS_WIN32 = ws2_32 advapi32 user32
 
 PROD_HOST += caRepeater catime acctst caConnTest casw caEventRate
-OBJS_IOC_vxWorks += 
-OBJS_IOC += catime acctst caConnTest casw caEventRate
+OBJS_IOC_vxWorks += catime acctst caConnTest casw caEventRate
 caRepeater_SRCS = caRepeater.cpp
 catime_SRCS = catimeMain.c catime.c 
 acctst_SRCS = acctstMain.c acctst.c 

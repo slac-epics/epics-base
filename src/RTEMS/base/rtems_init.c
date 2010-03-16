@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS startup task for EPICS
- *  rtems_init.c,v 1.15.2.32 2007/01/08 15:11:31 norume Exp
+ *  rtems_init.c,v 1.15.2.43 2008/10/11 16:40:45 norume Exp
  *      Author: W. Eric Norum
  *              eric.norum@usask.ca
  *              (306) 966-5394
@@ -17,29 +17,39 @@
 #include <ctype.h>
 #include <time.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/termios.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <rtems.h>
-#include <rtems/libcsupport.h>
+#include <rtems/malloc.h>
 #include <rtems/error.h>
 #include <rtems/stackchk.h>
 #include <rtems/rtems_bsdnet.h>
 #include <rtems/imfs.h>
+#include <librtemsNfs.h>
 #include <bsp.h>
 
-#include <epicsThread.h>
-#include <epicsTime.h>
-#include <epicsExit.h>
-#include <envDefs.h>
-#include <errlog.h>
-#include <logClient.h>
-#include <osiUnistd.h>
-#include <iocsh.h>
+#include "epicsThread.h"
+#include "epicsTime.h"
+#include "epicsExit.h"
+#include "envDefs.h"
+#include "errlog.h"
+#include "logClient.h"
+#include "osiUnistd.h"
+#include "iocsh.h"
+#include "osdTime.h"
 
 #include "epicsRtemsInitHooks.h"
+
+/*
+ * Prototypes for some functions not in header files
+ */
+void tzset(void);
+int fileno(FILE *);
+int main(int argc, char **argv);
 
 static void
 logReset (void)
@@ -68,10 +78,9 @@ logReset (void)
 static void
 delayedPanic (const char *msg)
 {
-    rtems_interval ticksPerSecond;
+    extern rtems_interval rtemsTicksPerSecond;
 
-    rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &ticksPerSecond);
-    rtems_task_wake_after (ticksPerSecond);
+    rtems_task_wake_after (rtemsTicksPerSecond);
     rtems_panic (msg);
 }
 
@@ -129,7 +138,7 @@ mustMalloc(int size, const char *msg)
 #endif
 
 static int
-initialize_local_filesystem(const char **argv)
+initialize_local_filesystem(char **argv)
 {
     extern char _DownloadLocation[] __attribute__((weak));
     extern char _FlashBase[] __attribute__((weak));
@@ -161,7 +170,7 @@ initialize_local_filesystem(const char **argv)
 }
 
 static void
-initialize_remote_filesystem(const char **argv, int hasLocalFilesystem)
+initialize_remote_filesystem(char **argv, int hasLocalFilesystem)
 {
 #ifdef OMIT_NFS_SUPPORT
     printf ("***** Initializing TFTP *****\n");
@@ -310,25 +319,18 @@ static void netStatCallFunc(const iocshArgBuf *args)
     rtems_netstat(args[0].ival);
 }
 
-static const iocshFuncDef stackCheckFuncDef = {"stackCheck",0,NULL};
-static void stackCheckCallFunc(const iocshArgBuf *args)
-{
-    Stack_check_Dump_usage();
-}
-
 static const iocshFuncDef heapSpaceFuncDef = {"heapSpace",0,NULL};
 static void heapSpaceCallFunc(const iocshArgBuf *args)
 {
-    unsigned long n = malloc_free_space();
+    rtems_malloc_statistics_t s;
+    double x;
 
-    if (n >= 1024*1024) {
-        double x = (double)n / (1024 * 1024);
-        printf("Heap space: %.1f MB\n", x);
-    }
-    else {
-        double x = (double)n / 1024;
-        printf("Heap space: %.1f kB\n", x);
-    }
+    malloc_get_statistics(&s);
+    x = s.space_available - (unsigned long)(s.lifetime_allocated - s.lifetime_freed);
+    if (x >= 1024*1024)
+        printf("Heap space: %.1f MB\n", x / (1024 * 1024));
+    else
+        printf("Heap space: %.1f kB\n", x / 1024);
 }
 
 #ifndef OMIT_NFS_SUPPORT
@@ -360,7 +362,6 @@ static void nfsMountCallFunc(const iocshArgBuf *args)
 static void iocshRegisterRTEMS (void)
 {
     iocshRegister(&netStatFuncDef, netStatCallFunc);
-    iocshRegister(&stackCheckFuncDef, stackCheckCallFunc);
     iocshRegister(&heapSpaceFuncDef, heapSpaceCallFunc);
 #ifndef OMIT_NFS_SUPPORT
     iocshRegister(&nfsMountFuncDef, nfsMountCallFunc);
@@ -413,16 +414,11 @@ rtems_task
 Init (rtems_task_argument ignored)
 {
     int                 i;
-    const char         *argv[3]         = { NULL, NULL, NULL };
-    rtems_interval      ticksPerSecond;
+    char               *argv[3]         = { NULL, NULL, NULL };
+    char               *cp;
     rtems_task_priority newpri;
     rtems_status_code   sc;
     rtems_time_of_day   now;
-
-    /*
-     * Get configuration
-     */
-    rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &ticksPerSecond);
 
     /*
      * Explain why we're here
@@ -459,6 +455,8 @@ Init (rtems_task_argument ignored)
     /*
      * Start network
      */
+    if ((cp = getenv("EPICS_TS_NTP_INET")) != NULL)
+        rtems_bsdnet_config.ntp_server[0] = cp;
     if (rtems_bsdnet_config.network_task_priority == 0)
     {
         unsigned int p;
@@ -485,31 +483,20 @@ Init (rtems_task_argument ignored)
     }
 
     /*
-     * Use BSP-supplied time of day if available
+     * Use BSP-supplied time of day if available otherwise supply default time.
+     * It is very likely that other time synchronization facilities in EPICS
+     * will soon override this value.
      */
     if (rtems_clock_get(RTEMS_CLOCK_GET_TOD,&now) != RTEMS_SUCCESSFUL) {
-        for (i = 0 ; ; i++) {
-            printf ("***** Initializing NTP *****\n");
-            if (rtems_bsdnet_synchronize_ntp (0, 0) >= 0)
-                break;
-            rtems_task_wake_after (5*ticksPerSecond);
-            if (i >= 12) {
-                printf ("    *************** WARNING ***************\n");
-                printf ("    ***** NO RESPONSE FROM NTP SERVER *****\n");
-                printf ("    *****  TIME SET TO DEFAULT VALUE  *****\n");
-                printf ("    ***************************************\n");
-                now.year = 2001;
-                now.month = 1;
-                now.day = 1;
-                now.hour = 0;
-                now.minute = 0;
-                now.second = 0;
-                now.ticks = 0;
-                if ((sc = rtems_clock_set (&now)) != RTEMS_SUCCESSFUL)
-                    printf ("***** Can't set time: %s\n", rtems_status_text (sc));
-                break;
-            }
-        }
+        now.year = 2001;
+        now.month = 1;
+        now.day = 1;
+        now.hour = 0;
+        now.minute = 0;
+        now.second = 0;
+        now.ticks = 0;
+        if ((sc = rtems_clock_set (&now)) != RTEMS_SUCCESSFUL)
+            printf ("***** Can't set time: %s\n", rtems_status_text (sc));
     }
     if (getenv("TZ") == NULL) {
         const char *tzp = envGetConfigParamPtr(&EPICS_TIMEZONE);
@@ -533,6 +520,7 @@ Init (rtems_task_argument ignored)
         }
     }
     tzset();
+    osdTimeRegister();
 
     /*
      * Run the EPICS startup script

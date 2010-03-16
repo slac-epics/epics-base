@@ -7,12 +7,10 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# RULES_ARCHS,v 1.23.2.6 2006/11/20 16:25:01 anj Exp
+# RULES_ARCHS,v 1.23.2.16 2009/06/24 19:33:57 anj Exp
 #
 
 all: install
-
-build install buildInstall: $(CHECK_RELEASE_$(CHECK_RELEASE))
 
 rebuild: clean install
 
@@ -22,6 +20,7 @@ ACTIONS += install
 ACTIONS += buildInstall
 ACTIONS += browse
 ACTIONS += runtests
+#ACTIONS += rebuild
 
 actionPart = $(word 1, $(subst $(DIVIDER), ,$@))
 archPart = $(word 2, $(subst $(DIVIDER), ,$@))
@@ -32,6 +31,29 @@ actionArchTargets = $(foreach x, $(ACTIONS),\
 cleanArchTargets = $(foreach arch,$(BUILD_ARCHS), clean$(DIVIDER)$(arch))
 
 buildDirs = $(addprefix O.,$(BUILD_ARCHS))
+
+#*************************************************************************
+# Create epics_host_arch dependancies for GNU make -j option
+# Only works with GNU make 3.81 or later (uses eval function)
+# Needed in dirs where EPICS_HOST_ARCH build creates a tool used in 
+# cross arch builds
+
+CROSS_ARCHS += $(CROSS1) $(CROSS2)
+
+# j is NOT found in MAKEFLAGS when using make 3.81
+# Hope to uncomment this for GNU make 3.82
+#ifeq ($(findstring j,$(MAKEFLAGS)),j)
+
+define DEP_template
+$(2): $$(EPICS_HOST_ARCH)
+$(1)$$(DIVIDER)$(2): $(1)$$(DIVIDER)$$(EPICS_HOST_ARCH)
+endef
+
+$(foreach action, $(ACTIONS), $(foreach arch,\
+      $(CROSS_ARCHS),$(eval $(call DEP_template,$(action),$(arch)))))
+
+#endif
+#*************************************************************************
 
 $(actionArchTargets) : $(buildDirs) O.Common
 	$(MAKE) -C O.$(archPart) -f ../Makefile TOP=$(TOP)/.. T_A=$(archPart) $(actionPart)
@@ -46,26 +68,6 @@ $(buildDirs):
 
 O.Common:
 	$(MKDIR) O.Common
-
-#
-# RELEASE consistency checking
-
-# The RELEASE.$(EPICS_HOST_ARCH) files don't need to be included here:
-targetReleaseFiles = $(wildcard $(foreach arch, $(BUILD_ARCHS), \
-		$(TOP)/configure/RELEASE.Common.$(arch) \
-		$(TOP)/configure/RELEASE.$(EPICS_HOST_ARCH).$(arch)))
-
-checkReleaseTargets = $(addprefix checkRelease, $(suffix $(targetReleaseFiles)))
-checkRelease: $(checkReleaseTargets)
-	$(PERL) $(TOOLS)/convertRelease.pl -h $(EPICS_HOST_ARCH) checkRelease
-$(checkReleaseTargets):checkRelease.%:
-	$(PERL) $(TOOLS)/convertRelease.pl -h $(EPICS_HOST_ARCH) -a $* checkRelease
-
-warnReleaseTargets = $(addprefix warnRelease, $(suffix $(targetReleaseFiles)))
-warnRelease: $(warnReleaseTargets)
-	-$(PERL) $(TOOLS)/convertRelease.pl -h $(EPICS_HOST_ARCH) checkRelease
-$(warnReleaseTargets):warnRelease.%:
-	-$(PERL) $(TOOLS)/convertRelease.pl -h $(EPICS_HOST_ARCH) -a $* checkRelease
 
 #
 # special clean rule
@@ -86,4 +88,3 @@ realclean ::
 .PHONY : $(cleanArchTargets)
 .PHONY : $(BUILD_ARCHS)
 .PHONY : $(ACTIONS) clean realclean archclean all
-.PHONY : checkRelease $(checkReleaseTargets)

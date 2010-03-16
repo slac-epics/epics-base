@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdThread.c
- *      osdThread.c,v 1.45.2.14 2006/12/07 00:49:00 jhill Exp
+ *      osdThread.c,v 1.45.2.26 2009/07/23 21:04:27 norume Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055
@@ -35,6 +35,7 @@
 #include "epicsString.h"
 #include "epicsThread.h"
 #include "cantProceed.h"
+#include "osiUnistd.h"
 #include "osdInterrupt.h"
 #include "epicsExit.h"
 
@@ -58,7 +59,7 @@ static struct taskVar *taskVarHead;
 /*
  * Support for `once-only' execution
  */
-static int initialized;
+static int initialized = 0;
 static epicsMutexId onceMutex;
 
 /*
@@ -122,16 +123,14 @@ epicsShareFunc epicsThreadBooleanStatus epicsShareAPI epicsThreadHighestPriority
     return epicsThreadBooleanStatusFail;
 }
 
-#define ARCH_STACK_FACTOR 2
-
 unsigned int
 epicsThreadGetStackSize (epicsThreadStackSizeClass size)
 {
-    unsigned int stackSize = 11000*ARCH_STACK_FACTOR;
+    unsigned int stackSize = 11000;
     switch(size) {
-    case epicsThreadStackSmall:  stackSize = 4000*ARCH_STACK_FACTOR; break;
-    case epicsThreadStackMedium: stackSize = 6000*ARCH_STACK_FACTOR; break;
-    case epicsThreadStackBig:                                        break;
+    case epicsThreadStackSmall:  stackSize = 5000; break;
+    case epicsThreadStackMedium: stackSize = 8000; break;
+    case epicsThreadStackBig:                      break;
     default:
         errlogPrintf("epicsThreadGetStackSize illegal argument");
         break;
@@ -192,7 +191,7 @@ static void
 setThreadInfo (rtems_id tid, const char *name, EPICSTHREADFUNC funptr,void *parm)
 {
     struct taskVar *v;
-    rtems_unsigned32 note;
+    uint32_t note;
     rtems_status_code sc;
 
     v = mallocMustSucceed (sizeof *v, "epicsThreadCreate_vars");
@@ -202,7 +201,7 @@ setThreadInfo (rtems_id tid, const char *name, EPICSTHREADFUNC funptr,void *parm
     v->parm = parm;
     v->threadVariableCapacity = 0;
     v->threadVariables = NULL;
-    note = (rtems_unsigned32)v;
+    note = (uint32_t)v;
     rtems_task_set_note (tid, RTEMS_NOTEPAD_TASKVAR, note);
     taskVarLock ();
     v->forw = taskVarHead;
@@ -230,9 +229,7 @@ epicsThreadInit (void)
     if (!initialized) {
         rtems_id tid;
         rtems_task_priority old;
-        extern void clockInit (void);
 
-        clockInit ();
         rtems_task_set_priority (RTEMS_SELF, epicsThreadGetOssPriorityValue(99), &old);
         onceMutex = epicsMutexMustCreate();
         taskVarMutex = epicsMutexMustCreate ();
@@ -367,13 +364,14 @@ epicsThreadSleep (double seconds)
 {
     rtems_status_code sc;
     rtems_interval delay;
-    extern double rtemsTicksPerSecond_double;
+    extern double rtemsTicksPerTwoSeconds_double;
     
     if (seconds <= 0.0) {
         delay = 0;
     }
     else {
-        delay = seconds * rtemsTicksPerSecond_double;
+        delay = seconds * rtemsTicksPerTwoSeconds_double;
+        delay = (delay + 1) / 2;
         if (delay == 0)
             delay++;
     }
@@ -393,7 +391,7 @@ epicsThreadGetIdSelf (void)
 
 const char *epicsThreadGetNameSelf(void)
 {
-    rtems_unsigned32 note;
+    uint32_t note;
     struct taskVar *v;
 
     rtems_task_get_note (RTEMS_SELF, RTEMS_NOTEPAD_TASKVAR, &note);
@@ -419,6 +417,10 @@ void epicsThreadGetName (epicsThreadId id, char *name, size_t size)
     }
     taskVarUnlock ();
     if (!haveName) {
+#if (__RTEMS_MAJOR__>4 || (__RTEMS_MAJOR__==4 && __RTEMS_MINOR__>8) || (__RTEMS_MAJOR__==4 && __RTEMS_MINOR__==8 && __RTEMS_REVISION__>=99))
+        if (_Objects_Get_name_as_string((rtems_id)id, size, name) != NULL)
+            haveName = 1;
+#else
         /*
          * Try to get the RTEMS task name
          */
@@ -441,6 +443,7 @@ void epicsThreadGetName (epicsThreadId id, char *name, size_t size)
             }
             _Thread_Enable_dispatch();
         }
+#endif
     }
     if (!haveName)
         snprintf(name, size, "0x%lx", (long)tid);
@@ -475,9 +478,11 @@ void epicsThreadOnceOsd(epicsThreadOnceId *id, void(*func)(void *), void *arg)
     if (!initialized) epicsThreadInit();
     epicsMutexMustLock(onceMutex);
     if (*id == 0) {
-            *id = -1;
-            func(arg);
-            *id = 1;
+        *id = -1;
+        epicsMutexUnlock(onceMutex);
+        func(arg);
+        epicsMutexMustLock(onceMutex);
+        *id = 1;
     } else
         assert(*id > 0 /* func() called epicsThreadOnce() with same id */);
     epicsMutexUnlock(onceMutex);
@@ -507,7 +512,7 @@ void epicsThreadPrivateDelete (epicsThreadPrivateId id)
 void epicsThreadPrivateSet (epicsThreadPrivateId id, void *pvt)
 {
     unsigned int varIndex = (unsigned int)id;
-    rtems_unsigned32 note;
+    uint32_t note;
     struct taskVar *v;
     int i;
 
@@ -527,7 +532,7 @@ void epicsThreadPrivateSet (epicsThreadPrivateId id, void *pvt)
 void * epicsThreadPrivateGet (epicsThreadPrivateId id)
 {
     unsigned int varIndex = (unsigned int)id;
-    rtems_unsigned32 note;
+    uint32_t note;
     struct taskVar *v;
 
     rtems_task_get_note (RTEMS_SELF, RTEMS_NOTEPAD_TASKVAR, &note);
@@ -608,15 +613,15 @@ showInternalTaskInfo (rtems_id tid)
     else
         fprintf(epicsGetStdout()," %4d", epicsPri);
     if (thread.current_priority == thread.real_priority)
-        fprintf(epicsGetStdout(),"%4d    ", thread.current_priority);
+        fprintf(epicsGetStdout(),"%4d    ", (int)thread.current_priority);
     else
-        fprintf(epicsGetStdout(),"%4d/%-3d", thread.real_priority, thread.current_priority);
+        fprintf(epicsGetStdout(),"%4d/%-3d", (int)thread.real_priority, (int)thread.current_priority);
     showBitmap (bitbuf, thread.current_state, taskState);
     fprintf(epicsGetStdout(),"%8.8s", bitbuf);
     if (thread.current_state & (STATES_WAITING_FOR_SEMAPHORE |
                                 STATES_WAITING_FOR_MUTEX |
                                 STATES_WAITING_FOR_MESSAGE))
-        fprintf(epicsGetStdout()," %8.8x", thread.Wait.id);
+        fprintf(epicsGetStdout()," %8.8x", (int)thread.Wait.id);
     else
         fprintf(epicsGetStdout()," %8.8s", "");
 #endif
@@ -633,7 +638,7 @@ epicsThreadShowHeader (void)
 static void
 epicsThreadShowInfo (struct taskVar *v, unsigned int level)
 {
-        fprintf(epicsGetStdout(),"%9.8x", v->id);
+        fprintf(epicsGetStdout(),"%9.8x", (int)v->id);
         showInternalTaskInfo (v->id);
         fprintf(epicsGetStdout()," %s\n", v->name);
 }

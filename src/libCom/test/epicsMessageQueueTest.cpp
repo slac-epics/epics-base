@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- *      epicsMessageQueueTest.cpp,v 1.7.2.6 2006/11/09 22:38:38 anj Exp
+ *      epicsMessageQueueTest.cpp,v 1.7.2.7 2008/10/03 19:28:34 anj Exp
  *
  *      Author  W. Eric Norum
  *              norume@aps.anl.gov
@@ -27,7 +27,8 @@
 #include "testMain.h"
 
 static const char *msg1 = "1234567890This is a very long message.";
-static int testExit = 0;
+static volatile int testExit = 0;
+static epicsEventId finished;
 
 /*
  * In Numerical Recipes in C: The Art of Scientific Computing (William  H.
@@ -105,6 +106,7 @@ receiver(void *arg)
             testDiag("Sender %d -- %d messages", sender, expectmsg[sender-1]-1);
     }
     testOk1(errors == 0);
+    epicsEventSignal(finished);
 }
 
 extern "C" void
@@ -125,7 +127,6 @@ sender(void *arg)
 
 extern "C" void messageQueueTest(void *parm)
 {
-    epicsEventId *pfinished = (epicsEventId *) parm;
     unsigned int i;
     char cbuf[80];
     int len;
@@ -278,19 +279,17 @@ extern "C" void messageQueueTest(void *parm)
     epicsThreadSleep(300.0);
 
     testExit = 1;
-    epicsThreadSleep(1.0);
-    epicsEventSignal(*pfinished);
 }
 
 MAIN(epicsMessageQueueTest)
 {
     testPlan(58);
 
-    epicsEventId finished = epicsEventMustCreate(epicsEventEmpty);
+    finished = epicsEventMustCreate(epicsEventEmpty);
 
     epicsThreadCreate("messageQueueTest", epicsThreadPriorityMedium,
         epicsThreadGetStackSize(epicsThreadStackMedium),
-        messageQueueTest, (void *) &finished);
+        messageQueueTest, NULL);
 
     epicsEventWait(finished);
 

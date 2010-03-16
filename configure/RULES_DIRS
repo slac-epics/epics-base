@@ -7,16 +7,17 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  RULES_DIRS,v 1.14.2.2 2006/11/20 16:25:01 anj Exp
+#  RULES_DIRS,v 1.14.2.6 2009/04/24 08:59:42 lange Exp
 #
 
 
 ARCHS += $(BUILD_ARCHS)
 ACTIONS += inc build install buildInstall clean realclean archclean runtests
 
-dirPart = $(word 1, $(subst $(DIVIDER), ,$@))
-actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$@)), \
-    $(addprefix $(DIVIDER),$(word 3, $(subst $(DIVIDER), ,$@))))
+dirPart = $(join $(dir $@), $(word 1, $(subst $(DIVIDER), ,$(notdir $@))))
+
+actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$(notdir $@))), \
+ $(addprefix $(DIVIDER),$(word 3, $(subst $(DIVIDER), ,$(notdir $@))))) 
 
 dirActionArchTargets = $(foreach dir, $(DIRS), \
                        $(foreach action, $(ACTIONS),\
@@ -35,6 +36,30 @@ actionArchTargets = $(foreach action, $(ACTIONS),\
 all : install
 
 rebuild : clean install
+
+# Create directory dependancies lines for GNU make -j option
+# Only works with GNU make 3.81 or later (uses eval function)
+define DEP_template1
+$(1): $$($(1)_DEPEND_DIRS)
+endef
+$(foreach dir, $(DIRS),$(eval $(call DEP_template1,$(dir))))
+
+define DEP_template2
+$(1)$$(DIVIDER)$(2) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2),$$(ddir)))
+endef
+$(foreach action, $(ACTIONS), $(foreach dir, $(DIRS),$(eval $(call DEP_template2,$(dir),$(action)))))
+
+define DEP_template3
+$(1)$$(DIVIDER)$(2) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2),$$(ddir)))
+endef
+$(foreach arch, $(ARCHS), $(foreach dir, $(DIRS),$(eval $(call DEP_template3,$(dir),$(arch)))))
+
+define DEP_template4
+$(1)$$(DIVIDER)$(2)$$(DIVIDER)$(3) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2)$$(DIVIDER)$(3),$$(ddir)))
+endef
+$(foreach arch, $(ARCHS), $(foreach action, $(ACTIONS), $(foreach dir, $(DIRS), \
+              $(eval $(call DEP_template4,$(dir),$(action),$(arch))))))
+
 
 $(DIRS) $(dirActionTargets) $(dirArchTargets) $(dirActionArchTargets) :
 	$(MAKE) -C $(dirPart) $(actionArchPart)

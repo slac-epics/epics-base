@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* errSymLib.c,v 1.31 2002/08/29 16:45:16 jhill Exp
+/* errSymLib.c,v 1.31.2.4 2009/07/09 20:11:01 anj Exp
  * errSymLib.c
  *      Author:          Marty Kraimer
  *      Date:            6-1-90
@@ -35,6 +35,8 @@
 #include "dbDefs.h"
 #include "errMdef.h"
 #include "errSymTbl.h"
+#include "ellLib.h"
+#include "errlog.h"
 
 
 static unsigned short errhash(long errNum);
@@ -49,7 +51,7 @@ typedef struct errnumnode {
 #define NHASH 256
 
 
-static ELLLIST errnumlist;
+static ELLLIST errnumlist = ELLLIST_INIT;
 static ERRNUMNODE **hashtable;
 static int initialized = FALSE;
 extern ERRSYMTAB_ID errSymTbl;
@@ -62,10 +64,9 @@ extern ERRSYMTAB_ID errSymTbl;
  * ell nodes that have a common hash number.
  *
  ***************************************************************/
-int epicsShareAPI errSymBld()
+int epicsShareAPI errSymBld(void)
 {
     ERRSYMBOL      *errArray = errSymTbl->symbols;
-    ELLLIST        *perrnumlist = &errnumlist;
     ERRNUMNODE     *perrNumNode = NULL;
     ERRNUMNODE     *pNextNode = NULL;
     ERRNUMNODE    **phashnode = NULL;
@@ -79,16 +80,16 @@ int epicsShareAPI errSymBld()
     for (i = 0; i < errSymTbl->nsymbols; i++, errArray++) {
 	modnum = errArray->errNum >> 16;
 	if (modnum < 501) {
-	    printf("errSymBld: ERROR - Module number in errSymTbl < 501 was Module=%lx Name=%s\n",
+	    fprintf(stderr, "errSymBld: ERROR - Module number in errSymTbl < 501 was Module=%lx Name=%s\n",
 		errArray->errNum, errArray->name);
 	    continue;
 	}
 	if ((errSymbolAdd(errArray->errNum, errArray->name))  <0 ) {
-	    printf("errSymBld: ERROR - errSymbolAdd() failed \n");
+	    fprintf(stderr, "errSymBld: ERROR - errSymbolAdd() failed \n");
 	    continue;
 	}
     }
-    perrNumNode = (ERRNUMNODE *) ellFirst(perrnumlist);
+    perrNumNode = (ERRNUMNODE *) ellFirst(&errnumlist);
     while (perrNumNode) {
 	/* hash each perrNumNode->errNum */
 	hashInd = errhash(perrNumNode->errNum);
@@ -128,13 +129,12 @@ unsigned short errnum;
  ***************************************************************/
 int epicsShareAPI errSymbolAdd (long errNum,char *name)
 {
-    ELLLIST        *perrnumlist = &errnumlist;
     ERRNUMNODE     *pNew;
 
     pNew = (ERRNUMNODE*)callocMustSucceed(1,sizeof(ERRNUMNODE),"errSymbolAdd");
     pNew->errNum = errNum;
     pNew->message = name;
-    ellAdd(perrnumlist,(ELLNODE*)pNew);
+    ellAdd(&errnumlist,(ELLNODE*)pNew);
     return(0);
 }
 
@@ -194,15 +194,6 @@ static void errRawCopy ( long statusToDecode, char *pBuf, unsigned bufLength )
 }
 
 /****************************************************************
- * errSymFind - deprecated
- ***************************************************************/
-int epicsShareAPI errSymFind (long status, char * pBuf)
-{
-    errSymLookup ( status, pBuf, UINT_MAX );
-    return 0;
-}
-
-/****************************************************************
  * errSymLookup
  ***************************************************************/
 void epicsShareAPI errSymLookup (long status, char * pBuf, unsigned bufLength)
@@ -245,7 +236,7 @@ void epicsShareAPI errSymLookup (long status, char * pBuf, unsigned bufLength)
 /****************************************************************
  * errSymDump
  ***************************************************************/
-void epicsShareAPI errSymDump()
+void epicsShareAPI errSymDump(void)
 {
 ERRNUMNODE    **phashnode = NULL;
 ERRNUMNODE     *pNextNode;
@@ -296,8 +287,8 @@ void epicsShareAPI errSymTestPrint(long errNum)
     modnum = (unsigned short) (errNum >> 16);
     errnum = (unsigned short) (errNum & 0xffff);
     if (modnum < 501) {
-        printf("Usage:  errSymTestPrint(long errNum) \n");
-        printf("errSymTestPrint: module number < 501 \n");
+        fprintf(stderr, "Usage:  errSymTestPrint(long errNum) \n");
+        fprintf(stderr, "errSymTestPrint: module number < 501 \n");
         return;
     }
     errSymLookup(errNum, message, sizeof(message));

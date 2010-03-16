@@ -3,12 +3,11 @@
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      casPVI.cc,v 1.42.2.2 2006/12/07 20:29:37 jhill Exp
+ *      casPVI.cc,v 1.42.2.6 2009/08/03 22:09:51 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov
@@ -19,6 +18,7 @@
 #include "gddAppTable.h" // EPICS application type table
 #include "gddApps.h"
 #include "dbMapper.h" // EPICS application type table
+#include "errlog.h"
 
 #define epicsExportSharedSymbols
 #include "caServerDefs.h"
@@ -149,7 +149,7 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
     gdd * pTmp = new gddScalar ( gddAppType_enums );
     if ( pTmp == NULL ) {
         errMessage ( S_cas_noMemory, 
-            "unable to read application type \"enums\" string"
+            "unable to create gdd for read of application type \"enums\" string"
             " conversion table for enumerated PV" );
         return S_cas_noMemory;
     }
@@ -159,7 +159,7 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
     if ( status != S_cas_success ) {
         pTmp->unreference ();
         errMessage ( status, 
-            "unable to read application type \"enums\" string"
+            "unable to to config gdd for read of application type \"enums\" string"
             " conversion table for enumerated PV");
         return status;
     }
@@ -168,22 +168,16 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
     // read the enum string table
     //
     status = this->read ( ctxIn, *pTmp );
-	if ( status == S_casApp_asyncCompletion ) {
-        return status;
-    }
-    else if ( status == S_casApp_postponeAsyncIO ) {
-        pTmp->unreference ();
-        return status;
+    if ( status == S_cas_success ) {
+        updateEnumStringTableAsyncCompletion ( *pTmp );
 	}
-    else if ( status ) {
-        pTmp->unreference ();
+    else if ( status != S_casApp_asyncCompletion && 
+                status != S_casApp_postponeAsyncIO ) {
         errMessage ( status, 
             "- unable to read application type \"enums\" string"
             " conversion table for enumerated PV");
-        return status;
-	}
+    }
 
-    updateEnumStringTableAsyncCompletion ( *pTmp );
     pTmp->unreference ();
 
     return status;
@@ -381,10 +375,10 @@ void casPVI::clearOutstandingReads ( tsDLList < casAsyncIOI > & ioList )
 		++tmp;
         if ( iterIO->oneShotReadOP () ) {
             ioList.remove ( *iterIO );
+		    delete iterIO.pointer ();
             assert ( this->nIOAttached != 0 );
             this->nIOAttached--;
         }
-		delete iterIO.pointer ();
 		iterIO = tmp;
 	}
 }
@@ -462,6 +456,23 @@ caStatus casPVI::write ( const casCtx & ctx, const gdd & value )
             return status;
         }
         status = this->pPV->write ( ctx, value );
+        this->pPV->endTransaction ();
+        return status;
+    }
+    else {
+        return S_cas_disconnect;
+    }
+}
+
+caStatus casPVI::writeNotify ( const casCtx & ctx, const gdd & value )
+{
+    epicsGuard < epicsMutex > guard ( this->mutex );
+    if ( this->pPV ) {
+        caStatus status = this->pPV->beginTransaction ();
+        if ( status != S_casApp_success ) {
+            return status;
+        }
+        status = this->pPV->writeNotify ( ctx, value );
         this->pPV->endTransaction ();
         return status;
     }

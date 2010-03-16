@@ -1,19 +1,17 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* recState.c */
-/* base/src/rec  stateRecord.c,v 1.11 2003/04/01 21:02:01 mrk Exp */
+
+/* stateRecord.c,v 1.11.2.2 2009/04/02 21:40:38 lange Exp */
 
 /* recState.c - Record Support Routines for State records */
 /*
  *      Original Author: Bob Dalesio
- *      Current Author:  Marty Kraimer
  *      Date:            10-10-90 
  */
 
@@ -41,7 +39,7 @@
 #define report NULL
 #define initialize NULL
 #define init_record NULL
-static long process();
+static long process(stateRecord *);
 #define special NULL
 #define get_value NULL
 #define cvt_dbaddr NULL
@@ -78,32 +76,30 @@ rset stateRSET={
 };
 epicsExportAddress(rset,stateRSET);
 
-static void monitor();
+static void monitor(stateRecord *);
 
-static long process(pstate)
-	struct stateRecord	*pstate;
+static long process(stateRecord *prec)
 {
 
-	pstate->udf = FALSE;
-        pstate->pact=TRUE;
-	recGblGetTimeStamp(pstate);
-	monitor(pstate);
+	prec->udf = FALSE;
+        prec->pact=TRUE;
+	recGblGetTimeStamp(prec);
+	monitor(prec);
         /* process the forward scan link record */
-        recGblFwdLink(pstate);
-        pstate->pact=FALSE;
+        recGblFwdLink(prec);
+        prec->pact=FALSE;
 	return(0);
 }
 
-static void monitor(pstate)
-    struct stateRecord             *pstate;
+static void monitor(stateRecord *prec)
 {
     unsigned short  monitor_mask;
 
     /* get previous stat and sevr  and new stat and sevr*/
-    monitor_mask = recGblResetAlarms(pstate);
-    if(strncmp(pstate->oval,pstate->val,sizeof(pstate->val))) {
-        db_post_events(pstate,&(pstate->val[0]),monitor_mask|DBE_VALUE|DBE_LOG);
-	strncpy(pstate->oval,pstate->val,sizeof(pstate->val));
+    monitor_mask = recGblResetAlarms(prec);
+    if(strncmp(prec->oval,prec->val,sizeof(prec->val))) {
+        db_post_events(prec,&(prec->val[0]),monitor_mask|DBE_VALUE|DBE_LOG);
+	strncpy(prec->oval,prec->val,sizeof(prec->val));
     }
     return;
 }

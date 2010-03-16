@@ -50,10 +50,12 @@ void disconnectGovernorTimer::shutdown (
     epicsGuard < epicsMutex > & cbGuard,
     epicsGuard < epicsMutex > & guard )
 {
-    epicsGuardRelease < epicsMutex > unguard ( guard );
     {
-        epicsGuardRelease < epicsMutex > cbUnguard ( cbGuard );
-        this->timer.cancel ();
+        epicsGuardRelease < epicsMutex > unguard ( guard );
+        {
+            epicsGuardRelease < epicsMutex > cbUnguard ( cbGuard );
+            this->timer.cancel ();
+        }
     }
     while ( nciu * pChan = this->chanList.get () ) {
         pChan->channelNode::listMember = 
@@ -77,11 +79,14 @@ epicsTimerNotify::expireStatus disconnectGovernorTimer::expire (
 void disconnectGovernorTimer::show ( unsigned level ) const
 {
     epicsGuard < epicsMutex > guard ( this->mutex );
-    ::printf ( "disconnect governor timer:\n" );
-    tsDLIterConst < nciu > pChan = this->chanList.firstIter ();
-	while ( pChan.valid () ) {
-        pChan->show ( level - 1u );
-        pChan++;
+    ::printf ( "disconnect governor timer: with %u channels pending\n",
+        this->chanList.count () );
+    if ( level > 0u ) {
+        tsDLIterConst < nciu > pChan = this->chanList.firstIter ();
+	    while ( pChan.valid () ) {
+            pChan->show ( level - 1u );
+            pChan++;
+        }
     }
 }
 

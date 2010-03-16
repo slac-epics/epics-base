@@ -25,6 +25,7 @@
 
 #include <string.h>
 
+#include "dbDefs.h"
 #include "osiSock.h"
 #include "osiWireFormat.h"
 
@@ -1431,7 +1432,7 @@ int caNetConvert ( unsigned type, const void *pSrc, void *pDest,
             return ECA_BADTYPE;
         }        
         if ( pSrc != pDest ) {
-            memcpy ( pDest, pSrc, count );
+            memcpy ( pDest, pSrc, dbr_size_n ( type, count ) );
         }
 #   endif
     return ECA_NORMAL;

@@ -25,8 +25,8 @@ typedef enum {
 
 class epicsShareClass epicsMutex {
 public:
-    class mutexCreateFailed {}; /* exception */
-    class invalidMutex {}; /* exception */
+    class mutexCreateFailed; /* exception payload */
+    class invalidMutex; /* exception payload */
     epicsMutex ();
     ~epicsMutex ();
     void show ( unsigned level ) const;
@@ -72,7 +72,10 @@ epicsShareFunc void epicsShareAPI epicsMutexDestroy(epicsMutexId id);
 epicsShareFunc void epicsShareAPI epicsMutexUnlock(epicsMutexId id);
 epicsShareFunc epicsMutexLockStatus epicsShareAPI epicsMutexLock(
     epicsMutexId id);
-#define epicsMutexMustLock(ID) assert((epicsMutexLock((ID))==epicsMutexLockOK))
+#define epicsMutexMustLock(ID) {                        \
+    epicsMutexLockStatus status = epicsMutexLock(ID);   \
+    assert(status == epicsMutexLockOK);                 \
+}
 epicsShareFunc epicsMutexLockStatus epicsShareAPI epicsMutexTryLock(
     epicsMutexId id);
 epicsShareFunc void epicsShareAPI epicsMutexShow(

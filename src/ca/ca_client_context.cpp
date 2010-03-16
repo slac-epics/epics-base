@@ -97,7 +97,7 @@ ca_client_context::ca_client_context ( bool enablePreemptiveCallback ) :
     if ( this->sock == INVALID_SOCKET ) {
         char sockErrBuf[64];
         epicsSocketConvertErrnoToString ( sockErrBuf, sizeof ( sockErrBuf ) );
-        this->printf (
+        this->printFormated (
             "ca_client_context: unable to create "
             "datagram socket because = \"%s\"\n",
             sockErrBuf );
@@ -112,7 +112,7 @@ ca_client_context::ca_client_context ( bool enablePreemptiveCallback ) :
             char sockErrBuf[64];
             epicsSocketConvertErrnoToString ( sockErrBuf, sizeof ( sockErrBuf ) );
             epicsSocketDestroy ( this->sock );
-            this->printf (
+            this->printFormated (
                 "%s: non blocking IO set fail because \"%s\"\n",
                             __FILE__, sockErrBuf );
             throwWithLocation ( noSocket () );
@@ -132,7 +132,7 @@ ca_client_context::ca_client_context ( bool enablePreemptiveCallback ) :
             char sockErrBuf[64];
             epicsSocketConvertErrnoToString ( sockErrBuf, sizeof ( sockErrBuf ) );
             epicsSocketDestroy (this->sock);
-            this->printf (
+            this->printFormated (
                 "CAC: unable to bind to an unconstrained "
                 "address because = \"%s\"\n",
                 sockErrBuf );
@@ -148,12 +148,12 @@ ca_client_context::ca_client_context ( bool enablePreemptiveCallback ) :
             char sockErrBuf[64];
             epicsSocketConvertErrnoToString ( sockErrBuf, sizeof ( sockErrBuf ) );
             epicsSocketDestroy ( this->sock );
-            this->printf ( "CAC: getsockname () error was \"%s\"\n", sockErrBuf );
+            this->printFormated ( "CAC: getsockname () error was \"%s\"\n", sockErrBuf );
             throwWithLocation ( noSocket () );
         }
         if ( tmpAddr.sa.sa_family != AF_INET) {
             epicsSocketDestroy ( this->sock );
-            this->printf ( "CAC: UDP socket was not inet addr family\n" );
+            this->printFormated ( "CAC: UDP socket was not inet addr family\n" );
             throwWithLocation ( noSocket () );
         }
         this->localPort = htons ( tmpAddr.ia.sin_port );
@@ -253,10 +253,15 @@ void ca_client_context::registerForFileDescriptorCallBack (
     this->fdRegFunc = pFunc;
     this->fdRegArg = pArg;
     this->fdRegFuncNeedsToBeCalled = true;
+    if ( pFunc ) {
+        // the receive thread might already be blocking
+        // w/o having sent the wakeup message
+        this->_sendWakeupMsg ();
+    }
 // should block here until releated callback in progress completes
 }
 
-int ca_client_context::printf ( 
+int ca_client_context :: printFormated ( 
     const char *pformat, ... ) const
 {
     va_list theArgs;
@@ -264,14 +269,14 @@ int ca_client_context::printf (
 
     va_start ( theArgs, pformat );
     
-    status = this->ca_client_context::vPrintf ( pformat, theArgs );
+    status = this->ca_client_context :: varArgsPrintFormated ( pformat, theArgs );
     
     va_end ( theArgs );
     
     return status;
 }
 
-int ca_client_context::vPrintf ( 
+int ca_client_context :: varArgsPrintFormated ( 
     const char *pformat, va_list args ) const // X aCC 361
 {
     caPrintfFunc * pFunc;
@@ -283,7 +288,7 @@ int ca_client_context::vPrintf (
         return ( *pFunc ) ( pformat, args );
     }
     else {
-        return ::vfprintf ( stderr, pformat, args );
+        return :: vfprintf ( stderr, pformat, args );
     }
 }
 
@@ -359,8 +364,9 @@ void ca_client_context::signal ( int ca_status, const char * pfilenm,
     va_end ( theArgs );
 }
 
-void ca_client_context::vSignal ( int ca_status, const char *pfilenm, 
-                     int lineno, const char *pFormat, va_list args )
+void ca_client_context :: vSignal ( 
+    int ca_status, const char *pfilenm, 
+        int lineno, const char *pFormat, va_list args )
 {
     static const char *severity[] = 
     {
@@ -374,27 +380,27 @@ void ca_client_context::vSignal ( int ca_status, const char *pfilenm,
         "Fatal"
     };
     
-    this->printf ( "CA.Client.Exception...............................................\n" );
+    this->printFormated ( "CA.Client.Exception...............................................\n" );
     
-    this->printf ( "    %s: \"%s\"\n", 
+    this->printFormated ( "    %s: \"%s\"\n", 
         severity[ CA_EXTRACT_SEVERITY ( ca_status ) ], 
         ca_message ( ca_status ) );
 
     if  ( pFormat ) {
-        this->printf ( "    Context: \"" );
-        this->vPrintf ( pFormat, args );
-        this->printf ( "\"\n" );
+        this->printFormated ( "    Context: \"" );
+        this->varArgsPrintFormated ( pFormat, args );
+        this->printFormated ( "\"\n" );
     }
         
     if ( pfilenm ) {
-        this->printf ( "    Source File: %s line %d\n",
+        this->printFormated ( "    Source File: %s line %d\n",
             pfilenm, lineno );    
     } 
 
     epicsTime current = epicsTime::getCurrent ();
     char date[64];
     current.strftime ( date, sizeof ( date ), "%a %b %d %Y %H:%M:%S.%f");
-    this->printf ( "    Current Time: %s\n", date );
+    this->printFormated ( "    Current Time: %s\n", date );
     
     /*
      *  Terminate execution if unsuccessful
@@ -405,7 +411,7 @@ void ca_client_context::vSignal ( int ca_status, const char *pfilenm,
         abort ();
     }
     
-    this->printf ( "..................................................................\n" );
+    this->printFormated ( "..................................................................\n" );
 }
 
 void ca_client_context::show ( unsigned level ) const
@@ -556,11 +562,11 @@ int ca_client_context::pendEvent ( const double & timeout )
                         0, & tmpAddr.sa, & addrSize );
             } while ( status > 0 );
         }
-        this->noWakeupSincePend = true;
         while ( this->callbackThreadsPending > 0 ) {
             epicsGuardRelease < epicsMutex > unguard ( guard );
             this->callbackThreadActivityComplete.wait ( 30.0 );
         }
+        this->noWakeupSincePend = true;
     }
 
     double elapsed = epicsTime::getCurrent() - current;
@@ -612,17 +618,22 @@ void ca_client_context::callbackProcessingInitiateNotify ()
             }
         }
         if ( sendNeeded ) {
-            // send short udp message to wake up a file descriptor manager
-            // when a message arrives
-            osiSockAddr tmpAddr;
-            tmpAddr.ia.sin_family = AF_INET;
-            tmpAddr.ia.sin_addr.s_addr = htonl ( INADDR_LOOPBACK );
-            tmpAddr.ia.sin_port = htons ( this->localPort );
-            char buf = 0;
-            sendto ( this->sock, & buf, sizeof ( buf ),
-                    0, & tmpAddr.sa, sizeof ( tmpAddr.sa ) );
+            _sendWakeupMsg ();
         }
     }
+}
+
+void ca_client_context :: _sendWakeupMsg ()
+{
+    // send short udp message to wake up a file descriptor manager
+    // when a message arrives
+    osiSockAddr tmpAddr;
+    tmpAddr.ia.sin_family = AF_INET;
+    tmpAddr.ia.sin_addr.s_addr = htonl ( INADDR_LOOPBACK );
+    tmpAddr.ia.sin_port = htons ( this->localPort );
+    char buf = 0;
+    sendto ( this->sock, & buf, sizeof ( buf ),
+            0, & tmpAddr.sa, sizeof ( tmpAddr.sa ) );
 }
 
 void ca_client_context::callbackProcessingCompleteNotify ()

@@ -1,21 +1,20 @@
 /*************************************************************************\
-* Copyright (c) 2003 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2003 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7 and higher are distributed subject to the
-* Software License Agreement found in the file LICENSE that is included
-* with this distribution.
+* EPICS BASE is distributed subject to the Software License Agreement
+* found in the file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* softMain.cpp,v 1.2.2.2 2004/08/27 16:20:47 mrk Exp */
+/* softMain.cpp,v 1.2.2.5 2009/07/28 21:08:35 anj Exp */
 
 /* Author: Andrew Johnson	Date: 2003-04-08 */
 
 /* Usage:
- *  softIoc [-D softIoc.dbd] [-h] [-s] [-a ascf]
+ *  softIoc [-D softIoc.dbd] [-h] [-S] [-s] [-a ascf]
  *	[-m macro=value,macro2=value2] [-d file.db]
- *	[st.cmd]
+ *	[-x prefix] [st.cmd]
  *
  *  If used the -D option must come first, and specify the
  *  path to the softIoc.dbd file.  The compile-time install
@@ -24,8 +23,12 @@
  *  Usage information will be printed if -h is given, then
  *  the program will exit normally.
  *
- *  The -s option causes an interactive shell to be started
+ *  The -S option prevents an interactive shell being started
  *  after all arguments have been processed.
+ *
+ *  Previous versions accepted a -s option to cause a shell
+ *  to be started; this option is still accepted but ignored
+ *  since a command shell is now started by default.
  *
  *  Access Security can be enabled with the -a option giving
  *  the name of the configuration file; if any macros were
@@ -36,17 +39,19 @@
  *  the macros are applied to the following .db files.  Each
  *  later -m option causes earlier macros to be discarded.
  *
+ *  The -x option loads the softIocExit.db with the macro
+ *  IOC set to the string provided.  This database contains
+ *  a subroutine record named $(IOC):exit which has its field
+ *  SNAM set to "exit".  When this record is processed, the
+ *  subroutine that runs will call epicsExit() with the value
+ *  of the field A determining whether the exit status is
+ *  EXIT_SUCCESS if (A == 0.0) or EXIT_FAILURE (A != 0.0).
+ *
  *  A st.cmd file is optional.  If any databases were loaded
  *  the st.cmd file will be run *after* iocInit.  To perform
  *  iocsh commands before iocInit, all database loading must
  *  be performed by the script itself, or by the user from
  *  the interactive IOC shell.
- *
- *  It is possible for a database to cause the IOC to exit:
- *  Create a subroutine record with SNAM="exit".  When this
- *  record processes, the OS' exit() routine will be called.
- *  The value in field A determines whether the exit status
- *  is EXIT_SUCCESS (A==0.0) or EXIT_FAILURE (A!=0.0).
  */
 
 #include <stddef.h>
@@ -58,20 +63,23 @@
 #include "registryFunction.h"
 #include "epicsThread.h"
 #include "epicsExit.h"
+#include "epicsStdio.h"
 #include "dbStaticLib.h"
 #include "subRecord.h"
 #include "dbAccess.h"
 #include "asDbLib.h"
 #include "iocInit.h"
 #include "iocsh.h"
+#include "epicsInstallDir.h"
 
 extern "C" int softIoc_registerRecordDeviceDriver(struct dbBase *pdbbase);
 
-#define QUOTE(x) #x
-#define DBD_FILE(top) QUOTE(top) "/dbd/softIoc.dbd"
+#define DBD_FILE EPICS_BASE "/dbd/softIoc.dbd"
+#define EXIT_FILE EPICS_BASE "/db/softIocExit.db"
 
 const char *arg0;
-const char *base_dbd = DBD_FILE(EPICS_BASE);
+const char *base_dbd = DBD_FILE;
+const char *exit_db = EXIT_FILE;
 
 
 static void exitSubroutine(subRecord *precord) {
@@ -79,10 +87,10 @@ static void exitSubroutine(subRecord *precord) {
 }
 
 static void usage(int status) {
-    printf("Usage: %s [-D softIoc.dbd] [-h] [-s] [-a ascf]\n", arg0);
+    printf("Usage: %s [-D softIoc.dbd] [-h] [-S] [-a ascf]\n", arg0);
     puts("\t[-m macro=value,macro2=value2] [-d file.db]");
-    puts("\t[st.cmd]");
-    puts("Compiled-in default path to softIoc.dbd is:");
+    puts("\t[-x prefix] [st.cmd]");
+    puts("Compiled-in path to softIoc.dbd is:");
     printf("\t%s\n", base_dbd);
     epicsExit(status);
 }
@@ -92,7 +100,8 @@ int main(int argc, char *argv[])
 {
     char *dbd_file = const_cast<char*>(base_dbd);
     char *macros = NULL;
-    int startIocsh = 0;	/* default = no shell */
+    char xmacro[PVNAME_STRINGSZ + 4];
+    int startIocsh = 1;	/* default = start shell */
     int loadedDb = 0;
     
     arg0 = strrchr(*argv, '/');
@@ -146,8 +155,20 @@ int main(int argc, char *argv[])
 	    --argc;
 	    break;
 	
+	case 'S':
+	    startIocsh = 0;
+	    break;
+	
 	case 's':
-	    startIocsh = 1;
+	    break;
+	
+	case 'x':
+	    epicsSnprintf(xmacro, sizeof xmacro, "IOC=%s", *++argv);
+	    if (dbLoadRecords(exit_db, xmacro)) {
+		epicsExit(EXIT_FAILURE);
+	    }
+	    loadedDb = 1;
+	    --argc;
 	    break;
 	
 	default:
@@ -163,14 +184,18 @@ int main(int argc, char *argv[])
 	case 'a':
 	case 'd':
 	case 'm':
+	case 'x':
 	    printf("%s: missing argument to option '%s'\n", arg0, *argv);
 	    usage(EXIT_FAILURE);
 	
 	case 'h':
 	    usage(EXIT_SUCCESS);
 	
+	case 'S':
+	    startIocsh = 0;
+	    break;
+	
 	case 's':
-	    startIocsh = 1;
 	    break;
 	
 	default:
@@ -204,7 +229,7 @@ int main(int argc, char *argv[])
 	    usage(EXIT_FAILURE);
 	}
     }
-    epicsExit( EXIT_SUCCESS);
+    epicsExit(EXIT_SUCCESS);
     /*Note that the following statement will never be executed*/
     return 0;
 }

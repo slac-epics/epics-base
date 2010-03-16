@@ -8,11 +8,12 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* systemCallIntMech.cpp,v 1.2.2.1 2004/05/14 13:36:01 norume Exp */
+/* systemCallIntMech.cpp,v 1.2.2.2 2008/08/19 21:52:11 anj Exp */
 /*
  *      Author:		Jeff Hill 
  */
 
+#define epicsExportSharedSymbols
 #include "osiSock.h"
 
 enum epicsSocketSystemCallInterruptMechanismQueryInfo 

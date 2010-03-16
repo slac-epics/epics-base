@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      osdMessageQueue.c,v 1.2.2.4 2004/10/12 16:06:07 norume Exp
+ *      osdMessageQueue.c,v 1.2.2.7 2009/04/24 17:01:39 anj Exp
  *
  *      Author  W. Eric Norum
  *              norume@aps.anl.gov
@@ -78,7 +78,7 @@ epicsMessageQueueCreate(unsigned int capacity, unsigned int maximumMessageSize)
 static rtems_status_code rtems_message_queue_send_timeout(
     rtems_id id,
     void *buffer,
-    rtems_unsigned32 size,
+    uint32_t size,
     rtems_interval timeout)
 {
   Message_queue_Control    *the_message_queue;
@@ -88,9 +88,6 @@ static rtems_status_code rtems_message_queue_send_timeout(
   the_message_queue = _Message_queue_Get( id, &location );
   switch ( location )
   {
-    case OBJECTS_REMOTE:
-      return RTEMS_ILLEGAL_ON_REMOTE_OBJECT;
-
     case OBJECTS_ERROR:
       return RTEMS_INVALID_ID;
 
@@ -158,11 +155,11 @@ epicsShareFunc int epicsShareAPI epicsMessageQueueSendWithTimeout(
 static int receiveMessage(
     epicsMessageQueueId id,
     void *buffer,
-    rtems_unsigned32 size,
-    rtems_unsigned32 wait,
+    uint32_t size,
+    uint32_t wait,
     rtems_interval delay)
 {
-    rtems_unsigned32 rsize;
+    size_t rsize;
     rtems_status_code sc;
     
     if (size < id->maxSize) {
@@ -207,7 +204,7 @@ epicsShareFunc int epicsShareAPI epicsMessageQueueReceiveWithTimeout(
     double timeout)
 {
     rtems_interval delay;
-    rtems_unsigned32 wait;
+    uint32_t wait;
     extern double rtemsTicksPerSecond_double;
     
     /*
@@ -229,7 +226,7 @@ epicsShareFunc int epicsShareAPI epicsMessageQueueReceiveWithTimeout(
 epicsShareFunc int epicsShareAPI epicsMessageQueuePending(
             epicsMessageQueueId id)
 {
-    rtems_unsigned32 count;
+    uint32_t count;
     rtems_status_code sc;
     
     sc = rtems_message_queue_get_number_pending(id->id, &count);

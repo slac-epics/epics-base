@@ -1,15 +1,13 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* 
- * devLibVxWorks.c
- * @(#)devLibOSD.c,v 1.1.2.5 2007/01/09 00:21:43 anj Exp
+ * devLibOSD.c,v 1.1.2.9 2009/07/09 16:37:23 anj Exp
  *
  * Archictecture dependent support for common device driver resources 
  *
@@ -31,20 +29,24 @@
 
 #include "epicsFindSymbol.h"
 #include "devLib.h"
+#include "errlog.h"
 
+typedef void    myISR (void *pParam);
+
+#if CPU_FAMILY != PPC
 /*
  * A list of the names of the unexpected interrupt handlers
  * ( some of these are provided by wrs )
  */
-LOCAL char  *defaultHandlerNames[] = {
+static char  *defaultHandlerNames[] = {
             "excStub",
             "excIntStub",
             "unsolicitedHandlerEPICS"};
 
-typedef void    myISR (void *pParam);
-LOCAL myISR *defaultHandlerAddr[NELEMENTS(defaultHandlerNames)];
+static myISR *defaultHandlerAddr[NELEMENTS(defaultHandlerNames)];
+#endif
 
-LOCAL myISR *isrFetch(unsigned vectorNumber);
+static myISR *isrFetch(unsigned vectorNumber);
 
 /*
  * this routine needs to be in the symbol table
@@ -58,6 +60,14 @@ void unsolicitedHandlerEPICS(int vectorNumber);
 int cISRTest(void (*)(), void (**)(), void **);
 
 /*
+ * Make sure that the CR/CSR addressing mode is defined.
+ * (it may not be in older versions of vxWorks)
+ */
+#ifndef VME_AM_CSR
+#  define VME_AM_CSR (0x2f)
+#endif
+
+/*
  * we use a translation between an EPICS encoding
  * and a vxWorks encoding here
  * to reduce dependency of drivers on vxWorks
@@ -65,22 +75,27 @@ int cISRTest(void (*)(), void (**)(), void **);
  * we assume that the BSP are configured to use these
  * address modes by default
  */
+
 #define EPICSAddrTypeNoConvert -1
+
 int EPICStovxWorksAddrType[] 
                 = {
                 VME_AM_SUP_SHORT_IO,
                 VME_AM_STD_SUP_DATA,
                 VME_AM_EXT_SUP_DATA,
-                EPICSAddrTypeNoConvert
+                EPICSAddrTypeNoConvert,
+                VME_AM_CSR
             };
 
-LOCAL void initHandlerAddrList(void);
+#if CPU_FAMILY != PPC
+static void initHandlerAddrList(void);
+#endif
 
 /*
  * maps logical address to physical address, but does not detect
  * two device drivers that are using the same address range
  */
-LOCAL long vxDevMapAddr (epicsAddressType addrType, unsigned options,
+static long vxDevMapAddr (epicsAddressType addrType, unsigned options,
         size_t logicalAddress, size_t size, volatile void **ppPhysicalAddress);
 
 /*
@@ -102,13 +117,13 @@ static long devInit(void) { return 0;}
 /*
  * used by dynamic bind in devLib.c
  */
-static devLibVirtualOS virtualOS = {
+static devLibVirtualOS vxVirtualOS = {
     vxDevMapAddr, vxDevReadProbe, vxDevWriteProbe, 
     devConnectInterruptVME, devDisconnectInterruptVME,
     devEnableInterruptLevelVME, devDisableInterruptLevelVME,
     devA24Malloc,devA24Free,devInit
 };
-devLibVirtualOS *pdevLibVirtualOS = &virtualOS;
+devLibVirtualOS *pdevLibVirtualOS = &vxVirtualOS;
 
 /*
  * devConnectInterruptVME
@@ -252,7 +267,7 @@ long devDisableInterruptLevelVME (unsigned level)
 /*
  * vxDevMapAddr ()
  */
-LOCAL long vxDevMapAddr (epicsAddressType addrType, unsigned options,
+static long vxDevMapAddr (epicsAddressType addrType, unsigned options,
             size_t logicalAddress, size_t size, volatile void **ppPhysicalAddress)
 {
     long status;
@@ -279,7 +294,7 @@ LOCAL long vxDevMapAddr (epicsAddressType addrType, unsigned options,
 
 /*
  * a bus error safe "wordSize" read at the specified address which returns 
- * unsuccessful status if the device isnt present
+ * unsuccessful status if the device isn't present
  */
 static long vxDevReadProbe (unsigned wordSize, volatile const void *ptr, void *pValue)
 {
@@ -295,7 +310,7 @@ static long vxDevReadProbe (unsigned wordSize, volatile const void *ptr, void *p
 
 /*
  * a bus error safe "wordSize" write at the specified address which returns 
- * unsuccessful status if the device isnt present
+ * unsuccessful status if the device isn't present
  */
 static long vxDevWriteProbe (unsigned wordSize, volatile void *ptr, const void *pValue)
 {
@@ -312,7 +327,7 @@ static long vxDevWriteProbe (unsigned wordSize, volatile void *ptr, const void *
 /*
  *      isrFetch()
  */
-LOCAL myISR *isrFetch(unsigned vectorNumber)
+static myISR *isrFetch(unsigned vectorNumber)
 {
     myISR   *psub;
     myISR   *pCISR;
@@ -399,13 +414,14 @@ void unsolicitedHandlerEPICS(int vectorNumber)
         0);
 }
 
+#if CPU_FAMILY != PPC
 /*
  *
  *  initHandlerAddrList()
  *      init list of interrupt handlers to ignore
  *
  */
-LOCAL 
+static 
 void initHandlerAddrList(void)
 {
     int i;
@@ -422,6 +438,7 @@ void initHandlerAddrList(void)
         }
     }
 }
+#endif
 
 /******************************************************************************
  *

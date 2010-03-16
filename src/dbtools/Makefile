@@ -11,25 +11,24 @@ TOP=../..
 
 include $(TOP)/configure/CONFIG
 
-#YACCOPT := -l
-#LEXOPT  := -L
-
 INC += dbLoadTemplate.h
+INC += dbtoolsIocRegister.h
 
-LIBSRCS += dbLoadTemplate.c
+LIB_SRCS += dbLoadTemplate.c
+LIB_SRCS += dbtoolsIocRegister.c
 
 LIBRARY_IOC = dbtoolsIoc
 
-dbtoolsIoc_LIBS  = dbIoc Com
+dbtoolsIoc_LIBS = dbIoc dbStaticIoc Com
 
-dbtoolsIoc_RCS_WIN32 = dbtoolsIoc.rc
+dbtoolsIoc_RCS = dbtoolsIoc.rc
 
 HTMLS += dbLoadTemplate.html
 
 # For R3.13 compatibility only
 ifeq ($(strip $(COMPAT_313)),YES)
 OBJLIB_vxWorks=dbtoolsIoc
-OBJLIB_SRCS = $(LIBSRCS)
+OBJLIB_SRCS = $(LIB_SRCS)
 endif
 
 include $(TOP)/configure/RULES

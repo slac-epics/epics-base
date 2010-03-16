@@ -3,8 +3,7 @@
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
@@ -18,6 +17,7 @@
 //
 
 #include "addrList.h"
+#include "errlog.h"
 
 #define epicsExportSharedSymbols
 #include "casDGIntfIO.h"
@@ -167,7 +167,7 @@ casDGIntfIO::casDGIntfIO ( caServerI & serverIn, clientBufMemoryManager & memMgr
         // add in the configured addresses
         //
         addAddrToChannelAccessAddressList (
-            & BCastAddrList, pParam, beaconPort );
+            & BCastAddrList, pParam, beaconPort, pParam == & EPICS_CA_ADDR_LIST );
     }
  
     removeDuplicateAddresses ( & this->beaconAddrList, & BCastAddrList, 0 );
@@ -177,11 +177,11 @@ casDGIntfIO::casDGIntfIO ( caServerI & serverIn, clientBufMemoryManager & memMgr
         ellInit ( & parsed );
         ellInit ( & filtered );
         // we dont care what port they are coming from
-        addAddrToChannelAccessAddressList ( & parsed, & EPICS_CAS_IGNORE_ADDR_LIST, 0 );
+        addAddrToChannelAccessAddressList ( & parsed, & EPICS_CAS_IGNORE_ADDR_LIST, 0, false );
         removeDuplicateAddresses ( & filtered, & parsed, true );
 
         while ( ELLNODE * pRawNode  = ellGet ( & filtered ) ) {
-		    assert ( offsetof (osiSockAddrNode, node) == 0 );
+		    STATIC_ASSERT ( offsetof (osiSockAddrNode, node) == 0 );
 		    osiSockAddrNode * pNode = reinterpret_cast < osiSockAddrNode * > ( pRawNode );
             if ( pNode->addr.sa.sa_family == AF_INET ) {
                 ipIgnoreEntry * pIPI = new ( this->ipIgnoreEntryFreeList )
@@ -394,13 +394,14 @@ casDGIntfIO::osdSend ( const char * pBufIn, bufSizeT size, // X aCC 361
         return outBufClient::flushNone;
     }
 }
-
-bufSizeT casDGIntfIO::incomingBytesPresent () const // X aCC 361
+    
+bufSizeT casDGIntfIO ::
+    dgInBytesPending () const 
 {
 	int status;
 	osiSockIoctl_t nchars = 0;
 
-	status = socket_ioctl ( this->sock, FIONREAD, & nchars ); // X aCC 392
+	status = socket_ioctl ( this->sock, FIONREAD, & nchars ); 
 	if ( status < 0 ) {
         char sockErrBuf[64];
         epicsSocketConvertErrnoToString ( sockErrBuf, sizeof ( sockErrBuf ) );
@@ -500,38 +501,21 @@ bufSizeT casDGIntfIO::optimumInBufferSize ()
 #endif
 }
 
-bufSizeT casDGIntfIO::optimumOutBufferSize () 
+bufSizeT casDGIntfIO :: 
+    osSendBufferSize () const 
 {
-    
-#if 1
-    //
-    // must update client before the message size can be
-    // increased here
-    //
-    return MAX_UDP_SEND;
-#else
-    int n;
-    int size;
-    int status;
-    
-
     /* fetch the TCP send buffer size */
-    n = sizeof(size);
-    status = getsockopt(
-        this->sock,
-        SOL_SOCKET,
-        SO_SNDBUF,
-        (char *)&size,
-        &n);
-    if(status < 0 || n != sizeof(size)){
+    int size = MAX_UDP_SEND;
+    osiSocklen_t n = sizeof ( size );
+    int status = getsockopt( this->sock, SOL_SOCKET, SO_SNDBUF,
+                    reinterpret_cast < char * > ( & size ), & n );
+    if ( status < 0 || n != sizeof(size) ) {
         size = MAX_UDP_SEND;
     }
-    
-    if (size<=0) {
+    if ( size <= MAX_UDP_SEND ) {
         size = MAX_UDP_SEND;
     }
-    return (bufSizeT) size;
-#endif
+    return static_cast < bufSizeT > ( size );
 }
 
 SOCKET casDGIntfIO::makeSockDG ()

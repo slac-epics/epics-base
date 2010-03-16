@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- * osdThread.c,v 1.52.2.16 2006/12/07 00:49:19 jhill Exp
+ * osdThread.c,v 1.52.2.19 2008/09/30 16:28:37 jhill Exp
  *
  * Author: Jeff Hill
  * 
@@ -698,7 +698,7 @@ epicsShareFunc unsigned epicsShareAPI epicsThreadGetPriority (epicsThreadId id)
 }
 
 /*
- * epicsThreadGetPriority ()
+ * epicsThreadGetPrioritySelf ()
  */
 epicsShareFunc unsigned epicsShareAPI epicsThreadGetPrioritySelf () 
 { 
@@ -793,13 +793,17 @@ epicsShareFunc void epicsShareAPI epicsThreadSleep ( double seconds )
  * epicsThreadSleepQuantum ()
  */
 double epicsShareAPI epicsThreadSleepQuantum ()
-{
+{ 
     /*
      * Its worth noting here that the sleep quantum on windows can
      * mysteriously get better. I eventually tracked this down to 
      * codes that call timeBeginPeriod(1). Calling timeBeginPeriod()
      * specifying a better timer resolution also increases the interrupt
      * load. This appears to be related to java applet activity.
+     * The function timeGetDevCaps can tell us the range of periods
+     * that can be specified to timeBeginPeriod, but alas there
+     * appears to be no way to find out what the value of the global 
+     * minimum of all timeBeginPeriod calls for all processes is.
      */
     static const double secPerTick = 100e-9;
     DWORD adjustment;
@@ -1004,7 +1008,9 @@ epicsShareFunc void epicsShareAPI epicsThreadOnceOsd (
 
     if ( *id == 0 ) {
         *id = -1;
+        LeaveCriticalSection ( & pGbl->mutex );
         ( *func ) ( arg );
+        EnterCriticalSection ( & pGbl->mutex );
         *id = 1;
     } else
         assert(*id > 0 /* func() called epicsThreadOnce() with same id */);

@@ -1,26 +1,27 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devLib.h */
-/* devLib.h,v 1.1.2.5 2006/11/30 22:24:00 jhill Exp */
+/* devLib.h,v 1.1.2.8 2009/07/09 15:27:43 anj Exp */
 
 /*
- *	Original Author: Marty Kraimer 
- *  Author:  	     Jeff Hill	
- *  Date:            03-10-93 
+ * Original Author: Marty Kraimer 
+ *  Author:     Jeff Hill
+ *  Date:       03-10-93
  */
 
 #ifndef INCdevLibh
 #define INCdevLibh 1
 
-#include <dbDefs.h>
-#include <osdVME.h>
+#include "dbDefs.h"
+#include "osdVME.h"
+#include "errMdef.h"
+#include "shareLib.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,7 @@ typedef enum {
 		atVMEA24,
 		atVMEA32,
 		atISA,	/* memory mapped ISA access (until now only on PC) */
+		atVMECSR, /* VME-64 CR/CSR address space */
 		atLast	/* atLast must be the last enum in this list */
 		} epicsAddressType;
 
@@ -44,15 +46,25 @@ typedef enum {
  */
 extern const char *epicsAddressTypeName[];
 
-long	devAddressMap(void); /* print an address map */
+epicsShareFunc long devAddressMap(void); /* print an address map */
 
+/*
+ * devBusToLocalAddr()
+ *
+ * OSI routine to translate bus addresses their local CPU address mapping
+ */
+epicsShareFunc long devBusToLocalAddr (
+		epicsAddressType addrType,
+		size_t busAddr,
+		volatile void **ppLocalAddr);
 /*
  * devReadProbe()
  *
  * a bus error safe "wordSize" read at the specified address which returns 
  * unsuccessful status if the device isnt present
  */
-long	devReadProbe (unsigned wordSize, volatile const void *ptr, void *pValueRead);
+epicsShareFunc long devReadProbe (
+    unsigned wordSize, volatile const void *ptr, void *pValueRead);
 
 /*
  * devNoResponseProbe()
@@ -64,7 +76,7 @@ long	devReadProbe (unsigned wordSize, volatile const void *ptr, void *pValueRead
  * Checks all naturally aligned word sizes between char and long for
  * the entire specified range of bytes.
  */
-long devNoResponseProbe(
+epicsShareFunc long devNoResponseProbe(
 			epicsAddressType addrType,
 			size_t base,
 			size_t size
@@ -76,16 +88,17 @@ long devNoResponseProbe(
  * a bus error safe "wordSize" write at the specified address which returns 
  * unsuccessful status if the device isnt present
  */
-long	devWriteProbe (unsigned wordSize, volatile void *ptr, const void *pValueWritten);
+epicsShareFunc long devWriteProbe (
+    unsigned wordSize, volatile void *ptr, const void *pValueWritten);
 
-long	devRegisterAddress(
+epicsShareFunc long devRegisterAddress(
 			const char *pOwnerName,
 			epicsAddressType addrType,
 			size_t logicalBaseAddress,
 			size_t size, /* bytes */
 			volatile void **pPhysicalAddress);
 
-long    devUnregisterAddress(
+epicsShareFunc long devUnregisterAddress(
 			epicsAddressType addrType,
 			size_t logicalBaseAddress,
 			const char *pOwnerName);
@@ -93,7 +106,7 @@ long    devUnregisterAddress(
 /*
  * allocate and register an unoccupied address block
  */
-long    devAllocAddress(
+epicsShareFunc long devAllocAddress(
 			const char *pOwnerName,
 			epicsAddressType addrType,
 			size_t size,
@@ -103,7 +116,7 @@ long    devAllocAddress(
 /*
  * connect ISR to a VME interrupt vector
  */
-long    devConnectInterruptVME(
+epicsShareFunc long devConnectInterruptVME(
 			unsigned vectorNumber,
 			void (*pFunction)(void *),
 			void  *parameter);
@@ -113,7 +126,7 @@ long    devConnectInterruptVME(
  * (not implemented)
  * (API should be reviewed)
  */
-long    devConnectInterruptISA(
+epicsShareFunc long devConnectInterruptISA(
 			unsigned interruptLevel,
 			void (*pFunction)(void *),
 			void  *parameter);
@@ -123,7 +136,7 @@ long    devConnectInterruptISA(
  * (not implemented)
  * (API should be reviewed)
  */
-long    devConnectInterruptPCI(
+epicsShareFunc long devConnectInterruptPCI(
 			unsigned bus,
 			unsigned device,
 			unsigned function,
@@ -137,7 +150,7 @@ long    devConnectInterruptPCI(
  * was connected. It is used as a key to prevent a driver from inadvertently
  * removing an interrupt handler that it didn't install 
  */
-long    devDisconnectInterruptVME(
+epicsShareFunc long devDisconnectInterruptVME(
 			unsigned vectorNumber,
 			void (*pFunction)(void *));
 
@@ -150,7 +163,7 @@ long    devDisconnectInterruptVME(
  * was connected. It is used as a key to prevent a driver from inadvertently
  * removing an interrupt handler that it didn't install 
  */
-long    devDisconnectInterruptISA(
+epicsShareFunc long devDisconnectInterruptISA(
 			unsigned interruptLevel,
 			void (*pFunction)(void *));
 
@@ -163,7 +176,7 @@ long    devDisconnectInterruptISA(
  * was connected. It is used as a key to prevent a driver from inadvertently
  * removing an interrupt handler that it didn't install 
  */
-long    devDisconnectInterruptPCI(
+epicsShareFunc long devDisconnectInterruptPCI(
 			unsigned bus,
 			unsigned device,
 			unsigned function,
@@ -174,7 +187,7 @@ long    devDisconnectInterruptPCI(
  *
  * returns boolean
  */
-int devInterruptInUseVME (unsigned vectorNumber);
+epicsShareFunc int devInterruptInUseVME (unsigned vectorNumber);
 
 /*
  * determine if an ISA interrupt level is in use
@@ -182,7 +195,7 @@ int devInterruptInUseVME (unsigned vectorNumber);
  *
  * returns boolean
  */
-int devInterruptLevelInUseISA (unsigned interruptLevel);
+epicsShareFunc int devInterruptLevelInUseISA (unsigned interruptLevel);
 
 /*
  * determine if a PCI interrupt is in use
@@ -190,7 +203,7 @@ int devInterruptLevelInUseISA (unsigned interruptLevel);
  *
  * returns boolean
  */
-int devInterruptInUsePCI (unsigned bus, unsigned device, 
+epicsShareFunc int devInterruptInUsePCI (unsigned bus, unsigned device, 
 							  unsigned function);
 
 typedef enum {intVME, intVXI, intISA} epicsInterruptType;
@@ -198,42 +211,42 @@ typedef enum {intVME, intVXI, intISA} epicsInterruptType;
 /*
  * enable VME interrupt level
  */
-long devEnableInterruptLevelVME (unsigned level);
+epicsShareFunc long devEnableInterruptLevelVME (unsigned level);
 
 /*
  * enable ISA interrupt level
  */
-long devEnableInterruptLevelISA (unsigned level);
+epicsShareFunc long devEnableInterruptLevelISA (unsigned level);
 
 /*
  * not implemented - API needs to be reviewed 
  */
-long devEnableInterruptLevelPCI (unsigned level,
+epicsShareFunc long devEnableInterruptLevelPCI (unsigned level,
 			unsigned bus, unsigned device, unsigned function);
 
 /*
  * disable VME interrupt level
  */
-long devDisableInterruptLevelVME (unsigned level);
+epicsShareFunc long devDisableInterruptLevelVME (unsigned level);
 
 /*
  * disable ISA interrupt level
  */
-long devDisableInterruptLevelISA (unsigned level);
+epicsShareFunc long devDisableInterruptLevelISA (unsigned level);
 
 /*
  * not implemented - API needs to be reviewed 
  */
-long devDisableInterruptLevelPCI (unsigned level,
+epicsShareFunc long devDisableInterruptLevelPCI (unsigned level,
 			unsigned bus, unsigned device, unsigned function);
 
 /*
  * Routines to allocate and free memory in the A24 memory region.
  *
  */
-void *devLibA24Malloc(size_t);
-void *devLibA24Calloc(size_t);
-void devLibA24Free(void *pBlock);
+epicsShareFunc void *devLibA24Malloc(size_t);
+epicsShareFunc void *devLibA24Calloc(size_t);
+epicsShareFunc void devLibA24Free(void *pBlock);
 
 /*
  * Normalize a digital value and convert it to type TYPE
@@ -318,7 +331,7 @@ typedef struct devLibVirtualOS {
         void (*pDevA24Free)(void *pBlock);
         long (*pDevInit)(void);
 }devLibVirtualOS;
-extern devLibVirtualOS *pdevLibVirtualOS;
+epicsShareExtern devLibVirtualOS *pdevLibVirtualOS;
 
 /*
  * error codes (and messages) associated with devLib.c
@@ -357,6 +370,8 @@ extern devLibVirtualOS *pdevLibVirtualOS;
 #define S_dev_badFunction (M_devLib| 31) /*bad function pointer*/
 #define S_dev_badVector (M_devLib| 32) /*bad interrupt vector*/
 #define S_dev_badArgument (M_devLib| 33) /*bad function argument*/
+#define S_dev_badISA (M_devLib| 34) /*Invalid ISA address*/
+#define S_dev_badCRCSR (M_devLib| 35) /*Invalid VME CR/CSR address*/
 #define S_dev_vxWorksIntEnFail S_dev_intEnFail
 
 /*
@@ -367,7 +382,7 @@ extern devLibVirtualOS *pdevLibVirtualOS;
  * devConnectInterruptISA etc. devConnectInterrupt will be removed 
  * in a future release.
  */
-long    devConnectInterrupt(
+epicsShareFunc long devConnectInterrupt(
 			epicsInterruptType intType,
 			unsigned vectorNumber,
 			void (*pFunction)(void *),
@@ -381,10 +396,10 @@ long    devConnectInterrupt(
  * devDisconnectInterruptISA etc. devDisconnectInterrupt will be removed 
  * in a future release.
  */
-long    devDisconnectInterrupt(
+epicsShareFunc long devDisconnectInterrupt(
 			epicsInterruptType      intType,
 			unsigned                vectorNumber,
-			void			        (*pFunction)(void *));
+			void		        (*pFunction)(void *));
 
 /*
  * NOTE: this routine has been deprecated. It exists
@@ -394,7 +409,8 @@ long    devDisconnectInterrupt(
  * devEnableInterruptLevelISA etc. devEnableInterruptLevel will be removed 
  * in a future release.
  */
-long devEnableInterruptLevel(epicsInterruptType intType, unsigned level);
+epicsShareFunc long devEnableInterruptLevel(
+    epicsInterruptType intType, unsigned level);
 
 /*
  * NOTE: this routine has been deprecated. It exists
@@ -404,7 +420,8 @@ long devEnableInterruptLevel(epicsInterruptType intType, unsigned level);
  * devDisableInterruptLevelPCI etc. devDisableInterruptLevel will be removed 
  * in a future release.
  */
-long devDisableInterruptLevel (epicsInterruptType intType, unsigned level);
+epicsShareFunc long devDisableInterruptLevel (
+    epicsInterruptType intType, unsigned level);
 
 /*
  * NOTE: this routine has been deprecated. It exists
@@ -413,7 +430,7 @@ long devDisableInterruptLevel (epicsInterruptType intType, unsigned level);
  * Please use devNoResponseProbe(). locationProbe() will be removed 
  * in a future release.
  */
-long locationProbe (epicsAddressType addrType, char *pLocation);
+epicsShareFunc long locationProbe (epicsAddressType addrType, char *pLocation);
 
 /*
  * Some vxWorks convenience routines

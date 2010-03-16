@@ -1,17 +1,15 @@
 /*************************************************************************\
 * Copyright (c) 2002 Southeastern Universities Research Association, as
 *     Operator of Thomas Jefferson National Accelerator Facility.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* recDfanout.c */
-/* share/src/rec @(#)recDfanout.c	1.16     6/4/93 */
+
+/* dfanoutRecord.c,v 1.20.2.4 2009/04/03 14:40:13 lange Exp */
 
 /* recDfanout.c - Record Support Routines for Dfanout records */
 /*
  * Original Author: 	Matt Bickley   (Sometime in 1994)
- * Current Author:	Johnny Tang
  *
  * Modification Log:
  * -----------------
@@ -48,21 +46,21 @@
 /* Create RSET - Record Support Entry Table*/
 #define report NULL
 #define initialize NULL
-static long init_record();
-static long process();
+static long init_record(dfanoutRecord *, int);
+static long process(dfanoutRecord *);
 #define special NULL
 #define get_value NULL
 #define cvt_dbaddr NULL
 #define get_array_info NULL
 #define put_array_info NULL
-static long get_units();
-static long get_precision();
+static long get_units(DBADDR *, char *);
+static long get_precision(DBADDR *, long *);
 #define get_enum_str NULL
 #define get_enum_strs NULL
 #define put_enum_str NULL
-static long get_graphic_double();
-static long get_control_double();
-static long get_alarm_double();
+static long get_graphic_double(DBADDR *,struct dbr_grDouble *);
+static long get_control_double(DBADDR *,struct dbr_ctrlDouble *);
+static long get_alarm_double(DBADDR *,struct dbr_alDouble *);
 
 rset dfanoutRSET={
 	RSETNUMBER,
@@ -87,58 +85,58 @@ rset dfanoutRSET={
 epicsExportAddress(rset,dfanoutRSET);
 
 
-static void checkAlarms();
-static void monitor();
-static void push_values();
+static void checkAlarms(dfanoutRecord *);
+static void monitor(dfanoutRecord *);
+static void push_values(dfanoutRecord *);
 
 #define OUT_ARG_MAX 8
 
 
-static long init_record(struct dfanoutRecord *pdfanout, int pass)
+static long init_record(dfanoutRecord *prec, int pass)
 {
     if (pass==0) return(0);
 
-    recGblInitConstantLink(&pdfanout->sell,DBF_USHORT,&pdfanout->seln);
+    recGblInitConstantLink(&prec->sell,DBF_USHORT,&prec->seln);
     /* get the initial value dol is a constant*/
-    if(recGblInitConstantLink(&pdfanout->dol,DBF_DOUBLE,&pdfanout->val))
-	    pdfanout->udf = isnan(pdfanout->val);
+    if(recGblInitConstantLink(&prec->dol,DBF_DOUBLE,&prec->val))
+	    prec->udf = isnan(prec->val);
     return(0);
 }
 
-static long process(struct dfanoutRecord *pdfanout)
+static long process(dfanoutRecord *prec)
 {
     long status=0;
 
-    if (!pdfanout->pact
-    && (pdfanout->dol.type != CONSTANT)
-    && (pdfanout->omsl == menuOmslclosed_loop)){
-	status = dbGetLink(&(pdfanout->dol),DBR_DOUBLE,&(pdfanout->val),0,0);
-	if(pdfanout->dol.type!=CONSTANT && RTN_SUCCESS(status))
-            pdfanout->udf = isnan(pdfanout->val);
+    if (!prec->pact
+    && (prec->dol.type != CONSTANT)
+    && (prec->omsl == menuOmslclosed_loop)){
+	status = dbGetLink(&(prec->dol),DBR_DOUBLE,&(prec->val),0,0);
+	if(prec->dol.type!=CONSTANT && RTN_SUCCESS(status))
+            prec->udf = isnan(prec->val);
     }
-    pdfanout->pact = TRUE;
-    recGblGetTimeStamp(pdfanout);
+    prec->pact = TRUE;
+    recGblGetTimeStamp(prec);
     /* Push out the data to all the forward links */
-    dbGetLink(&(pdfanout->sell),DBR_USHORT,&(pdfanout->seln),0,0);
-    checkAlarms(pdfanout);
-    push_values(pdfanout);
-    monitor(pdfanout);
-    recGblFwdLink(pdfanout);
-    pdfanout->pact=FALSE;
+    dbGetLink(&(prec->sell),DBR_USHORT,&(prec->seln),0,0);
+    checkAlarms(prec);
+    push_values(prec);
+    monitor(prec);
+    recGblFwdLink(prec);
+    prec->pact=FALSE;
     return(status);
 }
 
-static long get_units(struct dbAddr *paddr,char *units)
+static long get_units(DBADDR *paddr,char *units)
 {
-    struct dfanoutRecord *pdfanout=(struct dfanoutRecord *)paddr->precord;
+    dfanoutRecord *prec=(dfanoutRecord *)paddr->precord;
 
-    strncpy(units,pdfanout->egu,DB_UNITS_SIZE);
+    strncpy(units,prec->egu,DB_UNITS_SIZE);
     return(0);
 }
 
-static long get_precision(struct dbAddr *paddr,long *precision)
+static long get_precision(DBADDR *paddr,long *precision)
 {
-    struct dfanoutRecord *pdfanout=(struct dfanoutRecord *)paddr->precord;
+    dfanoutRecord *prec=(dfanoutRecord *)paddr->precord;
     int   fieldIndex = dbGetFieldIndex(paddr);
 
     if(fieldIndex == dfanoutRecordVAL
@@ -148,16 +146,16 @@ static long get_precision(struct dbAddr *paddr,long *precision)
     || fieldIndex == dfanoutRecordLOLO
     || fieldIndex == dfanoutRecordHOPR
     || fieldIndex == dfanoutRecordLOPR) {
-        *precision = pdfanout->prec;
+        *precision = prec->prec;
     } else {
         recGblGetPrec(paddr,precision);
     }
     return(0);
 }
 
-static long get_graphic_double(struct dbAddr *paddr,struct dbr_grDouble	*pgd)
+static long get_graphic_double(DBADDR *paddr,struct dbr_grDouble	*pgd)
 {
-    struct dfanoutRecord *pdfanout=(struct dfanoutRecord *)paddr->precord;
+    dfanoutRecord *prec=(dfanoutRecord *)paddr->precord;
     int   fieldIndex = dbGetFieldIndex(paddr);
 
     if(fieldIndex == dfanoutRecordVAL
@@ -167,15 +165,15 @@ static long get_graphic_double(struct dbAddr *paddr,struct dbr_grDouble	*pgd)
     || fieldIndex == dfanoutRecordLOLO
     || fieldIndex == dfanoutRecordHOPR
     || fieldIndex == dfanoutRecordLOPR) {
-        pgd->upper_disp_limit = pdfanout->hopr;
-        pgd->lower_disp_limit = pdfanout->lopr;
+        pgd->upper_disp_limit = prec->hopr;
+        pgd->lower_disp_limit = prec->lopr;
     } else recGblGetGraphicDouble(paddr,pgd);
     return(0);
 }
 
-static long get_control_double(struct dbAddr *paddr,struct dbr_ctrlDouble *pcd)
+static long get_control_double(DBADDR *paddr,struct dbr_ctrlDouble *pcd)
 {
-    struct dfanoutRecord *pdfanout=(struct dfanoutRecord *)paddr->precord;
+    dfanoutRecord *prec=(dfanoutRecord *)paddr->precord;
     int   fieldIndex = dbGetFieldIndex(paddr);
 
     if(fieldIndex == dfanoutRecordVAL
@@ -183,141 +181,153 @@ static long get_control_double(struct dbAddr *paddr,struct dbr_ctrlDouble *pcd)
     || fieldIndex == dfanoutRecordHIGH
     || fieldIndex == dfanoutRecordLOW
     || fieldIndex == dfanoutRecordLOLO) {
-        pcd->upper_ctrl_limit = pdfanout->hopr;
-        pcd->lower_ctrl_limit = pdfanout->lopr;
+        pcd->upper_ctrl_limit = prec->hopr;
+        pcd->lower_ctrl_limit = prec->lopr;
     } else recGblGetControlDouble(paddr,pcd);
     return(0);
 }
-static long get_alarm_double(struct dbAddr *paddr,struct dbr_alDouble *pad)
+static long get_alarm_double(DBADDR *paddr,struct dbr_alDouble *pad)
 {
-    struct dfanoutRecord *pdfanout=(struct dfanoutRecord *)paddr->precord;
+    dfanoutRecord *prec=(dfanoutRecord *)paddr->precord;
     int   fieldIndex = dbGetFieldIndex(paddr);
 
     
     if(fieldIndex == dfanoutRecordVAL) {
-         pad->upper_alarm_limit = pdfanout->hihi;
-         pad->upper_warning_limit = pdfanout->high;
-         pad->lower_warning_limit = pdfanout->low;
-         pad->lower_alarm_limit = pdfanout->lolo;
+        pad->upper_alarm_limit = prec->hhsv ? prec->hihi : epicsNAN;
+        pad->upper_warning_limit = prec->hsv ? prec->high : epicsNAN;
+        pad->lower_warning_limit = prec->lsv ? prec->low : epicsNAN;
+        pad->lower_alarm_limit = prec->llsv ? prec->lolo : epicsNAN;
     } else recGblGetAlarmDouble(paddr,pad);
     return(0);
 }
 
-static void checkAlarms(struct dfanoutRecord *pdfanout)
+static void checkAlarms(dfanoutRecord *prec)
 {
-	double		val;
-	double		hyst, lalm, hihi, high, low, lolo;
-	unsigned short	hhsv, llsv, hsv, lsv;
+    double val, hyst, lalm;
+    double alev;
+    epicsEnum16 asev;
 
-	if (pdfanout->udf) {
- 		recGblSetSevr(pdfanout,UDF_ALARM,INVALID_ALARM);
-		return;
-	}
-	hihi = pdfanout->hihi; lolo = pdfanout->lolo;
-	high = pdfanout->high; low = pdfanout->low;
-	hhsv = pdfanout->hhsv; llsv = pdfanout->llsv;
-	hsv = pdfanout->hsv; lsv = pdfanout->lsv;
-	val = pdfanout->val; hyst = pdfanout->hyst; lalm = pdfanout->lalm;
-	/* alarm condition hihi */
-	if (hhsv && (val >= hihi || ((lalm==hihi) && (val >= hihi-hyst)))){
-	    if(recGblSetSevr(pdfanout,HIHI_ALARM,pdfanout->hhsv))
-		pdfanout->lalm = hihi;
-	    return;
-	}
-	/* alarm condition lolo */
-	if (llsv && (val <= lolo || ((lalm==lolo) && (val <= lolo+hyst)))){
-	    if(recGblSetSevr(pdfanout,LOLO_ALARM,pdfanout->llsv))
-		pdfanout->lalm = lolo;
-	    return;
-	}
-	/* alarm condition high */
-	if (hsv && (val >= high || ((lalm==high) && (val >= high-hyst)))){
-	    if(recGblSetSevr(pdfanout,HIGH_ALARM,pdfanout->hsv))
-		pdfanout->lalm = high;
-	    return;
-	}
-	/* alarm condition low */
-	if (lsv && (val <= low || ((lalm==low) && (val <= low+hyst)))){
-	    if(recGblSetSevr(pdfanout,LOW_ALARM,pdfanout->lsv))
-		pdfanout->lalm = low;
-	    return;
-	}
-	/* we get here only if val is out of alarm by at least hyst */
-	pdfanout->lalm = val;
-	return;
+    if (prec->udf) {
+        recGblSetSevr(prec, UDF_ALARM, INVALID_ALARM);
+        return;
+    }
+
+    val = prec->val;
+    hyst = prec->hyst;
+    lalm = prec->lalm;
+
+    /* alarm condition hihi */
+    asev = prec->hhsv;
+    alev = prec->hihi;
+    if (asev && (val >= alev || ((lalm == alev) && (val >= alev - hyst)))) {
+        if (recGblSetSevr(prec, HIHI_ALARM, asev))
+            prec->lalm = alev;
+        return;
+    }
+
+    /* alarm condition lolo */
+    asev = prec->llsv;
+    alev = prec->lolo;
+    if (asev && (val <= alev || ((lalm == alev) && (val <= alev + hyst)))) {
+        if (recGblSetSevr(prec, LOLO_ALARM, asev))
+            prec->lalm = alev;
+        return;
+    }
+
+    /* alarm condition high */
+    asev = prec->hsv;
+    alev = prec->high;
+    if (asev && (val >= alev || ((lalm == alev) && (val >= alev - hyst)))) {
+        if (recGblSetSevr(prec, HIGH_ALARM, asev))
+            prec->lalm = alev;
+        return;
+    }
+
+    /* alarm condition low */
+    asev = prec->lsv;
+    alev = prec->low;
+    if (asev && (val <= alev || ((lalm == alev) && (val <= alev + hyst)))) {
+        if (recGblSetSevr(prec, LOW_ALARM, asev))
+            prec->lalm = alev;
+        return;
+    }
+
+    /* we get here only if val is out of alarm by at least hyst */
+    prec->lalm = val;
+    return;
 }
 
-static void monitor(struct dfanoutRecord *pdfanout)
+static void monitor(dfanoutRecord *prec)
 {
 	unsigned short	monitor_mask;
 
 	double		delta;
 
-        monitor_mask = recGblResetAlarms(pdfanout);
+        monitor_mask = recGblResetAlarms(prec);
         /* check for value change */
-        delta = pdfanout->mlst - pdfanout->val;
+        delta = prec->mlst - prec->val;
         if(delta<0) delta = -delta;
-        if (delta > pdfanout->mdel) {
+        if (delta > prec->mdel) {
                 /* post events for value change */
                 monitor_mask |= DBE_VALUE;
                 /* update last value monitored */
-                pdfanout->mlst = pdfanout->val;
+                prec->mlst = prec->val;
         }
         /* check for archive change */
-        delta = pdfanout->alst - pdfanout->val;
+        delta = prec->alst - prec->val;
         if(delta<0) delta = -delta;
-        if (delta > pdfanout->adel) {
+        if (delta > prec->adel) {
                 /* post events on value field for archive change */
                 monitor_mask |= DBE_LOG;
                 /* update last archive value monitored */
-                pdfanout->alst = pdfanout->val;
+                prec->alst = prec->val;
         }
 
         /* send out monitors connected to the value field */
         if (monitor_mask){
-                db_post_events(pdfanout,&pdfanout->val,monitor_mask);
+                db_post_events(prec,&prec->val,monitor_mask);
 	}
 	return;
 }
 
-static void push_values(struct dfanoutRecord *pdfanout)
+static void push_values(dfanoutRecord *prec)
 {
     struct link     *plink; /* structure of the link field  */
     int             i;
     long            status;
     unsigned short  state;
 
-    switch (pdfanout->selm){
+    switch (prec->selm){
     case (dfanoutSELM_All):
-        for(i=0, plink=&(pdfanout->outa); i<OUT_ARG_MAX; i++, plink++) {
-                status=dbPutLink(plink,DBR_DOUBLE,&(pdfanout->val),1);
-                if(status) recGblSetSevr(pdfanout,LINK_ALARM,MAJOR_ALARM);
+        for(i=0, plink=&(prec->outa); i<OUT_ARG_MAX; i++, plink++) {
+                status=dbPutLink(plink,DBR_DOUBLE,&(prec->val),1);
+                if(status) recGblSetSevr(prec,LINK_ALARM,MAJOR_ALARM);
         }
         break;
     case (dfanoutSELM_Specified):
-        if(pdfanout->seln>OUT_ARG_MAX) {
-            recGblSetSevr(pdfanout,SOFT_ALARM,INVALID_ALARM);
+        if(prec->seln>OUT_ARG_MAX) {
+            recGblSetSevr(prec,SOFT_ALARM,INVALID_ALARM);
             break;
         }
-        if(pdfanout->seln==0) break;
-        plink=&(pdfanout->outa);
-        plink += (pdfanout->seln -1);
-        status=dbPutLink(plink,DBR_DOUBLE,&(pdfanout->val),1);
-        if(status) recGblSetSevr(pdfanout,LINK_ALARM,MAJOR_ALARM);
+        if(prec->seln==0) break;
+        plink=&(prec->outa);
+        plink += (prec->seln -1);
+        status=dbPutLink(plink,DBR_DOUBLE,&(prec->val),1);
+        if(status) recGblSetSevr(prec,LINK_ALARM,MAJOR_ALARM);
         break;
     case (dfanoutSELM_Mask):
-        if(pdfanout->seln==0) break;
-        for(i=0, plink=&(pdfanout->outa), state=pdfanout->seln;
+        if(prec->seln==0) break;
+        for(i=0, plink=&(prec->outa), state=prec->seln;
         i<OUT_ARG_MAX;
         i++, plink++, state>>=1) {
             if(state&1) {
-                status=dbPutLink(plink,DBR_DOUBLE,&(pdfanout->val),1);
-                if(status) recGblSetSevr(pdfanout,LINK_ALARM,MAJOR_ALARM);
+                status=dbPutLink(plink,DBR_DOUBLE,&(prec->val),1);
+                if(status) recGblSetSevr(prec,LINK_ALARM,MAJOR_ALARM);
             }
         }
         break;
     default:
-        recGblSetSevr(pdfanout,SOFT_ALARM,INVALID_ALARM);
+        recGblSetSevr(prec,SOFT_ALARM,INVALID_ALARM);
     }
 
 }

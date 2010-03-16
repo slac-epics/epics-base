@@ -7,7 +7,7 @@
 # and higher are distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-# RULES_JAVA,v 1.9.2.13 2004/11/15 16:20:52 evans Exp
+# RULES_JAVA,v 1.9.2.16 2009/06/26 20:37:22 jba Exp
 #
 
 
@@ -53,7 +53,6 @@ COMMON_JAVAINC += $(addprefix $(COMMON_DIR)/,$(JAVAINC))
 
 JAVACFLAGS += $(USR_JAVACFLAGS)
 CLASSES += $(subst .java,.class,$(JAVA))
-DEPJAVA += $(subst .class,.java,$(CLASSES))
 INSTALL_CLASSES = $(addprefix $(INSTALL_JAVA)/,$(CLASSES))
 
 TESTCLASSES += $(subst .java,.class,$(notdir $(TESTJAVA)))
@@ -63,7 +62,7 @@ DEPTESTJAVA += $(subst .class,.java,$(TESTCLASSES))
 #-------------------------------------------------------
 # Java jar file
 
-INSTALL_JAR =$(addprefix $(INSTALL_JAVA)/,$(JAR) $(JAR_INPUT))
+INSTALL_JAR =$(addprefix $(INSTALL_JAVA)/,$(JAR))
 JARMANIFEST += $(firstword $(MANIFEST) $(JAR_MANIFEST))
 JARDEPFILES += $(addprefix $(INSTALL_JAVA)/,$(subst .java,.class,$(JAVA)) $(JAR_INPUT))
 JARINPUT += $(foreach inp,$(JAR_INPUT),-C $(INSTALL_JAVA) $(subst .java,.class,$(inp)))
@@ -115,41 +114,41 @@ $(JAVA_DIRECTORY_TARGETS):
 endif
 
 $(COMMON_JAVAINC):$(JAVAINC_CLASSFILES)
-	@echo Creating header files $(COMMON_JAVAINC)
+	$(ECHO) Creating header files $(COMMON_JAVAINC)
 	@$(RM) $@
 	$(JAVAHCMD) $(JAVAINC_CLASSNAMES)
 
 $(COMMON_TESTCLASSES): $(addprefix ../,$(DEPTESTJAVA))
-	@echo Creating test java class files $(COMMON_TESTCLASSES)
+	$(ECHO) Creating test java class files $(COMMON_TESTCLASSES)
 	@$(RM) $@
 	$(JAVACCMD) -d $(COMMON_DIR) $^
 
-$(INSTALL_CLASSES): $(addprefix ../,$(DEPJAVA))
-	@echo Creating java class files 
+$(INSTALL_CLASSES): $(addprefix ../,$(JAVA))
+	$(ECHO) Creating java class files 
 	@$(RM) $@
 	$(JAVACCMD) -d $(INSTALL_JAVA) $^
 
 $(INSTALL_JAVADOC): $(addprefix ../,$(JAVA))
-	@echo Creating java doc files 
+	$(ECHO) Creating java doc files 
 	@$(RM) $@
 	$(JAVADOCCMD) -d $(addprefix $(INSTALL_HTML)/,$(JAVADOC)) $^
 
 $(COMMON_DIR)/%.jar: $(JARDEPFILES)
-	@echo Creating java jar file $@
+	$(ECHO) Creating java jar file $@
 	@$(RM) $@
 	$(JARCMD)
 
 $(INSTALL_JAVA)/%.jar: $(COMMON_DIR)/%.jar
-	@echo "Installing java jar file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing java jar file $@"
+	@$(INSTALL) -d -m  $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_JAVA)/%.jar: %.jar
-	@echo "Installing java jar file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing java jar file $@"
+	@$(INSTALL) -d -m  $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(addprefix $(INSTALL_JAVA)/, $(JARINPUT)): $(INSTALL_JAVA)/%: ../%
-	@echo "Installing jar input file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing jar input file $@"
+	@$(INSTALL) -d -m  $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PHONY: all install buildInstall rebuild clean build inc
 

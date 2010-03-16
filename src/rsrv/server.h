@@ -39,8 +39,6 @@
 #define epicsExportSharedSymbols
 #endif
 
-#define LOCAL static
-
 /* a modified ca header with capacity for large arrays */
 typedef struct caHdrLargeArray {
     ca_uint32_t m_postsize;     /* size of message extension */
@@ -104,8 +102,11 @@ typedef struct client {
 
 enum rsrvChanState { 
     rsrvCS_invalid,
-    rsrvCS_inService, 
-    rsrvCS_inServiceUpdatePendAR };
+    rsrvCS_pendConnectResp,
+    rsrvCS_inService,
+    rsrvCS_pendConnectRespUpdatePendAR,
+    rsrvCS_inServiceUpdatePendAR 
+};
 
 /*
  * per channel structure 
@@ -136,8 +137,10 @@ struct event_ext {
     unsigned                size;       /* for speed */
     unsigned                mask;
     char                    modified;   /* mod & ev flw ctrl enbl */
-    char                    send_lock;  /* lock send buffer */
 };
+
+
+enum ctl {ctlRun, ctlPause, ctlExit};
 
 /*  NOTE: external used so they remember the state across loads */
 #ifdef  GLBLSOURCE
@@ -175,6 +178,14 @@ GLBLTYPE void               *rsrvLargeBufFreeListTCP;
 GLBLTYPE unsigned           rsrvSizeofLargeBufTCP;
 GLBLTYPE void               *rsrvPutNotifyFreeList; 
 GLBLTYPE unsigned           rsrvChannelCount;
+
+GLBLTYPE epicsEventId       casudp_startStopEvent;
+GLBLTYPE epicsEventId       beacon_startStopEvent;
+GLBLTYPE epicsEventId       castcp_startStopEvent;
+GLBLTYPE volatile enum ctl  casudp_ctl;
+GLBLTYPE volatile enum ctl  beacon_ctl;
+GLBLTYPE volatile enum ctl  castcp_ctl;
+
 
 #define CAS_HASH_TABLE_SIZE 4096
 

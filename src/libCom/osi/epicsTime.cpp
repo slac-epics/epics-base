@@ -1,10 +1,9 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2007 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* epicsTime.cpp */
@@ -44,17 +43,18 @@ static const char pEpicsTimeVersion[] =
 // useful public constants
 //
 static const unsigned mSecPerSec = 1000u;
-static const unsigned uSecPerSec = 1000u * mSecPerSec;
-static const unsigned nSecPerSec = 1000u * uSecPerSec;
+static const unsigned uSecPerMSec = 1000u;
+static const unsigned uSecPerSec = uSecPerMSec * mSecPerSec;
 static const unsigned nSecPerUSec = 1000u;
-static const unsigned secPerMin = 60u;
+static const unsigned nSecPerSec = nSecPerUSec * uSecPerSec;
 static const unsigned nSecFracDigits = 9u;
 
-static const unsigned tmStructEpochYear = 1900;
 
-static const unsigned epicsEpochYear = 1990;
-static const unsigned epicsEpocMonth = 0; // January
-static const unsigned epicsEpocDayOfTheMonth = 1; // the 1st day of the month
+// Timescale conversion data
+
+static const unsigned long NTP_TIME_AT_POSIX_EPOCH = 2208988800ul;
+static const unsigned long NTP_TIME_AT_EPICS_EPOCH =
+    NTP_TIME_AT_POSIX_EPOCH + POSIX_TIME_AT_EPICS_EPOCH;
 
 //
 // epicsTime (const unsigned long secIn, const unsigned long nSecIn)
@@ -81,53 +81,29 @@ static const epicsTimeLoadTimeInit lti;
 //
 epicsTimeLoadTimeInit::epicsTimeLoadTimeInit ()
 {
-    static const time_t ansiEpoch = 0;
-    double secWest;
+    // All we know about time_t is that it is an arithmetic type.
+    time_t t_zero = static_cast<time_t> (0);
+    time_t t_one  = static_cast<time_t> (1);
+    this->time_tSecPerTick = difftime (t_one, t_zero);
 
-    {
-        time_t current = time ( NULL );
-        time_t error;
-        struct tm date; // vxWorks 6.0 requires "struct" here 
+    /* The EPICS epoch (1/1/1990 00:00:00UTC) was 631152000 seconds after
+     * the ANSI epoch (1/1/1970 00:00:00UTC)
+     * Convert this offset into time_t units, however this must not be
+     * calculated using local time (i.e. using mktime() or similar), since
+     * in the UK the ANSI Epoch had daylight saving time in effect, and 
+     * the value calculated would be 3600 seconds wrong.*/
+    this->epicsEpochOffset =
+        (double) POSIX_TIME_AT_EPICS_EPOCH / this->time_tSecPerTick;
 
-        int status = epicsTime_gmtime ( &current, &date );
-        assert ( status == epicsTimeOK );
-        error = mktime ( &date );
-        assert ( error != (time_t) - 1 );
-        secWest =  difftime ( error, current );
-    }
-    
-    {
-        time_t first = static_cast<time_t> (0);
-        time_t last = static_cast<time_t> (1);
-        this->time_tSecPerTick = difftime (last, first);
-    }
-
-    {
-        struct tm tmEpicsEpoch;
-        time_t epicsEpoch;
-
-        tmEpicsEpoch.tm_sec = 0;
-        tmEpicsEpoch.tm_min = 0;
-        tmEpicsEpoch.tm_hour = 0;
-        tmEpicsEpoch.tm_mday = epicsEpocDayOfTheMonth;
-        tmEpicsEpoch.tm_mon = epicsEpocMonth;
-        tmEpicsEpoch.tm_year = epicsEpochYear - tmStructEpochYear;
-        // must not correct for DST because secWest does 
-        // not include a DST offset
-        tmEpicsEpoch.tm_isdst = 0; 
-
-        epicsEpoch = mktime (&tmEpicsEpoch);
-        assert (epicsEpoch!=(time_t)-1);
-        this->epicsEpochOffset = difftime ( epicsEpoch, ansiEpoch ) - secWest;
-    }
-
-    if ( this->time_tSecPerTick == 1.0 && this->epicsEpochOffset <= ULONG_MAX &&
-           this->epicsEpochOffset >= 0 ) {
+    if (this->time_tSecPerTick == 1.0 &&
+        this->epicsEpochOffset <= ULONG_MAX &&
+        this->epicsEpochOffset >= 0) {
+        // We can use simpler code on Posix-compliant systems
         this->useDiffTimeOptimization = true;
         this->epicsEpochOffsetAsAnUnsignedLong = 
-            static_cast < unsigned long > ( this->epicsEpochOffset );
-    }
-    else {
+            static_cast<unsigned long>(this->epicsEpochOffset);
+    } else {
+        // Forced to use the slower but correct code
         this->useDiffTimeOptimization = false;
         this->epicsEpochOffsetAsAnUnsignedLong = 0;
     }
@@ -205,9 +181,10 @@ epicsTime::epicsTime (const epicsTimeStamp &ts)
     }
 }
 
-epicsTime::epicsTime () : secPastEpoch(0u), nSec(0u) {}	
+epicsTime::epicsTime () :
+    secPastEpoch(0u), nSec(0u) {}
 
-epicsTime::epicsTime (const epicsTime &t) : 
+epicsTime::epicsTime (const epicsTime &t) :
     secPastEpoch (t.secPastEpoch), nSec (t.nSec) {}
 
 epicsTime epicsTime::getCurrent ()
@@ -223,14 +200,12 @@ epicsTime epicsTime::getCurrent ()
 epicsTime epicsTime::getEvent (const epicsTimeEvent &event)
 {
     epicsTimeStamp current;
-    int status = epicsTimeGetEvent (&current, event.eventNumber);
+    int status = epicsTimeGetEvent (&current, event);
     if (status) {
         throwWithLocation ( unableToFetchCurrentTime () );
     }
     return epicsTime ( current );
 }
-
-void epicsTime::synchronize () {} // depricated
 
 //
 // operator time_t_wrapper ()
@@ -268,7 +243,7 @@ epicsTime::operator local_tm_nano_sec () const
 
     int status = epicsTime_localtime ( &ansiTimeTicks.ts, &tm.ansi_tm );
     if ( status != epicsTimeOK ) {
-        throw std::logic_error ( "epicsTime_gmtime failed" );
+        throw std::logic_error ( "epicsTime_localtime failed" );
     }
 
     tm.nSec = this->nSec;
@@ -383,10 +358,8 @@ epicsTime::epicsTime (const struct timeval &ts)
     this->addNanoSec (ts.tv_usec * nSecPerUSec);
 }
 
-// 631152000 (at posix epic) + 2272060800 (btw posix and epics epoch) +
-// 15 ( leap seconds )
-static const unsigned long epicsEpocSecsPastEpochNTP = 2903212815u;
-static const double NTP_FRACTION_DENOMINATOR = (static_cast<double>(0xffffffff) + 1.0);
+
+static const double NTP_FRACTION_DENOMINATOR = 1.0 + 0xffffffff;
 
 struct l_fp { /* NTP time stamp */
     epicsUInt32 l_ui; /* sec past NTP epoch */
@@ -399,7 +372,7 @@ struct l_fp { /* NTP time stamp */
 epicsTime::operator l_fp () const
 {
     l_fp ts;
-    ts.l_ui = this->secPastEpoch + epicsEpocSecsPastEpochNTP;
+    ts.l_ui = this->secPastEpoch + NTP_TIME_AT_EPICS_EPOCH;
     ts.l_uf = static_cast < unsigned long > 
         ( ( this->nSec * NTP_FRACTION_DENOMINATOR ) / nSecPerSec );
     return ts;
@@ -410,7 +383,7 @@ epicsTime::operator l_fp () const
 //
 epicsTime::epicsTime ( const l_fp & ts )
 {
-    this->secPastEpoch = ts.l_ui - epicsEpocSecsPastEpochNTP;
+    this->secPastEpoch = ts.l_ui - NTP_TIME_AT_EPICS_EPOCH;
     this->nSec = static_cast < unsigned long > 
         ( ( ts.l_uf / NTP_FRACTION_DENOMINATOR ) * nSecPerSec );
 }
@@ -452,12 +425,12 @@ epicsTime::operator epicsTimeStamp () const
 // specifying its nnnn
 // C) returning a pointer to the postfix (which might be passed again 
 // to fracFormatFind.
-static const char * fracFormatFind ( 
-    const char * const pFormat, 
+static const char * fracFormatFind (
+    const char * const pFormat,
     char * const pPrefixBuf,
     const size_t prefixBufLen,
     bool & fracFmtFound,
-    unsigned long & fracFmtWidth  ) 
+    unsigned long & fracFmtWidth )
 {
     assert ( prefixBufLen > 1 );
     unsigned long width = ULONG_MAX;
@@ -535,8 +508,8 @@ size_t epicsTime::strftime (
         // look for "%0<n>f" at the end (used for fractional second formatting)        
         char strftimePrefixBuf [256];
         bool fracFmtFound;
-        unsigned long fracWid;
-        pFmt = fracFormatFind ( 
+        unsigned long fracWid = 0;
+        pFmt = fracFormatFind (
             pFmt, 
             strftimePrefixBuf, sizeof ( strftimePrefixBuf ),
             fracFmtFound, fracWid );
@@ -548,7 +521,7 @@ size_t epicsTime::strftime (
         // all but fractional seconds use strftime formatting
         if ( strftimePrefixBuf[0] != '\0' ) {
             local_tm_nano_sec tmns = *this;
-            size_t strftimeNumChar = :: strftime ( 
+            size_t strftimeNumChar = :: strftime (
                 pBufCur, bufLenLeft, strftimePrefixBuf, & tmns.ansi_tm );
             pBufCur [ strftimeNumChar ] = '\0';
             pBufCur += strftimeNumChar;
@@ -583,7 +556,7 @@ size_t epicsTime::strftime (
                     frac %= static_cast < unsigned long > ( 1e9 );
                     frac /= div[fracWid];
                     char fracFormat[32];
-                    sprintf ( fracFormat, "%%0%uu", fracWid );
+                    sprintf ( fracFormat, "%%0%lulu", fracWid );
                     int status = epicsSnprintf ( pBufCur, bufLenLeft, fracFormat, frac );
                     if ( status > 0 ) {
                         unsigned long nChar = static_cast < unsigned long > ( status );

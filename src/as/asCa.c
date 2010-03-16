@@ -1,11 +1,10 @@
 /*asCa.c*/
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* Author:  Marty Kraimer Date:    10-15-93 */
@@ -39,13 +38,13 @@
 
 int asCaDebug = 0;
 epicsExportAddress(int,asCaDebug);
-LOCAL int firstTime = TRUE;
-LOCAL epicsThreadId threadid=0;
-LOCAL int caInitializing=FALSE;
-LOCAL epicsMutexId asCaTaskLock;		/*lock access to task */
-LOCAL epicsEventId asCaTaskWait;		/*Wait for task to respond*/
-LOCAL epicsEventId asCaTaskAddChannels;	/*Tell asCaTask to add channels*/
-LOCAL epicsEventId asCaTaskClearChannels;/*Tell asCaTask to clear channels*/
+static int firstTime = TRUE;
+static epicsThreadId threadid=0;
+static int caInitializing=FALSE;
+static epicsMutexId asCaTaskLock;		/*lock access to task */
+static epicsEventId asCaTaskWait;		/*Wait for task to respond*/
+static epicsEventId asCaTaskAddChannels;	/*Tell asCaTask to add channels*/
+static epicsEventId asCaTaskClearChannels;/*Tell asCaTask to clear channels*/
 
 typedef struct {
     struct dbr_sts_double rtndata;
@@ -87,7 +86,7 @@ static void exceptionCallback(struct exception_handler_args args)
 }
 
 /*connectCallback only handles disconnects*/
-LOCAL void connectCallback(struct connection_handler_args arg)
+static void connectCallback(struct connection_handler_args arg)
 {
     chid		chid = arg.chid;
     ASGINP		*pasginp = (ASGINP *)ca_puser(chid);
@@ -104,14 +103,14 @@ LOCAL void connectCallback(struct connection_handler_args arg)
     }
 }
 
-LOCAL void eventCallback(struct event_handler_args arg)
+static void eventCallback(struct event_handler_args arg)
 {
     int		caStatus = arg.status;
     chid	chid = arg.chid;
     ASGINP	*pasginp = (ASGINP *)arg.usr;
     ASG		*pasg;
     CAPVT	*pcapvt;
-    READONLY struct dbr_sts_double *pdata;
+    const struct dbr_sts_double *pdata;
 
     if(caStatus!=ECA_NORMAL) {
 	if(chid) {
@@ -160,7 +159,7 @@ LOCAL void eventCallback(struct event_handler_args arg)
     if(!caInitializing) asComputeAsg(pasg);
 }
 
-LOCAL void asCaTask(void)
+static void asCaTask(void)
 {
     ASG		*pasg;
     ASGINP	*pasginp;
@@ -303,3 +302,32 @@ int epicsShareAPI ascarFP(FILE *fp,int level)
     fprintf(fp,"%d channels %d not connected\n",n,nbad);
     return(0);
 }
+
+void epicsShareAPI ascaStats(int *pchans, int *pdiscon)
+{
+    ASG *pasg;
+    int n = 0;
+    int nbad = 0;
+
+    if(!pasbase) {
+        if (pchans)  *pchans  = n;
+        if (pdiscon) *pdiscon = nbad;
+        return;
+    }
+    pasg = (ASG *)ellFirst(&pasbase->asgList);
+    while (pasg) {
+        ASGINP *pasginp;
+        pasginp = (ASGINP *)ellFirst(&pasg->inpList);
+        while (pasginp) {
+            CAPVT *pcapvt = (CAPVT *)pasginp->capvt;
+            chid chid = pcapvt->chid;
+            ++n;
+            if (ca_state(chid) != cs_conn) ++nbad;
+            pasginp = (ASGINP *)ellNext((ELLNODE *)pasginp);
+        }
+        pasg = (ASG *)ellNext((ELLNODE *)pasg);
+    }
+    if (pchans)  *pchans  = n;
+    if (pdiscon) *pdiscon = nbad;
+}
+
