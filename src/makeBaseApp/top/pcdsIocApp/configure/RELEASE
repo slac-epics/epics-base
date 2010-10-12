@@ -2,13 +2,18 @@
 # Defines location of external products
 include $(TOP)/RELEASE_SITE
 
+# ===============================================================
+# Define the location and version of EPICS base
+# ===============================================================
+BASE_MODULE_VERSION=R3.14.9-0.3.0
+EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 
 # ===============================================================
 # Define the version of modules needed by
 # IOC apps or other Support apps
 # ===============================================================
-AUTOSAVE_MODULE_VERSION=R4.2.1.2-0.3.0
-IOCADMIN_MODULE_VERSION=R2.0.0-0.5.0
+AUTOSAVE_MODULE_VERSION=R4.2.1.2-1.0.0
+IOCADMIN_MODULE_VERSION=R2.0.0-1.0.0
 
 # ============================================================
 # External Support module path definitions

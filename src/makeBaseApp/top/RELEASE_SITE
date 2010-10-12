@@ -3,28 +3,11 @@
 # We will build some tools/scripts that allow us to
 # change this easily when relocating software.
 # ==============================================================
-EPICS_SITE_TOP?=/reg/g/pcds/package/epics/3.14
-EPICS_SITE_CONFIG?=$(EPICS_SITE_TOP)/RELEASE_SITE
+EPICS_SITE_TOP=/reg/g/pcds/package/epics/3.14
 
-# Set the BASE and EXTENSIONS versions
-BASE_MODULE_VERSION?=R3.14.9-0.3.0
-EXTENSIONS_MODULE_VERSION?=R3.14.9-0.4.0
-
-# Set EPICS_BASE
-EPICS_BASE?=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
-
-# EPICS_HOST_ARCH is set here
-ifndef EPICS_HOST_ARCH
-EPICS_HOST_ARCH=$(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
-export EPICS_HOST_ARCH
-endif
-
-# =============================================================
-# Define location of module tree with respect to
-# EPICS_SITE_TOP
-# =============================================================
+# EPICS module releases are kept here
 EPICS_MODULES=$(EPICS_SITE_TOP)/modules
 
-RTEMS_SITE_TOP?=/reg/g/pcds/package/rtems
-RTEMS_VER?=rtems-4.7.1
+# Use the latest version of msi to avoid dependency on the extensions version
+MSI=$(EPICS_SITE_TOP)/extensions/current/bin/$(EPICS_HOST_ARCH)/msi
 
