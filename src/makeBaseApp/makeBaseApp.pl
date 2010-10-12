@@ -150,10 +150,10 @@ if ($opt_i) {
 		($appname = $ioc) =~ s/App$// if !$appnameIn;
 		($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
 		$ioc = "ioc-" . $ioc unless ($ioc =~ m/ioc/);
-		if (-d "iocBoot/$ioc") {
-			print "iocBoot/$ioc exists, not modified.\n";
-			next;
-		}
+		#if (-d "iocBoot/$ioc") {
+		#	print "iocBoot/$ioc exists, not modified.\n";
+		#	next;
+		#}
 		find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/ioc");
 
 		#
@@ -172,10 +172,10 @@ foreach $app ( @names ) {
     ($appname = $app) =~ s/App$//;
     ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
     $appdir  = $appname . "App";
-    if (-d "$appdir") {
-		print "$appname exists, not modified.\n";
-		next;
-    }
+    #if (-d "$appdir") {
+	#	print "$appname exists, not modified.\n";
+	#	next;
+    #}
     print "Creating $appname from template type $apptypename\n" if $opt_d; 
     find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/");
 
