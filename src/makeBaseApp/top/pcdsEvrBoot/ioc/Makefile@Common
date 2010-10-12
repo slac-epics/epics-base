@@ -6,6 +6,9 @@ include $(TOP)/configure/CONFIG
 ARCH = _ARCH_
 TARGETS = envPaths
 
+# Make sure these archive files are fully expanded
+USR_ARCHIVEFLAGS += -V
+
 #----------------------------------------------------
 # Create and install IOC archive file
 #

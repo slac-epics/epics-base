@@ -170,6 +170,10 @@ if ($opt_i) {
 #
 foreach $app ( @names ) {
     ($appname = $app) =~ s/App$//;
+    if ( $appname =~ /-.*/ ) {
+    	print "Invalid application name: $appname\n";
+    	next;
+    }
     ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
     $appdir  = $appname . "App";
     #if (-d "$appdir") {
@@ -249,7 +253,7 @@ sub get_commandline_opts { #no args
 			  map {"    $_\n"} @iocs;
 		}
 		print "Name the IOC(s) to be created.\n",
-		      "Names given will have \"ioc\" prepended to them.\n",
+		      "Names given will have \"ioc-\" prepended to them.\n",
 		      "IOC names? ";
 	    } else {
 		print "Name the application(s) to be created.\n",
@@ -264,7 +268,7 @@ sub get_commandline_opts { #no args
 	} 
     } else {
 	@names = @ARGV;
-    } 
+    }
 
     # ioc architecture and application name
     if ($opt_i && @names) {
@@ -303,6 +307,19 @@ sub get_commandline_opts { #no args
 		  "Application name? ";
 	    $appnameIn = <STDIN>;
 	    chomp($appnameIn);
+	}
+
+        # IOC PV Root name
+	if ( $opt_i and ! $opt_r ) {
+	    print "Enter the root PV name for this IOC (Ex. TST:R12:IOC:12):\n",
+		  "Root PV name? ";
+	    $opt_r = <STDIN>;
+	    chomp($opt_r);
+		printf "root PV name: $opt_r\n";
+	    if ( length "$opt_r" <= 0 ) {
+	    	$opt_r	= undef;
+			printf "Clear empty root PV name\n";
+	    }
 	}
     }
 

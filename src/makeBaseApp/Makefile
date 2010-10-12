@@ -18,12 +18,6 @@ TEMPLATES += top/edm-_IOC_.cmd
 
 TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
 
-#TEMPLATES += top/autosave/autosave.req
-#TEMPLATES += top/autosave/autosave_evr.req
-
-#TEMPLATES += top/archive/iocAdmin.req
-#TEMPLATES += top/archive/_IOC_.substitutions
-
 TEMPLATES += top/configure/CONFIG
 TEMPLATES += top/configure/CONFIG_SITE
 TEMPLATES += top/configure/Makefile
@@ -253,13 +247,11 @@ TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
 TEMPLATES += top/pcdsIocApp/Replace.pl
 TEMPLATES += top/pcdsIocApp/Makefile
 TEMPLATES += top/pcdsIocApp/Db/Makefile
+TEMPLATES += top/pcdsIocApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsIocApp/Db/archive__APPNAME_.substitutions
 TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
-TEMPLATES += top/pcdsIocApp/autosaveSrc/Makefile
-TEMPLATES += top/pcdsIocApp/autosaveSrc/autosave__APPNAME_.substitutions
-TEMPLATES += top/pcdsIocApp/archiveSrc/Makefile
-TEMPLATES += top/pcdsIocApp/archiveSrc/archive__APPNAME_.substitutions
 
 TEMPLATES += top/pcdsIocApp/configure/RELEASE
 
@@ -292,17 +284,13 @@ TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.substitutions
 TEMPLATES += top/pcdsEvrApp/Makefile
 
 TEMPLATES += top/pcdsEvrApp/Db/Makefile
+TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evr.substitutions
 
 TEMPLATES += top/pcdsEvrApp/src/Makefile
 TEMPLATES += top/pcdsEvrApp/src/_APPNAME_Main.cpp
-
-TEMPLATES += top/pcdsEvrApp/autosaveSrc/Makefile
-TEMPLATES += top/pcdsEvrApp/autosaveSrc/autosave__APPNAME_.substitutions
-
-TEMPLATES += top/pcdsEvrApp/archiveSrc/Makefile
-TEMPLATES += top/pcdsEvrApp/archiveSrc/archive__APPNAME_.substitutions
 
 TEMPLATES += top/pcdsEvrApp/configure/RELEASE
 

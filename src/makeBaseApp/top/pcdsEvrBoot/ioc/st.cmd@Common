@@ -16,6 +16,7 @@
 
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
+epicsEnvSet( "IOCSH_PS1", "_IOC_> " )
 < envPaths
 cd( "../.." )
 

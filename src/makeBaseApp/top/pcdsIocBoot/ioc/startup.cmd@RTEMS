@@ -3,11 +3,11 @@
 < /home/All/pre_rtems_tst.cmd
 
 # For development
-nfsMount(getenv("NFS_HOME"), "/nfsexport/home/_USER_/wa/epics", "/devel" )
-chdir("/devel/ioc/_APPNAME_/current/iocBoot/_IOC_")
+nfsMount( getenv("NFS_HOME"), "/nfsexport/home/_USER_/wa/epics", "/devel" )
+chdir( "/devel/ioc/tst/_APPNAME_/current/iocBoot/_IOC_" )
 
 # For release
-#chdir( "/iocs/_APPNAME_/R0.1.0/iocBoot/_IOC_" )
+#chdir( "/iocs/tst/_APPNAME_/R0.1.0/iocBoot/_IOC_" )
 
 # Run the start script
 < st.cmd
