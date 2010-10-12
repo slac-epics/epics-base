@@ -279,7 +279,7 @@ TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.substitutions
 # Author: Bruce Hill
 ######################################################################
 
-# pcdsEvrApp - Basic pcds IOC including autosave and iocAdmin
+# pcdsEvrApp - Basic pcds IOC including autosave, iocAdmin, and EVR
 
 TEMPLATES += top/pcdsEvrApp/Makefile
 
@@ -311,6 +311,61 @@ TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
 TEMPLATES += top/pcdsEvrBoot/ioc/README@Common
 
 TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.substitutions
+
+######################################################################
+# PCDS templates: 'pcdsMotorApp' and 'pcdsMotorBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsMotorApp - Basic pcds IOC including autosave, iocAdmin and motor
+TEMPLATES += top/pcdsMotorApp/Makefile
+
+TEMPLATES += top/pcdsMotorApp/Db/Makefile
+TEMPLATES += top/pcdsMotorApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/motors.substitutions
+
+TEMPLATES += top/pcdsMotorApp/configure/RELEASE
+
+TEMPLATES += top/pcdsMotorApp/src/Makefile
+TEMPLATES += top/pcdsMotorApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsMotorBoot/Makefile
+TEMPLATES += top/pcdsMotorBoot/nfsCommands@RTEMS
+
+TEMPLATES += top/pcdsMotorBoot/ioc/Makefile@Common
+TEMPLATES += top/pcdsMotorBoot/ioc/README@Common
+TEMPLATES += top/pcdsMotorBoot/ioc/README@RTEMS
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.substitutions
+TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@Common*
+TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@RTEMS*
+TEMPLATES += top/pcdsMotorBoot/ioc/startup.cmd@Common*
+TEMPLATES += top/pcdsMotorBoot/ioc/startup.cmd@RTEMS*
+
+######################################################################
+# PCDS template: 'pcdsModuleLib'
+# Author: Bruce Hill
+######################################################################
+
+# pcdsModuleLib - Basic pcds module including autosave and archive support
+
+TEMPLATES += top/pcdsModuleLib/Makefile
+
+TEMPLATES += top/pcdsModuleLib/Db/Makefile
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.template
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.template
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.template
+
+TEMPLATES += top/pcdsModuleLib/configure/RELEASE
+
+TEMPLATES += top/pcdsModuleLib/src/Makefile
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.cpp
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.dbd
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.h
 
 ######################################################################
 # End of PCDS additions

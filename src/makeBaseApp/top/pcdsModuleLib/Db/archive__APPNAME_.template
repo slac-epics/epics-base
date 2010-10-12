@@ -1,0 +1,30 @@
+#
+# Archive template for _APPNAME_
+#
+# Syntax:	<pv_name>   		<period> [ monitor ]
+# Example:	TST:R00:IOC:00:STATUS   0.1    monitor
+#
+# For monitor mode, the period should be your estimate
+# of how often the PV will change and is used to determine
+# how big a buffer to allocate in the archiver to guard
+# against dropped values.
+#
+# For sample mode, (no "monitor" keyword), the period is the
+# rate at which to sample and archive the PV.
+
+# Archive values which seldom change 
+# Ex: TST:R00:IOC:00:DEVNAME	30	monitor
+#
+# TODO:	Add a list of PV's which should be archived, but seldom change.
+
+# Archive values which occasionally have bursts of
+# activity which needs to be archived.
+# Ex: TST:R00:IOC:00:STATUS	0.1	monitor
+#
+# TODO:	Add a list of PV's which have burst activity
+
+# Archive values which change often but don't need all values archived
+# Ex: TST:R00:IOC:00:TEMP	30
+#
+# TODO:	Add a list of PV's for sampled archiving
+

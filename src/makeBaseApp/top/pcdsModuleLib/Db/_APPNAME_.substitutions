@@ -1,0 +1,16 @@
+#
+# _APPNAME_ database substitutions file
+#
+
+# Generate _APPNAME_ db file 
+#	Macros:
+#		TODO:	List here any macros used in the template
+#				Note which ones have defaults.
+file __APPNAME_.template
+{
+	{
+		# Hack till msi supports empty substitutions
+		IOC		=	$(IOC),
+	}
+}
+
