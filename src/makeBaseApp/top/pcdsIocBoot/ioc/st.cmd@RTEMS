@@ -12,6 +12,8 @@
 ## ex. AMO:R15:IOC:23
 ##
 
+ld( "../../bin/_ARCH_/_APPNAME_.obj" )
+
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
 < envPaths
@@ -30,7 +32,7 @@ dbLoadRecords( "db/iocAdmin.db",			"IOC=_IOCPVROOT_" )
 dbLoadRecords( "db/save_restoreStatus.db",	"IOC=_IOCPVROOT_" )
 
 # Setup autosave
-set_savefile_path( "/reg/d/iocData/_IOC_/autosave" )
+set_savefile_path( "/thisIocData/autosave" )
 set_requestfile_path( "autosave" )
 save_restoreSet_IncompleteSetsOk( 1 )
 save_restoreSet_DatedBackupFiles( 1 )
