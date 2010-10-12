@@ -245,6 +245,7 @@ TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
 TEMPLATES += top/pcdsIocApp/Replace.pl
 TEMPLATES += top/pcdsIocApp/Makefile
 TEMPLATES += top/pcdsIocApp/Db/Makefile
+TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
 TEMPLATES += top/pcdsIocApp/../_APPNAME_Screens/_APPNAME_.edl
