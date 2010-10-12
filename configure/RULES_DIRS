@@ -17,7 +17,7 @@ ARCHS += $(BUILD_ARCHS)
 #    single-colon 'clean:' rule, which conflicts the other
 #    double-colon 'clean::' rules that we use.
 ACTIONS += inc build install buildInstall clean realclean archclean runtests
-ACTIONS_NO_CLEAN += inc build install buildInstall realclean archclean runtests
+ACTIONS_NO_CLEAN += inc build install buildInstall archclean runtests
 
 dirPart = $(word 1, $(subst $(DIVIDER), ,$@))
 actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$@)), \
@@ -37,9 +37,9 @@ actionArchTargets = $(foreach action, $(ACTIONS),\
                     $(foreach arch, $(ARCHS), \
                     $(action)$(DIVIDER)$(arch)))
 
-all : install
+all: install
 
-rebuild : clean install
+rebuild: clean install
 
 $(DIRS) $(dirActionTargets) $(dirArchTargets) $(dirActionArchTargets) :
 	$(MAKE) -C $(dirPart) $(actionArchPart)
@@ -48,10 +48,12 @@ $(DIRS) $(dirActionTargets) $(dirArchTargets) $(dirActionArchTargets) :
 #    Restore the 'clean' rule, but make it 'clean::', not
 #    single-colon.  This allows other 'clean::'s to still function.
 
-$(ARCHS) $(ACTIONS_NO_CLEAN) $(actionArchTargets) :%: \
+$(ARCHS) $(ACTIONS_NO_CLEAN) $(actionArchTargets): %: \
 	$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
 
 clean::%:$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
+
+realclean::%:$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
 
 .PHONY : $(DIRS) all rebuild
 .PHONY : $(ARCHS) $(ACTIONS)

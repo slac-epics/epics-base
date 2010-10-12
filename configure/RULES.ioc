@@ -33,6 +33,13 @@ else
 	$(PERL) $(TOOLS)/convertRelease.pl -a $(ARCH) -t $(IOCS_APPL_TOP) $@
 endif
 
-realclean:
+realclean::
 	$(RM) cdCommands envPaths
+
+# Inflate the IOC archive file, if any
+$(INSTALL_ARCHIVE)/%.archive: %.substitutions
+	@echo "Inflating archive file from $<"
+	@$(RM) $@
+	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
+	$(MV) msi.tmp $@
 

@@ -56,7 +56,9 @@ INSTALL_LOCATION            ?= $(TOP)
 TOOLS                       = $(CONFIG)/tools
 
 # SLAC Specific Install locations
-INSTALL_DISPLAY		    = $(INSTALL_LOCATION)/display
+INSTALL_ARCHIVE             = $(INSTALL_LOCATION)/archive
+INSTALL_AUTOSAVE            = $(INSTALL_LOCATION)/autosave
+INSTALL_DISPLAY		        = $(INSTALL_LOCATION)/display
 INSTALL_RESTORE             = $(INSTALL_LOCATION)/restore
 
 
