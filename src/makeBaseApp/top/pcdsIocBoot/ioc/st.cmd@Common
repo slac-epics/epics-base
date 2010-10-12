@@ -16,19 +16,17 @@
 
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
-< endPaths
+< envPaths
 cd( "../.." )
 
-# IOCs can load settings which are common
-# for all IOCs. Such as EPICS_CA_ADDR_LIST, etc...
-# The file: pre_linux.cmd does the trick
+# Run common startup commands for linux soft IOC's
 < /reg/d/iocCommon/All/pre_linux.cmd
 
-## Register all support components
+# Register all support components
 dbLoadDatabase("dbd/_APPNAME_.dbd")
 _APPNAME__registerRecordDeviceDriver(pdbbase)
 
-## Load record instances
+# Load record instances
 dbLoadRecords( "db/iocAdmin.db",			"IOC=_IOCPVROOT_" )
 dbLoadRecords( "db/save_restoreStatus.db",	"IOC=_IOCPVROOT_" )
 
@@ -46,5 +44,5 @@ iocInit()
 # Start autosave backups
 create_monitor_set( "autosave.req", 5, "IOC=_IOCPVROOT_" )
 
-## All IOCs should dump some common info after initial startup.
+# All IOCs should dump some common info after initial startup.
 < /reg/d/iocCommon/All/post_linux.cmd

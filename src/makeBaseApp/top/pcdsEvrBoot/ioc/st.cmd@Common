@@ -1,50 +1,49 @@
-## Example RTEMS startup script
+#!../../bin/_ARCH_/_APPNAME_
 
 ## ToDo: The following substitutions can be done via makeBaseApp.pl
 ## If they weren't, do them before releasing your IOC
 ##
-## Replace _APPNAME_ with the name of the application
+## Replace _ USER _ with your userid
 ##
-## Replace _IOC_ with the network name of the IOC
+## Replace _ APPNAME _ with the name of the application
 ##
-## Replace _IOCPVROOT_ with the PV prefix used for
+## Replace _ IOC _ with the network name of the IOC
+##
+## Replace _ IOCPVROOT _ with the PV prefix used for
 ## iocAdmin PV's on this IOC
 ## ex. AMO:R15:IOC:23
 ##
 
-ld( "../../bin/_ARCH_/_APPNAME_.obj" )
-
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
 < envPaths
-chdir( "../.." )
+cd( "../.." )
 
-## Register all support components
+# Run common startup commands for linux soft IOC's
+< /reg/d/iocCommon/All/pre_linux.cmd
+
+# Register all support components
 dbLoadDatabase("dbd/_APPNAME_.dbd")
-_APPNAME__registerRecordDeviceDriver(pdbbase) 
+_APPNAME__registerRecordDeviceDriver(pdbbase)
 
-## Configure drivers as needed
-# EVR driver
-# ErConfigure( 0, 0, 0, 0, 1 )
+# Set EVR module debug level
+ErDebugLevel( 0 )
 
-## Load record instances
+# Initialize PMC EVR
+ErConfigure( 0, 0, 0, 0, 1 )
+
+# Load record instances
 dbLoadRecords( "db/iocAdmin.db",			"IOC=_IOCPVROOT_" )
 dbLoadRecords( "db/save_restoreStatus.db",	"IOC=_IOCPVROOT_" )
+dbLoadRecords( "db/evr.db",					"IOC=_IOCPVROOT_,EVR=_EVRPVROOT_" )
 
 # Setup autosave
-set_savefile_path( "/thisIocData/autosave" )
+set_savefile_path( "/reg/d/iocData/_IOC_/autosave" )
 set_requestfile_path( "autosave" )
 save_restoreSet_IncompleteSetsOk( 1 )
 save_restoreSet_DatedBackupFiles( 1 )
 set_pass0_restoreFile( "autosave.sav" )
 set_pass1_restoreFile( "autosave.sav" )
-
-# Update archive file
-cp( "autosave/_IOC_.archive", "/thisIocData/_IOC_/autosave/" )
-
-# Convenience aliases
-reboot=rtemsReboot
-mon=rtemsMonitor
 
 # Initialize the IOC and start processing records
 iocInit()
@@ -52,3 +51,5 @@ iocInit()
 # Start autosave backups
 create_monitor_set( "autosave.req", 5, "IOC=_IOCPVROOT_" )
 
+# All IOCs should dump some common info after initial startup.
+< /reg/d/iocCommon/All/post_linux.cmd

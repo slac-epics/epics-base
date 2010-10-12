@@ -19,6 +19,7 @@ TEMPLATES += top/edm-_IOC_.cmd
 TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
 
 TEMPLATES += top/autosave/autosave.req
+TEMPLATES += top/autosave/autosave_evr.req
 
 TEMPLATES += top/archiver/iocAdmin.req
 TEMPLATES += top/archiver/_IOC_.req
@@ -271,6 +272,41 @@ TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@Common
 TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
 
 TEMPLATES += top/pcdsIocBoot/ioc/README@Common
+
+
+######################################################################
+# PCDS templates: 'pcdsEvrApp' and 'pcdsEvrBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsEvrApp - Basic pcds IOC including autosave and iocAdmin
+
+TEMPLATES += top/pcdsEvrApp/Makefile
+TEMPLATES += top/pcdsEvrApp/Db/Makefile
+TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/evr.substitutions
+TEMPLATES += top/pcdsEvrApp/src/Makefile
+TEMPLATES += top/pcdsEvrApp/src/_APPNAME_Main.cpp
+TEMPLATES += top/pcdsEvrApp/configure/RELEASE
+#TEMPLATES += top/pcdsEvrApp/autosave/Makefile
+#TEMPLATES += top/pcdsEvrApp/autosave/_APPNAME_.substitutions
+#TEMPLATES += top/pcdsEvrApp/autosave/autosave_evr.req
+
+# pcdsEvrBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsEvrBoot/Makefile
+
+TEMPLATES += top/pcdsEvrBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsEvrBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsEvrBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsEvrBoot/ioc/README@Common
 
 ######################################################################
 # End of PCDS additions
