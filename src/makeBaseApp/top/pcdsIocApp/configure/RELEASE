@@ -1,6 +1,7 @@
 # RELEASE
 # Defines location of external products
--include $(TOP)/RELEASE_SITE
+include $(TOP)/RELEASE_SITE
+
 
 # ===============================================================
 # Define the version of modules needed by

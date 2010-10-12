@@ -19,6 +19,12 @@ EPICS_HOST_ARCH=$(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
 export EPICS_HOST_ARCH
 endif
 
+# =============================================================
+# Define location of module tree with respect to
+# EPICS_SITE_TOP
+# =============================================================
+EPICS_MODULES=$(EPICS_SITE_TOP)/modules
+
 RTEMS_SITE_TOP?=/reg/g/pcds/package/rtems
 RTEMS_VER?=rtems-4.7.1
 
