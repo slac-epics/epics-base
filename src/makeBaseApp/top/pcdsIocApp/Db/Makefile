@@ -17,14 +17,15 @@ DB += iocAdmin.db
 # Archive files, templates, substitutions like this
 #
 ARCHIVE += archive__APPNAME_.archive
-# Nothing to build for autosave, just install from $AUTOSAVE/db
-DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
 #
 REQ += autosave__APPNAME_.req
+
+# Nothing to build for autosave, just install from $AUTOSAVE/db
+DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
 
 include $(TOP)/configure/RULES
 #----------------------------------------

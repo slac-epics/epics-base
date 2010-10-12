@@ -46,6 +46,9 @@ MDrivePlusConfig( 0, "MMS:01" )
 # asynSetTraceIOMask( "MMS:01",	0,		2 )
 # asynSetTraceMask(   "MMS:01",	0,		9 )
 
+# Send trace output to motor specific log files
+asynSetTraceFile(   "MMS:01",	"/reg/d/iocCommon/_IOC_/MMS:01.log" )
+
 # Optional: Enable MDrive debug output
 # Requires that ImsSrc motor be built with DEBUG
 # drvMDrivePlusdebug = 4
