@@ -85,6 +85,7 @@ sub ReplaceFilename { # (filename)
 	}
     $file =~ s|_APPNAME_|$appname|g;
     $file =~ s|_APPTYPE_|$apptype|g;
+    $file =~ s|_IOCPVROOT_|$pvroot|g if ($pvroot);
 
 	my $qmtop = quotemeta($top);
 	$file =~ s|$qmtop/||;   # Change to the target location
@@ -105,6 +106,7 @@ sub ReplaceLine { # (line)
     $line =~ s/_APPNAME_/$appname/g;
     $line =~ s/_CSAFEAPPNAME_/$csafeappname/g;
     $line =~ s/_APPTYPE_/$apptype/go;
+    $line =~ s/_IOCPVROOT_/$pvroot/go if ($pvroot);
     $line =~ s/_ARCH_/$arch/go if ($opt_i);
     $line = &ReplaceLineHook($line); # Call the apptype's hook
     return $line;
@@ -190,7 +192,8 @@ exit 0;				# END OF SCRIPT
 # Get commandline options and check for validity
 #
 sub get_commandline_opts { #no args
-    getopts("a:b:dhilp:T:t:") or Cleanup(1);
+	# Options followed by ':' take an argument
+    getopts("a:b:dhilp:r:T:t:") or Cleanup(1);
     
     # Options help
     Cleanup(0) if $opt_h;
@@ -320,6 +323,7 @@ sub get_commandline_opts { #no args
     $apptypename = $apptype . $appext;
     (-r "$top/$apptypename") or
 	Cleanup(1, "Can't access template directory '$top/$apptypename'.\n");
+    $pvroot = $opt_r ? $opt_r : undef;
 
     print "\nCommand line / environment options validated:\n"
 	. " Templ-Top: $top\n"
@@ -419,9 +423,13 @@ sub CopyFile { # (source)
 			print OUT &ReplaceLine($_);
 		}
 		close INP; close OUT;
+		# Make startup cmd scripts executable
+		if ( $target =~ /.*\.cmd/ and !-x $target ) {
+			chmod 0775, $target;
+		}
     }
 }
-	
+
 #
 # Find() callback for file or structure copy
 #
@@ -474,6 +482,7 @@ EOF
           If not specified, base path is taken from configure/RELEASE
           If configure does not exist, base path is taken from command
  -d       Enable debug messages
+ -r root  Specifies the root name for the IOC's iocAdmin PV's, Ex AMO:R23:IOC:17
  -i       Specifies that ioc boot directories will be generated
  -l       List valid application types for this installation
 	  If this is specified the other options are not used

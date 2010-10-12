@@ -1,4 +1,10 @@
 #!/bin/bash
+if [ $UID -ne 0 ]
+then
+	echo "Error: This script must be run as root."
+	echo "Try 'sudo $0'"
+	exit 1
+fi
 
 # These commands should run as the appropriate IOC userid
 # TODO: Change tstioc as needed for your hutch
