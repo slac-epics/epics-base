@@ -75,6 +75,9 @@ $outfile = $ARGV[0];
 %macros = (TOP => LocalPath($top));
 @apps   = ('TOP');	# Records the order of definitions in RELEASE file
 
+# Many RELEASE files need $TOP
+$ENV{TOP} = $top if !exists $ENV{TOP};
+
 # Read the RELEASE file(s)
 $relfile = "$top/configure/RELEASE";
 die "Can't find $relfile" unless (-f $relfile);
@@ -126,8 +129,12 @@ sub readRelease {
     my ($pre, $var, $post, $macro, $path);
     my ($makecmd);
     local *IN;
-    
-    $makecmd = "make -s --no-print-directory -C " . $localpath . " -f Makefile.displayvar PARSEFILE=$file";
+
+	# Run from current directory, as $TOP can be relative to current directory.  i.e. ../..
+	# Otherwise, we get error messages from "convertRelease.pl checkRelease" for some macros
+	# if RELEASE includes files using $TOP
+    #$makecmd = "make -s --no-print-directory -C " . $localpath . " -f Makefile.displayvar PARSEFILE=$file";
+    $makecmd = "make -s --no-print-directory " . "-f $localpath/Makefile.displayvar PARSEFILE=$file";
     open(IN, $file) or die "Can't open $file: $!\n";
     while (<IN>) {
 	chomp;
@@ -290,13 +297,13 @@ sub envPaths {
     my $ioc = $cwd;
     $ioc =~ s/^.*\///;	# iocname is last component of directory name
     
-    print OUT "epicsEnvSet(ARCH,\"$arch\")\n";
-    print OUT "epicsEnvSet(IOC,\"$ioc\")\n";
+    print OUT "epicsEnvSet( \"ARCH\", \"$arch\" )\n";
+    print OUT "epicsEnvSet( \"IOC\",  \"$ioc\" )\n";
     
     foreach my $app (@includes) {
 	my $iocpath = my $path = $macros{$app};
 	$iocpath =~ s/^$root/$iocroot/o if ($opt_t);
-	print OUT "epicsEnvSet($app,\"$iocpath\")\n" if (-d $path);
+	print OUT "epicsEnvSet( \"$app\", \"$iocpath\" )\n" if (-d $path);
     }
     close OUT;
 }
@@ -317,11 +324,10 @@ sub checkRelease {
 	while (my ($parent, $ppath) = each %check) {
 	    if (exists $macros{$parent} &&
 		abs_path($macros{$parent}) ne abs_path($ppath)) {
-		print "\n" unless ($status);
-		print "Definition of $parent conflicts with $app support.\n";
-		print "In this application configure/RELEASE defines\n";
+		print "\nDefinition of $parent conflicts with $app support.\n";
+		print "  In this application configure/RELEASE defines\n";
 		print "\t$parent = $macros{$parent}\n";
-		print "but $app at $path has\n";
+		print "  but $app at $path has\n";
 		print "\t$parent = $ppath\n";
 		$status = 1;
 	    }
