@@ -188,11 +188,7 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 EPICS_SITE_VERSION = pcds-r$(shell svnversion $(EPICS_SITE_TOP))
 
 # =================================================================
-# By default EPICS is not build for the build machine architecture 
-# in PCDS environment
-# If you would like the EPICS module to be build for 
-# EPICS_HOST_ARCH set this variable
+# If you would like the EPICS module to be built for 
+# the EPICS_HOST_ARCH set this variable
 # =================================================================
-ifdef BASE_TOP
 BUILD_FOR_HOST_ARCH=1
-endif
