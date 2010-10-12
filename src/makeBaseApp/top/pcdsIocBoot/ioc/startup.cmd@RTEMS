@@ -1,0 +1,16 @@
+# Run the setup script
+# TODO: Change tst as needed for your hutch
+< /home/All/pre_rtems_tst.cmd
+
+# For development
+nfsMount(getenv("NFS_FILE_SYSTEM"), "/nfsexport/home/_USER_/wa/epics", "/devel" )
+chdir("/devel/ioc/_APPNAME_/current/iocBoot/_IOC_")
+
+# For release
+#chdir( "/iocs/_APPNAME_/R0.1.0/iocBoot/_IOC_" )
+
+# Run the start script
+< st.cmd
+
+< /home/All/post_rtems.cmd
+

@@ -12,9 +12,10 @@
 ## ex. AMO:R15:IOC:23
 ##
 
-# < envPaths
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
+< envPaths
+chdir( "../.." )
 
 ## Register all support components
 dbLoadDatabase("dbd/_APPNAME_.dbd")
@@ -28,9 +29,6 @@ _APPNAME__registerRecordDeviceDriver(pdbbase)
 dbLoadRecords( "db/iocAdmin.db",			"IOC=_IOCPVROOT_" )
 dbLoadRecords( "db/save_restoreStatus.db",	"IOC=_IOCPVROOT_" )
 
-## Set this to see messages from mySub
-#var mySubDebug 1
-
 # Setup autosave
 set_savefile_path( "/reg/d/iocData/_IOC_/autosave" )
 set_requestfile_path( "autosave" )
@@ -38,6 +36,10 @@ save_restoreSet_IncompleteSetsOk( 1 )
 save_restoreSet_DatedBackupFiles( 1 )
 set_pass0_restoreFile( "autosave.sav" )
 set_pass1_restoreFile( "autosave.sav" )
+
+# Convenience aliases
+reboot=rtemsReboot
+mon=rtemsMonitor
 
 # Initialize the IOC and start processing records
 iocInit()

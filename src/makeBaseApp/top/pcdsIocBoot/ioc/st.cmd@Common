@@ -1,4 +1,4 @@
-#!bin/_ARCH_/_APPNAME_
+#!../../bin/_ARCH_/_APPNAME_
 
 ## ToDo: The following substitutions can be done via makeBaseApp.pl
 ## If they weren't, do them before releasing your IOC
@@ -16,6 +16,8 @@
 
 epicsEnvSet( "ENGINEER", "your_name (_USER_)" )
 epicsEnvSet( "LOCATION", "_IOCPVROOT_" )
+< endPaths
+cd( "../.." )
 
 # IOCs can load settings which are common
 # for all IOCs. Such as EPICS_CA_ADDR_LIST, etc...

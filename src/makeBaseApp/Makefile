@@ -257,17 +257,15 @@ TEMPLATES += top/pcdsIocApp/configure/RELEASE
 
 TEMPLATES += top/pcdsIocBoot/Makefile
 
-
-TEMPLATES += top/pcdsIocBoot/nfsCommands@RTEMS
 TEMPLATES += top/pcdsIocBoot/ioc/Makefile@Common
 
-
 TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@Common
-
-
 TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@RTEMS
-TEMPLATES += top/pcdsIocBoot/ioc/README@Common
 
+TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsIocBoot/ioc/README@Common
 
 TEMPLATES += top/pcdsIocBoot/../archiver/_IOC_.req
 

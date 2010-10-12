@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# These commands should run as the appropriate IOC userid
+# TODO: Change tstioc as needed for your hutch
+export EPICS_SITE_TOP=/reg/g/pcds/package/epics/3.14
+export RUNUSER="/sbin/runuser tstioc -s /bin/bash --preserve-environment -c"
+export IOC_DATA=/reg/d/iocData/
+export PROCSERV="/reg/g/pcds/package/procServ-2.4.0/procServ --ignore ^D^C"
+
+# Make sure the IOC's data directories are ready for use
+export IOC="_IOC_"
+$RUNUSER "mkdir -p $IOC_DATA/$IOC/autosave"
+$RUNUSER "mkdir -p $IOC_DATA/$IOC/iocInfo"
+$RUNUSER "chmod g+w -R $IOC_DATA/$IOC"
+
+# For release
+#cd $EPICS_SITE_TOP/ioc/_APPNAME_/R0.1.0/iocBoot/_IOC_
+
+# Launch the IOC
+$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
