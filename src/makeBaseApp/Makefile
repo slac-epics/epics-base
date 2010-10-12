@@ -12,7 +12,12 @@ TEMPLATES += top/Makefile
 TEMPLATES += top/README
 TEMPLATES += top/RELEASE_NOTES
 TEMPLATES += top/RELEASE_SITE
+
 ## =================================================
+
+TEMPLATES += top/autosave/autosave.req
+TEMPLATES += top/archiver/archive.xml
+TEMPLATES += top/archiver/archive.req
 
 TEMPLATES += top/configure/CONFIG
 TEMPLATES += top/configure/CONFIG_SITE
@@ -171,64 +176,99 @@ TEMPLATES += top/lclsBoot/ioc/README@vxWorks6
 ## ==========================================
 
 ######################################################################
-# PCDS templates: 'pcdsApp' and 'pcdsBoot'.
+# PCDS templates: 'pcdsDemoApp' and 'pcdsDemoBoot'.
 # Author: Jason Tiller
 ######################################################################
 
-# pcdsApp - based on lclsApp.  Also includes a 'srcProtocol' directory
+# pcdsDemoApp - based on lclsApp.  Also includes a 'srcProtocol' directory
 # for managing streamDevice's protocol files.
 
-TEMPLATES += top/pcdsApp/Makefile
-TEMPLATES += top/pcdsApp/Db/Makefile
-TEMPLATES += top/pcdsApp/Db/dbExample1.db
-TEMPLATES += top/pcdsApp/Db/dbExample2.db
-TEMPLATES += top/pcdsApp/Db/dbSubExample.db
-TEMPLATES += top/pcdsApp/src/Makefile
-TEMPLATES += top/pcdsApp/src/xxxRecord.dbd
-TEMPLATES += top/pcdsApp/src/xxxRecord.c
-TEMPLATES += top/pcdsApp/src/devXxxSoft.c
-TEMPLATES += top/pcdsApp/src/xxxSupport.dbd
-TEMPLATES += top/pcdsApp/src/sncExample.stt
-TEMPLATES += top/pcdsApp/src/sncProgram.st
-TEMPLATES += top/pcdsApp/src/sncExample.dbd
-TEMPLATES += top/pcdsApp/src/dbSubExample.c
-TEMPLATES += top/pcdsApp/src/dbSubExample.dbd
-TEMPLATES += top/pcdsApp/src/_APPNAME_Main.cpp
-TEMPLATES += top/pcdsApp/src/_APPNAME_Hello.c
-TEMPLATES += top/pcdsApp/src/_APPNAME_Hello.dbd
+TEMPLATES += top/pcdsDemoApp/Makefile
+TEMPLATES += top/pcdsDemoApp/Db/Makefile
+TEMPLATES += top/pcdsDemoApp/Db/dbExample1.db
+TEMPLATES += top/pcdsDemoApp/Db/dbExample2.db
+TEMPLATES += top/pcdsDemoApp/Db/dbSubExample.db
+TEMPLATES += top/pcdsDemoApp/src/Makefile
+TEMPLATES += top/pcdsDemoApp/src/xxxRecord.dbd
+TEMPLATES += top/pcdsDemoApp/src/xxxRecord.c
+TEMPLATES += top/pcdsDemoApp/src/devXxxSoft.c
+TEMPLATES += top/pcdsDemoApp/src/xxxSupport.dbd
+TEMPLATES += top/pcdsDemoApp/src/sncExample.stt
+TEMPLATES += top/pcdsDemoApp/src/sncProgram.st
+TEMPLATES += top/pcdsDemoApp/src/sncExample.dbd
+TEMPLATES += top/pcdsDemoApp/src/dbSubExample.c
+TEMPLATES += top/pcdsDemoApp/src/dbSubExample.dbd
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Main.cpp
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.c
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.dbd
 
-TEMPLATES += top/pcdsApp/srcDisplay/Makefile
-TEMPLATES += top/pcdsApp/srcDisplay/example.edl
+TEMPLATES += top/pcdsDemoApp/srcDisplay/Makefile
+TEMPLATES += top/pcdsDemoApp/srcDisplay/example.edl
 
-TEMPLATES += top/pcdsApp/srcProtocol/Makefile
-TEMPLATES += top/pcdsApp/srcProtocol/example.proto
+TEMPLATES += top/pcdsDemoApp/srcProtocol/Makefile
+TEMPLATES += top/pcdsDemoApp/srcProtocol/example.proto
 
-# pcdsBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# pcdsDemoBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
 # into INSTALL_LOCATION if you aren't building in your development
 # directory.
 
-TEMPLATES += top/pcdsBoot/Makefile
+TEMPLATES += top/pcdsDemoBoot/Makefile
 
-TEMPLATES += top/pcdsBoot/nfsCommands@vxWorks
-TEMPLATES += top/pcdsBoot/nfsCommands@vxWorks6
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@vxWorks
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@vxWorks6
 
-TEMPLATES += top/pcdsBoot/nfsCommands@RTEMS
-TEMPLATES += top/pcdsBoot/ioc/Makefile@Common
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@RTEMS
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@Common
 
-TEMPLATES += top/pcdsBoot/ioc/Makefile@vxWorks
-TEMPLATES += top/pcdsBoot/ioc/Makefile@vxWorks6
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@vxWorks6
 
-TEMPLATES += top/pcdsBoot/ioc/st.cmd@Common
-TEMPLATES += top/pcdsBoot/ioc/st.cmd@Cross
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@Cross
 
-TEMPLATES += top/pcdsBoot/ioc/st.cmd@vxWorks
-TEMPLATES += top/pcdsBoot/ioc/st.cmd@vxWorks6
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
 
-TEMPLATES += top/pcdsBoot/ioc/st.cmd@RTEMS
-TEMPLATES += top/pcdsBoot/ioc/README@Common
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@RTEMS
+TEMPLATES += top/pcdsDemoBoot/ioc/README@Common
 
-TEMPLATES += top/pcdsBoot/ioc/README@vxWorks
-TEMPLATES += top/pcdsBoot/ioc/README@vxWorks6
+TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
+
+######################################################################
+# PCDS templates: 'pcdsIocApp' and 'pcdsIocBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsIocApp - Basic pcds IOC including autosave and iocAdmin
+
+TEMPLATES += top/pcdsIocApp/Replace.pl
+TEMPLATES += top/pcdsIocApp/Makefile
+TEMPLATES += top/pcdsIocApp/Db/Makefile
+TEMPLATES += top/pcdsIocApp/src/Makefile
+TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
+TEMPLATES += top/pcdsIocApp/../_APPNAME_Screens/_APPNAME_.edl
+TEMPLATES += top/pcdsIocApp/configure/RELEASE
+
+# pcdsIocBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsIocBoot/Makefile
+
+
+TEMPLATES += top/pcdsIocBoot/nfsCommands@RTEMS
+TEMPLATES += top/pcdsIocBoot/ioc/Makefile@Common
+
+
+TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@Common
+
+
+TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@RTEMS
+TEMPLATES += top/pcdsIocBoot/ioc/README@Common
+
+
+TEMPLATES += top/pcdsIocBoot/../archiver/_IOC_.req
 
 ######################################################################
 # End of PCDS additions

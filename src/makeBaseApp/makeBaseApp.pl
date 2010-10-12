@@ -49,43 +49,47 @@ sub ReplaceFilename { # (filename)
     $file =~ s|.*/$apptypename/Replace\.pl$||;
     
     if($opt_i) {
-	# Handle name@arch stuff, copy only the closest matching file
-	# NB: Won't work with directories, don't use '@' in a directory name!
-	my($base,$filearch) = split /@/, $file;
-	if ($base ne $file) {		# This file is arch-specific
-	    my($os,$cpu,$toolset) = split /-/, $arch, 3;
-	    if (-r "$base\@$arch") {	# A version exists for this arch
-		$base = '' unless ($filearch eq $arch && -s $file);
-	    } elsif (-r "$base\@$os") {	# A version exists for this os
-		$base = '' unless ($filearch eq $os && -s $file);
-	    } elsif (  $ENV{EPICS_HOST_ARCH} !~ "$os-$cpu" && 
-                  -r "$base\@Cross" ) {	# Cross version exists
-		$base = '' unless ($filearch eq "Cross" && -s $file);
-	    } elsif (-r "$base\@Common") {	# Default version exists
-		$base = '' unless ($filearch eq "Common" && -s $file);
-	    } else {			# No default version
-		$base = '';
-	    }
-	    $file = $base;	# Strip the @... part from the target name
+		# Handle name@arch stuff, copy only the closest matching file
+		# NB: Won't work with directories, don't use '@' in a directory name!
+		my($base,$filearch) = split /@/, $file;
+		if ($base ne $file) {		# This file is arch-specific
+		my($os,$cpu,$toolset) = split /-/, $arch, 3;
+		if (-r "$base\@$arch") {	# A version exists for this arch
+			$base = '' unless ($filearch eq $arch && -s $file);
+		} elsif (-r "$base\@$os") {	# A version exists for this os
+			$base = '' unless ($filearch eq $os && -s $file);
+		} elsif (  $ENV{EPICS_HOST_ARCH} !~ "$os-$cpu" && 
+			  -r "$base\@Cross" ) {	# Cross version exists
+			$base = '' unless ($filearch eq "Cross" && -s $file);
+		} elsif (-r "$base\@Common") {	# Default version exists
+			$base = '' unless ($filearch eq "Common" && -s $file);
+		} else {			# No default version
+			$base = '';
+		}
+		$file = $base;	# Strip the @... part from the target name
+		}
+		$file =~ s|/$apptypename|/iocBoot|;	# templateBoot => iocBoot
 	}
-	$file =~ s|/$apptypename|/iocBoot|;	# templateBoot => iocBoot
-    }
-    if ($ioc) {
+
+	if ($ioc) {
 	$file =~ s|/iocBoot/ioc|/iocBoot/$ioc|;	# name the ioc subdirectory
 	$file =~ s|_IOC_|$ioc|;
-    } else {
+	} else {
 	$file =~ s|.*/iocBoot/ioc/?.*||;	# Not doing IOCs here
-    }
-    if ($app) {
+	$file =~ s|.*_IOC_.*||;	# Ignore files with unexpanded _IOC_
+	}
+	if ($app) {
 	$file =~ s|/$apptypename|/$appdir|;	# templateApp => namedApp
-	$file =~ s|/$appdir/configure|/configure/$apptype|;
-    }
-    $file =~ s|_APPNAME_|$appname|;
-    $file =~ s|_APPTYPE_|$apptype|;
-    my $qmtop = quotemeta($top);
-    $file =~ s|$qmtop/||;   # Change to the target location
-    $file = &ReplaceFilenameHook($file); # Call the apptype's hook
-    return $file;
+#	$file =~ s|/$appdir/configure|/configure/$apptype|;
+	$file =~ s|/$appdir/configure|/configure|;
+	}
+    $file =~ s|_APPNAME_|$appname|g;
+    $file =~ s|_APPTYPE_|$apptype|g;
+
+	my $qmtop = quotemeta($top);
+	$file =~ s|$qmtop/||;   # Change to the target location
+	$file = &ReplaceFilenameHook($file); # Call the apptype's hook
+	return $file;
 }
 
 # ReplaceLine
@@ -106,6 +110,23 @@ sub ReplaceLine { # (line)
     return $line;
 }
 
+
+#
+# CopyTop
+# Copy files and dirs from <top> (other than App & Boot) if not present
+#
+# We do this after app expansion so _APPNAME_ substitution works for
+# any common directories or files, such as top/_APPNAME_Screens
+#
+sub CopyTop {
+	opendir TOPDIR, "$top" or die "Can't open $top: $!";
+	foreach $f ( grep !/^\.\.?$|^[^\/]*(App|Boot)/, readdir TOPDIR ) {
+	   find({wanted => \&FCopyTree, follow => 1}, "$top/$f");
+	}
+	closedir TOPDIR;
+}
+
+
 # Source replace overrides for file copy
 if (-r "$top/$apptypename/Replace.pl") {
     require "$top/$apptypename/Replace.pl";
@@ -114,11 +135,7 @@ if (-r "$top/$apptypename/Replace.pl") {
 #
 # Copy files and dirs from <top> (other than App & Boot) if not present
 #
-opendir TOPDIR, "$top" or die "Can't open $top: $!";
-foreach $f ( grep !/^\.\.?$|^[^\/]*(App|Boot)/, readdir TOPDIR ) {
-   find({wanted => \&FCopyTree, follow => 1}, "$top/$f") unless (-e "$f");
-}
-closedir TOPDIR;
+#CopyTop();
 
 #
 # Create ioc directories
@@ -128,14 +145,20 @@ if ($opt_i) {
 
     $appname=$appnameIn if $appnameIn;
     foreach $ioc ( @names ) {
-	($appname = $ioc) =~ s/App$// if !$appnameIn;
-	($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
-	$ioc = "ioc" . $ioc unless ($ioc =~ m/ioc/);
-	if (-d "iocBoot/$ioc") {
-	    print "iocBoot/$ioc exists, not modified.\n";
-	    next;
-	}
-	find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/ioc");
+		($appname = $ioc) =~ s/App$// if !$appnameIn;
+		($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
+		$ioc = "ioc-" . $ioc unless ($ioc =~ m/ioc/);
+		if (-d "iocBoot/$ioc") {
+			print "iocBoot/$ioc exists, not modified.\n";
+			next;
+		}
+		find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/ioc");
+
+		#
+		# Copy files and dirs from <top> with $ioc substituted for _IOC_
+		# We do this so _IOC_ substitution works for
+		# any common directories or files, such as top/archiver/_IOC_.req
+		CopyTop();
     }
     exit 0;			# finished here for -i (no xxxApps)
 }
@@ -148,11 +171,17 @@ foreach $app ( @names ) {
     ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
     $appdir  = $appname . "App";
     if (-d "$appdir") {
-	print "$appname exists, not modified.\n";
-	next;
+		print "$appname exists, not modified.\n";
+		next;
     }
     print "Creating $appname from template type $apptypename\n" if $opt_d; 
     find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/");
+
+	#
+	# Copy files and dirs from <top> with $appname substituted for _APPNAME_
+	# We do this so _APPNAME_ substitution works for
+	# any common directories or files, such as top/_APPNAME_Screens
+	CopyTop();
 }
 
 exit 0;				# END OF SCRIPT
@@ -173,10 +202,16 @@ sub get_commandline_opts { #no args
     } elsif ($release{"EPICS_BASE"}) { # second choice is configure/RELEASE
 	$epics_base = UnixPath($release{"EPICS_BASE"});
 	$epics_base =~s|^\$\(TOP\)/||;
-    } elsif ($command =~ m|/bin/|) { # assume script was run with full path to base
-	$epics_base = $command;
-	$epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
     }
+
+    if ( !$epics_base or !-d "$epics_base" ) {
+    	# Only try the command line path if neither of the above work
+	if ($command =~ m|/bin/|) { # assume script was run with full path to base
+	    $epics_base = $command;
+	    $epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
+	}
+    }
+
     $epics_base and -d "$epics_base" or Cleanup(1, "Can't find EPICS base");
     $app_epics_base = LocalPath($epics_base);
     $app_epics_base =~ s|^\.\.|\$(TOP)/..|;
@@ -372,17 +407,18 @@ sub ListAppTypes { # no args
 #
 sub CopyFile { # (source)
     $source = $_[0];
+    print "CopyFile: Checking source $source\n" if $opt_d; 
     $target = &ReplaceFilename($source);
 
     if ($target and !-e $target) {
-	open(INP, "<$source") and open(OUT, ">$target")
-	    or die "$! Copying $source -> $target";
+		open(INP, "<$source") and open(OUT, ">$target")
+			or die "$! Copying $source -> $target";
 
-	print "Copying file $source -> $target\n" if $opt_d;
-	while (<INP>) {
-	    print OUT &ReplaceLine($_);
-	}
-	close INP; close OUT;
+		print "Copying file $source -> $target\n" if $opt_d;
+		while (<INP>) {
+			print OUT &ReplaceLine($_);
+		}
+		close INP; close OUT;
     }
 }
 	
@@ -391,12 +427,12 @@ sub CopyFile { # (source)
 #
 sub FCopyTree {
     chdir $app_top;		# Sigh
-    if (-d "$File::Find::name"
-	and ($dir = &ReplaceFilename($File::Find::name))) {
-	print "Creating directory $dir\n" if $opt_d;
-	&mkpath($dir) unless (-d "$dir");
+    if (	-d "$File::Find::name"
+		and	($dir = &ReplaceFilename($File::Find::name))) {
+		print "Creating directory $dir\n" if $opt_d and !(-d "$dir");
+		&mkpath($dir) unless (-d "$dir");
     } else {
-	&CopyFile($File::Find::name);
+		&CopyFile($File::Find::name);
     }
     chdir $File::Find::dir;
 }

@@ -10,13 +10,10 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += dbExample1.db
-DB += dbExample2.db
-DB += dbSubExample.db
+DB += iocAdmin.db
 
-#----------------------------------------------------
-# If <anyname>.db template is not named <anyname>*.template add
-# <anyname>_TEMPLATE = <templatename>
+# Nothing to build for autosave, just install from $AUTOSAVE/db
+DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
 
 include $(TOP)/configure/RULES
 #----------------------------------------
