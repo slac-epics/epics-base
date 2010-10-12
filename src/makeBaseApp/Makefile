@@ -12,12 +12,16 @@ TEMPLATES += top/Makefile
 TEMPLATES += top/README
 TEMPLATES += top/RELEASE_NOTES
 TEMPLATES += top/RELEASE_SITE
+TEMPLATES += top/edm-_IOC_.cmd
 
 ## =================================================
 
+TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
+
 TEMPLATES += top/autosave/autosave.req
-TEMPLATES += top/archiver/archive.xml
-TEMPLATES += top/archiver/archive.req
+
+TEMPLATES += top/archiver/iocAdmin.req
+TEMPLATES += top/archiver/_IOC_.req
 
 TEMPLATES += top/configure/CONFIG
 TEMPLATES += top/configure/CONFIG_SITE
@@ -28,6 +32,8 @@ TEMPLATES += top/configure/RULES.ioc
 TEMPLATES += top/configure/RULES.copy
 TEMPLATES += top/configure/RULES_DIRS
 TEMPLATES += top/configure/RULES_TOP
+
+## =================================================
 
 TEMPLATES += top/supportApp/Makefile
 TEMPLATES += top/supportApp/Db/Makefile
@@ -248,7 +254,6 @@ TEMPLATES += top/pcdsIocApp/Db/Makefile
 TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
-TEMPLATES += top/pcdsIocApp/../_APPNAME_Screens/_APPNAME_.edl
 TEMPLATES += top/pcdsIocApp/configure/RELEASE
 
 # pcdsIocBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
@@ -266,8 +271,6 @@ TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@Common
 TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
 
 TEMPLATES += top/pcdsIocBoot/ioc/README@Common
-
-TEMPLATES += top/pcdsIocBoot/../archiver/_IOC_.req
 
 ######################################################################
 # End of PCDS additions

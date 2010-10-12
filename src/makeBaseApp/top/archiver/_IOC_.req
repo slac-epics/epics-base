@@ -1,7 +1,7 @@
 # Archiver request file
 ## Replace _IOCPVROOT_ with the PV prefix used for
 ## iocAdmin PV's on this IOC
-file "archiver/archiver.req"
+file "archiver/iocAdmin.req"
 {
 	{ IOC = "_IOCPVROOT_" }
 }

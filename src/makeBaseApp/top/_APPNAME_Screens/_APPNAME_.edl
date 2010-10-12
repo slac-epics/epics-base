@@ -3,8 +3,8 @@ beginScreenProperties
 major 4
 minor 0
 release 1
-x 55
-y 74
+x 1290
+y 453
 w 466
 h 566
 font "helvetica-medium-r-12.0"
@@ -22,7 +22,7 @@ ctlBgColor1 index 1
 ctlBgColor2 index 14
 topShadowColor index 1
 botShadowColor index 14
-title "_APPNAME_ Status"
+title "myIoc Status"
 showGrid
 snapToGrid
 gridSize 4
@@ -66,13 +66,13 @@ minor 1
 release 0
 x 13
 y 7
-w 214
+w 166
 h 16
 font "helvetica-bold-r-14.0"
 fgColor index 14
 bgColor index 54
 value {
-  "_APPNAME_ Template 480x600"
+  "myIoc Template 480x600"
 }
 autoSize
 endObjectProperties
@@ -108,10 +108,10 @@ beginObjectProperties
 major 4
 minor 0
 release 0
-x 287
+x 216
 y 40
-w 168
-h 515
+w 240
+h 516
 lineColor index 14
 fill
 fillColor index 2
@@ -123,7 +123,7 @@ beginObjectProperties
 major 4
 minor 1
 release 0
-x 299
+x 228
 y 48
 w 55
 h 21
@@ -163,5 +163,255 @@ setPosition {
 replaceSymbols {
   0 1
 }
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 296
+y 532
+w 148
+h 14
+controlPv "$(IOC):TOD"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+autoHeight
+limitsFromDb
+nullColor index 1
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 336
+y 4
+w 64
+h 20
+fgColor index 14
+onColor index 1
+offColor index 4
+topShadowColor index 1
+botShadowColor index 14
+controlPv "$(IOC):SYSRESET"
+pressValue "1"
+onLabel "Reboot Now!"
+offLabel "Reboot"
+3d
+font "helvetica-medium-r-12.0"
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 300
+y 76
+w 148
+h 14
+controlPv "$(IOC):UPTIME"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+autoHeight
+limitsFromDb
+nullColor index 1
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 228
+y 76
+w 37
+h 14
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+value {
+  "Uptime"
+}
+autoSize
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 300
+y 100
+w 148
+h 14
+controlPv "$(IOC):HEARTBEAT"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+autoHeight
+limitsFromDb
+nullColor index 1
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 228
+y 100
+w 54
+h 14
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+value {
+  "Heartbeat"
+}
+autoSize
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 300
+y 128
+w 148
+h 14
+controlPv "$(IOC):HOSTNAME"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+autoHeight
+limitsFromDb
+nullColor index 1
+smartRefresh
+useHexPrefix
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 228
+y 128
+w 61
+h 14
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+value {
+  "Host Name"
+}
+autoSize
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 2
+release 0
+x 300
+y 152
+w 148
+h 14
+controlPv "$(IOC):LOAD"
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 3
+autoHeight
+limitsFromDb
+nullColor index 1
+smartRefresh
+useHexPrefix
+showUnits
+newPos
+objType "monitors"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 228
+y 152
+w 57
+h 14
+font "helvetica-medium-r-12.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+value {
+  "CPU Load"
+}
+autoSize
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 0
+x 300
+y 48
+w 139
+h 21
+font "helvetica-medium-r-18.0"
+fontAlign "center"
+fgColor index 14
+bgColor index 1
+useDisplayBg
+value {
+  "$(IOC)"
+}
+autoSize
 endObjectProperties
 
