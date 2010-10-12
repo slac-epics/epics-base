@@ -325,10 +325,10 @@ sub checkRelease {
 	    if (exists $macros{$parent} &&
 		abs_path($macros{$parent}) ne abs_path($ppath)) {
 		print "\nDefinition of $parent conflicts with $app support.\n";
-		print "  In this application configure/RELEASE defines\n";
-		print "\t$parent = $macros{$parent}\n";
-		print "  but $app at $path has\n";
-		print "\t$parent = $ppath\n";
+		print "   In this application configure/RELEASE defines\n";
+		print "      $parent = $macros{$parent}\n";
+		print "   but $app at $path has\n";
+		print "      $parent = $ppath\n";
 		$status = 1;
 	    }
 	}
