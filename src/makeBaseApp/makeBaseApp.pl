@@ -159,7 +159,7 @@ if ($opt_i) {
 		#
 		# Copy files and dirs from <top> with $ioc substituted for _IOC_
 		# We do this so _IOC_ substitution works for
-		# any common directories or files, such as top/archiver/_IOC_.req
+		# any common directories or files, such as top/archive/_IOC_.req
 		CopyTop();
     }
     exit 0;			# finished here for -i (no xxxApps)

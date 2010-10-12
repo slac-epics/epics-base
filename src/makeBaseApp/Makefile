@@ -21,8 +21,8 @@ TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
 TEMPLATES += top/autosave/autosave.req
 TEMPLATES += top/autosave/autosave_evr.req
 
-TEMPLATES += top/archiver/iocAdmin.req
-TEMPLATES += top/archiver/_IOC_.req
+TEMPLATES += top/archive/iocAdmin.req
+TEMPLATES += top/archive/_IOC_.substitutions
 
 TEMPLATES += top/configure/CONFIG
 TEMPLATES += top/configure/CONFIG_SITE

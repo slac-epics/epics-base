@@ -7,6 +7,7 @@ source /reg/d/iocCommon/All/tst_env.sh
 # Make sure the IOC's data directories are ready for use
 export IOC="_IOC_"
 $RUNUSER "mkdir -p $IOC_DATA/$IOC/autosave"
+$RUNUSER "mkdir -p $IOC_DATA/$IOC/archive"
 $RUNUSER "mkdir -p $IOC_DATA/$IOC/iocInfo"
 $RUNUSER "chmod g+w -R $IOC_DATA/$IOC"
 
@@ -14,7 +15,7 @@ $RUNUSER "chmod g+w -R $IOC_DATA/$IOC"
 #cd $EPICS_SITE_TOP/ioc/_APPNAME_/R0.1.0/iocBoot/_IOC_
 
 # Copy the archive file to iocData
-$RUNUSER "cp autosave/ioc-tst-evr1.archive $IOC_DATA/$IOC/autosave"
+$RUNUSER "cp ../../archive/$IOC.archive $IOC_DATA/$IOC/archive"
 
 # Launch the IOC
 $RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"

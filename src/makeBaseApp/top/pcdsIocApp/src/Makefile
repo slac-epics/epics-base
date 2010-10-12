@@ -6,8 +6,9 @@ include $(TOP)/configure/CONFIG
 #=============================
 
 #=============================
-# build an ioc application
-
+# Build an ioc application
+# Use PROD_IOC_RTEMS for RTEMS only
+# Use PROD_IOC_Linux for Linux only
 PROD_IOC = _APPNAME_
 
 # _APPNAME_.dbd will be created and installed
