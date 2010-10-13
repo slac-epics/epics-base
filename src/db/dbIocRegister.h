@@ -7,8 +7,8 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-#ifndef INCLdb_testh
-#define INCLdb_testh
+#ifndef INC_dbIocRegister_H
+#define INC_dbIocRegister_H
 
 #include "shareLib.h"
 
@@ -16,11 +16,10 @@
 extern "C" {
 #endif
 
-epicsShareFunc int epicsShareAPI gft(char *pname);
-epicsShareFunc int epicsShareAPI pft(char *pname,char *pvalue);
-epicsShareFunc int epicsShareAPI tpn(char     *pname,char *pvalue);
+epicsShareFunc void epicsShareAPI dbIocRegister(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* INCLdb_testh */
+#endif /* INC_dbIocRegister_H */

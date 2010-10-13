@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbAccessDefs.h	*/
-/* dbAccessDefs.h,v 1.12.2.1 2005/10/31 20:54:09 anj Exp */
+/* dbAccessDefs.h,v 1.12.2.9 2009/04/03 20:53:59 lange Exp */
 
 #ifndef INCdbAccessDefsh
 #define INCdbAccessDefsh
@@ -107,9 +107,14 @@ epicsShareExtern volatile int interruptAccept;
 #define DB_UNITS_SIZE   16
 #define DBRunits \
 	char		units[DB_UNITS_SIZE];	/* units	*/
-#define DBRprecision \
-        epicsInt32      precision;      /* number of decimal places*/\
-        epicsInt32      field_width;    /* field width             */
+#define DBRprecision union { \
+        long            dp;      /* number of decimal places*/\
+        double          unused;  /* for alignment */\
+        } precision;
+        /* precision.dp must be long to match the pointer arguments to
+         * RSET->get_precision() and recGblGetPrec(), which it's
+         * too late to change now.  DBRprecision must be padded to
+         * maintain 8-byte alignment. */
 #define DBRtime \
 	epicsTimeStamp	time;		/* time stamp*/
 #define DBRenumStrs \
@@ -177,7 +182,7 @@ struct dbr_alDouble     {DBRalDouble};
 #define S_db_badField 	(M_dbAccess|15) /*Illegal field value*/
 #define S_db_lsetLogic 	(M_dbAccess|17) /*Logic error generating lock sets*/
 #define S_db_noRSET 	(M_dbAccess|31) /*missing record support entry table*/
-#define S_db_noSupport 	(M_dbAccess|33) /*RSET routine not defined*/
+#define S_db_noSupport 	(M_dbAccess|33) /*RSET or DSXT routine not defined*/
 #define S_db_BadSub 	(M_dbAccess|35) /*Subroutine not found*/
 /*!!!! Do not change next line without changing src/rsrv/server.h!!!!!!!!*/
 #define S_db_Pending 	(M_dbAccess|37) /*Request is pending*/
@@ -195,22 +200,25 @@ struct dbr_alDouble     {DBRalDouble};
 #define S_db_noMemory   (M_dbAccess|66) /*unable to allocate data structure from pool*/
 
 /* Global Database Access Routines*/
-#define dbGetLink(PLNK,DBRTYPE,PBUFFER,OPTIONS,NREQUEST) \
-    ((((PLNK)->type == CONSTANT) && (!(NREQUEST) &&(!OPTIONS))) \
-      ? 0\
+#define dbGetLink(PLNK, DBRTYPE, PBUFFER, OPTIONS, NREQUEST) \
+    ( ( ( (PLNK)->type == CONSTANT ) && \
+        ( (NREQUEST) == 0) &&\
+        ( (OPTIONS) == 0) ) \
+      ? 0 \
       : dbGetLinkValue((PLNK),(DBRTYPE), \
-	(void *)(PBUFFER),(OPTIONS),(NREQUEST)))
-#define dbPutLink(PLNK,DBRTYPE,PBUFFER,NREQUEST) \
-    (((PLNK)->type == CONSTANT) \
-    ? 0\
-    : dbPutLinkValue((PLNK),(DBRTYPE),(void *)(PBUFFER),(NREQUEST)))
+        (void *)(PBUFFER), (OPTIONS), (NREQUEST) ) )
+#define dbPutLink(PLNK, DBRTYPE, PBUFFER, NREQUEST) \
+    ( ( (PLNK)->type == CONSTANT) \
+      ? 0 \
+      : dbPutLinkValue( (PLNK), (DBRTYPE), (void *)(PBUFFER), (NREQUEST) ) )
 #define dbGetPdbAddrFromLink(PLNK) \
-    (\
-        ((PLNK)->type != DB_LINK) \
-        ? 0\
-        : (((DBADDR*)((PLNK)->value.pv_link.pvt))) \
-    )
+    ( ( (PLNK)->type != DB_LINK ) \
+      ? 0 \
+      : ( ( (struct dbAddr *)( (PLNK)->value.pv_link.pvt) ) ) )
+#define dbGetSevr(PLINK,PSEVERITY) \
+    dbGetAlarm((PLINK),NULL,(PSEVERITY));
 
+epicsShareFunc long epicsShareAPI dbPutSpecial(struct dbAddr *paddr,int pass);
 epicsShareFunc struct rset * epicsShareAPI dbGetRset(const struct dbAddr *paddr);
 epicsShareFunc long epicsShareAPI dbPutAttribute(
     const char *recordTypename,const char *name,const char*value);
@@ -256,8 +264,8 @@ epicsShareFunc long epicsShareAPI dbGetPrecision(
     const struct link *plink,short *precision);
 epicsShareFunc long epicsShareAPI dbGetUnits(
     const struct link *plink,char *units,int unitsSize);
-epicsShareFunc long epicsShareAPI dbGetSevr(
-    const struct link *plink,short *severity);
+epicsShareFunc long epicsShareAPI dbGetAlarm(
+    const struct link *plink, epicsEnum16 *status,epicsEnum16 *severity);
 epicsShareFunc long epicsShareAPI dbGetTimeStamp(
     const struct link *plink,epicsTimeStamp *pstamp);
 
@@ -269,10 +277,10 @@ epicsShareFunc long epicsShareAPI dbBufferSize(
 epicsShareFunc long epicsShareAPI dbValueSize(short dbrType);
 
 epicsShareFunc int epicsShareAPI  dbLoadDatabase(
-    char *filename,char *path,char *substitutions);
+    const char *filename, const char *path, const char *substitutions);
 
 epicsShareFunc int epicsShareAPI dbLoadRecords(
-    char* pfilename, char* substitutions);
+    const char* filename, const char* substitutions);
 
 #ifdef __cplusplus
 }
