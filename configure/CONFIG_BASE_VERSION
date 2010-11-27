@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  $Revision-Id$
+#  Revision-Id: jba@aps.anl.gov-20101124205038-hr4w7l8eki0rmwm0
 #
 #  EPICS Version information
 #
@@ -58,7 +58,7 @@ EPICS_SHORT_VERSION=$(EPICS_VERSION).$(EPICS_REVISION).$(EPICS_MODIFICATION)$(EP
 EPICS_VERSION_NUMBER=$(EPICS_SHORT_VERSION)$(EPICS_DEV_SNAPSHOT)$(EPICS_SITE_VSTRING)
 EPICS_VERSION_STRING="EPICS Version $(EPICS_VERSION_NUMBER)"
 
-COMMIT_DATE="\$$Date$$"
+COMMIT_DATE="\$Date: 2010/11/27 17:57:27 $"
 
 # Provide these in case anyone is still using the old names
 EPICS_CVS_SNAPSHOT=$(EPICS_DEV_SNAPSHOT)

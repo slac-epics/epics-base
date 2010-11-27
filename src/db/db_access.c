@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Revision-Id$ */
+/* Revision-Id: anj@aps.anl.gov-20101027182656-gkrwdp20hdmf08nj */
 
 /* Interface between old database access and new
  *

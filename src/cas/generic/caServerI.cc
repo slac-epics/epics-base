@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Revision-Id$
+ *      Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov
@@ -36,7 +36,7 @@
 static const char pVersionCAS[] = 
     "@(#) " EPICS_VERSION_STRING 
     ", CA Portable Server Library " 
-    "$Date$";
+    "Date: Tue 2010-10-05 14:27:37 -0500";
 
 caServerI::caServerI ( caServer & tool ) :
     adapter (tool),

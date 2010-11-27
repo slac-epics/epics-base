@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbFastLinkConv.c */
-/* base/src/db  $Revision-Id$ */
+/* base/src/db  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
 /*
  *      Author:            Matthew Needes
  *      Date:              12-9-93

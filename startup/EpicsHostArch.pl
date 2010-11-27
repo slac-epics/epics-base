@@ -9,7 +9,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# $Revision-Id$
+# Revision-Id: anj@aps.anl.gov-20101014190140-s9gxgtnoyhbck6id
 # Returns the Epics host architecture suitable
 # for assigning to the EPICS_HOST_ARCH variable
 

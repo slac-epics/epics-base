@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Revision-Id$ */
+/* Revision-Id: anj@aps.anl.gov-20101112220909-zd1pn4qnqsafag0l */
 
 /* recSubArray.c - Record Support Routines for SubArray records 
  *

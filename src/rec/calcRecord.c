@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Revision-Id$ */
+/* Revision-Id: anj@aps.anl.gov-20101124193504-syc2zmdo7fl70mcz */
 
 /* Record Support Routines for Calculation records */
 /*

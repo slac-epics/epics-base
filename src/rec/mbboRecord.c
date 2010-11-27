@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Revision-Id$ */
+/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
 
 /* recMbbo.c - Record Support Routines for multi bit binary Output records */
 /*

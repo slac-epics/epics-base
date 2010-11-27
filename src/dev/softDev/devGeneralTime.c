@@ -3,7 +3,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Revision-Id$ */
+/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
 /*
  *   Original Author:	Sheng Peng, ORNL / SNS Project
  *   Date:		07/2004

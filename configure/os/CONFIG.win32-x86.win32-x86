@@ -1,6 +1,6 @@
 # CONFIG.win32-x86.win32-x86
 #
-# $Revision-Id$
+# Revision-Id: jba@aps.anl.gov-20101021200611-k20b8rbfxat4nk3i
 # This file is maintained by the build community.
 #
 # Definitions for win32-x86 target archs when host arch is win32-x86
