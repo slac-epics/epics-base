@@ -34,9 +34,6 @@ VXWORKS_VERSION = 6.6
 #WIND_BASE = /usr/local/vw/vxWorks-$(VXWORKS_VERSION)
 #WIND_BASE = /ade/vxWorks/$(VXWORKS_VERSION)
 WIND_BASE = /usr/local/lcls/vxWorks/$(VXWORKS_VERSION)
-
-OP_SYS_CPPFLAGS += -DvxWorks 
-OP_SYS_CFLAGS += -fno-builtin 
 # =====================================================================
 
 
