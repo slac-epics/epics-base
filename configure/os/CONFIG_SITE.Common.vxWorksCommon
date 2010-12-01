@@ -33,7 +33,8 @@ VXWORKS_VERSION = 6.6
 #WIND_BASE = /usr/local/vw/tornado22-$(ARCH_CLASS)
 #WIND_BASE = /usr/local/vw/vxWorks-$(VXWORKS_VERSION)
 #WIND_BASE = /ade/vxWorks/$(VXWORKS_VERSION)
-WIND_BASE = /usr/local/lcls/vxWorks/$(VXWORKS_VERSION)
+#WIND_BASE = /usr/local/lcls/vxWorks/$(VXWORKS_VERSION)
+WIND_BASE = /afs/slac/package/vxworks/devel/$(VXWORKS_VERSION)
 # =====================================================================
 
 
