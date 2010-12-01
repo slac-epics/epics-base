@@ -184,5 +184,6 @@ GCC_PIPE = NO
 
 #  Include RPATH when linking executables and libraries.
 #       must be either YES or NO
-LINKER_USE_RPATH=YES
+#LINKER_USE_RPATH=YES
+LINKER_USE_RPATH=NO
 
