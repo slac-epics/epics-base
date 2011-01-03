@@ -36,6 +36,7 @@
 #include "epicsTimer.h"
 #include "epicsEvent.h"
 #include "freeList.h"
+#include "localHostName.h"
 
 #ifdef cach_restore_epicsExportSharedSymbols
 #   define epicsExportSharedSymbols
@@ -65,6 +66,8 @@ public:
         epicsGuard < epicsMutex > &, netWriteNotifyIO &io ) = 0;
     virtual void recycleSubscription ( 
         epicsGuard < epicsMutex > &, netSubscription &io ) = 0;
+protected:
+    virtual ~cacRecycle() {}
 };
 
 struct CASG;
@@ -182,9 +185,11 @@ public:
     // diagnostics
     unsigned circuitCount ( epicsGuard < epicsMutex > & ) const;
     void show ( epicsGuard < epicsMutex > &, unsigned level ) const;
-    int printf ( epicsGuard < epicsMutex > & callbackControl, 
+    int printFormated ( 
+        epicsGuard < epicsMutex > & callbackControl, 
         const char *pformat, ... ) const;
-    int vPrintf ( epicsGuard < epicsMutex > & callbackControl, 
+    int varArgsPrintFormated ( 
+        epicsGuard < epicsMutex > & callbackControl, 
         const char *pformat, va_list args ) const;
 
     // buffer management
@@ -193,6 +198,7 @@ public:
     unsigned largeBufferSizeTCP () const;
     char * allocateLargeBufferTCP ();
     void releaseLargeBufferTCP ( char * );
+    unsigned maxContiguousFrames ( epicsGuard < epicsMutex > & ) const;
 
     // misc
     const char * userNamePointer () const;
@@ -208,8 +214,10 @@ public:
     static unsigned highestPriorityLevelBelow ( unsigned priority );
     void destroyIIU ( tcpiiu & iiu ); 
 
+    const char * pLocalHostName ();
+    
 private:
-    localHostName hostNameCache;
+    epicsSingleton < localHostName > :: reference _refLocalHostName;
     chronIntIdResTable < nciu > chanTable;
     //
     // !!!! There is at this point no good reason
@@ -265,8 +273,9 @@ private:
     epicsThreadId initializingThreadsId;
     unsigned initializingThreadsPriority;
     unsigned maxRecvBytesTCP;
+    unsigned maxContigFrames;
     unsigned beaconAnomalyCount;
-    bool iiuUninstallInProgress;
+    unsigned iiuExistenceCount;
 
     void recycleReadNotifyIO ( 
         epicsGuard < epicsMutex > &, netReadNotifyIO &io );
@@ -356,12 +365,12 @@ inline epicsMutex & cac::mutexRef ()
     return this->mutex;
 }
 
-inline int cac::vPrintf ( 
+inline int cac :: varArgsPrintFormated ( 
     epicsGuard < epicsMutex > & callbackControl, 
     const char *pformat, va_list args ) const
 {
     callbackControl.assertIdenticalMutex ( this->cbMutex );
-    return this->notify.vPrintf ( pformat, args );
+    return this->notify.varArgsPrintFormated ( pformat, args );
 }
 
 inline void cac::attachToClientCtx ()
@@ -428,6 +437,17 @@ inline nciu * cac::lookupChannel (
 {
     guard.assertIdenticalMutex ( this->mutex );
     return this->chanTable.lookup ( idIn );
+}
+
+inline const char * cac :: pLocalHostName ()
+{
+    return _refLocalHostName->pointer ();
+}
+
+inline unsigned cac :: 
+    maxContiguousFrames ( epicsGuard < epicsMutex > & ) const
+{
+    return maxContigFrames;
 }
 
 #endif // ifdef cach

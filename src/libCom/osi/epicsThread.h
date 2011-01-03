@@ -20,21 +20,21 @@ extern "C" {
 
 typedef void (*EPICSTHREADFUNC)(void *parm);
 
-static const unsigned epicsThreadPriorityMax = 99;
-static const unsigned epicsThreadPriorityMin = 0;
+#define epicsThreadPriorityMax          99
+#define epicsThreadPriorityMin           0
 
 /* some generic values */
-static const unsigned epicsThreadPriorityLow = 10;
-static const unsigned epicsThreadPriorityMedium = 50;
-static const unsigned epicsThreadPriorityHigh = 90;
+#define epicsThreadPriorityLow          10
+#define epicsThreadPriorityMedium       50
+#define epicsThreadPriorityHigh         90
 
 /* some iocCore specific values */
-static const unsigned epicsThreadPriorityCAServerLow = 20;
-static const unsigned epicsThreadPriorityCAServerHigh = 40;
-static const unsigned epicsThreadPriorityScanLow = 60;
-static const unsigned epicsThreadPriorityScanHigh = 70;
-static const unsigned epicsThreadPriorityIocsh = 91;
-static const unsigned epicsThreadPriorityBaseMax = 91;
+#define epicsThreadPriorityCAServerLow  20
+#define epicsThreadPriorityCAServerHigh 40
+#define epicsThreadPriorityScanLow      60
+#define epicsThreadPriorityScanHigh     70
+#define epicsThreadPriorityIocsh        91
+#define epicsThreadPriorityBaseMax      91
 
 /* stack sizes for each stackSizeClass are implementation and CPU dependent */
 typedef enum {
@@ -149,6 +149,7 @@ public:
     bool isSuspended () const throw ();
     bool isCurrentThread () const throw ();
     bool operator == ( const epicsThread & ) const throw ();
+    void show ( unsigned level ) const throw ();
     /* these operate on the current thread */
     static void suspendSelf () throw ();
     static void sleep (double seconds) throw ();
@@ -156,7 +157,9 @@ public:
     static const char * getNameSelf () throw ();
     static bool isOkToBlock () throw ();
     static void setOkToBlock ( bool isOkToBlock ) throw ();
-    class unableToCreateThread; /* exception payload */
+
+    /* exceptions */
+    class unableToCreateThread;
 private:
     epicsThreadRunable & runable;
     epicsThreadId id;
@@ -172,13 +175,16 @@ private:
     epicsThread ( const epicsThread & );
     epicsThread & operator = ( const epicsThread & );
     friend void epicsThreadCallEntryPoint ( void * );
-
-    class exitException; /* exception payload */
+    void printLastChanceExceptionMessage ( 
+        const char * pExceptionTypeName,
+        const char * pExceptionContext );
+    /* exceptions */
+    class exitException {};
 };
 
 class epicsShareClass epicsThreadPrivateBase {
 public:
-    class unableToCreateThreadPrivate; /* exception */
+    class unableToCreateThreadPrivate {}; /* exception */
 protected:
     static void throwUnableToCreateThreadPrivate ();
 };

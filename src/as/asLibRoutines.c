@@ -113,7 +113,7 @@ long epicsShareAPI asInitialize(ASINPUTFUNCPTR inputfunction)
 	pasg->pavalue = asCalloc(CALCPERFORM_NARGS, sizeof(double));
 	pasg = (ASG *)ellNext((ELLNODE *)pasg);
     }
-    gphInitPvt(&((ASBASE *)pasbasenew)->phash,256);
+    gphInitPvt(&pasbasenew->phash, 256);
     /*Hash each uagname and each hagname*/
     puag = (UAG *)ellFirst(&pasbasenew->uagList);
     while(puag) {
@@ -274,7 +274,10 @@ long epicsShareAPI asRemoveMember(ASMEMBERPVT *asMemberPvt)
     pasgmember = *asMemberPvt;
     if(!pasgmember) return(S_asLib_badMember);
     LOCK;
-    if(ellCount(&pasgmember->clientList)>0) return(S_asLib_clientsExist);
+    if (ellCount(&pasgmember->clientList) > 0) {
+        UNLOCK;
+        return(S_asLib_clientsExist);
+    }
     if(pasgmember->pasg) {
 	ellDelete(&pasgmember->pasg->memberList,(ELLNODE *)pasgmember);
     } else {
@@ -333,21 +336,22 @@ long epicsShareAPI asAddClient(ASCLIENTPVT *pasClientPvt,ASMEMBERPVT asMemberPvt
 {
     ASGMEMBER	*pasgmember = asMemberPvt;
     ASGCLIENT	*pasgclient;
-    int		ind;
+    int		len, i;
 
     long	status;
     if(!asActive) return(S_asLib_asNotActive);
     if(!pasgmember) return(S_asLib_badMember);
     pasgclient = freeListCalloc(freeListPvt);
     if(!pasgclient) return(S_asLib_noMemory);
+    len = strlen(host);
+    for (i = 0; i < len; i++) {
+        host[i] = (char)tolower((int)host[i]);
+    }
     *pasClientPvt = pasgclient;
     pasgclient->pasgMember = asMemberPvt;
     pasgclient->level = asl;
     pasgclient->user = user;
     pasgclient->host = host;
-    for(ind=0; ind<strlen(pasgclient->host); ind++) {
-        pasgclient->host[ind] = (char)tolower((int)pasgclient->host[ind]);
-    }
     LOCK;
     ellAdd(&pasgmember->clientList,(ELLNODE *)pasgclient);
     status = asComputePvt(pasgclient);
@@ -360,9 +364,14 @@ long epicsShareAPI asChangeClient(
 {
     ASGCLIENT	*pasgclient = asClientPvt;
     long	status;
+    int		len, i;
 
     if(!asActive) return(S_asLib_asNotActive);
     if(!pasgclient) return(S_asLib_badClient);
+    len = strlen(host);
+    for (i = 0; i < len; i++) {
+        host[i] = (char)tolower((int)host[i]);
+    }
     LOCK;
     pasgclient->level = asl;
     pasgclient->user = user;
@@ -909,7 +918,7 @@ static long asComputeAsgPvt(ASG *pasg)
     if(!asActive) return(S_asLib_asNotActive);
     pasgrule = (ASGRULE *)ellFirst(&pasg->ruleList);
     while(pasgrule) {
-	double	result;
+	double	result = pasgrule->result;  /* set for VAL */
 	long	status;
 
 	if(pasgrule->calc && (pasg->inpChanged & pasgrule->inpUsed)) {
@@ -1170,12 +1179,13 @@ static HAG *asHagAdd(const char *hagName)
 static long asHagAddHost(HAG *phag,const char *host)
 {
     HAGNAME *phagname;
-    int     i;
+    int     len, i;
 
     if (!phag) return 0;
-    phagname = asCalloc(1, sizeof(HAGNAME)+strlen(host)+1);
-    phagname->host = (char *)(phagname+1);
-    for (i = 0; i < strlen(host); i++) {
+    len = strlen(host);
+    phagname = asCalloc(1, sizeof(HAGNAME) + len + 1);
+    phagname->host = (char *)(phagname + 1);
+    for (i = 0; i < len; i++) {
         phagname->host[i] = (char)tolower((int)host[i]);
     }
     ellAdd(&phag->list, (ELLNODE *)phagname);

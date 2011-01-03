@@ -3,8 +3,7 @@
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
@@ -55,7 +54,7 @@
 /*
  * clean_addrq
  */
-LOCAL void clean_addrq()
+static void clean_addrq(void)
 {
     struct channel_in_use * pciu;
     struct channel_in_use * pnextciu;
@@ -123,8 +122,6 @@ void cast_server(void *pParm)
     osiSocklen_t        recv_addr_size;
     unsigned short      port;
     osiSockIoctl_t      nchars;
-
-    taskwdInsert(epicsThreadGetIdSelf(),NULL,NULL);
 
     if ( envGetConfigParamPtr ( &EPICS_CAS_SERVER_PORT ) ) {
         port = envGetInetPortConfigParam ( &EPICS_CAS_SERVER_PORT, 
@@ -213,7 +210,9 @@ void cast_server(void *pParm)
      * add placeholder for the first version message should it be needed
      */
     rsrv_version_reply ( prsrv_cast_client );
-    
+
+    epicsEventSignal(casudp_startStopEvent);
+
     while (TRUE) {
         status = recvfrom (
             IOC_cast_sock,
@@ -222,15 +221,17 @@ void cast_server(void *pParm)
             0,
             (struct sockaddr *)&new_recv_addr, 
             &recv_addr_size);
-        if (status<0) {
-            char sockErrBuf[64];
-            epicsSocketConvertErrnoToString ( 
-                sockErrBuf, sizeof ( sockErrBuf ) );
-            epicsPrintf ("CAS: UDP recv error (errno=%s)\n",
-                    sockErrBuf);
-            epicsThreadSleep(1.0);
+        if (status < 0) {
+            if (SOCKERRNO != SOCK_EINTR) {
+                char sockErrBuf[64];
+                epicsSocketConvertErrnoToString ( 
+                    sockErrBuf, sizeof ( sockErrBuf ) );
+                epicsPrintf ("CAS: UDP recv error (errno=%s)\n",
+                        sockErrBuf);
+                epicsThreadSleep(1.0);
+            }
         }
-        else {
+        else if (casudp_ctl == ctlRun) {
             prsrv_cast_client->recv.cnt = (unsigned) status;
             prsrv_cast_client->recv.stk = 0ul;
             epicsTimeGetCurrent(&prsrv_cast_client->time_at_last_recv);

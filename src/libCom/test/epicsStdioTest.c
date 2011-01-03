@@ -29,21 +29,26 @@
 #define LINE_1 "# This is first line of sample report\n"
 #define LINE_2 "# This is second and last line of sample report\n"
 
-static void testEpicsSnprintf() {
+static void testEpicsSnprintf(void) {
+    char exbuffer[80], buffer[80];
     const int ivalue = 1234;
-    const float fvalue = 1.23e4;
+    const float fvalue = 1.23e4f;
     const char *svalue = "OneTwoThreeFour";
     const char *format = "int %d float %8.2e string %s";
-    const char *expected = "int 1234 float 1.23e+04 string OneTwoThreeFour";
-    char buffer[80];
-    int size, rtn;
-    int rlen = strlen(expected)+1;
+    const char *expected = exbuffer;
+    int size;
+    int rtn, rlen;
+    
+    sprintf(exbuffer, format, ivalue, fvalue, svalue);
+    rlen = strlen(expected)+1;
     
     strcpy(buffer, "AAAA");
     
     for (size = 1; size < strlen(expected) + 5; ++size) {
         rtn = epicsSnprintf(buffer, size, format, ivalue, fvalue, svalue);
-        testOk(rtn == rlen-1, "epicsSnprintf(size=%d) = %d", size, rtn);
+        testOk(rtn <= rlen-1, "epicsSnprintf(size=%d) = %d", size, rtn);
+        if (rtn != rlen-1)
+            testDiag("Return value does not indicate buffer size needed");
         testOk(strncmp(buffer, expected, size - 1) == 0,
             "buffer = '%s'", buffer);
         rtn = strlen(buffer);
@@ -112,7 +117,11 @@ void testStdoutRedir (const char *report)
 
 MAIN(epicsStdioTest)
 {
+#ifdef _WIN32
+    testPlan(166);
+#else
     testPlan(163);
+#endif
     testEpicsSnprintf();
     testStdoutRedir("report");
     return testDone();

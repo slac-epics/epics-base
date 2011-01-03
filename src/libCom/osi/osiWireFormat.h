@@ -1,25 +1,22 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2007 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/*  
- *
- *                              
+/*
  *                    L O S  A L A M O S
  *              Los Alamos National Laboratory
  *               Los Alamos, New Mexico 87545
- *                                  
+ *
  *  Copyright, 2000, The Regents of the University of California.
- *                                  
- *           
- *	Author Jeffrey O. Hill
- *	johill@lanl.gov
+ *
+ *
+ *  Author Jeffrey O. Hill
+ *  johill@lanl.gov
  */
 
 #ifndef osiWireFormat
@@ -162,14 +159,14 @@ union WireAlias < epicsFloat32 > {
 // Missaligned unsigned wire format get/set can be implemented generically 
 // w/o performance penalty. Attempts to improve this on architectures that
 // dont have alignement requirements will probably get into trouble with
-// over-aggresive optimization under strict aliasing rules.
+// over-aggressive optimization under strict aliasing rules.
 //
 
 template < class T >
 inline void WireGet ( const epicsUInt8 * pWireSrc, T & dst )
 {
     // copy through union here 
-    // a) prevents over-aggresive optimization under strict aliasing rules
+    // a) prevents over-aggressive optimization under strict aliasing rules
     // b) doesnt preclude extra copy operation being optimized away
     WireAlias < T > tmp;
     WireGet ( pWireSrc, tmp._u );
@@ -206,7 +203,7 @@ template < class T >
 inline void WireSet ( const T & src, epicsUInt8 * pWireDst )
 {
     // copy through union here 
-    // a) prevents over-aggresive optimization under strict aliasing rules
+    // a) prevents over-aggressive optimization under strict aliasing rules
     // b) doesnt preclude extra copy operation being optimized away
     WireAlias < T > tmp;
     tmp._o = src;
@@ -242,7 +239,7 @@ template < class T >
 inline void AlignedWireGet ( const T & src, T & dst )
 {
     // copy through union here 
-    // a) prevents over-aggresive optimization under strict aliasing rules
+    // a) prevents over-aggressive optimization under strict aliasing rules
     // b) doesnt preclude extra copy operation being optimized away
     WireAlias < T > srcu, dstu;
     srcu._o = src;
@@ -254,7 +251,7 @@ template < class T >
 inline void AlignedWireSet ( const T & src, T & dst )
 {
     // copy through union here 
-    // a) prevents over-aggresive optimization under strict aliasing rules
+    // a) prevents over-aggressive optimization under strict aliasing rules
     // b) doesnt preclude extra copy operation being optimized away
     WireAlias < T > srcu, dstu;
     srcu._o = src;

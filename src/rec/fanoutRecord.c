@@ -1,17 +1,15 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* fanoutRecord.c */
-/* base/src/rec  fanoutRecord.c,v 1.15 2003/04/01 21:01:50 mrk Exp */
+
+/* fanoutRecord.c,v 1.15.2.2 2009/04/02 21:40:37 lange Exp */
 /*
  *      Original Author: Bob Dalesio
- *      Current Author:  Marty Kraimer
  *      Date:            12-20-88
  */
 
@@ -39,8 +37,8 @@
 /* Create RSET - Record Support Entry Table*/
 #define report NULL
 #define initialize NULL
-static long init_record();
-static long process();
+static long init_record(fanoutRecord *, int);
+static long process(fanoutRecord *);
 #define special NULL
 #define get_value NULL
 #define cvt_dbaddr NULL
@@ -77,71 +75,68 @@ rset fanoutRSET={
 };
 epicsExportAddress(rset,fanoutRSET);
 
-static long init_record(pfanout,pass)
-    struct fanoutRecord	*pfanout;
-    int pass;
+static long init_record(fanoutRecord *prec, int pass)
 {
 
     if (pass==0) return(0);
-    recGblInitConstantLink(&pfanout->sell,DBF_USHORT,&pfanout->seln);
+    recGblInitConstantLink(&prec->sell,DBF_USHORT,&prec->seln);
     return(0);
 }
 	
-static long process(pfanout)
-    struct fanoutRecord     *pfanout;
+static long process(fanoutRecord *prec)
 {
     struct link    *plink;
     unsigned short state;
     short          i;
     unsigned short monitor_mask;
 
-    pfanout->pact = TRUE;
+    prec->pact = TRUE;
 
     /* fetch link selection  */
-    dbGetLink(&(pfanout->sell),DBR_USHORT,&(pfanout->seln),0,0);
-    switch (pfanout->selm){
+    dbGetLink(&(prec->sell),DBR_USHORT,&(prec->seln),0,0);
+    switch (prec->selm){
     case (fanoutSELM_All):
-        plink=&(pfanout->lnk1);
-        state=pfanout->seln;
+        plink=&(prec->lnk1);
+        state=prec->seln;
         for ( i=0; i<6; i++, state>>=1, plink++) {
             if(plink->type!=CONSTANT) dbScanFwdLink(plink);
         }
         break;
     case (fanoutSELM_Specified):
-        if(pfanout->seln>6) {
-		recGblSetSevr(pfanout,SOFT_ALARM,INVALID_ALARM);
+        if(prec->seln>6) {
+		recGblSetSevr(prec,SOFT_ALARM,INVALID_ALARM);
             break;
         }
-        if(pfanout->seln==0) {
+        if(prec->seln==0) {
             break;
         }
-        plink=&(pfanout->lnk1);
-        plink += (pfanout->seln-1); dbScanFwdLink(plink);
+        plink=&(prec->lnk1);
+        plink += (prec->seln-1); dbScanFwdLink(plink);
         break;
     case (fanoutSELM_Mask):
-        if(pfanout->seln==0) {
+        if(prec->seln==0) {
             break;
         }
-        if(pfanout->seln>63 ) {
-            recGblSetSevr(pfanout,SOFT_ALARM,INVALID_ALARM);
+        if(prec->seln>63 ) {
+            recGblSetSevr(prec,SOFT_ALARM,INVALID_ALARM);
             break;
         }
-        plink=&(pfanout->lnk1);
-        state=pfanout->seln;
+        plink=&(prec->lnk1);
+        state=prec->seln;
         for ( i=0; i<6; i++, state>>=1, plink++) {
             if(state & 1 && plink->type!=CONSTANT) dbScanFwdLink(plink);
         }
         break;
     default:
-        recGblSetSevr(pfanout,SOFT_ALARM,INVALID_ALARM);
+        recGblSetSevr(prec,SOFT_ALARM,INVALID_ALARM);
     }
-    pfanout->udf=FALSE;
-    recGblGetTimeStamp(pfanout);
+    prec->udf=FALSE;
+    recGblGetTimeStamp(prec);
     /* check monitors*/
     /* get previous stat and sevr  and new stat and sevr*/
-    monitor_mask = recGblResetAlarms(pfanout);
+    monitor_mask = recGblResetAlarms(prec);
     /* process the forward scan link record */
-    recGblFwdLink(pfanout);
-    pfanout->pact=FALSE;
+    recGblFwdLink(prec);
+    prec->pact=FALSE;
     return(0);
 }

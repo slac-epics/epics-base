@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS configuration for EPICS
- *  rtems_config.c,v 1.2.2.12 2006/09/19 15:46:13 lange Exp
+ *  rtems_config.c,v 1.2.2.23 2009/07/29 20:58:37 norume Exp
  *      Author: W. Eric Norum
  *              norume@aps.anl.gov
  *              (630) 252-4793
@@ -19,24 +19,29 @@
  *                         RTEMS CONFIGURATION                         *
  ***********************************************************************
  */
-/* #define STACK_CHECKER_ON                1 */
-
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 
-#define CONFIGURE_EXECUTIVE_RAM_SIZE        (2000*1024)
+#if __RTEMS_MAJOR__>4 || ( __RTEMS_MAJOR__==4 && __RTEMS_MINOR__>9 )
+#  define CONFIGURE_UNIFIED_WORK_AREAS
+#else
+#  define CONFIGURE_EXECUTIVE_RAM_SIZE (2000*1024)
+#endif
+
 #define CONFIGURE_MAXIMUM_TASKS             rtems_resource_unlimited(30)
 #define CONFIGURE_MAXIMUM_SEMAPHORES        rtems_resource_unlimited(500)
 #define CONFIGURE_MAXIMUM_TIMERS            rtems_resource_unlimited(20)
 #define CONFIGURE_MAXIMUM_MESSAGE_QUEUES    rtems_resource_unlimited(5)
 #define CONFIGURE_MAXIMUM_USER_EXTENSIONS   1
 
-#define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 100
+#define CONFIGURE_LIBIO_MAXIMUM_FILE_DESCRIPTORS 150
 #define CONFIGURE_USE_IMFS_AS_BASE_FILESYSTEM
 #define CONFIGURE_MAXIMUM_DRIVERS       8
 
 #define CONFIGURE_MICROSECONDS_PER_TICK 20000
 
 #define CONFIGURE_INIT_TASK_PRIORITY    80
+
+#define CONFIGURE_MALLOC_STATISTICS     1
 
 #define CONFIGURE_INIT
 #define CONFIGURE_INIT_TASK_INITIAL_MODES (RTEMS_PREEMPT | \
@@ -50,12 +55,15 @@ rtems_task Init (rtems_task_argument argument);
 #define CONFIGURE_APPLICATION_NEEDS_CONSOLE_DRIVER
 #define CONFIGURE_APPLICATION_NEEDS_CLOCK_DRIVER
 
-#warning "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-#warning "needs review"
-#warning "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-/* This should be made BSP dependent, not CPU dependent !! */
-#if !defined(__mc68040__) && !defined(__mcf5200__) && !defined(__arm__)  /* don't have RTC code */
+/*
+ * This should be made BSP dependent, not CPU dependent but I know of no
+ * appropriate conditionals to use.
+ * The new general time support makes including the RTC driverr less important.
+ */
+#if !defined(mpc604) && !defined(__mc68040__) && !defined(__mcf5200__) && !defined(mpc7455) && !defined(__arm__)  /* don't have RTC code */
 #define CONFIGURE_APPLICATION_NEEDS_RTC_DRIVER
 #endif
 
+
+#include <bsp.h>
 #include <rtems/confdefs.h>

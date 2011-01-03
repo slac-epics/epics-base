@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      chanIntfForPV.h,v 1.5.2.1 2003/09/01 20:05:12 lange Exp
+ *      chanIntfForPV.h,v 1.5.2.2 2008/07/28 16:19:50 anj Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov
@@ -44,6 +44,8 @@ class gdd;
 class casChannelDestroyFromPV { // X aCC 655
 public:
     virtual void postDestroyEvent () = 0;
+protected:
+    virtual ~casChannelDestroyFromPV() {}
 };
 
 class chanIntfForPV : public tsDLNode < chanIntfForPV > {

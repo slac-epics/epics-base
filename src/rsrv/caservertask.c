@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- * caservertask.c,v 1.105.2.15 2006/11/28 18:51:16 jhill Exp
+ * caservertask.c,v 1.105.2.18 2009/07/09 16:37:23 anj Exp
  *
  *  Author: Jeffrey O. Hill
  *      hill@luke.lanl.gov
@@ -60,7 +60,7 @@ epicsThreadPrivateId rsrvCurrentClient;
  *  handle each of them
  *
  */
-LOCAL void req_server (void *pParm)
+static void req_server (void *pParm)
 {
     unsigned priorityOfSelf = epicsThreadGetPrioritySelf ();
     unsigned priorityOfBeacons;
@@ -170,6 +170,9 @@ LOCAL void req_server (void *pParm)
         priorityOfBeacons = priorityOfSelf;
     }
 
+    beacon_startStopEvent = epicsEventMustCreate(epicsEventEmpty);
+    beacon_ctl = ctlPause;
+
     tid = epicsThreadCreate ( "CAS-beacon", priorityOfBeacons,
         epicsThreadGetStackSize (epicsThreadStackSmall),
         rsrv_online_notify_task, 0 );
@@ -177,9 +180,16 @@ LOCAL void req_server (void *pParm)
         epicsPrintf ( "CAS: unable to start beacon thread\n" );
     }
 
+    epicsEventMustWait(beacon_startStopEvent);
+    epicsEventSignal(castcp_startStopEvent);
+
     while (TRUE) {
         struct sockaddr     sockAddr;
         osiSocklen_t        addLen = sizeof(sockAddr);
+
+        while (castcp_ctl == ctlPause) {
+            epicsThreadSleep(0.1);
+        }
 
         clientSock = epicsSocketAccept ( IOC_sock, &sockAddr, &addLen );
         if ( clientSock == INVALID_SOCKET ) {
@@ -225,7 +235,7 @@ LOCAL void req_server (void *pParm)
 /*
  * rsrv_init ()
  */
-int epicsShareAPI rsrv_init (void)
+int rsrv_init (void)
 {
     epicsThreadBooleanStatus tbs;
     unsigned priorityOfConnectDaemon;
@@ -270,6 +280,9 @@ int epicsShareAPI rsrv_init (void)
     prsrv_cast_client = NULL;
     pCaBucket = NULL;
 
+    castcp_startStopEvent = epicsEventMustCreate(epicsEventEmpty);
+    castcp_ctl = ctlPause;
+
     /*
      * go down two levels so that we are below 
      * the TCP and event threads started on behalf
@@ -296,10 +309,30 @@ int epicsShareAPI rsrv_init (void)
         epicsPrintf ( "CAS: unable to start connection request thread\n" );
     }
 
+    epicsEventMustWait(castcp_startStopEvent);
+
     return RSRV_OK;
 }
 
-LOCAL unsigned countChanListBytes ( 
+int rsrv_run (void)
+{
+    castcp_ctl = ctlRun;
+    casudp_ctl = ctlRun;
+    beacon_ctl = ctlRun;
+
+    return RSRV_OK;
+}
+
+int rsrv_pause (void)
+{
+    beacon_ctl = ctlPause;
+    casudp_ctl = ctlPause;
+    castcp_ctl = ctlPause;
+
+    return RSRV_OK;
+}
+
+static unsigned countChanListBytes ( 
     struct client *client, ELLLIST * pList )
 {
     struct channel_in_use   * pciu;
@@ -318,7 +351,7 @@ LOCAL unsigned countChanListBytes (
     return bytes_reserved;
 }
 
-LOCAL void showChanList ( 
+static void showChanList ( 
     struct client * client, ELLLIST * pList )
 {
     unsigned i = 0u;
@@ -342,7 +375,7 @@ LOCAL void showChanList (
 /*
  *  log_one_client ()
  */
-LOCAL void log_one_client (struct client *client, unsigned level)
+static void log_one_client (struct client *client, unsigned level)
 {
     char                    *pproto;
     double                  send_delay;
@@ -577,7 +610,7 @@ void destroy_client ( struct client *client )
     freeListFree ( rsrvClientFreeList, client );
 }
 
-LOCAL void destroyAllChannels ( 
+static void destroyAllChannels ( 
     struct client * client, ELLLIST * pList )
 {
     if ( !client->chanListLock || !client->eventqLock ) {
@@ -804,7 +837,7 @@ struct client *create_tcp_client ( SOCKET sock )
 {
     int                     status;
     struct client           *client;
-    int                     true = TRUE;
+    int                     intTrue = TRUE;
     osiSocklen_t            addrSize;
     unsigned                priorityOfEvents;
 
@@ -819,7 +852,7 @@ struct client *create_tcp_client ( SOCKET sock )
      * faster. I take care of queue up as load increases.
      */
     status = setsockopt ( sock, IPPROTO_TCP, TCP_NODELAY, 
-                (char *) &true, sizeof (true) );
+                (char *) &intTrue, sizeof (intTrue) );
     if (status < 0) {
         errlogPrintf ( "CAS: TCP_NODELAY option set failed\n" );
         destroy_client ( client );
@@ -831,7 +864,7 @@ struct client *create_tcp_client ( SOCKET sock )
      * this task will find out and exit
      */
     status = setsockopt ( sock, SOL_SOCKET, SO_KEEPALIVE, 
-                    (char *) &true, sizeof (true) );
+                    (char *) &intTrue, sizeof (intTrue) );
     if ( status < 0 ) {
         errlogPrintf ( "CAS: SO_KEEPALIVE option set failed\n" );
         destroy_client ( client );

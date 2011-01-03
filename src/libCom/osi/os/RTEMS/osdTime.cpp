@@ -1,176 +1,87 @@
 /*************************************************************************\
 * Copyright (c) 2002 The University of Saskatchewan
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
-* in file LICENSE that is included with this distribution. 
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
+*     National Laboratory.
+* EPICS BASE is distributed subject to a Software License Agreement found
+* in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- * osdTime.cpp,v 1.6.2.1 2005/07/20 20:04:44 norume Exp
+ * osdTime.cpp,v 1.6.2.13 2008/10/11 16:40:46 norume Exp
  *
  * Author: W. Eric Norum
  */
-//
 
-/*
- * ANSI C
- */
-#include <stdio.h>
-#include <time.h>
-#include <limits.h>
-
-/*
- * RTEMS
- */
+#include <epicsStdio.h>
 #include <rtems.h>
-
-/*
-* SSRLAPPS
-*/
-#include <sys/timex.h>
- 
-/*
- * EPICS
- */
-#define epicsExportSharedSymbols
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "epicsTime.h"
-#include "errlog.h"
-#include "cantProceed.h"
-#include "iocClock.h"
+#include "osdTime.h"
+#include "osiNTPTime.h"
+#include "osiClockTime.h"
+#include "generalTimeSup.h"
 
 extern "C" {
 
-extern int ntp_gettime(struct ntptimeval *pDest)
-      __attribute__(( weak, alias("epicsTimeGetRTEMSSysclk") ));
+extern rtems_interval rtemsTicksPerSecond;
+int rtems_bsdnet_get_ntp(int, int(*)(), struct timespec *);
+static int ntpSocket = -1;
 
-/*
- * RTEMS clock rate
- */
-rtems_interval rtemsTicksPerSecond;
-double rtemsTicksPerSecond_double;
-
-/*
- * RTEMS time begins January 1, 1988 (local time).
- * EPICS time begins January 1, 1990 (GMT).
- *
- * FIXME: How to handle daylight-savings time?
- */
-#define EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH ((366+365)*86400)
-#define POSIX_TIME_SECONDS_1970_THROUGH_1988 \
-  (((1987 - 1970 + 1)  * TOD_SECONDS_PER_NON_LEAP_YEAR) + \
-       (4 * TOD_SECONDS_PER_DAY))
-
-static unsigned long timeoffset;
-
-typedef struct iocClockPvt {
-    pepicsTimeGetCurrent getCurrent;
-    pepicsTimeGetEvent getEvent;
-}iocClockPvt;
-static iocClockPvt *piocClockPvt = 0;
-
-void iocClockInit()
+void osdTimeRegister(void)
 {
-    if(piocClockPvt) return;
-    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockInit");
-    piocClockPvt->getCurrent = rtemsIocClockGetCurrent;
-    piocClockPvt->getEvent = rtemsIocClockGetEvent;
-    return;
+    /* Init NTP first so it can be used to sync ClockTime */
+    NTPTime_Init(100);
+    ClockTime_Init(CLOCKTIME_SYNC);
 }
 
-void iocClockRegister(pepicsTimeGetCurrent getCurrent,
-    pepicsTimeGetEvent getEvent)
+int osdNTPGet(struct timespec *ts)
 {
-    if(piocClockPvt) {
-        printf("iocClockRegister: iocClock already initialized\n");
+    if (ntpSocket < 0)
+        return -1;
+    return rtems_bsdnet_get_ntp(ntpSocket, NULL, ts);
+}
+
+void osdNTPInit(void)
+{
+    struct sockaddr_in myAddr;
+
+    ntpSocket = socket (AF_INET, SOCK_DGRAM, 0);
+    if (ntpSocket < 0) {
+        printf("osdNTPInit() Can't create socket: %s\n", strerror (errno));
         return;
     }
-    piocClockPvt = (iocClockPvt *)callocMustSucceed(1,sizeof(iocClockPvt),"iocClockRegister");
-    piocClockPvt->getCurrent = getCurrent;
-    piocClockPvt->getEvent = getEvent;
-}
-
-int epicsTimeGetCurrent (epicsTimeStamp *pDest)
-{
-    if(!piocClockPvt) {
-        iocClockInit();
+    memset (&myAddr, 0, sizeof myAddr);
+    myAddr.sin_family = AF_INET;
+    myAddr.sin_port = htons (123);
+    myAddr.sin_addr.s_addr = htonl (INADDR_ANY);
+    if (bind (ntpSocket, (struct sockaddr *)&myAddr, sizeof myAddr) < 0) {
+        printf("osdNTPInit() Can't bind socket: %s\n", strerror (errno));
+        close (ntpSocket);
+        ntpSocket = -1;
     }
-    if(piocClockPvt->getCurrent) return((*piocClockPvt->getCurrent)(pDest));
-    return(epicsTimeERROR);
 }
 
-int epicsTimeGetEvent (epicsTimeStamp *pDest, int eventNumber)
+void osdNTPReport(void)
 {
-    if(!piocClockPvt) {
-        iocClockInit();
-    }
-    if(piocClockPvt->getEvent)
-        return((*piocClockPvt->getEvent)(pDest,eventNumber));
-    return(epicsTimeERROR);
 }
 
-/*
- * Get current RTEMS systemclock time
- * Allow for this to be called before clockInit() and before
- * system time and date have been initialized.
- */
-int epicsTimeGetRTEMSSysclk (struct ntptimeval *pDest)
+int osdTickGet(void)
 {
-    struct timeval curtime;
     rtems_interval t;
-    rtems_status_code sc;
-
-    for (;;) {
-	sc = rtems_clock_get (RTEMS_CLOCK_GET_TIME_VALUE, &curtime);
-	if (sc == RTEMS_SUCCESSFUL)
-	    break;
-	else if (sc != RTEMS_NOT_DEFINED)
-	    return epicsTimeERROR;
-	sc = rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &t);
-	if (sc != RTEMS_SUCCESSFUL)
-	    return epicsTimeERROR;
-	rtems_task_wake_after (t);
-    }
-    pDest->time.tv_nsec = curtime.tv_usec * 1000;
-    pDest->time.tv_sec  = curtime.tv_sec + POSIX_TIME_SECONDS_1970_THROUGH_1988;
-    return epicsTimeOK;
+    rtems_clock_get (RTEMS_CLOCK_GET_TICKS_SINCE_BOOT, &t);
+    return t;
 }
 
-/* get current time via NTP if possible.
- * ntp_gettime is a weak alias for epicsTimeGetRTEMSSysclk which
- * will be used if the linker (or CEXP) doesn't find ntp_gettime
- */
-int rtemsIocClockGetCurrent (epicsTimeStamp *pDest)
+int osdTickRateGet(void)
 {
-struct ntptimeval ntv;
-
-	if ( ntp_gettime( &ntv ) &&
-		( ntp_gettime == epicsTimeGetRTEMSSysclk || epicsTimeGetRTEMSSysclk( &ntv )) )
-		return epicsTimeERROR;
-	pDest->nsec         = ntv.time.tv_nsec;
-	pDest->secPastEpoch = ntv.time.tv_sec - timeoffset;
-	return epicsTimeOK;
+    return rtemsTicksPerSecond;
 }
-	
+
 /*
- * rtemsIocClockTimeGetEvent ()
+ * Use reentrant versions of time access
  */
-int rtemsIocClockGetEvent (epicsTimeStamp *pDest, int eventNumber)
-{
-    if (eventNumber==epicsTimeEventCurrentTime) {
-        return epicsTimeGetCurrent (pDest);
-    }
-    else {
-        return epicsTimeERROR;
-    }
-}
-
-void clockInit(void)
-{
-	timeoffset  = EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH;
-	timeoffset += POSIX_TIME_SECONDS_1970_THROUGH_1988;
-	rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &rtemsTicksPerSecond);
-	rtemsTicksPerSecond_double = rtemsTicksPerSecond;
-}
-
 int epicsTime_gmtime ( const time_t *pAnsiTime, struct tm *pTM )
 {
     struct tm * pRet = gmtime_r ( pAnsiTime, pTM );
@@ -193,5 +104,29 @@ int epicsTime_localtime ( const time_t *clock, struct tm *result )
     }
 }
 
-} /* extern "C" */
+rtems_interval rtemsTicksPerSecond;
+double rtemsTicksPerSecond_double, rtemsTicksPerTwoSeconds_double;
 
+} // extern "C"
+
+/*
+ * Static constructors are run too early in a standalone binary
+ * to be able to initialize the NTP time provider (the network
+ * is not available yet), so the RTEMS standalone startup code
+ * explicitly calls osdTimeRegister() at the appropriate time.
+ * However if we are loaded dynamically we *do* register our
+ * standard time providers at static constructor time; in this
+ * case the tick rate will have been set already.
+ */
+static int staticTimeRegister(void)
+{
+    if (rtemsTicksPerSecond != 0)
+        osdTimeRegister();
+
+    rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &rtemsTicksPerSecond);
+    rtemsTicksPerSecond_double = rtemsTicksPerSecond;
+    rtemsTicksPerTwoSeconds_double = rtemsTicksPerSecond_double * 2.0;
+
+    return 1;
+}
+static int done = staticTimeRegister();

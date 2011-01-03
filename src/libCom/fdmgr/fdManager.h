@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      fdManager.h,v 1.39 2003/04/29 21:00:15 jhill Exp
+ *      fdManager.h,v 1.39.2.1 2008/07/28 16:19:50 anj Exp
  *
  *      File descriptor management C++ class library
  *      (for multiplexing IO in a single threaded environment)
@@ -35,7 +35,7 @@ enum fdRegType {fdrRead, fdrWrite, fdrException, fdrNEnums};
 //
 // file descriptor interest id
 //
-class epicsShareClass fdRegId  
+class epicsShareClass fdRegId
 {
 public:
 
@@ -60,6 +60,8 @@ public:
     resTableIndex hash () const;
 
     virtual void show (unsigned level) const;
+
+    virtual ~fdRegId() {}
 private:
     SOCKET fd;
     fdRegType type;

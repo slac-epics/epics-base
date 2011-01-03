@@ -1,53 +1,66 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* dbScan.h,v 1.9 2003/04/02 20:51:25 anj Exp
+/* dbScan.h,v 1.9.2.5 2009/04/02 14:11:27 anj Exp
  *
  *      Author:         Marty Kraimer
  *      Date:           07-17-91
  */
 
-#ifndef INCdbScanh
-#define INCdbScanh 1
+#ifndef INCdbScanH
+#define INCdbScanH
 
+#include <limits.h>
+
+#include "menuScan.h"
 #include "shareLib.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Note that these must match the first three definitions in choiceGbl.ascii*/
-#define SCAN_PASSIVE		0
-#define SCAN_EVENT		1
-#define SCAN_IO_EVENT		2
-#define SCAN_1ST_PERIODIC	3
+#define SCAN_PASSIVE        menuScanPassive
+#define SCAN_EVENT          menuScanEvent
+#define SCAN_IO_EVENT       menuScanI_O_Intr
+#define SCAN_1ST_PERIODIC   (menuScanI_O_Intr + 1)
 
-/*definitions for SCAN_IO_EVENT */
-typedef void * IOSCANPVT;
+#define MAX_PHASE           SHRT_MAX
+#define MIN_PHASE           SHRT_MIN
+
+/*definitions for I/O Interrupt Scanning */
+struct io_scan_list;
+
+typedef struct io_scan_list *IOSCANPVT;
 
 struct dbCommon;
 
-epicsShareFunc long epicsShareAPI scanInit(void);
-epicsShareFunc void epicsShareAPI post_event(int event);
-epicsShareFunc void epicsShareAPI scanAdd(struct dbCommon *);
-epicsShareFunc void epicsShareAPI scanDelete(struct dbCommon *);
-epicsShareFunc double epicsShareAPI scanPeriod(int scan);
-epicsShareFunc void epicsShareAPI scanOnce(void *precord);
-epicsShareFunc int epicsShareAPI scanOnceSetQueueSize(int size);
+epicsShareFunc long scanInit(void);
+epicsShareFunc void scanRun(void);
+epicsShareFunc void scanPause(void);
+
+epicsShareFunc void post_event(int event);
+epicsShareFunc void scanAdd(struct dbCommon *);
+epicsShareFunc void scanDelete(struct dbCommon *);
+epicsShareFunc double scanPeriod(int scan);
+epicsShareFunc void scanOnce(struct dbCommon *);
+epicsShareFunc int scanOnceSetQueueSize(int size);
+
 /*print periodic lists*/
-epicsShareFunc int epicsShareAPI scanppl(double rate);
+epicsShareFunc int scanppl(double rate);
+
 /*print event lists*/
-epicsShareFunc int epicsShareAPI scanpel(int event_number);
+epicsShareFunc int scanpel(int event_number);
+
 /*print io_event list*/
-epicsShareFunc int epicsShareAPI scanpiol(void);
-epicsShareFunc void epicsShareAPI scanIoInit(IOSCANPVT *);
-epicsShareFunc void epicsShareAPI scanIoRequest(IOSCANPVT);
+epicsShareFunc int scanpiol(void);
+
+epicsShareFunc void scanIoInit(IOSCANPVT *);
+epicsShareFunc void scanIoRequest(IOSCANPVT);
 
 #ifdef __cplusplus
 }

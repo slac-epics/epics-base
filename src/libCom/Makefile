@@ -1,10 +1,9 @@
 #*************************************************************************
-# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2007 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
-# EPICS BASE Versions 3.13.7
-# and higher are distributed subject to a Software License Agreement found
+# EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 TOP = ../..
@@ -18,7 +17,7 @@ epicsReadline_INCLUDES += $(INCLUDES_$(COMMANDLINE_LIBRARY))
 
 #POSIX thread priority scheduling flag
 THREAD_CPPFLAGS_NO += -DDONT_USE_POSIX_THREAD_PRIORITY_SCHEDULING
-osdThread_CPPFLAGS +=  $(THREAD_CPPFLAGS_$(USE_POSIX_THREAD_PRIORITY_SCHEDULING))
+osdThread_CPPFLAGS += $(THREAD_CPPFLAGS_$(USE_POSIX_THREAD_PRIORITY_SCHEDULING))
 
 #epicsVersion is created by this Makefile
 INC += epicsVersion.h
@@ -103,6 +102,14 @@ INC += gpHash.h
 SRCS += gpHashLib.c
 HTMLS += gpHash/gpHash.html
 
+SRC_DIRS += $(LIBCOM)/iocsh
+INC += iocsh.h
+INC += registry.h
+INC += libComRegister.h
+SRCS += iocsh.cpp
+SRCS += registry.c
+SRCS += libComRegister.c
+
 SRC_DIRS += $(LIBCOM)/logClient
 INC += iocLog.h
 INC += logClient.h
@@ -167,12 +174,17 @@ INC += osdThread.h
 
 INC += epicsThread.h
 INC += epicsTime.h
+INC += epicsGeneralTime.h
 INC += osdTime.h
+INC += generalTimeSup.h
+INC += osiClockTime.h
 INC += epicsSignal.h
 INC += osiProcess.h
 INC += osiUnistd.h
 INC += osiWireFormat.h
 INC += osdWireFormat.h
+INC += osdWireConfig.h
+INC += epicsEndian.h
 INC += epicsReadline.h
 INC += epicsMessageQueue.h
 INC += epicsStdio.h
@@ -187,6 +199,10 @@ SRCS += epicsMutex.cpp
 SRCS += epicsEvent.cpp
 SRCS += epicsTime.cpp
 SRCS += epicsMessageQueue.cpp
+SRCS += epicsMath.cpp
+
+SRCS += epicsGeneralTime.c
+SRCS += osiClockTime.c
 
 SRCS += osdSock.c
 SRCS += osdSockAddrReuse.cpp
@@ -235,12 +251,14 @@ SRC_DIRS += $(LIBCOM)/tsDefs
 INC += tsDefs.h
 SRCS += tsDefs.c
 
-# For vxWorks a clock
-INC_vxWorks += iocClock.h
-SRCS_vxWorks += iocClock.c
-#For vxWorks special reboot hook
+# Time providers, in osi
+SRCS_vxWorks += osiNTPTime.c
+SRCS_RTEMS += osiNTPTime.c
+
+# These files are in osi/os/vxWorks
+# Special reboot hook
 SRCS_vxWorks += atReboot.cpp
-#For old vxWorks applications
+# For old vxWorks applications
 INC_vxWorks += camacLib.h
 INC_vxWorks += epicsDynLink.h
 INC_vxWorks += module_types.h
@@ -252,6 +270,7 @@ SRCS_vxWorks += logMsgToErrlog.cpp
 #This forces the vxWorks compatibility stuff to be loaded
 OBJS_vxWorks = vxComLibrary
 
+# These files are in osi/os/WIN32
 SRCS_WIN32 += epicsGetopt.c 
 SRCS_WIN32 += setThreadName.cpp
 #SRCS_WIN32 += dllmain.cpp
@@ -264,7 +283,7 @@ LIBRARY=Com
 
 Com_SYS_LIBS_WIN32 = ws2_32 advapi32 user32
 
-Com_RCS_WIN32 = Com.rc
+Com_RCS = Com.rc
 
 # For R3.13 compatibility only
 ifeq ($(strip $(COMPAT_313)),YES)
@@ -275,12 +294,6 @@ endif
 #   libs needed for PROD and TESTPRODUCT
 PROD_LIBS = Com
 PROD_SYS_LIBS_WIN32 = ws2_32 advapi32
-
-#USR_CFLAGS += -DTS_TEST
-#TESTPROD_SRCS=tsSubr.c
-#TESTPROD_HOST=testtsLib
-#TESTPROD_HOST=envtest
-#TESTPROD_HOST=osiTimeTest fdManagerTest
 
 #	for bldErrSymTbl:
 #
@@ -297,6 +310,11 @@ ERR_S_FILES += $(TOP)/src/gdd/gddAppFuncTable.h
 
 include $(TOP)/configure/RULES
 
+osdAssert$(OBJ): $(COMMON_DIR)/epicsVersion.h
+epicsTime$(OBJ): $(COMMON_DIR)/epicsVersion.h
+osdNetIntf$(OBJ): $(COMMON_DIR)/epicsVersion.h
+osdSock$(OBJ): $(COMMON_DIR)/epicsVersion.h
+
 envData.c: $(LIBCOM)/env/envDefs.h $(LIBCOM)/env/bldEnvData.pl \
 	$(CONFIG)/CONFIG_ENV $(CONFIG)/CONFIG_SITE_ENV
 	$(PERL) $(LIBCOM)/env/bldEnvData.pl $(CONFIG)
@@ -310,4 +328,3 @@ $(COMMON_DIR)/epicsVersion.h: $(CONFIG)/CONFIG_BASE_VERSION $(CONFIG)/CONFIG_SIT
 clean::
 	@$(RM) errSymTbl.c envData.c
 
-inc depends: $(INSTALL_LIBS)

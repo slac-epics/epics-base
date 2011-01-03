@@ -25,6 +25,7 @@
 #define epicsAssertAuthor "Jeff Hill johill@lanl.gov"
 
 #include "envDefs.h"
+#include "dbDefs.h"
 #include "osiProcess.h"
 #include "osiWireFormat.h"
 #include "epicsAlgorithm.h"
@@ -685,6 +686,8 @@ bool udpiiu::beaconAction (
 {
     struct sockaddr_in ina;
 
+    memset(&ina, 0, sizeof(struct sockaddr_in));
+
     if ( net_addr.sa.sa_family != AF_INET ) {
         return false;
     }
@@ -1102,7 +1105,8 @@ void udpiiu::govExpireNotify (
     this->ppSearchTmr[0]->installChannel ( guard, chan );
 }
 
-int udpiiu::printf ( epicsGuard < epicsMutex > & cbGuard, 
+int udpiiu :: printFormated ( 
+    epicsGuard < epicsMutex > & cbGuard, 
                     const char * pformat, ... )
 {
     va_list theArgs;
@@ -1110,7 +1114,7 @@ int udpiiu::printf ( epicsGuard < epicsMutex > & cbGuard,
 
     va_start ( theArgs, pformat );
     
-    status = this->cacRef.vPrintf ( cbGuard, pformat, theArgs );
+    status = this->cacRef.varArgsPrintFormated ( cbGuard, pformat, theArgs );
     
     va_end ( theArgs );
     

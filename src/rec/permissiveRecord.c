@@ -1,19 +1,17 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* recPermissive.c */
-/* base/src/rec  permissiveRecord.c,v 1.11 2003/04/01 21:01:57 mrk Exp */
+
+/* permissiveRecord.c,v 1.11.2.2 2009/04/02 21:40:37 lange Exp */
 
 /* recPermissive.c - Record Support Routines for Permissive records */
 /*
  *      Original Author: Bob Dalesio
- *      Current Author:  Marty Kraimer
  *      Date:            10-10-90
  */
 
@@ -40,7 +38,7 @@
 #define report NULL
 #define initialize NULL
 #define init_record NULL
-static long process();
+static long process(permissiveRecord *);
 #define special NULL
 #define get_value NULL
 #define cvt_dbaddr NULL
@@ -77,42 +75,40 @@ rset permissiveRSET={
 };
 epicsExportAddress(rset,permissiveRSET);
 
-static void monitor();
+static void monitor(permissiveRecord *);
 
-static long process(ppermissive)
-    struct permissiveRecord     *ppermissive;
+static long process(permissiveRecord *prec)
 {
 
-    ppermissive->pact=TRUE;
-    ppermissive->udf=FALSE;
-    recGblGetTimeStamp(ppermissive);
-    monitor(ppermissive);
-    recGblFwdLink(ppermissive);
-    ppermissive->pact=FALSE;
+    prec->pact=TRUE;
+    prec->udf=FALSE;
+    recGblGetTimeStamp(prec);
+    monitor(prec);
+    recGblFwdLink(prec);
+    prec->pact=FALSE;
     return(0);
 }
 
-static void monitor(ppermissive)
-    struct permissiveRecord             *ppermissive;
+static void monitor(permissiveRecord *prec)
 {
     unsigned short  monitor_mask;
     unsigned short  val,oval,wflg,oflg;
 
-    monitor_mask = recGblResetAlarms(ppermissive);
+    monitor_mask = recGblResetAlarms(prec);
     /* get val,oval,wflg,oflg*/
-    val=ppermissive->val;
-    oval=ppermissive->oval;
-    wflg=ppermissive->wflg;
-    oflg=ppermissive->oflg;
+    val=prec->val;
+    oval=prec->oval;
+    wflg=prec->wflg;
+    oflg=prec->oflg;
     /*set  oval and oflg*/
-    ppermissive->oval = val;
-    ppermissive->oflg = wflg;
+    prec->oval = val;
+    prec->oflg = wflg;
     if(oval != val) {
-	db_post_events(ppermissive,&ppermissive->val,
+	db_post_events(prec,&prec->val,
 	    monitor_mask|DBE_VALUE|DBE_LOG);
     }
     if(oflg != wflg) {
-        db_post_events(ppermissive,&ppermissive->wflg,
+        db_post_events(prec,&prec->wflg,
 	    monitor_mask|DBE_VALUE|DBE_LOG);
     }
     return;

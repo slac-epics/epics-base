@@ -49,6 +49,8 @@ public:
     virtual unsigned sendBytes ( const void * pBuf, 
         unsigned nBytesInBuf, 
         const class epicsTime & currentTime ) = 0;
+protected:
+    virtual ~wireSendAdapter() {}
 };
 
 enum swioCircuitState { 
@@ -67,6 +69,8 @@ class wireRecvAdapter { // X aCC 655
 public:
     virtual void recvBytes ( void * pBuf, 
         unsigned nBytesInBuf, statusWireIO & ) = 0;
+protected:
+    virtual ~wireRecvAdapter() {}
 };
 
 class comBuf : public tsDLNode < comBuf > {
@@ -112,6 +116,8 @@ private:
     epicsUInt8 buf [ comBufSize ];
     void * operator new ( size_t size );
     void operator delete ( void * );
+    template < class T >
+    bool push ( const T * ); // disabled
 };
 
 inline void * comBuf::operator new ( size_t size, 

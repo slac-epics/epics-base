@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbNotify.c */
-/* base/src/db dbNotify.c,v 1.40.2.10 2004/12/03 16:10:39 mrk Exp */
+/* base/src/db dbNotify.c,v 1.40.2.12 2009/01/16 20:50:40 anj Exp */
 /*
  *      Author: 	Marty Kraimer
  *      Date:           03-30-95
@@ -201,7 +201,7 @@ STATIC void callUser(dbCommon *precord,putNotify *ppn)
 STATIC void putNotifyCommon(putNotify *ppn,dbCommon *precord)
 {
     long	status=0;
-    dbFldDes	*pfldDes=(dbFldDes *)(ppn->paddr->pfldDes);
+    dbFldDes	*pfldDes = ppn->paddr->pfldDes;
     putNotifyPvt *pputNotifyPvt = (putNotifyPvt *)ppn->pputNotifyPvt;
 
     if(precord->ppn && pputNotifyPvt->state!=putNotifyRestartCallbackRequested)
@@ -546,6 +546,9 @@ int epicsShareAPI dbNotifyDump(void)
         pdbRecordNode = (dbRecordNode *)ellNext(&pdbRecordNode->node)) {
             putNotifyPvt *pputNotifyPvt;
             precord = pdbRecordNode->precord;
+            if (!precord->name[0] ||
+                pdbRecordNode->flags & DBRN_FLAGS_ISALIAS)
+                continue;
             if(!precord->ppn) continue;
             if(!precord->ppnr) continue;
             if(precord->ppn->paddr->precord != precord) continue;

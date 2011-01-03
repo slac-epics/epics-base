@@ -40,9 +40,12 @@
 static const unsigned stackSizeTable[epicsThreadStackBig+1] = 
    {4000*ARCH_STACK_FACTOR, 6000*ARCH_STACK_FACTOR, 11000*ARCH_STACK_FACTOR};
 
-/*The following is just to force atReboot to be loaded*/
+/*The following forces atReboot to be loaded*/
 extern int atRebootExtern;
-static int *patRebootExtern = &atRebootExtern;
+static struct pext {
+    int *pExtern;
+    struct pext *pext;
+} pext = {&atRebootExtern, &pext};
 
 /* definitions for implementation of epicsThreadPrivate */
 static void **papTSD = 0;
@@ -109,11 +112,16 @@ unsigned int epicsThreadGetStackSize (epicsThreadStackSizeClass stackSizeClass)
 
 void epicsThreadOnceOsd(epicsThreadOnceId *id, void (*func)(void *), void *arg)
 {
+    int result;
     epicsThreadInit();
-    assert(semTake(epicsThreadOnceMutex,WAIT_FOREVER)==OK);
+    result = semTake(epicsThreadOnceMutex, WAIT_FOREVER);
+    assert(result == OK);
     if (*id == 0) { /*  0 => first call */
         *id = -1;   /* -1 => func() active */
+        semGive(epicsThreadOnceMutex);
         func(arg);
+        result = semTake(epicsThreadOnceMutex, WAIT_FOREVER);
+        assert(result == OK);
         *id = +1;   /* +1 => func() done */
     } else
         assert(*id > 0 /* func() called epicsThreadOnce() with same id */);
@@ -252,7 +260,7 @@ void epicsThreadSleep(double seconds)
     if(seconds<=0.0) {
         ticks = 0;
     } else {
-        ticks = seconds*sysClkRateGet();
+        ticks = seconds*sysClkRateGet() + 0.5;
         if(ticks<=0) ticks = 1;
     }
     status = taskDelay(ticks);
@@ -325,58 +333,43 @@ void epicsThreadPrivateDelete(epicsThreadPrivateId id)
 }
 
 /*
- * Note that it is not necessary to have mutex for following
- * because they must be called by the same thread
+ * No mutex is necessary here because by definition
+ * thread variables are local to a single thread.
  */
 void epicsThreadPrivateSet (epicsThreadPrivateId id, void *pvt)
 {
-    int indpepicsThreadPrivate = (int)id;
+    int int_id = (int)id;
     int nepicsThreadPrivateOld = 0;
 
-    if(papTSD) nepicsThreadPrivateOld = (int)papTSD[0];
-    if(!papTSD || (nepicsThreadPrivateOld<indpepicsThreadPrivate)) {
+    if (papTSD) nepicsThreadPrivateOld = (int)papTSD[0];
+
+    if (!papTSD || nepicsThreadPrivateOld < int_id) {
         void **papTSDold = papTSD;
         int i;
 
-        papTSD = callocMustSucceed(indpepicsThreadPrivate + 1,sizeof(void *),
+        papTSD = callocMustSucceed(int_id + 1,sizeof(void *),
             "epicsThreadPrivateSet");
-        papTSD[0] = (void *)(indpepicsThreadPrivate);
-        for(i=1; i<= nepicsThreadPrivateOld; i++) papTSD[i] = papTSDold[i];
+        papTSD[0] = (void *)(int_id);
+        for (i = 1; i <= nepicsThreadPrivateOld; i++) {
+            papTSD[i] = papTSDold[i];
+        }
         free (papTSDold);
     }
-    papTSD[indpepicsThreadPrivate] = pvt;
+    papTSD[int_id] = pvt;
 }
 
 void *epicsThreadPrivateGet(epicsThreadPrivateId id)
 {
-    int indpepicsThreadPrivate = (int)id;
-    void *data;
-    if(!papTSD) {
-        papTSD = callocMustSucceed(indpepicsThreadPrivate + 1,sizeof(void *),
-            "epicsThreadPrivateSet");
-        papTSD[0] = (void *)(indpepicsThreadPrivate);
-    }
-    /* Note that epicsThreadPrivateGet may be called BEFORE epicsThreadPrivateSet*/
-    if ( (int) id <= (int) papTSD[0] ) {
-        data = papTSD[(int)id];
-    }
-    else {
-        data = 0;
-    }
-    return(data);
-}
+    int int_id = (int)id;
 
-/* Tornado compilers for 68k have an optimizer bug at -O1 and above; the
- * code generated for epicsThreadSleepQuantum() is incorrect.  This routine
- * tests for that bug.  This routine must appear above the code it calls or
- * or the optimizer may inline epicsThreadSleepQuantum() */
-int vxWorksBrokenCompilerTest()
-{
-    double q = epicsThreadSleepQuantum();
-    double one = q * sysClkRateGet();
-    int ok = (one > 0.999) && (one < 1.001);
-    printf("%s: epicsThreadSleepQuantum() = %f\n", ok  ? "Ok" : "BROKEN", q);
-    return ok;
+    /*
+     * If epicsThreadPrivateGet() is called before epicsThreadPrivateSet()
+     * for any particular thread, the value returned is always NULL.
+     */
+    if ( papTSD && int_id <= (int) papTSD[0] ) {
+        return papTSD[int_id];
+    }
+    return NULL;
 }
 
 double epicsThreadSleepQuantum ()

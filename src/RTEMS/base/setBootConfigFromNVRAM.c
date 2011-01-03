@@ -2,10 +2,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <fcntl.h> /* for open() */
 #include <rtems/rtems_bsdnet.h>
 #include <bsp.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #include <epicsStdlib.h>
 #include <epicsStdio.h>
 #include <epicsString.h>
@@ -15,19 +17,77 @@ char *env_nfsServer;
 char *env_nfsPath;
 char *env_nfsMountPoint;
 
-#if defined(HAVE_MOTLOAD)
+/*
+ * Split argument string of form nfs_server:nfs_export:<path>
+ * The nfs_export component will be used as:
+ *      - the path to the directory exported from the NFS server
+ *      - the local mount point
+ *      - a prefix of <path>
+ * For example, the argument string:
+ *       romeo:/export/users:smith/ioc/iocexample/st.cmd
+ * would:
+ *       - mount /export/users from NFS server romeo on /export/users
+ *       - chdir to /export/users/smith/ioc/iocexample
+ *       - read commands from st.cmd
+ */
+static void
+splitRtemsBsdnetBootpCmdline(void)
+{
+    char *cp1, *cp2, *cp3;
 
-#ifndef BSP_NVRAM_BASE_ADDR
-#define BSP_NVRAM_BASE_ADDR (GT64260_DEV1_BASE + 0x10000)
-#endif
+    if ((cp1 = rtems_bsdnet_bootp_cmdline) == NULL)
+        return;
+    if (((cp2 = strchr(cp1, ':')) != NULL)
+     && (((cp3 = strchr(cp2+1, ' ')) != NULL)
+      || ((cp3 = strchr(cp2+1, ':')) != NULL))) {
+        int l1 = cp2 - cp1;
+        int l2 = cp3 - cp2 - 1;
+        int l3 = strlen(cp3) - 1;
+        if (l1 && l2 && l3) {
+            *cp2++ = '\0';
+            *cp3 = '\0';
+            env_nfsServer = cp1;
+            env_nfsMountPoint = env_nfsPath = epicsStrDup(cp2);
+            *cp3 = '/';
+            rtems_bsdnet_bootp_cmdline = cp2;
+        }
+    }
+}
+
+/*
+ * Split NFS mount information of the form nfs_server:host_path:local_path
+ */
+static void
+splitNfsMountPath(char *nfsString)
+{
+    char *cp2, *cp3;
+
+    if (nfsString == NULL)
+        return;
+    if (((cp2 = strchr(nfsString, ':')) != NULL)
+     && (((cp3 = strchr(cp2+1, ' ')) != NULL)
+      || ((cp3 = strchr(cp2+1, ':')) != NULL))) {
+        int l1 = cp2 - nfsString;
+        int l2 = cp3 - cp2 - 1;
+        int l3 = strlen(cp3) - 1;
+        if (l1 && l2 && l3) {
+            *cp2++ = '\0';
+            *cp3++ = '\0';
+            env_nfsServer = nfsString;
+            env_nfsPath = cp2;
+            env_nfsMountPoint = cp3;
+        }
+    }
+}
+
+#if defined(HAVE_MOTLOAD)
 
 /*
  * Motorola MOTLOAD NVRAM Access
  */
 static char *
-gev(const char *parm)
+gev(const char *parm, volatile char *nvp)
 {
-    volatile char *nvp = (volatile unsigned char *)(BSP_NVRAM_BASE_ADDR + 0x70F8);
     const char *val;
     const char *name;
     char *ret;
@@ -90,33 +150,61 @@ setBootConfigFromNVRAM(void)
 {
     char *cp;
     const char *mot_script_boot;
+    char *nvp;
+
+# if defined(BSP_NVRAM_BASE_ADDR)
+    nvp = (volatile unsigned char *)(BSP_NVRAM_BASE_ADDR+0x70f8);
+# elif defined(BSP_I2C_VPD_EEPROM_DEV_NAME)
+    char gev_buf[3592];
+    int fd;
+    if ((fd = open(BSP_I2C_VPD_EEPROM_DEV_NAME, 0)) < 0) {
+        printf("Can't open %s: %s\n", BSP_I2C_VPD_EEPROM_DEV_NAME, strerror(errno));
+        return;
+    }
+    lseek(fd, 0x10f8, SEEK_SET);
+    if (read(fd, gev_buf, sizeof gev_buf) != sizeof gev_buf) {
+        printf("Can't read %s: %s\n", BSP_I2C_VPD_EEPROM_DEV_NAME, strerror(errno));
+        return;
+    }
+    close(fd);
+    nvp = gev_buf;
+# else
+#  error "No way to read GEV!"
+# endif
 
     if (rtems_bsdnet_config.bootp != NULL)
         return;
-    mot_script_boot = gev("mot-script-boot");
-    if ((rtems_bsdnet_bootp_server_name = gev("mot-/dev/enet0-sipa")) == NULL)
+    mot_script_boot = gev("mot-script-boot", nvp);
+    if ((rtems_bsdnet_bootp_server_name = gev("mot-/dev/enet0-sipa", nvp)) == NULL)
         rtems_bsdnet_bootp_server_name = motScriptParm(mot_script_boot, 's');
-    if ((rtems_bsdnet_config.gateway = gev("mot-/dev/enet0-gipa")) == NULL)
+    if ((rtems_bsdnet_config.gateway = gev("mot-/dev/enet0-gipa", nvp)) == NULL)
         rtems_bsdnet_config.gateway = motScriptParm(mot_script_boot, 'g');
-    if  ((rtems_bsdnet_config.ifconfig->ip_netmask = gev("mot-/dev/enet0-snma")) == NULL)
+    if  ((rtems_bsdnet_config.ifconfig->ip_netmask = gev("mot-/dev/enet0-snma", nvp)) == NULL)
         rtems_bsdnet_config.ifconfig->ip_netmask = motScriptParm(mot_script_boot, 'm');
 
-    rtems_bsdnet_config.name_server[0] = gev("rtems-dns-server");
+    rtems_bsdnet_config.name_server[0] = gev("rtems-dns-server", nvp);
     if (rtems_bsdnet_config.name_server[0] == NULL)
         rtems_bsdnet_config.name_server[0] = rtems_bsdnet_bootp_server_name;
-    cp = gev("rtems-dns-domainname");
+    cp = gev("rtems-dns-domainname", nvp);
     if (cp)
         rtems_bsdnet_config.domainname = cp;
 
-    if ((rtems_bsdnet_config.ifconfig->ip_address = gev("mot-/dev/enet0-cipa")) == NULL)
+    if ((rtems_bsdnet_config.ifconfig->ip_address = gev("mot-/dev/enet0-cipa", nvp)) == NULL)
         rtems_bsdnet_config.ifconfig->ip_address = motScriptParm(mot_script_boot, 'c');
-    rtems_bsdnet_config.hostname = gev("rtems-client-name");
+    rtems_bsdnet_config.hostname = gev("rtems-client-name", nvp);
     if (rtems_bsdnet_config.hostname == NULL)
         rtems_bsdnet_config.hostname = rtems_bsdnet_config.ifconfig->ip_address;
 
-    if ((rtems_bsdnet_bootp_boot_file_name = gev("mot-/dev/enet0-file")) == NULL)
+    if ((rtems_bsdnet_bootp_boot_file_name = gev("mot-/dev/enet0-file", nvp)) == NULL)
         rtems_bsdnet_bootp_boot_file_name = motScriptParm(mot_script_boot, 'f');
-    rtems_bsdnet_bootp_cmdline = gev("epics-script");
+    rtems_bsdnet_bootp_cmdline = gev("epics-script", nvp);
+    splitRtemsBsdnetBootpCmdline();
+    splitNfsMountPath(gev("epics-nfsmount", nvp));
+    rtems_bsdnet_config.ntp_server[0] = gev("epics-ntpserver", nvp);
+    if (rtems_bsdnet_config.ntp_server[0] == NULL)
+        rtems_bsdnet_config.ntp_server[0] = rtems_bsdnet_bootp_server_name;
+    if ((cp = gev("epics-tz", nvp)) != NULL)
+        epicsEnvSet("TZ", cp);
 }
 
 #elif defined(HAVE_PPCBUG)
@@ -124,28 +212,28 @@ setBootConfigFromNVRAM(void)
  * Motorola PPCBUG NVRAM Access
  */
 struct ppcbug_nvram {
-    rtems_unsigned32    PacketVersionIdentifier;
-    rtems_unsigned32    NodeControlMemoryAddress;
-    rtems_unsigned32    BootFileLoadAddress;
-    rtems_unsigned32    BootFileExecutionAddress;
-    rtems_unsigned32    BootFileExecutionDelay;
-    rtems_unsigned32    BootFileLength;
-    rtems_unsigned32    BootFileByteOffset;
-    rtems_unsigned32    TraceBufferAddress;
-    rtems_unsigned32    ClientIPAddress;
-    rtems_unsigned32    ServerIPAddress;
-    rtems_unsigned32    SubnetIPAddressMask;
-    rtems_unsigned32    BroadcastIPAddressMask;
-    rtems_unsigned32    GatewayIPAddress;
-    rtems_unsigned8     BootpRarpRetry;
-    rtems_unsigned8     TftpRarpRetry;
-    rtems_unsigned8     BootpRarpControl;
-    rtems_unsigned8     UpdateControl;
+    uint32_t    PacketVersionIdentifier;
+    uint32_t    NodeControlMemoryAddress;
+    uint32_t    BootFileLoadAddress;
+    uint32_t    BootFileExecutionAddress;
+    uint32_t    BootFileExecutionDelay;
+    uint32_t    BootFileLength;
+    uint32_t    BootFileByteOffset;
+    uint32_t    TraceBufferAddress;
+    uint32_t    ClientIPAddress;
+    uint32_t    ServerIPAddress;
+    uint32_t    SubnetIPAddressMask;
+    uint32_t    BroadcastIPAddressMask;
+    uint32_t    GatewayIPAddress;
+    uint8_t     BootpRarpRetry;
+    uint8_t     TftpRarpRetry;
+    uint8_t     BootpRarpControl;
+    uint8_t     UpdateControl;
     char                BootFilenameString[64];
     char                ArgumentFilenameString[64];
 };
 
-static char *addr(char *cbuf, rtems_unsigned32 addr)
+static char *addr(char *cbuf, uint32_t addr)
 {
     struct in_addr a;
     if ((a.s_addr = addr) == 0)
@@ -156,7 +244,6 @@ static char *addr(char *cbuf, rtems_unsigned32 addr)
 void
 setBootConfigFromNVRAM(void)
 {
-    char *cp1, *cp2, *cp3;
     static struct ppcbug_nvram nvram;
     static char ip_address[INET_ADDRSTRLEN];
     static char ip_netmask[INET_ADDRSTRLEN];
@@ -174,6 +261,23 @@ setBootConfigFromNVRAM(void)
      * location of the network configuration parameters.
      * Care must be taken to access the NVRAM a byte at a time.
      */
+
+#if defined(NVRAM_INDIRECT)
+   {
+      volatile char *addrLo = (volatile char *)0x80000074;
+      volatile char *addrHi = (volatile char *)0x80000075;
+      volatile char *data = (volatile char *)0x80000077;
+      int addr =  0x1000;
+      char *d = (char *)&nvram;
+
+      while (d < ((char *)&nvram + sizeof nvram)) {
+         *addrLo = addr & 0xFF;
+         *addrHi = (addr >> 8) & 0xFF;
+         *d++ = *data;
+         addr++;
+      }
+   }
+#else
     {
     volatile char *s = (volatile char *)0xFFE81000;
     char *d = (char *)&nvram;
@@ -181,14 +285,14 @@ setBootConfigFromNVRAM(void)
     while (d < ((char *)&nvram + sizeof nvram))
         *d++ = *s++;
     }
-
+#endif
     /*
-     * Assume that the boot server is also the name server and log server!
+     * Assume that the boot server is also the name, log and ntp server!
      */
     rtems_bsdnet_config.name_server[0] =
+    rtems_bsdnet_config.ntp_server[0]  =
       rtems_bsdnet_bootp_server_name   = addr(server, nvram.ServerIPAddress);
     rtems_bsdnet_bootp_server_address.s_addr = nvram.ServerIPAddress;
-
     /*
      * Nothing better to use as host name!
      */
@@ -197,39 +301,10 @@ setBootConfigFromNVRAM(void)
 
     rtems_bsdnet_config.gateway = addr(gateway, nvram.GatewayIPAddress);
     rtems_bsdnet_config.ifconfig->ip_netmask = addr(ip_netmask, nvram.SubnetIPAddressMask);
-    rtems_bsdnet_bootp_boot_file_name = nvram.BootFilenameString;
 
-    /*
-     * Check for argument string of form nfs_server:nfs_export:<path>
-     * The nfs_export component will be used as:
-     *      - the path to the directory exported from the NFS server
-     *      - the local mount point
-     *      - a prefix of <path>
-     * For example, the argument string:
-     *       romeo:/export/users:smith/ioc/iocexample/st.cmd
-     * would:
-     *       - mount /export/users from NFS server romeo on /export/users
-     *       - chdir to /export/users/smith/ioc/iocexample
-     *       - read commands from st.cmd
-     *
-     */
+    rtems_bsdnet_bootp_boot_file_name = nvram.BootFilenameString;
     rtems_bsdnet_bootp_cmdline = nvram.ArgumentFilenameString;
-    cp1 = nvram.ArgumentFilenameString;
-    if (((cp2 = strchr(cp1, ':')) != NULL)
-     && (((cp3 = strchr(cp2+1, ' ')) != NULL)
-      || ((cp3 = strchr(cp2+1, ':')) != NULL))) {
-        int l1 = cp2 - cp1;
-        int l2 = cp3 - cp2 - 1;
-        int l3 = strlen(cp3) - 1;
-        if (l1 && l2 && l3) {
-            *cp2++ = '\0';
-            *cp3 = '\0';
-            env_nfsServer = cp1;
-            env_nfsMountPoint = env_nfsPath = epicsStrDup(cp2);
-            *cp3 = '/';
-            rtems_bsdnet_bootp_cmdline = cp2;
-        }
-    }
+    splitRtemsBsdnetBootpCmdline();
 }
 
 #elif defined(__mcf528x__)
@@ -261,7 +336,6 @@ setBootConfigFromNVRAM(void)
     rtems_bsdnet_bootp_server_name = env("SERVER", "192.168.0.1");
     rtems_bsdnet_config.name_server[0] = env("NAMESERVER", rtems_bsdnet_bootp_server_name);
     rtems_bsdnet_config.ntp_server[0] = env("NTPSERVER", rtems_bsdnet_bootp_server_name);
-    epicsEnvSet("EPICS_TS_NTP_INET",rtems_bsdnet_config.ntp_server[0]);
     cp1 = env("DOMAIN", NULL);
     if (cp1 != NULL)
         rtems_bsdnet_config.domainname = cp1;
@@ -269,23 +343,7 @@ setBootConfigFromNVRAM(void)
     rtems_bsdnet_config.ifconfig->ip_address = env("IPADDR0", "192.168.0.2");
     rtems_bsdnet_bootp_boot_file_name = env("BOOTFILE", "uC5282App.boot");
     rtems_bsdnet_bootp_cmdline = env("CMDLINE", "epics/iocBoot/iocNobody/st.cmd");
-    if ((cp1 = env("NFSMOUNT", NULL)) != NULL) {
-        char *cp2, *cp3;
-        if (((cp2 = strchr(cp1, ':')) != NULL)
-         && (((cp3 = strchr(cp2+1, ' ')) != NULL)
-          || ((cp3 = strchr(cp2+1, ':')) != NULL))) {
-            int l1 = cp2 - cp1;
-            int l2 = cp3 - cp2 - 1;
-            int l3 = strlen(cp3) - 1;
-            if (l1 && l2 && l3) {
-                *cp2++ = '\0';
-                *cp3++ = '\0';
-                env_nfsServer = cp1;
-                env_nfsPath = cp2;
-                env_nfsMountPoint = cp3;
-            }
-        }
-    }
+    splitNfsMountPath(env("NFSMOUNT", NULL));
     if ((cp1 = env("TZ", NULL)) != NULL)
         epicsEnvSet("TZ", cp1);
 }

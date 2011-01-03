@@ -1,13 +1,12 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2007 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* callback.h,v 1.12.2.1 2006/12/06 17:10:26 anj Exp */
+/* callback.h,v 1.12.2.3 2008/05/15 17:41:02 anj Exp */
 
 /* includes for general purpose callback tasks		*/
 /*
@@ -56,15 +55,18 @@ typedef void    (*CALLBACKFUNC)(struct callbackPvt*);
 #define callbackGetUser(USER,PCALLBACK)\
 ( (USER) = (void *)((CALLBACK *)(PCALLBACK))->user )
 
-epicsShareFunc void epicsShareAPI callbackInit(void);
-epicsShareFunc void epicsShareAPI callbackRequest(CALLBACK *pCallback);
-epicsShareFunc void epicsShareAPI callbackRequestProcessCallback(
+epicsShareFunc void callbackInit(void);
+epicsShareFunc void callbackRequest(CALLBACK *pCallback);
+epicsShareFunc void callbackSetProcess(
+    CALLBACK *pcallback, int Priority, void *pRec);
+epicsShareFunc void callbackRequestProcessCallback(
     CALLBACK *pCallback,int Priority, void *pRec);
-epicsShareFunc void epicsShareAPI callbackRequestDelayed(
+epicsShareFunc void callbackRequestDelayed(
     CALLBACK *pCallback,double seconds);
-epicsShareFunc void epicsShareAPI callbackRequestProcessCallbackDelayed(
-    CALLBACK *pCallback, int Priority, void *pRec,double seconds);
-epicsShareFunc int epicsShareAPI callbackSetQueueSize(int size);
+epicsShareFunc void callbackCancelDelayed(CALLBACK *pcallback);
+epicsShareFunc void callbackRequestProcessCallbackDelayed(
+    CALLBACK *pCallback, int Priority, void *pRec, double seconds);
+epicsShareFunc int callbackSetQueueSize(int size);
 
 #ifdef __cplusplus
 }

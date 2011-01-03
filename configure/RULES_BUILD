@@ -6,7 +6,7 @@
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
-# RULES_BUILD,v 1.88.2.25 2006/11/20 17:38:36 anj Exp
+# RULES_BUILD,v 1.88.2.48 2009/06/26 20:43:02 jba Exp
 #
 #	Rules for making things specified in Makefile
 #
@@ -32,6 +32,9 @@ include $(CONFIG)/CONFIG_ADDONS
 
 #---------------------------------------------------------------
 # Set PROD, TESTPROD, OBJS, and LIBRARY
+
+SCRIPTS_HOST += $(PERL_SCRIPTS)
+# PERL_SCRIPTS are installed into existing $(INSTALL_BIN) for Host systems
 
 ifeq ($(findstring Host,$(VALID_BUILDS)),Host)
 LIBRARY += $(LIBRARY_HOST)
@@ -67,10 +70,6 @@ all:	install
 
 -include $(CONFIG)/RULES.Db
 
--include $(CONFIG)/RULES.Display
- 	 
--include $(CONFIG)/RULES.Restore
-
 -include $(CONFIG)/RULES_JAVA
 
 ifneq (,$(strip $(HDEPENDS_FILES)))
@@ -78,17 +77,11 @@ ifneq (,$(strip $(HDEPENDS_FILES)))
 endif
 
 #---------------------------------------------------------------
-# Create included Makefile for prod,testprod, and library targets
+# Included defines and rules for prod,testprod, and library targets
 
-ifneq (,$(strip $(PROD) $(TESTPROD) $(LIBRARY) $(LOADABLE_LIBRARY)))
-
-MakefileInclude: ../Makefile $(wildcard $(TOP)/configure/RELEASE*)
-	@$(RM) $@
-	@$(PERL) $(TOOLS)/makeMakefileInclude.pl $(PROD) $(TESTPROD) $(LIBRARY) $(LOADABLE_LIBRARY) $@
-
--include MakefileInclude
-
-endif # PROD, TESTPROD, LIBRARY, or LOADABLE_LIBRARY defined
+#ifneq (,$(strip $(PROD) $(TESTPROD) $(LIBRARY) $(LOADABLE_LIBRARY)))
+include $(CONFIG)/RULES_TARGET
+#endif
 
 #---------------------------------------------------------------
 #   Products and Object libraries
@@ -104,13 +97,10 @@ LIBTARGETS += $(LIBNAME) $(INSTALL_LIBS) \
               $(DLL_LINK_LIBNAME) $(INSTALL_DLL_LINK_LIBS) \
               $(LOADABLE_SHRLIBNAME) $(INSTALL_LOADABLE_SHRLIBS)
 
-#---------------------------------------------------------------
-ifneq ($(CONFIG),$(TOP)/configure)
-RULES_TOP:=$(INSTALL_LOCATION)
--include $(TOP)/configure/RULES_BUILD
-endif
--include $(TOP)/configure/O.$(T_A)/RULES_INCLUDE
-#---------------------------------------------------------------
+$(INSTALL_LIBS): $(INSTALL_SHRLIBS)  $(INSTALL_DLL_LINK_LIBS)  $(INSTALL_LOADABLE_SHRLIBS)
+
+
+-include $(CONFIG)/RULES_FILE_TYPE
 
 #	Main targets
 
@@ -123,9 +113,9 @@ rebuild: clean install
 build : inc 
 
 build: $(OBJSNAME) $(LIBTARGETS) $(PRODTARGETS) $(TESTPRODNAME) \
-	$(TARGETS) $(TESTSCRIPTS)
+	$(TARGETS) $(TESTSCRIPTS) $(INSTALL_LIB_INSTALLS)
 
-inc : $(COMMON_INC) $(INSTALL_INC)
+inc : $(COMMON_INC) $(INSTALL_INC) $(INSTALL_CONFIGS)
 
 buildInstall : \
 	$(INSTALL_SCRIPTS) $(INSTALL_PROD) $(INSTALL_MUNCHS) \
@@ -134,24 +124,22 @@ buildInstall : \
 	$(INSTALL_DOCS) \
 	$(INSTALL_HTMLS) \
 	$(INSTALL_TEMPLATE) \
-	$(INSTALL_CONFIGS)
-
-ifdef BIN_INSTALLS
-buildInstall : binInstalls
-endif
-
-ifdef LIB_INSTALLS
-buildInstall : libInstalls
-endif
+	$(INSTALL_BIN_INSTALLS)
 
 clean::
-	@echo "Cleaning"
-	@$(RM) *.i *$(OBJ) *.a $(TESTPRODNAME) $(LIBNAME) $(SHRLIBNAME)\
-	$(INC) *$(RES) $(TARGETS) $(DLL_LINK_LIBNAME) $(TDS) \
+	$(ECHO) "Cleaning"
+	@$(RM) *.i *$(OBJ) *.a $(TESTPRODNAME) $(LIBNAME) $(SHRLIBNAME) \
+	$(INC) $(TARGETS) $(DLL_LINK_LIBNAME) $(TDS) \
 	*.out MakefileInclude  $(LOADABLE_SHRLIBNAME) *.manifest *.exp \
 	$(COMMON_INC) $(HDEPENDS_FILES) $(PRODTARGETS) $(TESTSCRIPTS)
+ifdef RES
+	@$(RM) *$(RES)
+endif
 ifdef BAF
-	@$(RM) $(PROD_BAF) $(LIB_BAF) *$(BOF)
+	@$(RM) $(PROD_BAF) $(LIB_BAF)
+endif
+ifdef BOF
+	@$(RM) *$(BOF)
 endif
 
 # WIN95/NT source browser
@@ -161,6 +149,14 @@ browse: $(LIB_BAF) $(PROD_BAF)
 
 $(DIRECTORY_TARGETS) :
 	$(MKDIR) -p $@
+
+$(PRODNAME): $(INSTALL_LIB_INSTALLS)
+
+# RELEASE file consistency checking
+checkRelease:
+	$(CONVERTRELEASE) checkRelease
+warnRelease:
+	-$(CONVERTRELEASE) checkRelease
 
 #---------------------------------------------------------------
 #  The order of the following rules is
@@ -211,7 +207,7 @@ $(OBJLIBNAME):%$(OBJ):
 
 # WIN95/NT source browser
 %.bsc: %.sbr
-	@echo "building source browser archive $@"
+	$(ECHO) "building source browser archive $@"
 	@$(RM) $@
 	$(BAFCMD) $<
 
@@ -258,7 +254,7 @@ endif
 ifdef BAF
 
 $(LIB_BAF): $(addsuffix $(BOF),$(basename $(LIBRARY_LD_OBJS)))
-	@echo "Building source browser archive $@"
+	$(ECHO) "Building source browser archive $@"
 	@$(RM) $@
 	$(BAFCMD) $^
 
@@ -268,35 +264,32 @@ ifneq (,$(wildcard ../baseLIBOBJS))
 $(LIBNAME): ../baseLIBOBJS
 endif
 
-# rule for lib (archive of object files) creation
 $(LIBNAME): $(LIBRARY_OBJS)
 
-$(LIBNAME): $(LIB_PREFIX)%$(LIB_SUFFIX):
+$(DLL_LINK_LIBNAME): $(LIBRARY_OBJS) $(LIBRARY_RESS) $(SHRLIB_DEPLIBS) 
+
+$(LIBNAME) $(DLL_LINK_LIBNAME): $(LIB_PREFIX)%$(LIB_SUFFIX):
 	@$(RM) $@
 	$(ARCMD)
 ifneq ($(strip $(RANLIB)),)
 	$(RANLIB) $@
 endif # RANLIB
 
-$(DLL_LINK_LIBNAME): $(LIBRARY_OBJS) $(LIBRARY_RESS) $(SHRLIB_DEPLIBS) 
-
-$(DLL_LINK_LIBNAME):$(SHRLIB_PREFIX)%.lib:
-	@$(RM) $@
-	$(LINK.shrlib)
-	$(MT_DLL_COMMAND)
-
 $(SHRLIBNAME): $(LIBRARY_OBJS) $(LIBRARY_RESS) $(SHRLIB_DEPLIBS)
 
 $(SHRLIBNAME):$(SHRLIB_PREFIX)%$(SHRLIB_SUFFIX):
 	@$(RM) $@
 	$(LINK.shrlib)
+ifeq ($(SHRLIB_SUFFIX),.dll)
 	$(MT_DLL_COMMAND)
+endif
 
 $(LOADABLE_SHRLIBNAME): $(LIBRARY_OBJS) $(LIBRARY_RESS) $(SHRLIB_DEPLIBS)
 
 $(LOADABLE_SHRLIBNAME):$(LOADABLE_SHRLIB_PREFIX)%$(LOADABLE_SHRLIB_SUFFIX):
 	@$(RM) $@
-	$(LINK.loadable_shrlib)
+	$(LINK.shrlib)
+	$(MT_DLL_COMMAND)
 
 # C++ munching for VxWorks
 %.nm : %$(EXE)
@@ -320,7 +313,7 @@ $(OBJLIB_MUNCHNAME):%.munch : %_ctdt$(OBJ) %$(OBJ)
 	$(MUNCH_CMD)
 
 runtests: $(TESTSCRIPTS_$(BUILD_CLASS))
-	$(PERL) -e 'use Test::Harness; runtests @ARGV if @ARGV;' $^
+	-$(PERL) -MTest::Harness -e 'runtests @ARGV if @ARGV;' $^
 
 # If there's a perl test script (.plt) available, use it
 %.t: ../%.plt
@@ -328,51 +321,55 @@ runtests: $(TESTSCRIPTS_$(BUILD_CLASS))
 	@$(CP) $< $@
 
 # Some versions of Test::Harness expect test programs in perl only.
-# Generate a 1-line perl program to exec the real test binary.
-# Uses the $0 runtime path to itself to find the executable.
+# Generate a perl program to exec the real test binary.
 %.t: %$(EXE)
 	@$(RM) $@
-	@echo '($$e=$$0)=~s/.t$$/$(EXE)/;exec "./$$e" or die "exec failed";'>$@
+	@$(PERL) $(TOOLS)/makeTestfile.pl $@ $<
 
-# Ext, app and module rules
-RULES_INCLUDE CONFIG_APP_INCLUDE: $(wildcard $(TOP)/configure/RELEASE*)
-	@$(RM) $@
-	$(PERL) $(TOOLS)/convertRelease.pl -h $(EPICS_HOST_ARCH) $@
+#---------------------------------------------------------------
+## Install rules for BIN_INSTALLS and LIB_INSTALLS
+define  BIN_INSTALLS_template
+$$(INSTALL_BIN)/$$(notdir $(1)) : $(1)
+	$(ECHO) "Installing $$(<F)"
+	@$$(INSTALL) -d -m $$(BIN_PERMISSIONS) $$^ $$(INSTALL_BIN)
+endef
+$(foreach file, $(BIN_INSTALLS), $(eval $(call BIN_INSTALLS_template, $(file))))
 
-binInstalls:  $(BIN_INSTALLS)
-	@echo "Installing $(^F)"
-	@$(INSTALL) -d -m 555 $^ $(INSTALL_BIN)
+define  LIB_INSTALLS_template
+$$(INSTALL_LIB)/$$(notdir $(1)) : $(1)
+	$(ECHO) "Installing $$(<F)"
+	@$$(INSTALL) -d -m $$(LIB_PERMISSIONS) $$^ $$(INSTALL_LIB)
+endef
+$(foreach file, $(LIB_INSTALLS), $(eval $(call LIB_INSTALLS_template, $(file))))
 
-libInstalls:  $(LIB_INSTALLS)
-	@echo "Installing $(^F)"
-	@$(INSTALL) -d -m 555 $^ $(INSTALL_LIB)
+#---------------------------------------------------------------
 
 $(INSTALL_BIN)/%: ../os/$(OS_CLASS)/%
-	@echo "Installing os-specific script $@"
-	@$(INSTALL_PRODUCT) -d -m 555 $< $(INSTALL_BIN)
+	$(ECHO) "Installing os-specific script $@"
+	@$(INSTALL_PRODUCT) -d -m $(BIN_PERMISSIONS) $< $(INSTALL_BIN)
 
 $(INSTALL_BIN)/%: %
-	@echo "Installing binary $@"
-	@$(INSTALL_PRODUCT) -d -m 555 $< $(INSTALL_BIN)
+	$(ECHO) "Installing created file $@"
+	@$(INSTALL_PRODUCT) -d -m $(BIN_PERMISSIONS) $< $(INSTALL_BIN)
 
 $(INSTALL_BIN)/%: ../%
-	@echo "Installing script $@"
-	@$(INSTALL_PRODUCT) -d -m 555 $< $(INSTALL_BIN)
+	$(ECHO) "Installing script $@"
+	@$(INSTALL_PRODUCT) -d -m $(BIN_PERMISSIONS) $< $(INSTALL_BIN)
 
 $(INSTALL_LIB)/%.a: %.a
-	@echo "Installing library $@"
-	@$(INSTALL_LIBRARY) -d -m 644 $< $(INSTALL_LIB)
+	$(ECHO) "Installing library $@"
+	@$(INSTALL_LIBRARY) -d -m $(LIB_PERMISSIONS) $< $(INSTALL_LIB)
 ifneq ($(strip $(RANLIB)),)
 	$(RANLIB) $@
 endif # RANLIB
 
 $(INSTALL_LIB)/%.lib: %.lib
-	@echo "Installing library $@"
-	@$(INSTALL_LIBRARY) -d -m 644 $< $(INSTALL_LIB)
+	$(ECHO) "Installing library $@"
+	@$(INSTALL_LIBRARY) -d -m $(LIB_PERMISSIONS) $< $(INSTALL_LIB)
 
 $(INSTALL_SHRLIB)/lib%: lib%
-	@echo "Installing shared library $@"
-	@$(INSTALL_LIBRARY) -d -m 555 $< $(INSTALL_SHRLIB)
+	$(ECHO) "Installing shared library $@"
+	@$(INSTALL_LIBRARY) -d -m $(LIB_PERMISSIONS) $< $(INSTALL_SHRLIB)
 ifneq (,$(strip $(SHRLIB_VERSION)))
 	@$(RM) $(subst .$(SHRLIB_VERSION),,$@)
 	ln -s $< $(subst .$(SHRLIB_VERSION),,$@)
@@ -381,20 +378,20 @@ endif # SHRLIB_VERSION
 
 ifneq ($(INSTALL_TCLLIB),$(INSTALL_BIN))
 $(INSTALL_TCLLIB)/%: %
-	@echo "Installing Tcl library $@"
-	@$(INSTALL) -d -m 555 $< $(INSTALL_TCLLIB)
+	$(ECHO) "Installing Tcl library $@"
+	@$(INSTALL) -d -m $(BIN_PERMISSIONS) $< $(INSTALL_TCLLIB)
 
 $(INSTALL_TCLLIB)/%: ../%
-	@echo "Installing Tcl library $@"
-	@$(INSTALL) -d -m 555 $< $(INSTALL_TCLLIB)
+	$(ECHO) "Installing Tcl library $@"
+	@$(INSTALL) -d -m $(BIN_PERMISSIONS) $< $(INSTALL_TCLLIB)
 endif
 
 $(INSTALL_TCLLIB)/$(TCLINDEX): $(INSTALL_TCLLIBS)
-	@echo "Updating $@"
-	@echo eval auto_mkindex $(INSTALL_TCLLIB) "$(TCLLIBNAME)" | tclsh
+	$(ECHO) "Updating $@"
+	$(ECHO) eval auto_mkindex $(INSTALL_TCLLIB) "$(TCLLIBNAME)" | tclsh
 
 $(INSTALL_LOADABLE_SHRLIBS): $(INSTALL_SHRLIB)/%: %
-	@echo "Installing loadable shared library $@"
+	$(ECHO) "Installing loadable shared library $@"
 	@$(INSTALL_LIBRARY) -d -m 555 $< $(INSTALL_SHRLIB)
 ifneq (,$(strip $(LOADABLE_SHRLIB_VERSION)))
 	@$(RM) $(subst .$(LOADABLE_SHRLIB_VERSION),,$@)
@@ -402,54 +399,56 @@ ifneq (,$(strip $(LOADABLE_SHRLIB_VERSION)))
 endif # LOADABLE_SHRLIB_VERSION
 
 $(INSTALL_CONFIG)/%: %
-	@echo "Installing config file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing config file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_CONFIG)/%: ../%
-	@echo "Installing config file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing config file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_INCLUDE)/% : $(COMMON_DIR)/%
-	@echo "Installing generated generic include file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing generated generic include file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_INCLUDE)/% : %
-	@echo "Installing generic include file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing generic include file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_INCLUDE)/os/$(OS_CLASS)/% : %
-	@echo "Installing os dependent include file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing os dependent include file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_DOC)/%: %
-	@echo "Installing doc $@"
-	@$(INSTALL) -d -m 644 $< $(INSTALL_DOC)
+	$(ECHO) "Installing doc $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(INSTALL_DOC)
 
 $(INSTALL_DOC)/%: ../%
-	@echo "Installing doc $@"
-	@$(INSTALL) -d -m 644 $< $(INSTALL_DOC)
+	$(ECHO) "Installing doc $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(INSTALL_DOC)
 
 $(INSTALL_HTML)/$(HTMLS_DIR)/%: %
-	@echo "Installing html $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing html $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_HTML)/$(HTMLS_DIR)/%: ../%
-	@echo "Installing html $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing html $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_TEMPLATES_SUBDIR)/%: ../%
-	@echo "Installing $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_TEMPLATES_SUBDIR)/%: %
-	@echo "Installing $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+	$(ECHO) "Installing $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
+
+-include $(CONFIG)/RULES_EXPAND
 
 .PRECIOUS: %.i %.o %.c %.nm %.cpp %.cc
 .PRECIOUS: $(COMMON_INC)
 
-.PHONY: all inc build install clean rebuild buildInstall binInstalls libInstalls
-.PHONY: runtests
+.PHONY: all inc build install clean rebuild buildInstall
+.PHONY: runtests checkRelease warnRelease
 
 endif # BASE_RULES_BUILD
 #	EOF RULES_BUILD

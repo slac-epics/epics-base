@@ -1,19 +1,5 @@
 #
 # CONFIG.Common.RTEMS-beatnik
-# Author: Till Straumann
-#	  SSRL
-#         strauman@slac.stanford.edu
-#
-# All RTEMS targets use the same Makefile fragment
-#
-
-RTEMS_TARGET_CPU = powerpc
-GNU_TARGET       = powerpc-rtems
-ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
-
-include $(CONFIG)/os/CONFIG.Common.RTEMS
-#
-# CONFIG.Common.RTEMS-beatnik
 # A migration from Eric Norum's CONFIG.Common.RTEMS-mvme5500
 # Author: Dayle Kotturi
 #         SLAC
@@ -26,12 +12,11 @@ RTEMS_TARGET_CPU = powerpc
 GNU_TARGET=powerpc-rtems
 ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
 ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
-ARCH_DEP_CFLAGS += -mlongcall
 
 MUNCH_SUFFIX = .boot
 MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
 define MUNCH_CMD
-	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
 endef
 
 CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik
@@ -42,6 +27,8 @@ RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
 INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
 INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
 
+OP_SYS_LDLIBS += -lbspExt
+
 %.sym: %$(EXE)
 	$(XSYMS) $^ $@
 
@@ -49,5 +36,3 @@ INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
 	$(OBJCOPY) -Obinary $^ $@
 
 #PRODTARGETS+=$(INSTALL_RTEMSSYMS) $(INSTALL_RTEMSIMGS)
-
-

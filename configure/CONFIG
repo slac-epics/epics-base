@@ -8,7 +8,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  CONFIG,v 1.17.2.6 2006/04/20 14:54:51 jba Exp
+#  CONFIG,v 1.17.2.11 2009/03/03 19:54:05 jba Exp
 #
 #  The developer may edit this file.
 # assume T_A is the host arch if not specified
@@ -17,12 +17,12 @@
 #  Common build definitions
 #
 
-ifndef EPICS_BASE
+ifneq ($(wildcard $(TOP)/configure/CONFIG_BASE_VERSION),)
 EPICS_BASE = $(INSTALL_LOCATION)
 CONFIG = $(TOP)/configure
 BASE_TOP=YES
 else
-CONFIG = $(EPICS_BASE)/configure
+CONFIG ?= $(EPICS_BASE)/configure
 endif
 
 -include $(CONFIG)/os/CONFIG_COMPAT
@@ -36,6 +36,7 @@ ifdef T_A
 endif
 
 include $(CONFIG)/CONFIG_COMMON
+include $(CONFIG)/CONFIG_FILE_TYPE
 
 #  Base-specific build options
 #
@@ -53,7 +54,6 @@ include $(CONFIG)/CONFIG_BASE_VERSION
 #
 include $(CONFIG)/os/CONFIG.$(EPICS_HOST_ARCH).Common
 -include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).Common
--include $(CONFIG)/O.$(T_A)/CONFIG_APP_INCLUDE
 
 ifdef T_A
 
@@ -71,11 +71,36 @@ endif
 #
 -include $(CONFIG)/os/CONFIG.$(EPICS_HOST_ARCH).$(T_A)
 
+#  RELEASE file specific definitions
+#
+ifneq ($(CONFIG),$(TOP)/configure)
+-include $(CONFIG)/CONFIG_APP_INCLUDE
+endif
+
 #  Site specific target and host-target definitions
 #
 -include $(CONFIG)/os/CONFIG_SITE.Common.$(T_A)
 -include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).$(T_A)
 
+endif
+
+# Include <top>/cfg/CONFIG* definitions from tops defined in RELEASE* files
+#
+ifneq ($(CONFIG),$(TOP)/configure)
+RELEASE_TOPS ?= $(shell $(PERL) $(TOOLS)/convertRelease.pl -T $(TOP) releaseTops )
+RELEASE_CFG_CONFIGS = $(foreach top, $(RELEASE_TOPS), $(wildcard $($(top))/cfg/CONFIG*))
+ifneq ($(RELEASE_CFG_CONFIGS),)
+include $(RELEASE_CFG_CONFIGS)
+endif
+endif
+
+# Include $(INSTALL_CFG)/CONFIG* definitions
+#
+ifndef T_A
+TOP_CFG_CONFIGS = $(wildcard $(INSTALL_CFG)/CONFIG*)
+ifneq ($(TOP_CFG_CONFIGS),)
+include $(TOP_CFG_CONFIGS)
+endif
 endif
 
 #  User specific definitions
@@ -105,6 +130,4 @@ endif
 #etc.
 
 #CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-#CMPLR=STRICT
-#CXXCMPLR=STRICT
 

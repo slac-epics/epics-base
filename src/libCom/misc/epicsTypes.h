@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* epicsTypes.h,v 1.8.2.2 2006/11/18 00:24:29 jhill Exp  */
+/* epicsTypes.h,v 1.8.2.5 2009/06/05 19:56:33 anj Exp  */
 
 /*
  *      Author:     Jeff Hill  
@@ -56,12 +56,11 @@ typedef enum {
     typedef unsigned short  epicsUInt16;
     typedef epicsUInt16     epicsEnum16;
     typedef int             epicsInt32;
-    typedef unsigned        epicsUInt32;
+    typedef unsigned int    epicsUInt32;
 #endif
 typedef float           epicsFloat32;
 typedef double          epicsFloat64;
-typedef unsigned long   epicsIndex;
-typedef epicsInt32      epicsStatus;   
+typedef epicsInt32      epicsStatus;
 
 
 typedef struct {
@@ -132,7 +131,7 @@ typedef enum {
  * of type name strings.
  */
 #ifdef epicsTypesGLOBAL
-epicsShareDef READONLY char *epicsTypeNames [lastEpicsType+1] = {
+epicsShareDef const char *epicsTypeNames [lastEpicsType+1] = {
         "epicsInt8",
         "epicsUInt8",
         "epicsInt16",
@@ -146,7 +145,7 @@ epicsShareDef READONLY char *epicsTypeNames [lastEpicsType+1] = {
         "epicsOldString",
 };
 #else /* epicsTypesGLOBAL */
-epicsShareExtern READONLY char *epicsTypeNames [lastEpicsType+1];
+epicsShareExtern const char *epicsTypeNames [lastEpicsType+1];
 #endif /* epicsTypesGLOBAL */
 
 /*
@@ -154,7 +153,7 @@ epicsShareExtern READONLY char *epicsTypeNames [lastEpicsType+1];
  * of type code name strings.
  */
 #ifdef epicsTypesGLOBAL
-epicsShareDef READONLY char *epicsTypeCodeNames [lastEpicsType+1] = {
+epicsShareDef const char *epicsTypeCodeNames [lastEpicsType+1] = {
         "epicsInt8T",
         "epicsUInt8T",
         "epicsInt16T",
@@ -168,11 +167,11 @@ epicsShareDef READONLY char *epicsTypeCodeNames [lastEpicsType+1] = {
         "epicsOldStringT",
 };
 #else /* epicsTypesGLOBAL */
-epicsShareExtern READONLY char *epicsTypeCodeNames [lastEpicsType+1];
+epicsShareExtern const char *epicsTypeCodeNames [lastEpicsType+1];
 #endif /* epicsTypesGLOBAL */
 
 #ifdef epicsTypesGLOBAL
-epicsShareDef READONLY unsigned epicsTypeSizes [lastEpicsType+1] = {
+epicsShareDef const unsigned epicsTypeSizes [lastEpicsType+1] = {
         sizeof (epicsInt8),
         sizeof (epicsUInt8),
         sizeof (epicsInt16),
@@ -186,7 +185,7 @@ epicsShareDef READONLY unsigned epicsTypeSizes [lastEpicsType+1] = {
         sizeof (epicsOldString),
 };
 #else /* epicsTypesGLOBAL */
-epicsShareExtern READONLY unsigned epicsTypeSizes [lastEpicsType+1];
+epicsShareExtern const unsigned epicsTypeSizes [lastEpicsType+1];
 #endif /* epicsTypesGLOBAL */
 
 /*
@@ -201,7 +200,7 @@ typedef enum {
     epicsStringC,
     epicsOldStringC} epicsTypeClass;
 #ifdef epicsTypesGLOBAL
-epicsShareDef READONLY epicsTypeClass epicsTypeClasses [lastEpicsType+1] = {
+epicsShareDef const epicsTypeClass epicsTypeClasses [lastEpicsType+1] = {
         epicsIntC,
         epicsUIntC,
         epicsIntC,
@@ -215,12 +214,12 @@ epicsShareDef READONLY epicsTypeClass epicsTypeClasses [lastEpicsType+1] = {
         epicsOldStringC
     };
 #else /* epicsTypesGLOBAL */
-epicsShareExtern READONLY epicsTypeClass epicsTypeClasses [lastEpicsType+1];
+epicsShareExtern const epicsTypeClass epicsTypeClasses [lastEpicsType+1];
 #endif /* epicsTypesGLOBAL */
 
 
 #ifdef epicsTypesGLOBAL
-epicsShareDef READONLY char *epicsTypeAnyFieldName [lastEpicsType+1] = {
+epicsShareDef const char *epicsTypeAnyFieldName [lastEpicsType+1] = {
             "int8",
             "uInt8",
             "int16",
@@ -234,7 +233,7 @@ epicsShareDef READONLY char *epicsTypeAnyFieldName [lastEpicsType+1] = {
             "", /* Old Style Strings will not be in epicsAny type */
     };
 #else /* epicsTypesGLOBAL */
-epicsShareExtern READONLY char *epicsTypeAnyFieldName [lastEpicsType+1];
+epicsShareExtern const char *epicsTypeAnyFieldName [lastEpicsType+1];
 #endif /* epicsTypesGLOBAL */
 
 #endif /* INCepicsTypesh */

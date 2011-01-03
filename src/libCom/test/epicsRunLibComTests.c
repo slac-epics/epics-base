@@ -6,18 +6,19 @@
 \*************************************************************************/
 
 /*
- * Run tests as a batch
+ * Run libCom tests as a batch
  *
  * This is part of the work being done to provide a unified set of automated
  * tests for EPICS.  Many more changes will be forthcoming.
  */
 #include <stdio.h>
 #include <epicsThread.h>
-#include <epicsExit.h>
+#include <epicsUnitTest.h>
 
 int epicsThreadTest(void);
 int epicsTimerTest(void);
 int epicsAlgorithm(void);
+int epicsEllTest(void);
 int epicsCalcTest(void);
 int epicsEventTest(void);
 int epicsExceptionTest(void);
@@ -29,91 +30,71 @@ int epicsStringTest(void);
 int epicsThreadPriorityTest(void);
 int epicsThreadPrivateTest(void);
 int epicsTimeTest(void);
+int macLibTest(void);
 int macEnvExpandTest(void);
 int ringPointerTest(void);
+int ringBytesTest(void);
 int blockingSockTest(void);
+int taskwdTest(void);
+int cvtFastPerform(void);
 int epicsExitTest(void);
 
-void
-epicsRunLibComTests(void)
+void epicsRunLibComTests(void)
 {
-	/*
-	 * Thread startup sets some internal variables so do it first
-	 */
-	printf("\n****** Thread Test *****\n");
-	epicsThreadTest ();
-	epicsThreadSleep (1.0);
+    testHarness();
 
-	/*
-	 * Timer tests get confused if run after some of the other tests
-	 */
-	printf("\n****** Timer Test *****\n");
-	epicsTimerTest ();
-	epicsThreadSleep (1.0);
+    /*
+     * Thread startup sets some internal variables so do it first
+     */
+    runTest(epicsThreadTest);
 
-	printf("\n****** Algorithm Test *****\n");
-	epicsAlgorithm ();
-	epicsThreadSleep (1.0);
+    /*
+     * Timer tests get confused if run after some of the other tests
+     */
+    runTest(epicsTimerTest);
 
-	printf("\n****** Calculation Test *****\n");
-	epicsCalcTest();
-	epicsThreadSleep (1.0);
+    runTest(epicsAlgorithm);
 
-	printf("\n****** Event Test *****\n");
-	epicsEventTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsEllTest);
 
-	printf("\n****** Exception Test *****\n");
-	epicsExceptionTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsCalcTest);
 
-	printf("\n****** Math Test *****\n");
-	epicsMathTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsEventTest);
 
-	printf("\n****** Message Queue Test *****\n");
-	epicsMessageQueueTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsExceptionTest);
 
-	printf("\n****** Mutex Test *****\n");
-	epicsMutexTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsMathTest);
 
-	printf("\n****** Stdio Test *****\n");
-	epicsStdioTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsMessageQueueTest);
 
-	printf("\n****** String Test *****\n");
-	epicsStringTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsMutexTest);
 
-	printf("\n****** Thread Priority Test *****\n");
-	epicsThreadPriorityTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsStdioTest);
 
-	printf("\n****** Thread Private Test *****\n");
-	epicsThreadPrivateTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsStringTest);
 
-	printf("\n****** Time Test *****\n");
-	epicsTimeTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsThreadPriorityTest);
 
-	printf("\n****** Macro Environment Variable Expansion Test *****\n");
-	macEnvExpandTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsThreadPrivateTest);
 
-	printf("\n****** Ring Pointer Test *****\n");
-	ringPointerTest ();
-	epicsThreadSleep (1.0);
+    runTest(epicsTimeTest);
 
-	printf("\n****** Check socket behaviour *****\n");
-	blockingSockTest();
-	epicsThreadSleep (1.0);
+    runTest(macLibTest);
 
-	/*
-	 * Must come last
-	 */
-	printf("\n****** EpicsExit Test *****\n");
-	epicsExitTest();    /* Never returns */
+    runTest(macEnvExpandTest);
+
+    runTest(ringPointerTest);
+
+    runTest(ringBytesTest);
+
+    runTest(blockingSockTest);
+
+    runTest(taskwdTest);
+
+    runTest(cvtFastPerform);
+
+    /*
+     * Exit must come last as it never returns
+     */
+    runTest(epicsExitTest);
 }

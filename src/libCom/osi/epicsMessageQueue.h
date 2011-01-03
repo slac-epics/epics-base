@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      epicsMessageQueue.h,v 1.1.2.1 2003/05/29 03:10:09 norume Exp
+ *      epicsMessageQueue.h,v 1.1.2.2 2008/07/29 20:12:09 anj Exp
  *
  *      Author  W. Eric Norum
  *              norume@aps.anl.gov
@@ -44,8 +44,8 @@ public:
     void show ( unsigned int level = 0 );
     unsigned int pending ();
 
-private: // Prevent compiler-generated member functions
-    // default constructor, copy constructor, assignment operator
+private: /* Prevent compiler-generated member functions */
+    /* default constructor, copy constructor, assignment operator */
     epicsMessageQueue();
     epicsMessageQueue(const epicsMessageQueue &);
     epicsMessageQueue& operator=(const epicsMessageQueue &);
@@ -95,7 +95,7 @@ epicsShareFunc void epicsShareAPI epicsMessageQueueShow(
 
 #ifdef __cplusplus
 }
-#endif /*__cplusplus */
+#endif /* __cplusplus */
 
 #include "osdMessageQueue.h"
 

@@ -55,7 +55,7 @@
 #include "tsDLList.h"
 #include "epicsMutex.h"
 #include "epicsGuard.h"
-#include "epicsSingleton.h"
+#include "epicsThread.h"
 
 #ifdef cacIOh_restore_epicsExportSharedSymbols
 #   define epicsExportSharedSymbols
@@ -287,7 +287,7 @@ public:
         epicsGuard < epicsMutex > &, int status, const char * pContext, 
         const char * pFileName, unsigned lineNo ) = 0;
 // perhaps this should be phased out in deference to the exception mechanism
-    virtual int vPrintf ( const char * pformat, va_list args ) const = 0;
+    virtual int varArgsPrintFormated ( const char * pformat, va_list args ) const = 0;
 // backwards compatibility (from here down)
     virtual void attachToClientCtx () = 0;
     virtual void callbackProcessingInitiateNotify () = 0;

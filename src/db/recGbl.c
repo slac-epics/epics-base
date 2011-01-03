@@ -1,14 +1,13 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* recGbl.c - Global record processing routines */
-/* base/src/db recGbl.c,v 1.60.2.4 2006/12/06 17:10:26 anj Exp */
+/* recGbl.c */
+/* recGbl.c,v 1.60.2.8 2009/02/24 22:30:26 anj Exp */
 
 /*
  *      Author:          Marty Kraimer
@@ -52,7 +51,7 @@ static void getMaxRangeValues(short field_type, double *pupper_limit,
 
 
 
-void epicsShareAPI recGblDbaddrError(long status, struct dbAddr *paddr,
+void epicsShareAPI recGblDbaddrError(long status, const struct dbAddr *paddr,
     const char *pmessage)
 {
     dbCommon *precord = 0;
@@ -83,16 +82,16 @@ void epicsShareAPI recGblRecordError(long status, void *pdbc,
     return;
 }
 
-void epicsShareAPI recGblRecSupError(long status, struct dbAddr *paddr,
+void epicsShareAPI recGblRecSupError(long status, const struct dbAddr *paddr,
     const char *pmessage, const char *psupport_name)
 {
     dbCommon *precord = 0;
-    dbFldDes	*pdbFldDes = 0;
-    dbRecordType	*pdbRecordType = 0;
+    dbFldDes *pdbFldDes = 0;
+    dbRecordType *pdbRecordType = 0;
 
     if(paddr) {
         precord = paddr->precord;
-        pdbFldDes=(dbFldDes *)(paddr->pfldDes);
+        pdbFldDes = paddr->pfldDes;
         if(pdbFldDes) pdbRecordType = pdbFldDes->pdbRecordType;
     }
     errPrintf(status,0,0,
@@ -108,9 +107,9 @@ void epicsShareAPI recGblRecSupError(long status, struct dbAddr *paddr,
     return;
 }
 
-void epicsShareAPI recGblGetPrec(struct dbAddr *paddr,long *precision)
+void epicsShareAPI recGblGetPrec(const struct dbAddr *paddr,long *precision)
 {
-    dbFldDes               *pdbFldDes=(dbFldDes *)(paddr->pfldDes);
+    dbFldDes *pdbFldDes = paddr->pfldDes;
 
     switch(pdbFldDes->field_type){
     case(DBF_SHORT):
@@ -136,9 +135,9 @@ void epicsShareAPI recGblGetPrec(struct dbAddr *paddr,long *precision)
 }
 
 void epicsShareAPI recGblGetGraphicDouble(
-    struct dbAddr *paddr,struct dbr_grDouble *pgd)
+    const struct dbAddr *paddr,struct dbr_grDouble *pgd)
 {
-    dbFldDes               *pdbFldDes=(dbFldDes *)(paddr->pfldDes);
+    dbFldDes *pdbFldDes = paddr->pfldDes;
 
     getMaxRangeValues(pdbFldDes->field_type,&pgd->upper_disp_limit,
 	&pgd->lower_disp_limit);
@@ -147,7 +146,7 @@ void epicsShareAPI recGblGetGraphicDouble(
 }
 
 void epicsShareAPI recGblGetAlarmDouble(
-    struct dbAddr *paddr,struct dbr_alDouble *pad)
+    const struct dbAddr *paddr,struct dbr_alDouble *pad)
 {
     pad->upper_alarm_limit = 0;
     pad->upper_warning_limit = 0;
@@ -158,9 +157,9 @@ void epicsShareAPI recGblGetAlarmDouble(
 }
 
 void epicsShareAPI recGblGetControlDouble(
-    struct dbAddr *paddr,struct dbr_ctrlDouble *pcd)
+    const struct dbAddr *paddr,struct dbr_ctrlDouble *pcd)
 {
-    dbFldDes               *pdbFldDes=(dbFldDes *)(paddr->pfldDes);
+    dbFldDes *pdbFldDes=paddr->pfldDes;
 
     getMaxRangeValues(pdbFldDes->field_type,&pcd->upper_ctrl_limit,
 	&pcd->lower_ctrl_limit);
@@ -178,41 +177,41 @@ int  epicsShareAPI recGblInitConstantLink(
 	strcpy((char *)pdest,plink->value.constantStr);
 	break;
     case DBF_CHAR : {
-	short	value;
-	char	*pvalue = (char *)pdest;
+	epicsInt16 value;
+	epicsInt8 *pvalue = (epicsInt8 *)pdest;
 
 	sscanf(plink->value.constantStr,"%hi",&value);
 	*pvalue = value;
 	}
 	break;
     case DBF_UCHAR : {
-	unsigned short	value;
-	unsigned char	*pvalue = (unsigned char *)pdest;
+	epicsUInt16 value;
+	epicsUInt8 *pvalue = (epicsUInt8 *)pdest;
 
 	sscanf(plink->value.constantStr,"%hu",&value);
 	*pvalue = value;
 	}
 	break;
     case DBF_SHORT : 
-	sscanf(plink->value.constantStr,"%hi",(short *)pdest);
+	sscanf(plink->value.constantStr,"%hi",(epicsInt16 *)pdest);
 	break;
     case DBF_USHORT : 
     case DBF_ENUM : 
     case DBF_MENU : 
     case DBF_DEVICE : 
-	sscanf(plink->value.constantStr,"%hu",(unsigned short *)pdest);
+	sscanf(plink->value.constantStr,"%hu",(epicsUInt16 *)pdest);
 	break;
     case DBF_LONG : 
-	sscanf(plink->value.constantStr,"%li",(long *)pdest);
+	*(epicsInt32 *)pdest = strtol(plink->value.constantStr, NULL, 0);
 	break;
     case DBF_ULONG : 
-	sscanf(plink->value.constantStr,"%lu",(unsigned long *)pdest);
+	*(epicsUInt32 *)pdest = strtoul(plink->value.constantStr, NULL, 10);
 	break;
     case DBF_FLOAT : 
-	epicsScanFloat(plink->value.constantStr, (float *)pdest);
+	epicsScanFloat(plink->value.constantStr, (epicsFloat32 *)pdest);
 	break;
     case DBF_DOUBLE : 
-	epicsScanDouble(plink->value.constantStr, (double *)pdest);
+	epicsScanDouble(plink->value.constantStr, (epicsFloat64 *)pdest);
 	break;
     default:
 	epicsPrintf("Error in recGblInitConstantLink: Illegal DBF type\n");
@@ -224,12 +223,12 @@ int  epicsShareAPI recGblInitConstantLink(
 unsigned short epicsShareAPI recGblResetAlarms(void *precord)
 {
     dbCommon *pdbc = precord;
-    unsigned short prev_stat = pdbc->stat;
-    unsigned short prev_sevr = pdbc->sevr;
-    unsigned short new_stat = pdbc->nsta;
-    unsigned short new_sevr = pdbc->nsev;
-    unsigned short val_mask = 0;
-    unsigned short stat_mask = 0;
+    epicsEnum16 prev_stat = pdbc->stat;
+    epicsEnum16 prev_sevr = pdbc->sevr;
+    epicsEnum16 new_stat = pdbc->nsta;
+    epicsEnum16 new_sevr = pdbc->nsev;
+    epicsEnum16 val_mask = 0;
+    epicsEnum16 stat_mask = 0;
 
     pdbc->stat = new_stat;
     pdbc->sevr = new_sevr;
@@ -275,27 +274,26 @@ void epicsShareAPI recGblFwdLink(void *precord)
     pdbc->putf = FALSE;
 }
 
-void epicsShareAPI recGblGetTimeStamp(void* prec)
+void epicsShareAPI recGblGetTimeStamp(void *pvoid)
 {
-    dbCommon* pr = (dbCommon*)prec;
-    struct link *plink = &pr->tsel;
- 
-    if(plink->type!=CONSTANT) {
+    dbCommon* prec = (dbCommon*)pvoid;
+    struct link *plink = &prec->tsel;
+
+    if (plink->type != CONSTANT) {
         struct pv_link *ppv_link = &plink->value.pv_link;
 
-        if(ppv_link->pvlMask&pvlOptTSELisTime) {
-            long status = dbGetTimeStamp(plink,&pr->time);
-            if(status)
-                errlogPrintf("%s recGblGetTimeStamp dbGetTimeStamp failed\n",
-                    pr->name);
+        if (ppv_link->pvlMask & pvlOptTSELisTime) {
+            if (dbGetTimeStamp(plink, &prec->time))
+                errlogPrintf("recGblGetTimeStamp: dbGetTimeStamp failed, %s.TSEL = %s\n",
+                    prec->name, ppv_link->pvname);
             return;
         }
-        dbGetLink(&(pr->tsel), DBR_SHORT,&(pr->tse),0,0);
+        dbGetLink(&prec->tsel, DBR_SHORT, &prec->tse, 0, 0);
     }
-    if(pr->tse!=epicsTimeEventDeviceTime) {
-        int status;
-        status = epicsTimeGetEvent(&pr->time,pr->tse);
-        if(status) errlogPrintf("%s recGblGetTimeStamp failed\n",pr->name);
+    if (prec->tse != epicsTimeEventDeviceTime) {
+        if (epicsTimeGetEvent(&prec->time, prec->tse))
+            errlogPrintf("recGblGetTimeStamp: epicsTimeGetEvent failed, %s.TSE = %d\n",
+                prec->name, prec->tse);
     }
 }
 
@@ -304,15 +302,15 @@ void epicsShareAPI recGblTSELwasModified(struct link *plink)
     struct pv_link *ppv_link = &plink->value.pv_link;
     char *pfieldname;
 
-    if(plink->type!=PV_LINK) {
+    if (plink->type != PV_LINK) {
         errlogPrintf("recGblTSELwasModified called for non PV_LINK\n");
         return;
     }
     /*If pvname ends in .TIME then just ask for VAL*/
     /*Note that the VAL value will not be used*/
-    pfieldname = strstr(ppv_link->pvname,".TIME");
-    if(pfieldname) {
-        strcpy(pfieldname,".VAL");
+    pfieldname = strstr(ppv_link->pvname, ".TIME");
+    if (pfieldname) {
+        strcpy(pfieldname, ".VAL");
         ppv_link->pvlMask |= pvlOptTSELisTime;
     }
 }

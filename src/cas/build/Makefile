@@ -73,13 +73,15 @@ LIBSRCS += casDGIntfIO.cc
 LIBSRCS += casStreamIO.cc
 LIBSRCS += ipIgnoreEntry.cc
 
+LIBSRCS_vxWorks += templateInstances.cpp
+
 LIBRARY = cas
 cas_LIBS = ca gdd Com
 cas_SYS_LIBS_WIN32 = ws2_32
-cas_RCS_WIN32 = cas.rc
+cas_RCS = cas.rc
 
 include $(TOP)/configure/RULES
 
 clean::
-	@$(RM) -rf Templates.DB
+	@$(RM) Templates.DB
 

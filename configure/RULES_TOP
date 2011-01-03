@@ -8,14 +8,15 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  RULES_TOP,v 1.17.2.5 2005/03/01 17:04:17 jba Exp
+#  RULES_TOP,v 1.17.2.15 2009/08/10 16:41:28 jba Exp
 #
 
 include $(CONFIG)/RULES_DIRS
 
 UNINSTALL_DIRS += $(INSTALL_DBD) $(INSTALL_INCLUDE) $(INSTALL_DOC)\
         $(INSTALL_HTML) $(INSTALL_JAVA) $(INSTALL_TEMPLATES) \
-        $(INSTALL_DB) $(INSTALL_DISPLAY) $(INSTALL_RESTORE)
+        $(INSTALL_DB)
+UNINSTALL_DIRS += $(DIRECTORY_TARGETS)
 
 uninstallArchTargets = $(foreach arch,$(BUILD_ARCHS), uninstall$(DIVIDER)$(arch))
 archPart = $(word 2, $(subst $(DIVIDER), ,$@))
@@ -35,8 +36,10 @@ endif
 
 distclean: realclean realuninstall
 
+CVSCLEAN=$(firstword $(wildcard $(TOOLS)/cvsclean.pl $(TOP)/src/tools/cvsclean.pl))
+
 cvsclean:
-	@$(PERL) $(TOOLS)/cvsclean.pl 
+	@$(PERL) $(CVSCLEAN) 
 
 realuninstall:
 	@$(RMDIR) $(INSTALL_LOCATION_BIN) $(INSTALL_LOCATION_LIB)

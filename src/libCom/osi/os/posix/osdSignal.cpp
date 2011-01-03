@@ -1,11 +1,10 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
-*     National Laboratory.
-* Copyright (c) 2002 The Regents of the University of California, as
-*     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
-* in file LICENSE that is included with this distribution. 
+ * Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ *     National Laboratory.
+ * Copyright (c) 2002 The Regents of the University of California, as
+ *     Operator of Los Alamos National Laboratory.
+ * EPICS BASE is distributed subject to a Software License Agreement found
+ * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
 /*
@@ -26,8 +25,8 @@ extern "C" {
 typedef void ( *pSigFunc ) ( int );
 }
 
+static pSigFunc pReplacedSigHupFunc = 0;
 static pSigFunc pReplacedSigPipeFunc = 0;
-static pSigFunc pReplacedSigAlarmFunc = 0;
 
 /*
  * localInstallSigHandler ()
@@ -64,6 +63,22 @@ static void localInstallSigHandler ( int signalIn, pSigFunc pNewFunc,
 }
 
 /*
+ * ignoreSigHup ()
+ */
+extern "C" {
+static void ignoreSigHup ( int signal )
+{
+    static volatile int reentered = 1;
+
+    if (--reentered == 0) {
+        if ( pReplacedSigHupFunc ) {
+            ( *pReplacedSigHupFunc ) ( signal );
+        }
+    }
+}
+}
+
+/*
  * ignoreSigPipe ()
  */
 extern "C" {
@@ -80,20 +95,12 @@ static void ignoreSigPipe ( int signal )
 }
 
 /*
- * ignoreSigAlarm ()
+ * epicsSignalInstallSigHupIgnore ()
  */
-extern "C" {
-static void ignoreSigAlarm ( int signal )
+epicsShareFunc void epicsShareAPI epicsSignalInstallSigHupIgnore (void)
 {
-    static volatile int reentered = 1;
-
-    if (--reentered == 0) {
-        if ( pReplacedSigAlarmFunc ) {
-            ( *pReplacedSigAlarmFunc ) ( signal );
-        }
-    }
-    ++reentered;
-}
+    localInstallSigHandler ( SIGHUP, 
+        ignoreSigHup, & pReplacedSigHupFunc );
 }
 
 /*
@@ -108,22 +115,14 @@ epicsShareFunc void epicsShareAPI epicsSignalInstallSigPipeIgnore (void)
 /*
  * epicsSignalInstallSigAlarmIgnore ()
  */
-epicsShareFunc void epicsShareAPI epicsSignalInstallSigAlarmIgnore ( void ) 
+epicsShareFunc void epicsShareAPI epicsSignalInstallSigAlarmIgnore ( void )
 {
-    localInstallSigHandler ( SIGALRM, 
-        ignoreSigAlarm, & pReplacedSigAlarmFunc );
+    // Removed; this functionality was only required by HPUX,
+    // and it interferes with the posix timer API on Linux.
 }
 
 /*
  * epicsSignalRaiseSigAlarm ()
  */
 epicsShareFunc void epicsShareAPI epicsSignalRaiseSigAlarm 
-                                        ( struct epicsThreadOSD * threadId ) 
-{
-    pthread_t id = epicsThreadGetPosixThreadId ( threadId );
-    int status = pthread_kill ( id, SIGALRM );
-    if ( status ) {
-        errlogPrintf ( "Failed to send SIGALARM to thread. Status = \"%s\"\n", 
-            strerror ( status ) );
-    }
-}
+                                  ( struct epicsThreadOSD * /* threadId */ ) {}

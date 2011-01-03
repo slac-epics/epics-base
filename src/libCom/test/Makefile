@@ -32,6 +32,11 @@ epicsMathTest_SRCS += epicsMathTest.c
 testHarness_SRCS += epicsMathTest.c
 TESTS += epicsMathTest
 
+TESTPROD_HOST += epicsEllTest
+epicsEllTest_SRCS += epicsEllTest.c
+testHarness_SRCS += epicsEllTest.c
+TESTS += epicsEllTest
+
 TESTPROD_HOST += epicsStdioTest
 epicsStdioTest_SRCS += epicsStdioTest.c
 testHarness_SRCS += epicsStdioTest.c
@@ -77,6 +82,11 @@ ringPointerTest_SRCS += ringPointerTest.c
 testHarness_SRCS += ringPointerTest.c
 TESTS += ringPointerTest
 
+TESTPROD_HOST += ringBytesTest
+ringBytesTest_SRCS += ringBytesTest.c
+testHarness_SRCS += ringBytesTest.c
+TESTS += ringBytesTest
+
 TESTPROD_HOST += epicsEventTest
 epicsEventTest_SRCS += epicsEventTest.cpp
 testHarness_SRCS += epicsEventTest.cpp
@@ -101,6 +111,16 @@ TESTPROD_HOST += macEnvExpandTest
 macEnvExpandTest_SRCS += macEnvExpandTest.c
 testHarness_SRCS += macEnvExpandTest.c
 TESTS += macEnvExpandTest
+
+TESTPROD_HOST += macLibTest
+macLibTest_SRCS += macLibTest.c
+testHarness_SRCS += macLibTest.c
+TESTS += macLibTest
+
+TESTPROD_HOST += taskwdTest
+taskwdTest_SRCS += taskwdTest.c
+testHarness_SRCS += taskwdTest.c
+TESTS += taskwdTest
 
 TESTPROD_HOST += blockingSockTest
 blockingSockTest_SRCS += blockingSockTest.cpp
@@ -145,6 +165,9 @@ fdmgrTest_SRCS += fdmgrTest.c
 fdmgrTest_LIBS += ca
 # FIXME: program never exits.
 
+TESTPROD_HOST += cvtFastPerform
+cvtFastPerform_SRCS += cvtFastPerform.cpp
+testHarness_SRCS += cvtFastPerform.cpp
 
 include $(TOP)/configure/RULES
 

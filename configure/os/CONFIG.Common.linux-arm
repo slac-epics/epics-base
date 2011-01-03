@@ -15,6 +15,7 @@ ARCH_CLASS = arm
 ARCH_DEP_CPPFLAGS += -D_ARM_NWFP_
 
 ifeq ($(BUILD_CLASS),CROSS)
+    VALID_BUILDS = Ioc
     GNU_TARGET = arm-linux
 
     # prefix of compiler tools

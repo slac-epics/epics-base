@@ -1,29 +1,29 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* calcPerform.c,v 1.37.2.5 2006/11/30 22:29:08 jhill Exp */
+/* calcPerform.c,v 1.37.2.11 2009/08/25 18:19:49 anj Exp */
 /*
  *	Author: Julie Sander and Bob Dalesio
  *	Date:	07-27-87
  */
 
-#include	<stdlib.h>
-#include	<stddef.h>
-#include	<stdio.h>
-#include	<string.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 #define epicsExportSharedSymbols
-#include	"osiUnistd.h"
-#include	"dbDefs.h"
-#include	"epicsMath.h"
-#include	"postfix.h"
-#include	"postfixPvt.h"
+#include "osiUnistd.h"
+#include "dbDefs.h"
+#include "epicsMath.h"
+#include "errlog.h"
+#include "postfix.h"
+#include "postfixPvt.h"
 
 static double calcRandom(void);
 static int cond_search(const char **ppinst, int match);
@@ -43,12 +43,11 @@ epicsShareFunc long
     double stack[CALCPERFORM_STACK+1];	/* zero'th entry not used */
     double *ptop;			/* stack pointer */
     double top; 			/* value from top of stack */
-    int itop;				/* integer from top of stack */
+    long itop;				/* integer from top of stack */
+    int nargs;
 
     /* initialize */
     ptop = stack;
-
-    if(*pinst == END_EXPRESSION) return -1;
 
     /* RPN evaluation loop */
     while (*pinst != END_EXPRESSION){
@@ -59,6 +58,10 @@ epicsShareFunc long
 	    ++pinst;
 	    memcpy((void *)ptop, pinst, sizeof(double));
 	    pinst += sizeof(double) - 1;
+	    break;
+
+	case FETCH_VAL:
+	    *++ptop = *presult;
 	    break;
 
 	case FETCH_A:
@@ -128,8 +131,11 @@ epicsShareFunc long
 	    break;
 
 	case MODULO:
-	    top = *ptop--;
-	    *ptop = fmod(*ptop, top);
+	    itop = (long) *ptop--;
+	    if (itop)
+		*ptop = (long) *ptop % itop;
+	    else
+		*ptop = epicsNAN;   /* NaN */
 	    break;
 
 	case POWER:
@@ -154,15 +160,21 @@ epicsShareFunc long
 	    break;
 
 	case MAX:
-	    top = *ptop--;
-	    if (*ptop < top || isnan(top))
-		*ptop = top;
+	    nargs = *++pinst;
+	    while (--nargs) {
+		top = *ptop--;
+		if (*ptop < top || isnan(top))
+		    *ptop = top;
+	    }
 	    break;
 
 	case MIN:
-	    top = *ptop--;
-	    if (*ptop > top || isnan(top))
-		*ptop = top;
+	    nargs = *++pinst;
+	    while (--nargs) {
+		top = *ptop--;
+		if (*ptop > top || isnan(top))
+		    *ptop = top;
+	    }
 	    break;
 
 	case SQU_RT:
@@ -219,7 +231,13 @@ epicsShareFunc long
 	    break;
 
 	case FINITE:
-	    *ptop = finite(*ptop);
+	    nargs = *++pinst;
+	    top = finite(*ptop);
+	    while (--nargs) {
+		--ptop;
+		top = top && finite(*ptop);
+	    }
+	    *ptop = top;
 	    break;
 
 	case ISINF:
@@ -227,7 +245,13 @@ epicsShareFunc long
 	    break;
 
 	case ISNAN:
-	    *ptop = isnan(*ptop);
+	    nargs = *++pinst;
+	    top = isnan(*ptop);
+	    while (--nargs) {
+		--ptop;
+		top = top || isnan(*ptop);
+	    }
+	    *ptop = top;
 	    break;
 
 	case NINT:
@@ -254,33 +278,33 @@ epicsShareFunc long
 	    break;
 
 	case BIT_OR:
-	    itop = (int) *ptop--;
-	    *ptop = (int) *ptop | itop;
+	    itop = (long) *ptop--;
+	    *ptop = (long) *ptop | itop;
 	    break;
 
 	case BIT_AND:
-	    itop = (int) *ptop--;
-	    *ptop = (int) *ptop & itop;
+	    itop = (long) *ptop--;
+	    *ptop = (long) *ptop & itop;
 	    break;
 
 	case BIT_EXCL_OR:
-	    itop = (int) *ptop--;
-	    *ptop = (int) *ptop ^ itop;
+	    itop = (long) *ptop--;
+	    *ptop = (long) *ptop ^ itop;
 	    break;
 
 	case BIT_NOT:
-	    itop = (int) *ptop;
+	    itop = (long) *ptop;
 	    *ptop = ~itop;
 	    break;
 
 	case RIGHT_SHIFT:
-	    itop = (int) *ptop--;
-	    *ptop = (int) *ptop >> itop;
+	    itop = (long) *ptop--;
+	    *ptop = (long) *ptop >> itop;
 	    break;
 
 	case LEFT_SHIFT:
-	    itop = (int) *ptop--;
-	    *ptop = (int) *ptop << itop;
+	    itop = (long) *ptop--;
+	    *ptop = (long) *ptop << itop;
 	    break;
 
 	case NOT_EQ:
@@ -406,7 +430,7 @@ static unsigned short seed = 0xa3bf;
 static unsigned short multy = 191 * 8 + 5;  /* 191 % 8 == 5 */
 static unsigned short addy = 0x3141;
 
-static double calcRandom()
+static double calcRandom(void)
 {
     seed = (seed * multy) + addy;
 

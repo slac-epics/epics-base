@@ -1,6 +1,6 @@
 # CONFIG.solaris-x86-gnu.solaris-x86-gnu
 #
-# CONFIG.solaris-x86-gnu.solaris-x86-gnu,v 1.4.2.7 2005/09/15 16:53:59 jba Exp
+# CONFIG.solaris-x86-gnu.solaris-x86-gnu,v 1.4.2.8 2007/12/11 20:22:06 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for solaris-x86 gnu compiler host - solaris-x86 gnu compiler target builds
@@ -14,7 +14,7 @@ AR = ar -rc
 RANLIB=
 LD = ld -r
 
-SHRLIB_LDFLAGS += -shared -fPIC -h $@  -z defs
-LOADABLE_SHRLIB_LDFLAGS += -shared -fPIC -h $@
+SHRLIB_LDFLAGS += -h $@  -z defs
+LOADABLE_SHRLIB_LDFLAGS += -h $@
 
 OP_SYS_LDFLAGS += -z ignore -z combreloc -z lazyload

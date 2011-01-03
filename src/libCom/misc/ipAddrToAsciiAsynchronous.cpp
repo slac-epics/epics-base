@@ -80,8 +80,10 @@ template class tsFreeList
 #   pragma warning ( pop )
 #endif
 
+extern "C" {
 static void ipAddrToAsciiEngineGlobalMutexConstruct ( void * );
-static void ipAddrToAsciiEngineGlobalMutexDestruct ( void * );
+static void ipAddrToAsciiEngineShutdownRequest ( void * );
+}
 
 // - this class executes the synchronous DNS query
 // - it creates one thread
@@ -109,6 +111,7 @@ private:
     static epicsMutex * pGlobalMutex;
     static ipAddrToAsciiEnginePrivate * pEngine;
     static unsigned numberOfReferences;
+    static bool shutdownRequest;
     ipAddrToAsciiTransaction & createTransaction ();
     void release (); 
     void run ();
@@ -116,13 +119,14 @@ private:
 	ipAddrToAsciiEnginePrivate & operator = ( const ipAddrToAsciiEngine & );
     friend class ipAddrToAsciiEngine;
     friend class ipAddrToAsciiTransactionPrivate;
-    friend void ipAddrToAsciiEngineGlobalMutexDestruct ( void * );
+    friend void ipAddrToAsciiEngineShutdownRequest ( void * );
     friend void ipAddrToAsciiEngineGlobalMutexConstruct ( void * );
 };
 
 epicsMutex * ipAddrToAsciiEnginePrivate :: pGlobalMutex = 0;
 ipAddrToAsciiEnginePrivate * ipAddrToAsciiEnginePrivate :: pEngine = 0;
 unsigned ipAddrToAsciiEnginePrivate :: numberOfReferences = 0u;
+bool ipAddrToAsciiEnginePrivate :: shutdownRequest = false;
 static epicsThreadOnceId ipAddrToAsciiEngineGlobalMutexOnceFlag = 0;
 
 // the users are not required to supply a show routine
@@ -134,15 +138,26 @@ ipAddrToAsciiCallBack::~ipAddrToAsciiCallBack () {}
 ipAddrToAsciiTransaction::~ipAddrToAsciiTransaction () {}
 ipAddrToAsciiEngine::~ipAddrToAsciiEngine () {}
 
-static void ipAddrToAsciiEngineGlobalMutexDestruct ( void * )
+static void ipAddrToAsciiEngineShutdownRequest ( void * )
 {
-    delete ipAddrToAsciiEnginePrivate :: pGlobalMutex;
+    bool deleteGlobalMutexCondDetected = false;
+    {
+        epicsGuard < epicsMutex > 
+            guard ( * ipAddrToAsciiEnginePrivate :: pGlobalMutex );
+        ipAddrToAsciiEnginePrivate :: shutdownRequest = true;
+        deleteGlobalMutexCondDetected = 
+            ( ipAddrToAsciiEnginePrivate :: numberOfReferences == 0 );
+    }
+    if ( deleteGlobalMutexCondDetected ) {
+        delete ipAddrToAsciiEnginePrivate :: pGlobalMutex;
+        ipAddrToAsciiEnginePrivate :: pGlobalMutex = 0;
+    }
 }
 
 static void ipAddrToAsciiEngineGlobalMutexConstruct ( void * )
 {
     ipAddrToAsciiEnginePrivate :: pGlobalMutex = new epicsMutex ();
-    epicsAtExit ( ipAddrToAsciiEngineGlobalMutexDestruct, 0 );
+    epicsAtExit ( ipAddrToAsciiEngineShutdownRequest, 0 );
 }
 
 // for now its probably sufficent to allocate one 
@@ -154,6 +169,16 @@ ipAddrToAsciiEngine & ipAddrToAsciiEngine::allocate ()
     epicsThreadOnce (
         & ipAddrToAsciiEngineGlobalMutexOnceFlag,
         ipAddrToAsciiEngineGlobalMutexConstruct, 0 );
+    // since we must not own lock when checking this flag
+    // this diagnostic has imperfect detection, but never
+    // incorrect detection
+    if ( ipAddrToAsciiEnginePrivate :: shutdownRequest ) {
+        throw std :: runtime_error ( 
+            "ipAddrToAsciiEngine::allocate (): "
+            "attempts to create an "
+            "ipAddrToAsciiEngine while the exit "
+            "handlers are running are rejected");
+    }
     epicsGuard < epicsMutex > guard ( * ipAddrToAsciiEnginePrivate::pGlobalMutex );
     if ( ! ipAddrToAsciiEnginePrivate::pEngine ) {
         ipAddrToAsciiEnginePrivate::pEngine = new ipAddrToAsciiEnginePrivate ();
@@ -164,7 +189,7 @@ ipAddrToAsciiEngine & ipAddrToAsciiEngine::allocate ()
 
 ipAddrToAsciiEnginePrivate::ipAddrToAsciiEnginePrivate () :
     thread ( *this, "ipToAsciiProxy",
-        epicsThreadGetStackSize(epicsThreadStackSmall),
+        epicsThreadGetStackSize(epicsThreadStackBig),
         epicsThreadPriorityLow ),
     pCurrent ( 0 ), cancelPendingCount ( 0u ), exitFlag ( false ),  
     callbackInProgress ( false )
@@ -188,15 +213,25 @@ ipAddrToAsciiEnginePrivate::~ipAddrToAsciiEnginePrivate ()
 // leave our options open for the future
 void ipAddrToAsciiEnginePrivate::release ()
 {
+    bool deleteGlobalMutexCondDetected = false;
     epicsThreadOnce (
         & ipAddrToAsciiEngineGlobalMutexOnceFlag,
         ipAddrToAsciiEngineGlobalMutexConstruct, 0 );
-    epicsGuard < epicsMutex > guard ( * ipAddrToAsciiEnginePrivate::pGlobalMutex );
-    assert ( ipAddrToAsciiEnginePrivate::numberOfReferences > 0u );
-    ipAddrToAsciiEnginePrivate::numberOfReferences--;
-    if ( ipAddrToAsciiEnginePrivate::numberOfReferences == 0u ) {
-        delete ipAddrToAsciiEnginePrivate::pEngine;
-        ipAddrToAsciiEnginePrivate::pEngine = 0;
+    {
+        epicsGuard < epicsMutex > 
+            guard ( * ipAddrToAsciiEnginePrivate::pGlobalMutex );
+        assert ( ipAddrToAsciiEnginePrivate::numberOfReferences > 0u );
+        ipAddrToAsciiEnginePrivate::numberOfReferences--;
+        if ( ipAddrToAsciiEnginePrivate::numberOfReferences == 0u ) {
+            deleteGlobalMutexCondDetected = 
+                ipAddrToAsciiEnginePrivate :: shutdownRequest;
+            delete ipAddrToAsciiEnginePrivate :: pEngine;
+            ipAddrToAsciiEnginePrivate :: pEngine = 0;
+        }
+    }
+    if ( deleteGlobalMutexCondDetected ) {
+        delete ipAddrToAsciiEnginePrivate :: pGlobalMutex;
+        ipAddrToAsciiEnginePrivate :: pGlobalMutex = 0;
     }
 }
 

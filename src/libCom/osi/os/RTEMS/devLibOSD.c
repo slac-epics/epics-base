@@ -1,13 +1,12 @@
-/*  devLibRTEMS.c */
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
+/* devLibOSD.c,v 1.1.2.8 2009/07/09 16:37:23 anj Exp */
 
 /*      RTEMS port by Till Straumann, <strauman@slac.stanford.edu>
  *            3/2002
@@ -31,7 +30,7 @@
 
 typedef void    myISR (void *pParam);
 
-LOCAL myISR *isrFetch(unsigned vectorNumber, void **parg);
+static myISR *isrFetch(unsigned vectorNumber, void **parg);
 
 /*
  * this routine needs to be in the symbol table
@@ -39,9 +38,17 @@ LOCAL myISR *isrFetch(unsigned vectorNumber, void **parg);
  */
 void unsolicitedHandlerEPICS(int vectorNumber);
 
-LOCAL myISR *defaultHandlerAddr[]={
-		(myISR*)unsolicitedHandlerEPICS,
+static myISR *defaultHandlerAddr[]={
+    (myISR*)unsolicitedHandlerEPICS,
 };
+
+/*
+ * Make sure that the CR/CSR addressing mode is defined.
+ * (it may not be in some BSPs).
+ */
+#ifndef VME_AM_CSR
+#  define VME_AM_CSR (0x2f)
+#endif
 
 /*
  * we use a translation between an EPICS encoding
@@ -57,14 +64,15 @@ int EPICStovxWorksAddrType[]
                 VME_AM_SUP_SHORT_IO,
                 VME_AM_STD_SUP_DATA,
                 VME_AM_EXT_SUP_DATA,
-                EPICSAddrTypeNoConvert
+                EPICSAddrTypeNoConvert,
+                VME_AM_CSR
             };
 
 /*
  * maps logical address to physical address, but does not detect
  * two device drivers that are using the same address range
  */
-LOCAL long rtmsDevMapAddr (epicsAddressType addrType, unsigned options,
+static long rtmsDevMapAddr (epicsAddressType addrType, unsigned options,
         size_t logicalAddress, size_t size, volatile void **ppPhysicalAddress);
 
 /*
@@ -82,27 +90,28 @@ long rtmsDevWriteProbe (unsigned wordSize, volatile void *ptr, const void *pValu
 /* RTEMS specific init */
 
 /*devA24Malloc and devA24Free are not implemented*/
-LOCAL void *devA24Malloc(size_t size) { return 0;}
-LOCAL void devA24Free(void *pBlock) {};
-LOCAL long rtmsDevInit(void);
+static void *devA24Malloc(size_t size) { return 0;}
+static void devA24Free(void *pBlock) {};
+static long rtmsDevInit(void);
 
 /*
  * used by bind in devLib.c
  */
-const struct devLibVirtualOS devLibRTEMSOS = 
-    {rtmsDevMapAddr, rtmsDevReadProbe, rtmsDevWriteProbe, 
+static devLibVirtualOS rtemsVirtualOS = {
+    rtmsDevMapAddr, rtmsDevReadProbe, rtmsDevWriteProbe, 
     devConnectInterruptVME, devDisconnectInterruptVME,
     devEnableInterruptLevelVME, devDisableInterruptLevelVME,
-    devA24Malloc,devA24Free,rtmsDevInit};
-devLibVirtualOS *pdevLibVirtualOS = &devLibRTEMSOS;
+    devA24Malloc,devA24Free,rtmsDevInit
+};
+devLibVirtualOS *pdevLibVirtualOS = &rtemsVirtualOS;
 
 /* RTEMS specific initialization */
-LOCAL long
+static long
 rtmsDevInit(void)
 {
-	/* assume the vme bridge has been initialized by bsp */
-	/* init BSP extensions [memProbe etc.] */
-	return bspExtInit();
+    /* assume the vme bridge has been initialized by bsp */
+    /* init BSP extensions [memProbe etc.] */
+    return bspExtInit();
 }
 
 /*
@@ -149,7 +158,7 @@ long devDisconnectInterruptVME (
 )
 {
     void (*psub)();
-	void  *arg;
+    void  *arg;
     int status;
 
     /*
@@ -162,13 +171,13 @@ long devDisconnectInterruptVME (
     }
 
     status = BSP_removeVME_isr(
-            	vectorNumber,
-				psub,
-				arg) ||
-			 BSP_installVME_isr(
-				vectorNumber,
-            	(BSP_VME_ISR_t)unsolicitedHandlerEPICS,
-            	(void*)vectorNumber);        
+        vectorNumber,
+        psub,
+        arg) ||
+     BSP_installVME_isr(
+        vectorNumber,
+        (BSP_VME_ISR_t)unsolicitedHandlerEPICS,
+        (void*)vectorNumber);        
     if(status){
         return S_dev_vecInstlFail;
     }
@@ -181,7 +190,7 @@ long devDisconnectInterruptVME (
  */
 long devEnableInterruptLevelVME (unsigned level)
 {
-		return BSP_enableVME_int_lvl(level);
+    return BSP_enableVME_int_lvl(level);
 }
 
 /*
@@ -189,13 +198,13 @@ long devEnableInterruptLevelVME (unsigned level)
  */
 long devDisableInterruptLevelVME (unsigned level)
 {
-		return BSP_disableVME_int_lvl(level);
+    return BSP_disableVME_int_lvl(level);
 }
 
 /*
  * rtmsDevMapAddr ()
  */
-LOCAL long rtmsDevMapAddr (epicsAddressType addrType, unsigned options,
+static long rtmsDevMapAddr (epicsAddressType addrType, unsigned options,
             size_t logicalAddress, size_t size, volatile void **ppPhysicalAddress)
 {
     long status;
@@ -224,6 +233,7 @@ LOCAL long rtmsDevMapAddr (epicsAddressType addrType, unsigned options,
  * a bus error safe "wordSize" read at the specified address which returns 
  * unsuccessful status if the device isnt present
  */
+rtems_status_code bspExtMemProbe(void *addr, int write, int size, void *pval);
 long rtmsDevReadProbe (unsigned wordSize, volatile const void *ptr, void *pValue)
 {
     long status;
@@ -261,7 +271,7 @@ long rtmsDevWriteProbe (unsigned wordSize, volatile void *ptr, const void *pValu
 /*
  *      isrFetch()
  */
-LOCAL myISR *isrFetch(unsigned vectorNumber, void **parg)
+static myISR *isrFetch(unsigned vectorNumber, void **parg)
 {
     /*
      * fetch the handler or C stub attached at this vector
@@ -276,12 +286,12 @@ int devInterruptInUseVME (unsigned vectorNumber)
 {
     int i;
     myISR *psub;
-	void *arg;
+    void *arg;
 
     psub = isrFetch (vectorNumber,&arg);
 
-	if (!psub)
-		return FALSE;
+    if (!psub)
+        return FALSE;
 
     /*
      * its a C routine. Does it match a default handler?
@@ -313,16 +323,16 @@ void unsolicitedHandlerEPICS(int vectorNumber)
 {
     /*
      * call epicInterruptContextMessage()
-	 * and not errMessage()
+     * and not errMessage()
      * so we are certain that printf()
      * does not get called at interrupt level
-	 *
-	 * NOTE: current RTEMS implementation only
-	 *       allows a static string to be passed
+     *
+     * NOTE: current RTEMS implementation only
+     *       allows a static string to be passed
      */
     epicsInterruptContextMessage(
         "Interrupt to EPICS disconnected vector"
-		);
+        );
 }
 
 #endif /* defined(__PPC__) && defined(mpc750) */
