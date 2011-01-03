@@ -3,7 +3,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Id$ */
+/* devGeneralTime.c,v 1.1.2.6 2009/01/28 20:01:41 anj Exp */
 /*
  *   Original Author:	Sheng Peng, ORNL / SNS Project
  *   Date:		07/2004

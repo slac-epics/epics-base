@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* recGbl.c */
-/* $Id$ */
+/* recGbl.c,v 1.60.2.8 2009/02/24 22:30:26 anj Exp */
 
 /*
  *      Author:          Marty Kraimer

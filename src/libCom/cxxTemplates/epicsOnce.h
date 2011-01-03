@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*  
- *  $Id$
+ *  epicsOnce.h,v 1.4 2002/07/12 21:34:22 jba Exp
  *
  *                              
  *                    L O S  A L A M O S

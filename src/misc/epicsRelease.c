@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* epicsRelease.c,v 1.16.2.2 2006/11/16 19:32:12 anj Exp
  **/
 
 #include    <stdlib.h>

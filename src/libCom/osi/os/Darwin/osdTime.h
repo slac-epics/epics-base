@@ -4,7 +4,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- * $Id$
+ * osdTime.h,v 1.4.2.1 2009/04/23 18:49:40 anj Exp
  *
  * Author: Eric Norum
  */

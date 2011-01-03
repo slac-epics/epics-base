@@ -36,7 +36,7 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Header$ (LBL)";
+    "@(#) /usr/local/epicsmgr/cvsroot/epics/base/src/toolsComm/flex/misc.c,v 1.3.2.3 2009/06/03 15:11:30 anj Exp (LBL)";
 #endif
 
 #include <ctype.h>

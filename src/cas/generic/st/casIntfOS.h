@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// casIntfOS.h,v 1.2.2.1 2005/08/31 21:09:10 jhill Exp
 //
 // casOSD.h - Channel Access Server OS dependent wrapper
 // 

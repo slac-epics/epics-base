@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casMonEvent.h,v 1.3 2003/03/10 22:26:28 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

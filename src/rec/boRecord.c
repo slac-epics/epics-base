@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* boRecord.c,v 1.17.2.3 2009/07/08 18:14:10 anj Exp */
 
 /* recBo.c - Record Support Routines for Binary Output records */
 /*

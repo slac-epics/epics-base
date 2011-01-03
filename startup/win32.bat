@@ -8,7 +8,7 @@ REM  EPICS BASE Versions 3.13.7
 REM  and higher are distributed subject to a Software License Agreement found
 REM  in file LICENSE that is included with this distribution.
 REM *************************************************************************
-REM  $Id$
+REM  win32.bat,v 1.11.2.6 2009/05/06 18:50:46 jba Exp
 REM
 REM  Site-specific EPICS environment settings
 REM 

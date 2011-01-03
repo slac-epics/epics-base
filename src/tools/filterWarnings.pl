@@ -12,7 +12,7 @@ eval 'exec perl -S $0 ${1+"$@"}'      # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 
-# $Id$
+# filterWarnings.pl,v 1.1.2.1 2008/03/24 22:14:22 jba Exp
 #
 #  Author: Ralph Lange
 #

@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      outBuf.cc,v 1.23.2.6 2009/07/25 01:24:50 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

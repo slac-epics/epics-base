@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devMbbiSoftRaw.c,v 1.11.2.1 2008/08/06 22:11:51 anj Exp
  *
  *      Original Authors: Bob Dalesio and Marty Kraimer
  *      Date: 6-1-90

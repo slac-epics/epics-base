@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      tsDLList.h,v 1.51.2.2 2004/01/09 09:38:05 lange Exp
  *
  *      type safe doubly linked list templates
  *

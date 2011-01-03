@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdEvent.c
- *	$Id$
+ *	osdEvent.c,v 1.6.2.4 2008/10/16 13:38:14 norume Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055

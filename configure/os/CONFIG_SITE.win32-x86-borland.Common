@@ -1,6 +1,6 @@
 # CONFIG_SITE.win32-x86-borland.Common
 #
-# $Id$
+# CONFIG_SITE.win32-x86-borland.Common,v 1.4 2001/08/23 18:59:11 jba Exp
 #
 # Site specific definitions for win32-x86-borland host
 # Only the local epics system manager should modify this file

@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbAccessDefs.h	*/
-/* $Id$ */
+/* dbAccessDefs.h,v 1.12.2.9 2009/04/03 20:53:59 lange Exp */
 
 #ifndef INCdbAccessDefsh
 #define INCdbAccessDefsh

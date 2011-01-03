@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* osdAssert.c,v 1.7.2.1 2009/07/02 19:49:11 anj Exp */
 /*
  *      Author:         Jeffrey Hill
  *      Date:           02-27-95

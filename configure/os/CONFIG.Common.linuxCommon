@@ -1,6 +1,6 @@
 # CONFIG.Common.linuxCommon
 #
-# $Id$
+# CONFIG.Common.linuxCommon,v 1.1.2.8 2009/05/07 16:00:16 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for linux target builds

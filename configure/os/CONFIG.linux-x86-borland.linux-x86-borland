@@ -1,6 +1,6 @@
 #  CONFIG.linux-x86-borland.linux-x86-borland
 #
-# $Id$
+# CONFIG.linux-x86-borland.linux-x86-borland,v 1.1.2.7 2009/04/24 19:31:57 anj Exp
 #
 # Definitions for linux-x86-borland host - linux-x86-borland target builds
 # Sites may override these definitions in CONFIG_SITE.linux-x86-borland.linux-x86-borland

@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* stringinRecord.c,v 1.13.2.3 2009/07/08 18:14:11 anj Exp */
 
 /* recStringin.c - Record Support Routines for Stringin records */
 /*

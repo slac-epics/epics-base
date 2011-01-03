@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * aitConvert.h,v 1.18.2.1 2004/08/12 16:46:05 jhill Exp
  *
  */
 

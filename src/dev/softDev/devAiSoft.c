@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devAiSoft.c,v 1.10.2.2 2009/04/09 15:03:09 anj Exp
  *
  *      Original Authors: Bob Dalesio and Marty Kraimer
  *      Date: 3/6/91

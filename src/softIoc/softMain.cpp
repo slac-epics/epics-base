@@ -7,7 +7,7 @@
 * found in the file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Id$ */
+/* softMain.cpp,v 1.2.2.5 2009/07/28 21:08:35 anj Exp */
 
 /* Author: Andrew Johnson	Date: 2003-04-08 */
 

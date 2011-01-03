@@ -8,7 +8,7 @@
 
 /*
  * Dummy version -- use if application does not provide its own version
- *  $Id$
+ *  epicsRtemsInitHookPre.c,v 1.1.2.1 2006/06/29 15:22:49 norume Exp
  */
 #include "epicsRtemsInitHooks.h"
 

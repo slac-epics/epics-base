@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Id$ */
+/* dbTest.c,v 1.88.2.23 2009/07/08 19:08:22 anj Exp */
 /*	database access test subroutines */
 
 #include <stddef.h>

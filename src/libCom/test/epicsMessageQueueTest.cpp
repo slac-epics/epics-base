@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- *      $Id$
+ *      epicsMessageQueueTest.cpp,v 1.7.2.7 2008/10/03 19:28:34 anj Exp
  *
  *      Author  W. Eric Norum
  *              norume@aps.anl.gov

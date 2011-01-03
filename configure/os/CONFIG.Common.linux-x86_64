@@ -1,6 +1,6 @@
 # CONFIG.Common.linux-x86_64
 #
-# $Id$
+# CONFIG.Common.linux-x86_64,v 1.1.2.3 2007/12/11 21:17:03 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for linux-x86_64 target builds

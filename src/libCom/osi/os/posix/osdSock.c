@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* osdSock.c */
-/* $Id$ */
+/* osdSock.c,v 1.1.2.4 2003/07/16 22:09:58 jhill Exp */
 /*
  *      Author:		Jeff Hill 
  *      Date:          	04-05-94 

@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* biRecord.c,v 1.16.2.4 2009/04/02 21:40:36 lange Exp */
 
 /* recBi.c - Record Support Routines for Binary Input records */
 /*

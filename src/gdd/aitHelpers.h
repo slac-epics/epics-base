@@ -14,7 +14,7 @@
  * Authors: Jeff Hill and Jim Kowalkowski
  * Date: 6/20/96
  *
- * $Id$
+ * aitHelpers.h,v 1.26.2.1 2006/06/29 15:27:33 jhill Exp
  *
  */
 

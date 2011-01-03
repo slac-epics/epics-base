@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* selRecord.c,v 1.17.2.8 2009/08/25 18:19:49 anj Exp */
 
 /* selRecord.c - Record Support Routines for Select records */
 /*

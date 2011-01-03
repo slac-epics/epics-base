@@ -45,7 +45,7 @@ char copyright[] =
 /*
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Header$ (LBL)";
+    "@(#) /usr/local/epicsmgr/cvsroot/epics/base/src/toolsComm/flex/main.c,v 1.3.2.4 2009/07/22 20:37:32 jba Exp (LBL)";
 #endif
 
 #include "flexdef.h"

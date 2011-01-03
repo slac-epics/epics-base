@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casEventMask.h,v 1.12 2003/02/12 19:05:58 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

@@ -34,7 +34,7 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* @(#) $Header$ (LBL) */
+/* @(#) /usr/local/epicsmgr/cvsroot/epics/base/src/toolsComm/flex/flexdef.h,v 1.6.2.5 2009/06/05 19:16:31 anj Exp (LBL) */
 
 #ifndef INC_flexdef_H
 #define INC_flexdef_H

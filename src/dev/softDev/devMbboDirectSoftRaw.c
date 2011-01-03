@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devMbboDirectSoftRaw.c */
-/* base/src/dev $Id$ */
+/* base/src/dev devMbboDirectSoftRaw.c,v 1.11.2.2 2009/04/03 17:46:22 lange Exp */
 /*
  *      Author:		Janet Anderson
  *      Current Author: Matthew Needes

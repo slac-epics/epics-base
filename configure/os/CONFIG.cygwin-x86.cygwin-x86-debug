@@ -1,6 +1,6 @@
 # CONFIG.cygwin-x86.cygwin-x86-debug
 #
-# $Id$
+# CONFIG.cygwin-x86.cygwin-x86-debug,v 1.1.2.2 2009/07/14 19:30:51 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for cygwin-x86 host - cygwin-x86-debug target build

@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      timerQueueActiveMgr.cpp,v 1.10.2.1 2009/02/10 22:24:20 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

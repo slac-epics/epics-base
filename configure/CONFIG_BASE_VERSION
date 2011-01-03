@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  $Id$
+#  CONFIG_BASE_VERSION,v 1.10.2.32 2009/08/28 18:47:36 jba Exp
 #
 #  EPICS Version information
 #
@@ -56,5 +56,5 @@ EPICS_SHORT_VERSION=$(EPICS_VERSION).$(EPICS_REVISION).$(EPICS_MODIFICATION)$(EP
 EPICS_VERSION_NUMBER=$(EPICS_SHORT_VERSION)$(EPICS_CVS_SNAPSHOT)$(EPICS_SITE_VSTRING)
 EPICS_VERSION_STRING="EPICS Version $(EPICS_VERSION_NUMBER)"
 
-CVS_DATE="\$$Date$$"
-CVS_TAG="\$$Name$$"
+CVS_DATE="\$2009/08/28 18:47:36$"
+CVS_TAG="\$R3-14-11$"

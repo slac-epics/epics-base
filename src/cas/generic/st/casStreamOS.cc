@@ -8,7 +8,7 @@
 \*************************************************************************/
 //
 // casStreamOS.cc
-// $Id$
+// casStreamOS.cc,v 1.38.2.7 2009/08/13 23:55:03 jhill Exp
 //
 // TO DO:
 // o armRecv() and armSend() should return bad status when

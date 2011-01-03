@@ -1,6 +1,6 @@
 # CONFIG_COMPAT
 #
-# $Id$
+# CONFIG_COMPAT,v 1.9.2.4 2009/04/24 20:01:36 anj Exp
 #
 # Convert old HOST_ARCH environment variable to
 # new EPICS_HOST_ARCH environment variable 

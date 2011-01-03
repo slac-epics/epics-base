@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* devSoStdio.c,v 1.1.2.4 2008/09/29 17:54:35 anj Exp */
 
 #include <stdio.h>
 #include <string.h>

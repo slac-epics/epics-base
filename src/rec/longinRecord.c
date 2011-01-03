@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* longinRecord.c,v 1.15.2.4 2009/07/08 18:14:10 anj Exp */
 
 /* recLongin.c - Record Support Routines for Longin records */
 /*

@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id$
+# RULES_ARCHS,v 1.23.2.16 2009/06/24 19:33:57 anj Exp
 #
 
 all: install

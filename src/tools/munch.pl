@@ -8,7 +8,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
-#  $Id$
+#  munch.pl,v 1.1.2.1 2008/03/24 22:14:23 jba Exp
 #
 # Creates a ctdt.c file of C++ static constructors and destructors,
 # as required for all vxWorks binaries containing C++ code.

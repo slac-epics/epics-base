@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      fdManager.h,v 1.39.2.1 2008/07/28 16:19:50 anj Exp
  *
  *      File descriptor management C++ class library
  *      (for multiplexing IO in a single threaded environment)

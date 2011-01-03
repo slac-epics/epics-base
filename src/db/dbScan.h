@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* dbScan.h,v 1.9.2.5 2009/04/02 14:11:27 anj Exp
  *
  *      Author:         Marty Kraimer
  *      Date:           07-17-91

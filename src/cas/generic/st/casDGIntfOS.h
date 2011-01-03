@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// casDGIntfOS.h,v 1.2.2.2 2009/07/30 23:54:18 jhill Exp
 //
 
 #ifndef casDGIntfOSh

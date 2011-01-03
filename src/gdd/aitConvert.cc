@@ -11,7 +11,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// $Id$
+// aitConvert.cc,v 1.18.2.7 2009/07/23 00:23:17 jhill Exp
 //
 
 #define AIT_CONVERT_SOURCE 1

@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casChannelI.h,v 1.6.2.2 2009/08/03 22:09:51 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

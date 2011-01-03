@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-// $Id$
+// epicsExcept.h,v 1.5 2002/07/12 21:34:20 jba Exp
 //	Author: Andrew Johnson & Jeff Hill
 //	Date:   December 2000
 

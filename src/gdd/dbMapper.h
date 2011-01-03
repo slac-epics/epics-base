@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * dbMapper.h,v 1.16 2002/07/15 20:34:06 jba Exp
  *
  */
 

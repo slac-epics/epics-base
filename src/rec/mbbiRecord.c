@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* mbbiRecord.c,v 1.16.2.5 2009/04/02 21:40:37 lange Exp */
 /*
  *      Original Author: Bob Dalesio
  *      Date:            5-9-88

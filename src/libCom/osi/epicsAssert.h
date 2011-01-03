@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* epicsAssert.h,v 1.10.2.4 2009/08/04 19:07:07 anj Exp */
 /*
  * EPICS assert
  *

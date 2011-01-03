@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * gddUtils.h,v 1.7.2.2 2008/12/10 21:51:19 anj Exp
  *
  */
 

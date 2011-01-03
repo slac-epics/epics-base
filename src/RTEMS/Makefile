@@ -8,7 +8,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id$
+# Makefile,v 1.2 2002/07/12 21:32:42 jba Exp
 #
 
 TOP = ../..

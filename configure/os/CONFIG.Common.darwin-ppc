@@ -1,6 +1,6 @@
 # CONFIG.Common.darwin-ppc
 #
-# $Id$
+# CONFIG.Common.darwin-ppc,v 1.18.2.6 2009/05/06 17:24:58 anj Exp
 # This file is maintained by the build community.
 #
 # Definitions for darwin-ppc target builds

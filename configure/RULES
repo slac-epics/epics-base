@@ -7,7 +7,7 @@
 # and higher are distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-# $Id$
+# RULES,v 1.6 2002/07/12 21:32:37 jba Exp
 
 ifndef T_A
 

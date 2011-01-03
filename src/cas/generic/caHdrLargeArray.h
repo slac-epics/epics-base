@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      caHdrLargeArray.h,v 1.1 2003/02/12 19:09:29 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

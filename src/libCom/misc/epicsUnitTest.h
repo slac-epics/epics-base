@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Id$
+/* epicsUnitTest.h,v 1.1.2.4 2009/04/03 17:46:25 lange Exp
  * Author: Andrew Johnson
  */
 

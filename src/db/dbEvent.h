@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* 
- *      $Id$
+ *      dbEvent.h,v 1.27.2.1 2006/11/28 18:54:03 jhill Exp
  *
  *      Author: Jeff Hill 
  *      Date: 	030393 

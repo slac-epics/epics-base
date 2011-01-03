@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      timerPrivate.h,v 1.30.2.7 2009/05/11 22:50:06 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

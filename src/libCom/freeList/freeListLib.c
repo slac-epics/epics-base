@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* freeListLib.c,v 1.18 2002/07/12 21:34:33 jba Exp */
 /* Author:  Marty Kraimer Date:    04-19-94 */
 
 

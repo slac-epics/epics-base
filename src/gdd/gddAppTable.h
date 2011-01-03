@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * gddAppTable.h,v 1.11 2003/02/12 18:53:26 jhill Exp
  *
  */
 

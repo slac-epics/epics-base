@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devMbbiDirectSoft.c,v 1.10.2.1 2008/08/06 22:11:50 anj Exp
  *
  *      Original Authors: Bob Dalesio and Matthew Needes
  *      Date: 10-08-93

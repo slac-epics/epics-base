@@ -15,7 +15,7 @@
 // Author:	Jim Kowalkowski
 // Date:	3/97
 //
-// $Id$
+// gddContainer.cc,v 1.6 2002/07/15 20:34:11 jba Exp
 //
 #define epicsExportSharedSymbols
 #include "gdd.h"

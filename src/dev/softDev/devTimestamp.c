@@ -5,7 +5,7 @@
 * in the file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* $Id$ */
+/* devTimestamp.c,v 1.1.2.3 2008/06/06 14:29:37 anj Exp */
 /*
  * Device support for EPICS time stamps
  *

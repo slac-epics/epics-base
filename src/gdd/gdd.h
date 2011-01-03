@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * gdd.h,v 1.38.2.3 2004/02/07 01:34:59 jhill Exp
  *
  */
 

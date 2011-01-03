@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      tsDefs.h,v 1.5 2002/07/12 21:35:15 jba Exp
  * This file contains the old R3.13 
  * time stamp definitions and routines
  * needed by epics extensions. They exist 

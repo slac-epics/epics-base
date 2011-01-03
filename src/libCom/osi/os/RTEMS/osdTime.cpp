@@ -6,7 +6,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- * $Id$
+ * osdTime.cpp,v 1.6.2.13 2008/10/11 16:40:46 norume Exp
  *
  * Author: W. Eric Norum
  */

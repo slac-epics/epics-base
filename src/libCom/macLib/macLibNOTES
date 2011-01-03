@@ -1,4 +1,4 @@
-# $Id$
+# macLibNOTES,v 1.1 1996/07/10 14:49:53 mrk Exp
 #
 # Test input file for macTest filter, doubling as notes on usage of the
 # macro library. Some special strings at start of line are supported:

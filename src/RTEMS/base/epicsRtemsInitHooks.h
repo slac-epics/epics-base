@@ -8,7 +8,7 @@
 
 /*
  * Hooks into RTEMS startup code
- *  $Id$
+ *  epicsRtemsInitHooks.h,v 1.1.2.2 2006/06/29 20:07:10 norume Exp
  */
 #include <bsp.h>
 #include <rtems/rtems_bsdnet.h>

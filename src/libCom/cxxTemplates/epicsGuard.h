@@ -16,7 +16,7 @@
 #endif
 
 /*
- *  $Id$
+ *  epicsGuard.h,v 1.7.2.1 2007/01/11 22:04:44 jhill Exp
  *
  *  Author: Jeffrey O. Hill
  *

@@ -4,7 +4,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
-// $Id$
+// epicsCalcTest.cpp,v 1.1.2.8 2009/08/21 14:49:01 anj Exp
 //	Author: Andrew Johnson
 
 #include "epicsUnitTest.h"

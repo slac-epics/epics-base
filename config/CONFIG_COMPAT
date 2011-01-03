@@ -8,7 +8,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id$
+# CONFIG_COMPAT,v 1.6.2.5 2006/11/17 22:31:54 jba Exp
 #
 # Convert old HOST_ARCH environment variable 
 

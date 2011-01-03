@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* dfanoutRecord.c,v 1.20.2.4 2009/04/03 14:40:13 lange Exp */
 
 /* recDfanout.c - Record Support Routines for Dfanout records */
 /*

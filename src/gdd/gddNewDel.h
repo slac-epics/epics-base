@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * gddNewDel.h,v 1.6.2.4 2009/07/01 22:28:41 jhill Exp
  *
  */
 

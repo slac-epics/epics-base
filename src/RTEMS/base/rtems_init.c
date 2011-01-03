@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS startup task for EPICS
- *  $Id$
+ *  rtems_init.c,v 1.15.2.43 2008/10/11 16:40:45 norume Exp
  *      Author: W. Eric Norum
  *              eric.norum@usask.ca
  *              (306) 966-5394

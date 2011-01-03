@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- * $Id$
+ * macLibTest.c,v 1.1.2.1 2008/03/31 19:30:16 anj Exp
  */
 
 #include <stddef.h>

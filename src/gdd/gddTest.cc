@@ -10,7 +10,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// $Id$
+// gddTest.cc,v 1.13 2002/07/15 20:34:14 jba Exp
 // 
 
 #include <stdio.h>

@@ -10,7 +10,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// ipIgnoreEntry.h,v 1.1 2003/02/12 19:11:43 jhill Exp
 //
 
 #ifndef ipIgnoreEntryh

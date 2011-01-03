@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* osdVME.h,v 1.1.2.1 2004/11/13 17:14:27 norume Exp */
 
 /*
  * OS-dependent VME support

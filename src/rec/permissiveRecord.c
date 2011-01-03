@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* permissiveRecord.c,v 1.11.2.2 2009/04/02 21:40:37 lange Exp */
 
 /* recPermissive.c - Record Support Routines for Permissive records */
 /*

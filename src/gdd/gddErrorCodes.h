@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * gddErrorCodes.h,v 1.5 2002/07/15 20:34:12 jba Exp
  *
  */
 

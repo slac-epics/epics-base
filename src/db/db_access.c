@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* db_access.c,v 1.47.2.5 2009/03/10 18:51:03 anj Exp */
 
 /* Interface between old database access and new
  *

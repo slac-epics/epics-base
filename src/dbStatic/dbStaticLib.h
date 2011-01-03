@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* dbStaticLib.h,v 1.30.2.10 2009/04/23 21:56:22 anj Exp
  *
  *      Author: Marty Kraimer
  *      Date:   06-08-93

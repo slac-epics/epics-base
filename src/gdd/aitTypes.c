@@ -11,7 +11,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * aitTypes.c,v 1.10 2002/07/15 20:34:09 jba Exp
  *
  */
 

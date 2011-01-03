@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devLiSoft.c,v 1.10.2.1 2008/08/06 22:11:50 anj Exp
  *
  *      Author: Janet Anderson
  *      Date: 09-23-91

@@ -7,7 +7,7 @@
 # and higher are distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-# $Id$
+# CONFIG.Host.osf-alpha-gnu,v 1.1.2.1 2006/12/19 16:50:52 jba Exp
 
 # osf-alpha is the new name for alpha
 -include $(EPICS_BASE)/config/CONFIG.Host.alpha

@@ -5,7 +5,7 @@
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# $Id$
+# Path.pm,v 1.1.2.2 2008/10/20 18:32:47 anj Exp
 
 use Carp;
 use Cwd qw(getcwd abs_path);

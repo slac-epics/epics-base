@@ -10,7 +10,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// casDGEvWakeup.h,v 1.1 2003/02/12 19:10:34 jhill Exp
 //
 
 #ifndef casDGEvWakeuph 

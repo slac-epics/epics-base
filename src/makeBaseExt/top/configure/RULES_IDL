@@ -1,4 +1,4 @@
-# $Id$
+# RULES_IDL,v 1.1.2.3 2009/05/06 15:13:45 jba Exp
 
 ifdef T_A
 ifeq ($(findstring Host,$(VALID_BUILDS)),Host)

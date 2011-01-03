@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
-/* $Id$
+/* epicsStringTest.c,v 1.1.2.8 2009/04/10 19:58:34 anj Exp
  *
  *      Author  Marty Kraimer
  */

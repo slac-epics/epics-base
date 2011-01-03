@@ -10,7 +10,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// $Id$
+// gddNewDel.cc,v 1.5.2.1 2004/01/28 00:04:02 anj Exp
 // 
 
 #define epicsExportSharedSymbols

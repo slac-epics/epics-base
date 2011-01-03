@@ -9,7 +9,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 
-# $Id$
+# cvsclean.pl,v 1.1.2.1 2008/03/24 22:14:22 jba Exp
 #
 # Find and delete cvs .#* files in all dirs of directory tree
 

@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* calcRecord.c,v 1.20.2.6 2009/04/03 14:40:13 lange Exp */
 
 /* Record Support Routines for Calculation records */
 /*

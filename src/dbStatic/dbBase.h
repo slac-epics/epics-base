@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* dbBase.h,v 1.12.2.9 2009/07/09 15:27:42 anj Exp
  *
  *      Current Author:         Marty Kraimer
  *      Date:                   03-19-92

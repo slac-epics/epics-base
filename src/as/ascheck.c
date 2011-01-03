@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* ascheck.c,v 1.9.2.3 2006/12/01 23:52:59 anj Exp */
 /*	Author: Marty Kraimer	Date: 03-24-94	*/
 
 #include <stdlib.h>

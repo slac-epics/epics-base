@@ -9,7 +9,7 @@
 \*************************************************************************/
 /* fdmgr.h
  *
- *      share/epicsH/$Id$
+ *      share/epicsH/fdmgr.h,v 1.13.2.1 2009/04/27 18:31:50 anj Exp
  *
  *      Header file associated with a file descriptor manager 
  *	for use with the UNIX system call select

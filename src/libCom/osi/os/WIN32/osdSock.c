@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- *	    $Id$
+ *	    osdSock.c,v 1.16.2.2 2003/07/16 22:05:52 jhill Exp
  *
  *	    WIN32 specific initialisation for bsd sockets,
  *	    based on Chris Timossi's base/src/ca/windows_depend.c,

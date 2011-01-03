@@ -1,7 +1,7 @@
 #
 # This file contains definitions for RTEMS builds
 #
-# $Id$
+# CONFIG.Common.RTEMS,v 1.44.2.24 2009/06/04 18:29:33 jba Exp
 # Author: W. Eric Norum
 #         University of Saskatchewan
 #         eric.norum@usask.ca

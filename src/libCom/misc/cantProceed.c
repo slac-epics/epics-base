@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* cantProceed.c,v 1.10.2.8 2008/07/29 20:47:11 anj Exp */
 
 /* Author:  Marty Kraimer Date:    04JAN99 */
 

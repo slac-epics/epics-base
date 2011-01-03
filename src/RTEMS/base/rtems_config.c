@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS configuration for EPICS
- *  $Id$
+ *  rtems_config.c,v 1.2.2.23 2009/07/29 20:58:37 norume Exp
  *      Author: W. Eric Norum
  *              norume@aps.anl.gov
  *              (630) 252-4793

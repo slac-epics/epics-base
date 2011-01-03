@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* Error Handling definitions */
-/* $Id$ */
+/* errMdef.h,v 1.11.2.3 2009/07/09 20:11:01 anj Exp */
 /*
  *      Author:          Marty Kraimer
  *      Date:            6-1-90

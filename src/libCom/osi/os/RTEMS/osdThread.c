@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdThread.c
- *      $Id$
+ *      osdThread.c,v 1.45.2.26 2009/07/23 21:04:27 norume Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055

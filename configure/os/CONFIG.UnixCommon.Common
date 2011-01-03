@@ -1,6 +1,6 @@
 # CONFIG.UnixCommon.Common
 #
-# $Id$
+# CONFIG.UnixCommon.Common,v 1.5 2003/03/18 22:44:46 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions common to unix hosts

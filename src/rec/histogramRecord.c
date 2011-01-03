@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* histogramRecord.c,v 1.14.2.4 2009/07/08 18:14:10 anj Exp */
 
 /* recHistogram.c - Record Support Routines for Histogram records */
 /*

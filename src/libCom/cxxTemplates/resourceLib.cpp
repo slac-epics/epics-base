@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 /*  
- *  $Id$
+ *  resourceLib.cpp,v 1.3.2.1 2009/03/24 17:04:02 anj Exp
  *
  *                    L O S  A L A M O S
  *              Los Alamos National Laboratory

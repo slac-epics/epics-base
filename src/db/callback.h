@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* callback.h,v 1.12.2.3 2008/05/15 17:41:02 anj Exp */
 
 /* includes for general purpose callback tasks		*/
 /*

@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbNotify.c */
-/* base/src/db $Id$ */
+/* base/src/db dbNotify.c,v 1.40.2.12 2009/01/16 20:50:40 anj Exp */
 /*
  *      Author: 	Marty Kraimer
  *      Date:           03-30-95

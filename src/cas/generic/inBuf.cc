@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      inBuf.cc,v 1.14.2.1 2009/07/30 23:45:14 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

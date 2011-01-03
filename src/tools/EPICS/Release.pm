@@ -5,7 +5,7 @@
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# $Id$
+# Release.pm,v 1.1.2.3 2009/01/06 16:41:56 anj Exp
 
 #
 # Parse all relevent configure/RELEASE* files and includes

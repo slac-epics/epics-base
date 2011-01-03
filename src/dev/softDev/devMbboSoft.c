@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devMbboSoft.c */
-/* base/src/dev $Id$ */
+/* base/src/dev devMbboSoft.c,v 1.10.2.2 2009/04/03 17:46:22 lange Exp */
 /*
  *      Original Author: Bob Dalesio
  *      Current Author:  Marty Kraimer

@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* share/epicsH/freeList.h	*/
-/* share/epicsH $Id$ */
+/* share/epicsH freeList.h,v 1.7 2002/07/12 21:34:32 jba Exp */
 /* Author:  Marty Kraimer Date:    04-19-94	*/
 
 #ifndef INCfreeListh

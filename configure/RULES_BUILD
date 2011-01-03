@@ -6,7 +6,7 @@
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
-# $Id$
+# RULES_BUILD,v 1.88.2.48 2009/06/26 20:43:02 jba Exp
 #
 #	Rules for making things specified in Makefile
 #

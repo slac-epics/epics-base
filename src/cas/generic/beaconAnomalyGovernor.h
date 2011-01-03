@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      beaconAnomalyGovernor.h,v 1.3 2003/02/12 19:05:50 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

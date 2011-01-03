@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* stateRecord.c,v 1.11.2.2 2009/04/02 21:40:38 lange Exp */
 
 /* recState.c - Record Support Routines for State records */
 /*

@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* macLib.h,v 1.10.2.5 2008/03/31 19:30:17 anj Exp
  *
  * Definitions for macro substitution library (macLib)
  *

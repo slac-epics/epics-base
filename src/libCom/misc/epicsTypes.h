@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$  */
+/* epicsTypes.h,v 1.8.2.5 2009/06/05 19:56:33 anj Exp  */
 
 /*
  *      Author:     Jeff Hill  

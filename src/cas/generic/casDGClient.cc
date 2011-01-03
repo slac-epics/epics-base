@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casDGClient.cc,v 1.50.2.8 2009/07/30 23:29:43 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

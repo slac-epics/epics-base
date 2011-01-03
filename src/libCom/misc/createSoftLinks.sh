@@ -1,6 +1,6 @@
 #! /bin/sh
 # createSoftLinks.sh
-# $Id$
+# createSoftLinks.sh,v 1.1 1996/01/25 21:38:43 mrk Exp
 
 # Tailored script to create local softlinks releative to this directory
 # the name createSoftLinks.sh is a key and must not be changed. If the

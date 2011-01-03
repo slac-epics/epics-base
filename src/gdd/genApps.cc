@@ -10,9 +10,12 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// $Id$
+// genApps.cc,v 1.4 2002/07/15 20:34:14 jba Exp
 // 
-// $Log$
+// genApps.cc,v
+// Revision 1.4  2002/07/15 20:34:14  jba
+// Removed log history comments.
+//
 
 #define epicsExportSharedSymbols
 #include "gddAppTable.h"

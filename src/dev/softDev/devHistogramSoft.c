@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devHistogramSoft.c */
-/* base/src/dev $Id$ */
+/* base/src/dev devHistogramSoft.c,v 1.10.2.2 2009/04/03 17:46:22 lange Exp */
 /*
  *      Author:		Janet Anderson
  *      Date:		07/02/91

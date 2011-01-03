@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* ellLib.c,v 1.12.2.3 2009/08/28 18:34:38 anj Exp
  *
  *      Author: John Winans (ANL)
  *      Date:   07-02-92

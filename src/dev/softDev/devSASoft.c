@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devSASoft.c,v 1.10.2.1 2008/08/06 22:11:51 anj Exp
  *
  *      Author: Carl Lionberger
  *      Date: 9-2-93

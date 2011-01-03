@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* dbLexRoutines.c,v 1.27.2.24 2009/07/22 22:58:09 anj Exp */
 
 /* Author:  Marty Kraimer Date:    13JUL95*/
 

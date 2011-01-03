@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* iocLogServer.c */
-/* base/src/util $Id$ */
+/* base/src/util iocLogServer.c,v 1.47.2.8 2009/07/09 17:06:45 anj Exp */
 
 /*
  *	archive logMsg() from several IOC's to a common rotating file	

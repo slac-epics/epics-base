@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* callbackTest.c,v 1.8.2.2 2008/10/09 15:01:53 anj Exp */
 
 /* Author:  Marty Kraimer Date:    26JAN2000 */
 

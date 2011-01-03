@@ -36,7 +36,7 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Header$ (LBL)";
+    "@(#) /usr/local/epicsmgr/cvsroot/epics/base/src/toolsComm/flex/gen.c,v 1.3.2.2 2009/04/30 20:45:30 anj Exp (LBL)";
 #endif
 
 #include "flexdef.h"

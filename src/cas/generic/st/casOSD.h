@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// casOSD.h,v 1.21 2003/02/12 19:06:12 jhill Exp
 //
 // casOSD.h - Channel Access Server OS dependent wrapper
 // 

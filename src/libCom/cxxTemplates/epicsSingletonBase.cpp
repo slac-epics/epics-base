@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *  $Id$
+ *  epicsSingletonBase.cpp,v 1.5.2.1 2004/08/27 16:04:26 mrk Exp
  *
  *  Author: Jeffrey O. Hill
  *

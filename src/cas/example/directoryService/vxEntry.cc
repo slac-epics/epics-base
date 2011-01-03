@@ -8,10 +8,13 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// vxEntry.cc,v 1.3 2002/07/12 21:33:16 jba Exp
 // Author: Jeff HIll (LANL)
 //
-// $Log$
+// vxEntry.cc,v
+// Revision 1.3  2002/07/12 21:33:16  jba
+// Updated license comments.
+//
 // Revision 1.2  2001/01/31 13:33:29  mrk
 // osiTime=>epicsTime
 //

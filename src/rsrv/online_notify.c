@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *  $Id$
+ *  online_notify.c,v 1.57.2.15 2008/09/19 23:27:52 jhill Exp
  *
  *  tell CA clients this a server has joined the network
  *

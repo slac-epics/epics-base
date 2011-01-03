@@ -11,7 +11,7 @@
 // Author:	Jim Kowalkowski
 // Date:	3/97
 //
-// $Id$
+// gddErrorCodes.cc,v 1.4 2002/07/15 20:34:12 jba Exp
 //
 
 // -------------------------- Error messages -------------------------

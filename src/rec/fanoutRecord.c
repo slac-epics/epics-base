@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* fanoutRecord.c,v 1.15.2.2 2009/04/02 21:40:37 lange Exp */
 /*
  *      Original Author: Bob Dalesio
  *      Date:            12-20-88

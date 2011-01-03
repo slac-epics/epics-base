@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      resourceLib.h,v 1.103.2.6 2009/03/24 17:04:02 anj Exp
  *
  *      General hash table templates for fast indexing of resources
  *      of any base resource type and any resource identifier type. Fast 

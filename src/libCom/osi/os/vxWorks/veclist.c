@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *	$Id$
+ *	veclist.c,v 1.1.2.4 2009/07/09 16:37:23 anj Exp
  *	@(#)veclist.c	1.10
  *
  *	list fuctions attached to the interrupt vector table
@@ -42,7 +42,7 @@
 #include "sysSymTbl.h"
 
 static const char sccsID[] = 
-	"@(#) $Id$";
+	"@(#) veclist.c,v 1.1.2.4 2009/07/09 16:37:23 anj Exp";
 
 /*
  *

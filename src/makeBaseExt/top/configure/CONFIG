@@ -1,4 +1,4 @@
-# $Id$
+# CONFIG,v 1.1.2.4 2006/03/30 17:25:13 jba Exp
 
 INSTALL_IDLFILE = $(INSTALL)
 

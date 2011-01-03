@@ -35,7 +35,7 @@
  */
 
 /*
- * $Id$
+ * yylex.c,v 1.3.2.1 2009/04/30 20:45:31 anj Exp
  */
 
 #include <ctype.h>

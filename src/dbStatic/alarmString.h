@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* alarmString.h,v 1.4.2.3 2009/03/03 17:15:10 anj Exp */
 
 /* String names for alarms */
 

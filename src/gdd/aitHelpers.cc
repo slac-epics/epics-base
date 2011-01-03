@@ -11,7 +11,7 @@
 // Author: Jim Kowalkowski
 // Date: 6/20/96
 //
-// $Id$
+// aitHelpers.cc,v 1.17.2.1 2006/06/29 15:27:33 jhill Exp
 //
 
 #include <stdio.h>

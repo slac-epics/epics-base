@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- * $Id$
+ * osiFileName.h,v 1.2 2002/07/12 21:34:43 jba Exp
  *
  * Author: Eric Norum
  */

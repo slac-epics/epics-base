@@ -8,7 +8,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  $Id$
+#  RULES_TOP,v 1.17.2.15 2009/08/10 16:41:28 jba Exp
 #
 
 include $(CONFIG)/RULES_DIRS

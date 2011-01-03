@@ -4,7 +4,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
-/* $Id$
+/* aSubRecord.c,v 1.1.2.5 2009/07/09 15:27:43 anj Exp
  * 
  * Record Support Routines for the Array Subroutine Record type,
  * derived from Andy Foster's genSub record, with some features

@@ -9,7 +9,7 @@
 \*************************************************************************/
 /* osdEvent.c */
 /*
- *      $Id$
+ *      osdEvent.c,v 1.13 2002/11/26 23:21:21 jhill Exp
  *      WIN32 version
  *
  *      Author  Jeffrey O. Hill

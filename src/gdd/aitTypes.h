@@ -14,7 +14,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * aitTypes.h,v 1.16.2.2 2008/12/10 21:51:19 anj Exp
  *
  */
 

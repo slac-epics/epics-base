@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      osdMessageQueue.cpp,v 1.5.2.1 2003/05/29 03:10:14 norume Exp
  *
  *      Author  W. Eric Norum
  *              norume@aps.anl.gov

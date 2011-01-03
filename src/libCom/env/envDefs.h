@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/*	$Id$
+/*	envDefs.h,v 1.21.2.4 2009/06/05 19:56:33 anj Exp
  *	Author:	Roger A. Cole
  *	Date:	07-20-91
  *

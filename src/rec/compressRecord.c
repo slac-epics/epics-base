@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* compressRecord.c,v 1.19.2.3 2009/04/02 21:40:37 lange Exp */
 /*
  *      Original Author: Bob Dalesio
  *      Date:            7-14-89 

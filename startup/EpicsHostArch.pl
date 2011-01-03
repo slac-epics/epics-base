@@ -10,7 +10,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# $Id$
+# EpicsHostArch.pl,v 1.5.2.6 2006/12/19 17:03:02 jba Exp
 # Returns the Epics host architecture suitable
 # for assigning to the EPICS_HOST_ARCH variable
 

@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* longoutRecord.c,v 1.21.2.4 2009/07/08 18:14:10 anj Exp */
 /*
  * Author: 	Janet Anderson
  * Date:	9/23/91

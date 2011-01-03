@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casCoreClient.h,v 1.6.2.6 2009/08/13 23:37:30 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

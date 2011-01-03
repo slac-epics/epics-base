@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* subArrayRecord.c,v 1.13.2.5 2009/04/23 22:19:46 anj Exp */
 
 /* recSubArray.c - Record Support Routines for SubArray records 
  *

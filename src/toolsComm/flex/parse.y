@@ -32,7 +32,7 @@
 
 #ifndef lint
 static char rcsid[] =
-    "@(#) $Header$ (LBL)";
+    "@(#) /usr/local/epicsmgr/cvsroot/epics/base/src/toolsComm/flex/parse.y,v 1.2.20.1 2009/04/30 20:45:31 anj Exp (LBL)";
 #endif
 
 #include "flexdef.h"

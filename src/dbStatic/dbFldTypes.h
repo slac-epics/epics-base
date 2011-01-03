@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* dbFldTypes.h,v 1.3.2.1 2005/12/12 21:25:17 anj Exp
  *
  *      Author:          Marty Kraimer
  *      Date:            6-1-90

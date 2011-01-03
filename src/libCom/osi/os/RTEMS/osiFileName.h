@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osiFileName.h
- *	$Id$
+ *	osiFileName.h,v 1.2 2002/07/12 21:34:48 jba Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055

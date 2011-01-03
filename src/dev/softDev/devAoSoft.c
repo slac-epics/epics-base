@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devAoSoft.c */
-/* base/src/dev $Id$ */
+/* base/src/dev devAoSoft.c,v 1.10.2.2 2009/04/03 17:46:21 lange Exp */
 
 /* Device Support Routines for soft Analog Output Records*/
 /*

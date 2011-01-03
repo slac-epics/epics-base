@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$ */
+/* devSoSoft.c,v 1.10.2.3 2009/04/03 17:46:23 lange Exp */
 /*
  *      Author: Janet Anderson
  *      Date:   21APR1991

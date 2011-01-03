@@ -9,7 +9,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# $Id$
+# makeIncludeDbd.pl,v 1.1.2.1 2008/03/24 22:14:22 jba Exp
 
 use File::Basename;
 

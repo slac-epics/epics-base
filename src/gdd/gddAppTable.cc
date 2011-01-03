@@ -10,7 +10,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// $Id$
+// gddAppTable.cc,v 1.16 2003/02/12 18:53:08 jhill Exp
 // 
 
 #define epicsExportSharedSymbols

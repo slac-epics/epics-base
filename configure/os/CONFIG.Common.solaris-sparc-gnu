@@ -1,6 +1,6 @@
 # CONFIG.Common.solaris-sparc-gnu
 #
-# $Id$
+# CONFIG.Common.solaris-sparc-gnu,v 1.3.2.7 2008/07/10 19:45:01 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for solaris-sparc gnu compiler target archs

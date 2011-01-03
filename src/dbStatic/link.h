@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* link.h */
-/* base/include $Id$ */
+/* base/include link.h,v 1.10.2.2 2009/04/03 20:54:00 lange Exp */
 
 /*
  *      Original Author: Bob Dalesio

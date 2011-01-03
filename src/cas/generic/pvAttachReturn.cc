@@ -10,7 +10,7 @@
 \*************************************************************************/
 
 //
-//	$Id$
+//	pvAttachReturn.cc,v 1.1 2002/08/21 16:33:49 jhill Exp
 //
 //      Author: Jeffrey O. Hill
 //              johill@lanl.gov

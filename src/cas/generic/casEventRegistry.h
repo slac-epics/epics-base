@@ -11,7 +11,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casEventRegistry.h,v 1.1 2003/02/12 19:09:39 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

@@ -14,7 +14,7 @@
 // Author:	Jim Kowalkowski
 // Date:	3/97
 //
-// $Id$
+// gddArray.cc,v 1.6 2002/07/15 20:42:22 jba Exp
 
 #define epicsExportSharedSymbols
 #include "gdd.h"

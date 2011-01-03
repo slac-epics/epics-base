@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casStrmClient.cc,v 1.92.2.30 2009/08/18 00:36:22 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

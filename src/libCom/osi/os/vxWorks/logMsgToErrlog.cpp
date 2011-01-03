@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /* 
- * $Id$
+ * logMsgToErrlog.cpp,v 1.3.2.2 2003/08/06 18:17:30 mrk Exp
  *
  * route vxWorks logMsg messages into the EPICS logging system
  *

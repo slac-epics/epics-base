@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* errSymLib.c,v 1.31.2.4 2009/07/09 20:11:01 anj Exp
  * errSymLib.c
  *      Author:          Marty Kraimer
  *      Date:            6-1-90

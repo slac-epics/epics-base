@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* mbbiDirectRecord.c,v 1.16.2.5 2009/07/08 18:14:10 anj Exp */
 
 /* recMbbiDirect.c - Record Support routines for mbboDirect records */
 /*

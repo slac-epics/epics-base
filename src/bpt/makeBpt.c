@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/*  $Id$
+/*  makeBpt.c,v 1.11.2.5 2009/04/24 16:53:20 anj Exp
  *	Author: Marty Kraimer
  *	Date:	9/28/95
  *	Replacement for old bldCvtTable

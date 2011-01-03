@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- *      $Id$
+ *      epicsTimerTest.cpp,v 1.24.2.11 2009/08/24 17:07:03 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

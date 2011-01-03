@@ -9,7 +9,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// casStreamIO.h,v 1.2.2.3 2009/07/30 23:51:48 jhill Exp
 //
 
 #ifndef casStreamIOh

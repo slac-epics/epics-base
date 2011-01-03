@@ -6,7 +6,7 @@
 # Author: Andrew Johnson <anj@aps.anl.gov>
 # Date: 10 February 2005
 #
-# $Id$
+# expandVars.pl,v 1.1.2.1 2008/09/23 22:13:50 anj Exp
 #
 
 use strict;

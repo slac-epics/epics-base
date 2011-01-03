@@ -1,6 +1,6 @@
 # CONFIG.Common.vxWorks-68040
 #
-# $Id$
+# CONFIG.Common.vxWorks-68040,v 1.1.2.2 2004/11/17 19:59:20 anj Exp
 # This file is maintained by the build community.
 #
 # Definitions for vxWorks-68040 target archs

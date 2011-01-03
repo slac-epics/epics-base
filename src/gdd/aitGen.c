@@ -11,7 +11,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * $Id$
+ * aitGen.c,v 1.16.2.3 2009/04/03 17:46:23 lange Exp
  *
  */
 

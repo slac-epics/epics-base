@@ -1,6 +1,6 @@
 # CONFIG.linux-x86-debug.Common
 #
-# $Id$
+# CONFIG.linux-x86-debug.Common,v 1.1.2.1 2003/12/18 15:23:24 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for linux-x86 debug with debug compiler flags

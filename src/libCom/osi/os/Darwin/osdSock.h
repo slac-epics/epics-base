@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- * $Id$
+ * osdSock.h,v 1.6.2.2 2005/06/28 20:33:41 norume Exp
  *
  * Author: Eric Norum
  */

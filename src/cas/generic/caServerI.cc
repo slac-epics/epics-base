@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      caServerI.cc,v 1.51.2.4 2009/08/06 02:21:22 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov
@@ -36,7 +36,7 @@
 static const char pVersionCAS[] = 
     "@(#) " EPICS_VERSION_STRING 
     ", CA Portable Server Library " 
-    "$Date$";
+    "2009/08/06 02:21:22";
 
 caServerI::caServerI ( caServer & tool ) :
     adapter (tool),

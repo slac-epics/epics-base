@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      casChannelI.cc,v 1.29.2.2 2009/08/03 22:09:50 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

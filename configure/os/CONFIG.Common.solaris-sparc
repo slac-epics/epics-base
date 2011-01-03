@@ -1,6 +1,6 @@
 # CONFIG.Common.solaris-sparc
 #
-# $Id$
+# CONFIG.Common.solaris-sparc,v 1.15.2.22 2008/12/02 23:45:16 anj Exp
 # This file is maintained by the build community.
 #
 # Definitions for solaris-sparc target archs

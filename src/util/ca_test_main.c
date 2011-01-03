@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/*	@(#)ca_test_main.c	$Id$
+/*	@(#)ca_test_main.c	ca_test_main.c,v 1.7 2002/07/12 21:35:39 jba Exp
  *	Author:	Jeff Hill
  *	Date:	21JAN2000
  */

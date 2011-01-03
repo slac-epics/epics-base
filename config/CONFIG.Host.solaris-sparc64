@@ -7,7 +7,7 @@
 # and higher are distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-# $Id$
+# CONFIG.Host.solaris-sparc64,v 1.1.2.2 2006/11/28 18:52:13 jba Exp
 
 # solaris-sparc is the new name for solaris
 -include $(EPICS_BASE)/config/CONFIG.Host.solaris

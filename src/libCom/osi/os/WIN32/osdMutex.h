@@ -10,7 +10,7 @@
 
 /* osdMutex.h */
 /*
- *      $Id$
+ *      osdMutex.h,v 1.2 2002/07/12 21:34:52 jba Exp
  *      WIN32 version
  *
  *      Author  Jeffrey O. Hill

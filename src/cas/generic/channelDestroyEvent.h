@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      channelDestroyEvent.h,v 1.2 2003/03/13 00:16:39 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

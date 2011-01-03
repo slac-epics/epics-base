@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* $Id$
+/* cvtTable.h,v 1.5 2002/07/12 21:32:45 jba Exp
  * Breakpoint Tables
  *
  *      Author:          Marty Kraimer

@@ -1,6 +1,6 @@
 # CONFIG.win32-x86.win32-x86
 #
-# $Id$
+# CONFIG.win32-x86.win32-x86,v 1.32.2.20 2009/07/16 14:33:52 jba Exp
 # This file is maintained by the build community.
 #
 # Definitions for win32-x86 target archs when host arch is win32-x86

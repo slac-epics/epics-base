@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      tsSLList.h,v 1.41.2.1 2004/10/08 15:03:04 jhill Exp
  *
  *      type safe singly linked list templates
  *

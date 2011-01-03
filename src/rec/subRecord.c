@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$ */
+/* subRecord.c,v 1.25.2.9 2009/07/28 21:11:02 anj Exp */
 
 /* Record Support Routines for Subroutine records */
 /*

@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- *      $Id$
+ *      epicsTimer.cpp,v 1.38.2.3 2009/05/11 22:50:06 jhill Exp
  *
  *      Author  Jeffrey O. Hill
  *              johill@lanl.gov

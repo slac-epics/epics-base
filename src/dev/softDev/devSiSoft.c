@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* $Id$
+/* devSiSoft.c,v 1.10.2.2 2009/04/03 17:46:22 lange Exp
  *
  *      Author: Janet Anderson
  *      Date: 04-21-91

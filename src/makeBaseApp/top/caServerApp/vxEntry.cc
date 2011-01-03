@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// $Id$
+// vxEntry.cc,v 1.1 2003/02/05 23:46:22 anj Exp
 // Author: Jeff HIll (LANL)
 //
 //
