@@ -1,0 +1,7 @@
+
+
+record( stringout, "$(IOC):_APPNAME_:STATUS" )
+{
+	field( DTYP, "Soft Channel" )
+	field( VAL,	 "Unknown status" )
+}
