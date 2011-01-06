@@ -87,6 +87,220 @@ TEMPLATES += top/iocBoot/ioc/st.cmd@Cross
 TEMPLATES += top/iocBoot/ioc/st.cmd@vxWorks
 TEMPLATES += top/iocBoot/ioc/st.cmd@RTEMS
 
+######################################################################
+# PCDS Additions
+######################################################################
+
+######################################################################
+## Application TOP files
+## ================================================
+TEMPLATES += top/README
+TEMPLATES += top/RELEASE_NOTES
+TEMPLATES += top/RELEASE_SITE
+TEMPLATES += top/edm-_IOC_.cmd
+TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
+
+######################################################################
+## Additional RULES
+## ================================================
+TEMPLATES += top/configure/RULES.archive
+TEMPLATES += top/configure/RULES.copy
+
+######################################################################
+# PCDS templates: 'pcdsDemoApp' and 'pcdsDemoBoot'.
+# Author: Jason Tiller
+######################################################################
+
+## =================================================
+# pcdsDemoApp - based on lclsApp.  Also includes a 'srcProtocol' directory
+# for managing streamDevice's protocol files.
+
+TEMPLATES += top/pcdsDemoApp/Makefile
+TEMPLATES += top/pcdsDemoApp/Db/Makefile
+TEMPLATES += top/pcdsDemoApp/Db/dbExample1.db
+TEMPLATES += top/pcdsDemoApp/Db/dbExample2.db
+TEMPLATES += top/pcdsDemoApp/Db/dbSubExample.db
+TEMPLATES += top/pcdsDemoApp/src/Makefile
+TEMPLATES += top/pcdsDemoApp/src/xxxRecord.dbd
+TEMPLATES += top/pcdsDemoApp/src/xxxRecord.c
+TEMPLATES += top/pcdsDemoApp/src/devXxxSoft.c
+TEMPLATES += top/pcdsDemoApp/src/xxxSupport.dbd
+TEMPLATES += top/pcdsDemoApp/src/sncExample.stt
+TEMPLATES += top/pcdsDemoApp/src/sncProgram.st
+TEMPLATES += top/pcdsDemoApp/src/sncExample.dbd
+TEMPLATES += top/pcdsDemoApp/src/dbSubExample.c
+TEMPLATES += top/pcdsDemoApp/src/dbSubExample.dbd
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Main.cpp
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.c
+TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.dbd
+
+TEMPLATES += top/pcdsDemoApp/srcDisplay/Makefile
+TEMPLATES += top/pcdsDemoApp/srcDisplay/example.edl
+
+TEMPLATES += top/pcdsDemoApp/srcProtocol/Makefile
+TEMPLATES += top/pcdsDemoApp/srcProtocol/example.proto
+
+# pcdsDemoBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsDemoBoot/Makefile
+
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@vxWorks
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@vxWorks6
+
+TEMPLATES += top/pcdsDemoBoot/nfsCommands@RTEMS
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/Makefile@vxWorks6
+
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@Cross
+
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
+
+TEMPLATES += top/pcdsDemoBoot/ioc/st.cmd@RTEMS
+TEMPLATES += top/pcdsDemoBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks
+TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
+
+######################################################################
+# PCDS templates: 'pcdsIocApp' and 'pcdsIocBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsIocApp - Basic pcds IOC including autosave and iocAdmin
+
+TEMPLATES += top/pcdsIocApp/Replace.pl
+TEMPLATES += top/pcdsIocApp/Makefile
+TEMPLATES += top/pcdsIocApp/Db/Makefile
+TEMPLATES += top/pcdsIocApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsIocApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsIocApp/src/Makefile
+TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsIocApp/configure/RELEASE
+
+# pcdsIocBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsIocBoot/Makefile
+
+TEMPLATES += top/pcdsIocBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsIocBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsIocBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.substitutions
+
+
+######################################################################
+# PCDS templates: 'pcdsEvrApp' and 'pcdsEvrBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsEvrApp - Basic pcds IOC including autosave, iocAdmin, and EVR
+
+TEMPLATES += top/pcdsEvrApp/Makefile
+
+TEMPLATES += top/pcdsEvrApp/Db/Makefile
+TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/evr.substitutions
+
+TEMPLATES += top/pcdsEvrApp/src/Makefile
+TEMPLATES += top/pcdsEvrApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsEvrApp/configure/RELEASE
+
+# pcdsEvrBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsEvrBoot/Makefile
+
+TEMPLATES += top/pcdsEvrBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsEvrBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsEvrBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsEvrBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.substitutions
+
+######################################################################
+# PCDS templates: 'pcdsMotorApp' and 'pcdsMotorBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsMotorApp - Basic pcds IOC including autosave, iocAdmin and motor
+TEMPLATES += top/pcdsMotorApp/Makefile
+
+TEMPLATES += top/pcdsMotorApp/Db/Makefile
+TEMPLATES += top/pcdsMotorApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/motors.substitutions
+
+TEMPLATES += top/pcdsMotorApp/configure/RELEASE
+
+TEMPLATES += top/pcdsMotorApp/src/Makefile
+TEMPLATES += top/pcdsMotorApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsMotorBoot/Makefile
+TEMPLATES += top/pcdsMotorBoot/nfsCommands@RTEMS
+
+TEMPLATES += top/pcdsMotorBoot/ioc/Makefile@Common
+TEMPLATES += top/pcdsMotorBoot/ioc/README@Common
+TEMPLATES += top/pcdsMotorBoot/ioc/README@RTEMS
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.substitutions
+TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@Common*
+TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@RTEMS*
+TEMPLATES += top/pcdsMotorBoot/ioc/startup.cmd@Common*
+TEMPLATES += top/pcdsMotorBoot/ioc/startup.cmd@RTEMS*
+
+######################################################################
+# PCDS template: 'pcdsModuleLib'
+# Author: Bruce Hill
+######################################################################
+
+# pcdsModuleLib - Basic pcds module including autosave and archive support
+
+TEMPLATES += top/pcdsModuleLib/Makefile
+
+TEMPLATES += top/pcdsModuleLib/Db/Makefile
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.template
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.template
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.template
+
+TEMPLATES += top/pcdsModuleLib/configure/RELEASE
+
+TEMPLATES += top/pcdsModuleLib/src/Makefile
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.cpp
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.dbd
+TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.h
+
+######################################################################
+# End of PCDS additions
+######################################################################
+
 SCRIPTS_HOST += makeBaseApp.pl
 
 include $(TOP)/configure/RULES

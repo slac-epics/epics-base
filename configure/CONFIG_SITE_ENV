@@ -40,7 +40,7 @@
 # EPICS_TS_NTP_INET
 #	NTP or Unix time server ip address.  Uses boot host if not set.
 
-EPICS_TIMEZONE=CUS::360:030802:110102
+EPICS_TIMEZONE=PUS::480:031102:110402
 #EPICS_TIMEZONE=MET::-60:032902:102502
 EPICS_TS_NTP_INET=
 
@@ -50,7 +50,7 @@ EPICS_TS_NTP_INET=
 # IOCSH_HISTSIZE
 #	Number of lines of command history to keep.
 IOCSH_PS1="epics> "
-IOCSH_HISTSIZE=50
+IOCSH_HISTSIZE=100
 
 # Log Server:
 # EPICS_IOC_LOG_INET 
