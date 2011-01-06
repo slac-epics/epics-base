@@ -8,7 +8,7 @@ include $(TOP)/configure/CONFIG
 #==================================================
 # Build an IOC support library
 
-LIBRARY_IOC += xxxSupport
+LIBRARY_IOC += _APPNAME_Support
 
 # xxxRecord.h will be created from xxxRecord.dbd
 DBDINC += xxxRecord
@@ -16,10 +16,10 @@ DBDINC += xxxRecord
 DBD += xxxSupport.dbd
 
 # The following are compiled and added to the Support library
-xxxSupport_SRCS += xxxRecord.c
-xxxSupport_SRCS += devXxxSoft.c
+_APPNAME_Support_SRCS += xxxRecord.c
+_APPNAME_Support_SRCS += devXxxSoft.c
 
-xxxSupport_LIBS += $(EPICS_BASE_IOC_LIBS)
+_APPNAME_Support_LIBS += $(EPICS_BASE_IOC_LIBS)
 
 #=============================
 # build an ioc application
@@ -46,7 +46,7 @@ _APPNAME__SRCS += _APPNAME_Hello.c
 # The following adds support from base/src/vxWorks
 _APPNAME__OBJS_vxWorks += $(EPICS_BASE_BIN)/vxComLibrary
 
-_APPNAME__LIBS += xxxSupport
+_APPNAME__LIBS += _APPNAME_Support
 
 # NOTE: To build SNL programs, SNCSEQ must be defined
 # in the <top>/configure/RELEASE file
