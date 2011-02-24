@@ -20,6 +20,8 @@
 GNU_TARGET_INCLUDE_DIR =
 unexport GCC_EXEC_PREFIX
 
+RTEMS_BSP = $(subst RTEMS-,,$(T_A))
+
 #--------------------------------------------------
 # Get RTEMS_BASE definition
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
@@ -30,7 +32,8 @@ endif
 
 #-------------------------------------------------------
 # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
+#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
+include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
 
@@ -76,6 +79,7 @@ $(BASE_CPPFLAGS) $(TARGET_CPPFLAGS) $(USR_CPPFLAGS) $(ARCH_DEP_CPPFLAGS)\
 CROSS_CPPFLAGS =
 CROSS_LDFLAGS =
 SHRLIB_CFLAGS =
+# SLAC PCDS note: These were commented out in the 3.14.9 that we got from LCLS
 OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
 OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
 OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
