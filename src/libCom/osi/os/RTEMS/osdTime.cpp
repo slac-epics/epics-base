@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/systm.h>
 #include <netinet/in.h>
 #include "epicsTime.h"
 #include "osdTime.h"
