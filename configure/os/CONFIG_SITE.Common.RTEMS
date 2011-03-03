@@ -31,8 +31,8 @@ endif
 ifeq ($(shell if [ -e $(RTEMS_SITE_TOP)/CVS -o -e $(RTEMS_SITE_TOP)/.svn ]; then echo 1; fi ),1)
 	RTEMS_VER=
 else
-	RTEMS_VER?=rtems-4.7.1
-#	RTEMS_VER?=rtems-4.9.3
+#	RTEMS_VER?=rtems-4.7.1
+ 	RTEMS_VER?=rtems-4.9.3
 endif
 
 #
