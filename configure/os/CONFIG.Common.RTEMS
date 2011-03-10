@@ -47,9 +47,8 @@ else
 # since checkRelease is pretty dumb...
 #
 
-#RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.1/
-
-RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
+#RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
 RTEMS_PATCHLVL=rtems_p0
 SSRLAPPS_PATCHLVL=ssrlApps_p3
 endif
