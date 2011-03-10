@@ -137,11 +137,11 @@ HDEPENDS=YES
 
 #  Host build optimization
 #	must be either YES or NO
-HOST_OPT=YES
+HOST_OPT=NO
 
 #  Cross build optimization
 #	must be either YES or NO
-CROSS_OPT=YES
+CROSS_OPT=NO
 
 #  Generate Verbose Compiler Warnings for Host builds
 #	must be either YES or NO
