@@ -282,7 +282,7 @@ MAIN(epicsErrlogTest)
     errlogFlush();
     testDiag("Logged %u messages", pvt.count);
 
-    testOk1(pvt.count == N+2);
+    testOk1(pvt.count == N+1);
 
     /* Clean up */
     errlogRemoveListener(&logClient);
