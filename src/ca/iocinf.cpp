@@ -74,7 +74,8 @@ static char *getToken ( const char **ppString, char *pBuf, unsigned bufSIze )
  * addAddrToChannelAccessAddressList ()
  */
 extern "C" void epicsShareAPI addAddrToChannelAccessAddressList 
-    ( ELLLIST *pList, const ENV_PARAM *pEnv, unsigned short port )
+    ( ELLLIST *pList, const ENV_PARAM *pEnv, 
+    unsigned short port, int ignoreNonDefaultPort )
 {
     osiSockAddrNode *pNewNode;
     const char *pStr;
@@ -93,6 +94,10 @@ extern "C" void epicsShareAPI addAddrToChannelAccessAddressList
         if (status<0) {
             fprintf ( stderr, "%s: Parsing '%s'\n", __FILE__, pEnv->name);
             fprintf ( stderr, "\tBad internet address or host name: '%s'\n", pToken);
+            continue;
+        }
+
+        if ( ignoreNonDefaultPort && ntohs ( addr.sin_port ) != port ) {
             continue;
         }
 
@@ -122,7 +127,7 @@ extern "C" void epicsShareAPI removeDuplicateAddresses
     ELLNODE *pRawNode;
 
     while ( (pRawNode  = ellGet ( pSrcList ) ) ) {
-		assert ( offsetof (osiSockAddrNode, node) == 0 );
+		STATIC_ASSERT ( offsetof (osiSockAddrNode, node) == 0 );
 		osiSockAddrNode *pNode = reinterpret_cast <osiSockAddrNode *> ( pRawNode );
         osiSockAddrNode *pTmpNode;
 
@@ -235,7 +240,7 @@ extern "C" void epicsShareAPI configureChannelAccessAddressList
             }
         }
     }
-    addAddrToChannelAccessAddressList ( &tmpList, &EPICS_CA_ADDR_LIST, port );
+    addAddrToChannelAccessAddressList ( &tmpList, &EPICS_CA_ADDR_LIST, port, false );
 
     removeDuplicateAddresses ( pList, &tmpList, 0 );
 }

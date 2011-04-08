@@ -14,6 +14,7 @@ DBDINC += aaiRecord
 DBDINC += aaoRecord
 DBDINC += aiRecord
 DBDINC += aoRecord
+DBDINC += aSubRecord
 DBDINC += biRecord
 DBDINC += boRecord
 DBDINC += calcRecord
@@ -43,6 +44,7 @@ LIBSRCS += aaiRecord.c
 LIBSRCS += aaoRecord.c
 LIBSRCS += aiRecord.c
 LIBSRCS += aoRecord.c
+LIBSRCS += aSubRecord.c
 LIBSRCS += biRecord.c
 LIBSRCS += boRecord.c
 LIBSRCS += calcRecord.c
@@ -71,7 +73,7 @@ LIBSRCS += waveformRecord.c
 LIBRARY_IOC += recIoc
 
 recIoc_LIBS = asIoc dbIoc registryIoc dbStaticIoc ca Com
-recIoc_RCS_WIN32 = recIoc.rc
+recIoc_RCS = recIoc.rc
 
 # For R3.13 compatability
 ifeq ($(strip $(COMPAT_313)),YES)

@@ -1,10 +1,9 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2007 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbToRecordtypeH.c */
@@ -109,20 +108,15 @@ int main(int argc,char **argv)
     pdbbase->loadCdefs = TRUE;
     status = dbReadDatabase(&pdbbase,argv[1],path,sub);
     if(status)  {
-	fprintf(stderr,"Terminal error For input file %s\n",argv[1]);
-	exit(-1);
+        errlogFlush();
+        fprintf(stderr, "dbToMenuH: Input errors, no output generated\n");
+        exit(1);
     }
     outFile = fopen(outFilename,"w");
     if(!outFile) {
-	errPrintf(0,__FILE__,__LINE__,"Error opening %s\n",outFilename);
-	exit(-1);
+        epicsPrintf("Error creating output file \"%s\"\n", outFilename);
+        exit(1);
     }
-
-    fprintf(outFile,"#include \"ellLib.h\"\n");
-    fprintf(outFile,"#include \"epicsMutex.h\"\n");
-    fprintf(outFile,"#include \"link.h\"\n");
-    fprintf(outFile,"#include \"epicsTime.h\"\n");
-    fprintf(outFile,"#include \"epicsTypes.h\"\n");
 
     pdbMenu = (dbMenu *)ellFirst(&pdbbase->menuList);
     while(pdbMenu) {
@@ -142,6 +136,11 @@ int main(int argc,char **argv)
     while(pdbRecordType) {
         fprintf(outFile,"#ifndef INC%sH\n",pdbRecordType->name);
         fprintf(outFile,"#define INC%sH\n",pdbRecordType->name);
+	pdbCdef = (dbText *)ellFirst(&pdbRecordType->cdefList);
+	while (pdbCdef) {
+	    fprintf(outFile,"%s\n",pdbCdef->text);
+	    pdbCdef = (dbText *)ellNext(&pdbCdef->node);
+	}
 	fprintf(outFile,"typedef struct %s",pdbRecordType->name);
 	if(!isdbCommonRecord) fprintf(outFile,"Record");
 	fprintf(outFile," {\n");
@@ -155,56 +154,56 @@ int main(int argc,char **argv)
 	    name[strlen(pdbFldDes->name)] = 0;
 	    switch(pdbFldDes->field_type) {
 		case DBF_STRING :
-		    fprintf(outFile,"\tchar\t\t%s[%d]; /*%s*/\n",
-			name,pdbFldDes->size,pdbFldDes->prompt);
+		    fprintf(outFile, "\tchar\t\t%s[%d];\t/* %s */\n",
+			name, pdbFldDes->size, pdbFldDes->prompt);
 		    break;
 		case DBF_CHAR :
-		    fprintf(outFile,"\tchar\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsInt8\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_UCHAR :
-		    fprintf(outFile,"\tunsigned char\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsUInt8\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_SHORT :
-		    fprintf(outFile,"\tshort\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsInt16\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_USHORT :
-		    fprintf(outFile,"\tunsigned short\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsUInt16\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_LONG :
-		    fprintf(outFile,"\tepicsInt32\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsInt32\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_ULONG :
-		    fprintf(outFile,"\tunsigned long\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsUInt32\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_FLOAT :
-		    fprintf(outFile,"\tfloat\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsFloat32\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_DOUBLE :
-		    fprintf(outFile,"\tdouble\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsFloat64\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_ENUM :
 		case DBF_MENU :
 		case DBF_DEVICE :
-		    fprintf(outFile,"\tepicsEnum16\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tepicsEnum16\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_INLINK :
 		case DBF_OUTLINK :
 		case DBF_FWDLINK :
-		    fprintf(outFile,"\tDBLINK\t\t%s;\t/*%s*/\n",
-			name,pdbFldDes->prompt);
+		    fprintf(outFile, "\tDBLINK\t\t%s;\t/* %s */\n",
+			name, pdbFldDes->prompt);
 		    break;
 		case DBF_NOACCESS:
-		    fprintf(outFile,"\t%s;\t/*%s*/\n",
-			pdbFldDes->extra,pdbFldDes->prompt);
+		    fprintf(outFile, "\t%s;\t/* %s */\n",
+			pdbFldDes->extra, pdbFldDes->prompt);
 		    break;
 		default:
 		    fprintf(outFile,"ILLEGAL FIELD TYPE\n");
@@ -218,11 +217,6 @@ int main(int argc,char **argv)
 		pdbFldDes = pdbRecordType->papFldDes[i];
 		fprintf(outFile,"#define %sRecord%s\t%d\n",
 		    pdbRecordType->name,pdbFldDes->name,pdbFldDes->indRecordType);
-	    }
-	    pdbCdef = (dbText *)ellFirst(&pdbRecordType->cdefList);
-	    while (pdbCdef) {
-		fprintf(outFile,"%s\n",pdbCdef->text);
-		pdbCdef = (dbText *)ellNext(&pdbCdef->node);
 	    }
 	}
 	fprintf(outFile,"#endif /*INC%sH*/\n",pdbRecordType->name);

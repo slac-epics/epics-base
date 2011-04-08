@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdEvent.c
- *	osdEvent.c,v 1.6 2002/07/12 21:34:44 jba Exp
+ *	osdEvent.c,v 1.6.2.4 2008/10/16 13:38:14 norume Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055
@@ -131,22 +131,16 @@ epicsEventWaitWithTimeout(epicsEventId id, double timeOut)
 {
     rtems_id sid = (rtems_id)id;
     rtems_status_code sc;
-    rtems_unsigned32 wait;
     rtems_interval delay;
     extern double rtemsTicksPerSecond_double;
     
+    if (timeOut <= 0.0)
+        return epicsEventTryWait(id);
     SEMSTAT(1)
-    if (timeOut <= 0.0) {
-        wait = RTEMS_NO_WAIT;
-        delay = 0;
-    }
-    else {
-        wait = RTEMS_WAIT;
-        delay = timeOut * rtemsTicksPerSecond_double;
-        if (delay == 0)
-            delay++;
-    }
-    sc = rtems_semaphore_obtain (sid, wait, delay);
+    delay = timeOut * rtemsTicksPerSecond_double;
+    if (delay == 0)
+        delay++;
+    sc = rtems_semaphore_obtain (sid, RTEMS_WAIT, delay);
     if (sc == RTEMS_SUCCESSFUL)
         return epicsEventWaitOK;
     else if (sc == RTEMS_TIMEOUT)
@@ -190,18 +184,18 @@ epicsEventShow(epicsEventId id, unsigned int level)
      */
     semaphore = *the_semaphore;
     _Thread_Enable_dispatch();
-    printf ("          %8.8x  ", sid);
+    printf ("          %8.8x  ", (int)sid);
     if (_Attributes_Is_counting_semaphore (semaphore.attribute_set)) {
-            printf ("Count: %d", semaphore.Core_control.semaphore.count);
+            printf ("Count: %d", (int)semaphore.Core_control.semaphore.count);
     }
     else {
         if (_CORE_mutex_Is_locked(&semaphore.Core_control.mutex)) {
             char name[30];
             epicsThreadGetName ((epicsThreadId)semaphore.Core_control.mutex.holder_id, name, sizeof name);
             printf ("Held by:%8.8x (%s)  Nest count:%d",
-                                    semaphore.Core_control.mutex.holder_id,
+                                    (unsigned int)semaphore.Core_control.mutex.holder_id,
                                     name,
-                                    semaphore.Core_control.mutex.nest_count);
+                                    (int)semaphore.Core_control.mutex.nest_count);
         }
         else {
             printf ("Not Held");

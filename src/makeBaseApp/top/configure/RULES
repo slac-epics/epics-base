@@ -1,6 +1,10 @@
 # RULES
 
-include $(EPICS_BASE)/configure/RULES
+include $(CONFIG)/RULES
+
+# include custom SLAC RULES
+include $(TOP)/configure/RULES.autosave
+include $(TOP)/configure/RULES.archive
 
 # Library should be rebuilt because LIBOBJS may have changed.
 $(LIBNAME): ../Makefile

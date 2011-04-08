@@ -1,14 +1,13 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devLib.c - support for allocation of common device resources */
-/* @(#)devLib.c,v 1.1.2.7 2006/12/22 21:33:07 jhill Exp*/
+/* devLib.c,v 1.1.2.11 2009/07/09 16:37:23 anj Exp */
 
 /*
  *  Original Author: Marty Kraimer
@@ -19,7 +18,7 @@
  * .01  06-14-93    joh needs devAllocInterruptVector() routine
  */
 
-static const char sccsID[] = "@(#) devLib.c,v 1.1.2.7 2006/12/22 21:33:07 jhill Exp";
+static const char sccsID[] = "@(#) devLib.c,v 1.1.2.11 2009/07/09 16:37:23 anj Exp";
 
 #include <string.h>
 #include <stdio.h>
@@ -29,41 +28,46 @@ static const char sccsID[] = "@(#) devLib.c,v 1.1.2.7 2006/12/22 21:33:07 jhill 
 #include "dbDefs.h"
 #include "epicsMutex.h"
 #include "errlog.h"
+#include "ellLib.h"
 #include "devLib.h"
 
-LOCAL ELLLIST addrAlloc[atLast];
-LOCAL ELLLIST addrFree[atLast];
+static ELLLIST addrAlloc[atLast];
+static ELLLIST addrFree[atLast];
 
-LOCAL size_t addrLast[atLast] = {
+static size_t addrLast[atLast] = {
             0xffff,
             0xffffff,
             0xffffffff,
-            0xffffff
+            0xffffff,
+            0xffffff,
             };
 
-LOCAL unsigned addrHexDig[atLast] = {
+static unsigned addrHexDig[atLast] = {
             4,
             6,
             8,
+            6,
             6
             };
 
-LOCAL long  addrFail[atLast] = {
+static long  addrFail[atLast] = {
             S_dev_badA16,
             S_dev_badA24,
             S_dev_badA32,
-            S_dev_badA24
+            S_dev_badISA,
+            S_dev_badCRCSR
             };
 
-LOCAL epicsMutexId addrListLock;
-LOCAL char devLibInitFlag;
+static epicsMutexId addrListLock;
+static char devLibInitFlag;
 
 const char *epicsAddressTypeName[]
         = {
         "VME A16",
         "VME A24",
         "VME A32",
-        "ISA"
+        "ISA",
+        "VME CR/CSR"
     };
 
 typedef struct{
@@ -83,14 +87,14 @@ typedef struct{
  * These routines are not exported
  */
 
-LOCAL long devLibInit(void);
+static long devLibInit(void);
 
-LOCAL long addrVerify(
+static long addrVerify(
             epicsAddressType addrType, 
             size_t base,
             size_t size);
 
-LOCAL long blockFind (
+static long blockFind (
             epicsAddressType addrType,
             const rangeItem *pRange,
             /* size needed */
@@ -100,28 +104,28 @@ LOCAL long blockFind (
             /* base address found */
             size_t *pFirst);
 
-LOCAL void report_conflict(
+static void report_conflict(
             epicsAddressType addrType,
             size_t base,
             size_t size,
             const char *pOwnerName);
 
-LOCAL void report_conflict_device(
+static void report_conflict_device(
             epicsAddressType addrType, 
             const rangeItem *pRange);
 
-LOCAL void devInsertAddress(
+static void devInsertAddress(
             ELLLIST         *pRangeList,
             rangeItem       *pNewRange);
 
-LOCAL long devListAddressMap(
+static long devListAddressMap(
             ELLLIST             *pRangeList);
 
-LOCAL long devCombineAdjacentBlocks(
+static long devCombineAdjacentBlocks(
             ELLLIST     *pRangeList,
             rangeItem   *pRange);
 
-LOCAL long devInstallAddr(
+static long devInstallAddr(
             rangeItem *pRange, /* item on the free list to be split */
             const char *pOwnerName,
             epicsAddressType addrType,
@@ -130,6 +134,57 @@ LOCAL long devInstallAddr(
             volatile void **ppPhysicalAddress);
 
 #define SUCCESS 0
+
+/*
+ * devBusToLocalAddr()
+ */
+long devBusToLocalAddr(
+    epicsAddressType addrType,
+    size_t busAddr,
+    volatile void **ppLocalAddress)
+{
+    long status;
+    volatile void *localAddress;
+
+    /*
+     * Make sure that devLib has been intialized
+     */
+    if (!devLibInitFlag) {
+        status = devLibInit();
+        if(status){
+            return status;
+        }
+    }
+
+    /*
+     * Make sure we have a valid bus address
+     */
+    status = addrVerify (addrType, busAddr, 4);
+    if (status) {
+        return status;
+    }
+
+    /*
+     * Call the virtual os routine to map the bus address to a CPU address
+     */
+    status = (*pdevLibVirtualOS->pDevMapAddr) (addrType, 0, busAddr, 4, &localAddress);
+    if (status) {
+        errPrintf (status, __FILE__, __LINE__, "%s bus address =0X%X\n",
+            epicsAddressTypeName[addrType], (unsigned int)busAddr);
+        return status;
+    }
+
+    /*
+     * Return the local CPU address if the pointer is supplied
+     */
+    if (ppLocalAddress) {
+        *ppLocalAddress = localAddress;
+    }
+
+    return SUCCESS;
+
+}/*end devBusToLocalAddr()*/
+
 
 /*
  * devRegisterAddress()
@@ -246,7 +301,7 @@ long devWriteProbe (unsigned wordSize, volatile void *ptr, const void *pValue)
 /*
  *  devInstallAddr()
  */
-LOCAL long devInstallAddr (
+static long devInstallAddr (
     rangeItem *pRange, /* item on the free list to be split */
     const char *pOwnerName,
     epicsAddressType addrType,
@@ -359,7 +414,7 @@ LOCAL long devInstallAddr (
 /*
  * report_conflict()
  */
-LOCAL void report_conflict (
+static void report_conflict (
     epicsAddressType addrType,
     size_t base,
     size_t size,
@@ -374,8 +429,8 @@ LOCAL void report_conflict (
             __LINE__,
             "%10s 0X%08X - OX%08X Requested by %s",
             epicsAddressTypeName[addrType],
-            base,
-            base+size-1,
+            (unsigned int)base,
+            (unsigned int)(base+size-1),
             pOwnerName);
 
     pRange = (rangeItem *) ellFirst(&addrAlloc[addrType]);
@@ -392,7 +447,7 @@ LOCAL void report_conflict (
 /*
  * report_conflict_device()
  */
-LOCAL void report_conflict_device(epicsAddressType addrType, const rangeItem *pRange)
+static void report_conflict_device(epicsAddressType addrType, const rangeItem *pRange)
 {
     errPrintf (
             S_dev_identifyOverlap,
@@ -400,8 +455,8 @@ LOCAL void report_conflict_device(epicsAddressType addrType, const rangeItem *pR
             __LINE__,
             "%10s 0X%08X - 0X%08X Owned by %s",
             epicsAddressTypeName[addrType],
-            pRange->begin,
-            pRange->end,
+            (unsigned int)pRange->begin,
+            (unsigned int)pRange->end,
             pRange->pOwnerName);
 }
 
@@ -454,7 +509,7 @@ long devUnregisterAddress(
             __LINE__,
     "unregister address for %s at 0X%X failed because %s owns it",
             pOwnerName,
-            baseAddress,
+            (unsigned int)baseAddress,
             pRange->pOwnerName);
         return s;
     }   
@@ -477,7 +532,7 @@ long devUnregisterAddress(
 /*
  *      devCombineAdjacentBlocks()
  */
-LOCAL long devCombineAdjacentBlocks(
+static long devCombineAdjacentBlocks(
     ELLLIST *pRangeList,
     rangeItem *pRange)
 {
@@ -516,7 +571,7 @@ LOCAL long devCombineAdjacentBlocks(
 /*
  *      devInsertAddress()
  */
-LOCAL void devInsertAddress(
+static void devInsertAddress(
 ELLLIST     *pRangeList,
 rangeItem   *pNewRange)
 {
@@ -554,7 +609,7 @@ long devAllocAddress(
 {
     int s;
     rangeItem *pRange;
-    size_t base;
+    size_t base = 0;
 
     if (!devLibInitFlag) {
         s = devLibInit();
@@ -607,7 +662,7 @@ long devAllocAddress(
  *
  * care has been taken here not to overflow type size_t
  */
-LOCAL long addrVerify(epicsAddressType addrType, size_t base, size_t size)
+static long addrVerify(epicsAddressType addrType, size_t base, size_t size)
 {
     if (addrType>=atLast) {
         return S_dev_uknAddrType;
@@ -635,7 +690,7 @@ LOCAL long addrVerify(epicsAddressType addrType, size_t base, size_t size)
 /*
  *  devLibInit()
  */
-LOCAL long devLibInit (void)
+static long devLibInit (void)
 {
     rangeItem   *pRange;
     int 	i;
@@ -686,7 +741,7 @@ long devAddressMap(void)
 /*
  *  devListAddressMap()
  */
-LOCAL long devListAddressMap(ELLLIST *pRangeList)
+static long devListAddressMap(ELLLIST *pRangeList)
 {
     rangeItem *pri;
     int i;
@@ -729,7 +784,7 @@ LOCAL long devListAddressMap(ELLLIST *pRangeList)
  * Find unoccupied block in a large block
  *
  */
-LOCAL long blockFind (
+static long blockFind (
     epicsAddressType addrType,
     const rangeItem *pRange,
     /* size needed */
@@ -1008,7 +1063,7 @@ void *devLibA24Malloc(size_t size)
     void *ret;
     
     if (devLibA24Debug)
-        epicsPrintf ("devLibA24Malloc(%d) entered\n", size);
+        epicsPrintf ("devLibA24Malloc(%u) entered\n", (unsigned int)size);
     
     ret = pdevLibVirtualOS->pDevA24Malloc(size);
     return(ret);

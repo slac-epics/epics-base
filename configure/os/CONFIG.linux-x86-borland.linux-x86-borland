@@ -1,6 +1,6 @@
 #  CONFIG.linux-x86-borland.linux-x86-borland
 #
-# CONFIG.linux-x86-borland.linux-x86-borland,v 1.1.2.3 2004/01/26 20:02:37 jba Exp
+# CONFIG.linux-x86-borland.linux-x86-borland,v 1.1.2.7 2009/04/24 19:31:57 anj Exp
 #
 # Definitions for linux-x86-borland host - linux-x86-borland target builds
 # Sites may override these definitions in CONFIG_SITE.linux-x86-borland.linux-x86-borland
@@ -9,6 +9,10 @@
 # Include common gnu compiler definitions
 include $(CONFIG)/CONFIG.gnuCommon
 SHRLIB_CFLAGS =
+SHRLIB_LDFLAGS =
+LOADABLE_SHRLIB_LDFLAGS =
+GPROF=NO
+PROFILE=NO
 
 GNU_DIR = /usr
 
@@ -29,22 +33,6 @@ CCLINKOPT = -q -a8
 CC = $(BORLAND_BIN)/bc++ $(CCLINKOPT)
 LD = $(BORLAND_BIN)/bc++ -r
 RANLIB = 
-
-#
-# __STDC__=0 works but not as cleanly as with
-# Microsoft Visual C++.
-# The Borland header files use ifdef __STDC__
-# to disable many nice things. This is overridden
-# by defining NO_BORLAND_STDC in the Makefile.
-#
-ifdef NO_BORLAND_STDC
-CONFORM_CFLAGS_ANSI =
-CONFORM_CFLAGS_STRICT =
-else
-CONFORM_CFLAGS_ANSI = -D__STDC__=0
-CONFORM_CFLAGS_STRICT = -D__STDC__=0
-endif
-CONFORM_CFLAGS_TRAD =
 
 # -w display warnings on
 # -g0 no limit to warning messages
@@ -73,17 +61,7 @@ CPP = $(BORLAND_BIN)/bcpp
 
 # Configure OS vendor C++ compiler
 #
-# __STDC__=0 works but not as cleanly as with
-# Microsoft Visual C++.
-# The Borland header files use ifdef __STDC__
-# to disable many nice things. This is overridden
-# by defining NO_BORLAND_STDC in the Makefile.
-#
 CCC = $(BORLAND_BIN)/bc++ $(CCLINKOPT)
-ifndef NO_BORLAND_STDC
-CONFORM_CXXFLAGS_NORMAL = -D__STDC__=0
-CONFORM_CXXFLAGS_STRICT = -D__STDC__=0
-endif
 
 # -w display warnings on
 # -g0 no limit to warning messages
@@ -133,10 +111,6 @@ OPT_LDFLAGS =
 
 ARCH_DEP_CFLAGS=
 
-#	to identify the general architecture class:
-#	should be BSD, SYSV, WIN32, ...
-#	is: WIN32, sun4, hpux, linux, ...
-#
 OS_CLASS=Linux
 
 
@@ -219,6 +193,6 @@ LINK.cpp += $(PROD_LDFLAGS) borinit.o /usr/lib/crt1.o $(PROD_LD_OBJS)
 LINK.cpp += , $@ ,,$(LINKLIBS) $(PROD_LDLIBS)
 
 LINK.shrlib = $(WINLINK) $(STATIC_LDFLAGS) $(SHRLIBDIR_LDFLAGS) $(LDFLAGS) -Tpd -Gi
-LINK.shrlib+= $(LIB_LDFLAGS) borinitso.o $(LIBRARY_LD_OBJS) 
+LINK.shrlib+= $(TARGET_LIB_LDFLAGS) borinitso.o $(LIBRARY_LD_OBJS) 
 LINK.shrlib+= , $@ ,,$(LINKLIBS) $(SHRLIB_LDLIBS)
 

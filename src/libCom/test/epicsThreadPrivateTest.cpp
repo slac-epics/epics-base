@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
-/* epicsThreadPrivateTest.cpp,v 1.10.2.4 2006/11/10 21:43:16 anj Exp */
+/* epicsThreadPrivateTest.cpp,v 1.10.2.5 2008/08/28 15:32:46 anj Exp */
 
 /* Author: Jeff Hill Date:    March 28 2001 */
 
@@ -21,8 +21,8 @@ static epicsThreadPrivate < bool > priv;
 
 extern "C" void epicsThreadPrivateTestThread ( void * )
 {
-    testOk1 ( 0 == priv.get () );
-    static bool var;
+    testOk1 ( NULL == priv.get () );
+    bool var = true;
     priv.set ( &var );
     testOk1 ( &var == priv.get () );
 }
@@ -31,7 +31,7 @@ MAIN(epicsThreadPrivateTest)
 {
     testPlan(5);
 
-    static bool var;
+    bool var = false;
     priv.set ( &var );
     testOk1 ( &var == priv.get() );
 
@@ -41,8 +41,8 @@ MAIN(epicsThreadPrivateTest)
     epicsThreadSleep ( 1.0 );
     testOk1 ( &var == priv.get() );
 
-    priv.set ( 0 );
-    testOk1 ( 0 == priv.get() );
+    priv.set ( NULL );
+    testOk1 ( NULL == priv.get() );
 
     return testDone();
 }

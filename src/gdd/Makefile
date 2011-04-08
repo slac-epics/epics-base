@@ -3,8 +3,7 @@
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
-# EPICS BASE Versions 3.13.7
-# and higher are distributed subject to a Software License Agreement found
+# EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 
@@ -20,7 +19,6 @@ INC += gddArray.h
 INC += gddArrayI.h
 INC += gddScalar.h
 INC += gddScalarI.h
-INC += gddSemaphore.h
 INC += gddNewDel.h
 INC += gddUtils.h
 INC += gddUtilsI.h
@@ -53,12 +51,13 @@ LIBRARY = gdd
 
 gdd_LIBS = Com
 
-gdd_RCS_WIN32 = gdd.rc
+gdd_RCS = gdd.rc
 
 PROD_HOST = aitGen genApps
 genApps_SRCS = genApps.cc $(AITGENSRCS)
 aitGen_SRCS = aitTypes.c aitGen.c
 PROD_LIBS = Com
+genApps_SYS_LIBS_WIN32 = ws2_32
 
 # aitGen.c doesn't compile for linux-arm at -O3 when using gcc-3.4.5
 aitGen_CFLAGS_linux-arm = -O2
@@ -78,26 +77,21 @@ include $(TOP)/configure/RULES
 #	not have been installed if we are building for
 #	the first time
 #	-> use explicit reference to the uninstalled files in '..'
-aitConvert$(OBJ): ../aitConvert.cc aitConvertGenerated.cc\
-		../aitConvert.h ../aitTypes.h
 
+aitConvert$(OBJ): $(COMMON_DIR)/aitConvertGenerated.cc
 
-dbMapper.o:	../gdd.h ../gddI.h ../gddContainer.h ../gddContainerI.h \
-		../gddArray.h ../gddScalar.h ../gddAppTable.h ../dbMapper.h \
-		$(INSTALL_INCLUDE)/gddApps.h ../aitTypes.h  ../gddUtils.h ../gddUtilsI.h
+dbMapper$(OBJ):	$(COMMON_DIR)/gddApps.h 
 
 # Rules for generated files
-#
-aitConvertGenerated.cc: $(INSTALL_HOST_BIN)/aitGen$(HOSTEXE) aitTypes.h
-	$(INSTALL_HOST_BIN)/aitGen$(HOSTEXE)
 
-$(COMMON_DIR)/gddApps.h : $(INSTALL_HOST_BIN)/genApps$(HOSTEXE)
-	$(INSTALL_HOST_BIN)/genApps$(HOSTEXE) $@
+$(COMMON_DIR)/aitConvertGenerated.cc: $(TOOLS)/aitGen$(HOSTEXE)
+	$(TOOLS)/aitGen$(HOSTEXE) $@
+
+$(COMMON_DIR)/gddApps.h : $(TOOLS)/genApps$(HOSTEXE)
+	$(TOOLS)/genApps$(HOSTEXE) $@
 
 clean::
-	$(RM) aitConvertGenerated.cc gddApps.h
+	@$(RM) $(COMMON_DIR)/aitConvertGenerated.cc
 
-aitConvert$(OBJ): aitConvertGenerated.cc
-
-#	EOF base/src/gdd/Makefile.Host:n
+#	EOF base/src/gdd/Makefile
 

@@ -1,11 +1,11 @@
 /*************************************************************************\
-* Copyright (c) 2006 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* epicsUnitTest.h,v 1.1.2.2 2006/11/07 15:35:14 anj Exp
+/* epicsUnitTest.h,v 1.1.2.4 2009/04/03 17:46:25 lange Exp
  * Author: Andrew Johnson
  */
 
@@ -28,7 +28,7 @@ epicsShareFunc void testFail(const char *fmt, ...)
 						EPICS_PRINTF_STYLE(1, 2);
 epicsShareFunc void testSkip(int skip, const char *why);
 epicsShareFunc void testTodoBegin(const char *why);
-epicsShareFunc void testTodoEnd();
+epicsShareFunc void testTodoEnd(void);
 epicsShareFunc int  testDiag(const char *fmt, ...)
 						EPICS_PRINTF_STYLE(1, 2);
 epicsShareFunc void testAbort(const char *fmt, ...)
@@ -36,6 +36,13 @@ epicsShareFunc void testAbort(const char *fmt, ...)
 epicsShareFunc int  testDone(void);
 
 #define testOk1(cond) testOk(cond, "%s", #cond)
+
+
+typedef int (*TESTFUNC)(void);
+epicsShareFunc void testHarness(void);
+epicsShareFunc void runTestFunc(const char *name, TESTFUNC func);
+
+#define runTest(func) runTestFunc(#func, func)
 
 #ifdef __cplusplus
 }

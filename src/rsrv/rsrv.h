@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- * rsrv.h,v 1.4.2.2 2005/09/23 15:12:25 jhill Exp
+ * rsrv.h,v 1.4.2.3 2008/07/09 21:31:56 anj Exp
  *
  *  Author: Jeffrey O. Hill
  *      hill@luke.lanl.gov
@@ -22,11 +22,14 @@
 
 #include "shareLib.h"
 
-epicsShareFunc int epicsShareAPI rsrv_init (void);
+epicsShareFunc int rsrv_init(void);
+epicsShareFunc int rsrv_run(void);
+epicsShareFunc int rsrv_pause(void);
+
 epicsShareFunc void epicsShareAPI casr (unsigned level);
-epicsShareFunc void epicsShareAPI casHostNameInitiatingCurrentThread ( 
+epicsShareFunc void epicsShareAPI casHostNameInitiatingCurrentThread (
                         char * pBuf, unsigned bufSize );
-epicsShareFunc void epicsShareAPI casUserNameInitiatingCurrentThread ( 
+epicsShareFunc void epicsShareAPI casUserNameInitiatingCurrentThread (
                         char * pBuf, unsigned bufSize );
 void casStatsFetch ( unsigned *pChanCount, unsigned *pConnCount );
 

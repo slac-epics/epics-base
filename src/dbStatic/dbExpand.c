@@ -26,7 +26,7 @@
 
 DBBASE *pdbbase = NULL;
 
-void usage() 
+void usage(void)
 {
     fprintf(stderr, "Usage:\n\tdbExpand -Ipath -ooutfile "
 	    "-S macro=value file1.dbd file2.dbd ...\n");
@@ -95,6 +95,7 @@ int main(int argc,char **argv)
 	if (status) returnStatus = status;
     }
     if (returnStatus) {
+        errlogFlush();
         fprintf(stderr, "dbExpand: Input errors, no output generated\n");
         exit(1);
     }

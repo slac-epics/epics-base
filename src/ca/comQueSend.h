@@ -145,9 +145,13 @@ private:
             return;
         }
         pComBuf = newComBuf ();
-        assert ( pComBuf->push ( val ) );
+        bool success = pComBuf->push ( val );
+        assert ( success );
         this->pushComBuf ( *pComBuf );
     }
+
+    template < class T >
+    inline void push ( const T * ); // disabled
 
     comQueSend ( const comQueSend & );
     comQueSend & operator = ( const comQueSend & );

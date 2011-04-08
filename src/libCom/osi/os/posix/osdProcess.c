@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /* 
- * osdProcess.c,v 1.9.2.3 2005/10/21 17:02:49 jhill Exp
+ * osdProcess.c,v 1.9.2.4 2007/06/11 20:03:03 anj Exp
  * 
  * Operating System Dependent Implementation of osiProcess.h
  *
@@ -104,5 +104,6 @@ epicsShareFunc osiSpawnDetachedProcessReturn epicsShareAPI osiSpawnDetachedProce
         fprintf ( stderr, "**** You may need to modify your PATH environment variable.\n" );
         fprintf ( stderr, "**** Unable to start \"%s\" process.\n", pProcessName);
     }
-    exit ( -1 );
+    /* Don't run our parent's atexit() handlers */
+    _exit ( -1 );
 }

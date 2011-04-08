@@ -8,16 +8,37 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Makefile,v 1.47.2.4 2006/03/20 19:18:28 jba Exp
+# Makefile,v 1.47.2.6 2008/03/24 22:04:01 jba Exp
 #
 
 TOP = .
+
+### SLAC PCDS
+# If EPICS_BASE is not set, use TOP
+ifndef EPICS_BASE
+EPICS_BASE=$(TOP)
+export EPICS_BASE
+endif
+
+# If EPICS_HOST_ARCH is not set, derive it
+ifndef EPICS_HOST_ARCH
+EPICS_HOST_ARCH=$(shell $(TOP)/startup/EpicsHostArch.pl)
+export EPICS_HOST_ARCH
+endif
+### END SLAC PCDS
+
 include $(TOP)/configure/CONFIG
 
+# Bootstrap resolution: tools not installed yet
+TOOLS = $(TOP)/src/tools
+
+DIRS += configure src
 ifeq ($(findstring YES,$(COMPAT_313) $(COMPAT_TOOLS_313)),YES)
 DIRS += config
 endif
-DIRS += configure src
+
+src_DEPEND_DIRS = configure
+config_DEPEND_DIRS = src
 
 include $(TOP)/configure/RULES_TOP
 

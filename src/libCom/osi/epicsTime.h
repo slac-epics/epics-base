@@ -1,10 +1,9 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* epicsTime.h */
@@ -18,6 +17,9 @@
 #include "shareLib.h"
 #include "epicsTypes.h"
 #include "osdTime.h"
+
+/* The EPICS Epoch is 00:00:00 Jan 1, 1990 UTC */
+#define POSIX_TIME_AT_EPICS_EPOCH 631152000u
 
 /* epics time stamp for C interface*/
 typedef struct epicsTimeStamp {
@@ -62,13 +64,11 @@ struct time_t_wrapper {
     time_t ts;
 };
 
-class epicsTime;
-
 class epicsShareClass epicsTimeEvent
 {
-    friend class epicsTime;
 public:
-    epicsTimeEvent (const int &eventName);
+    epicsTimeEvent (const int &number);
+    operator int () const;
 private:
     int eventNumber;
 };
@@ -165,9 +165,6 @@ private:
 
     unsigned long secPastEpoch; /* seconds since O000 Jan 1, 1990 */
     unsigned long nSec; /* nanoseconds within second */
-
-public:
-    static void synchronize (); /* depricated */
 };
 
 extern "C" {
@@ -182,9 +179,14 @@ extern "C" {
 #define epicsTimeEventBestTime -1
 #define epicsTimeEventDeviceTime -2
 
+/* These are implemented in the "generalTime" framework */
 epicsShareFunc int epicsShareAPI epicsTimeGetCurrent ( epicsTimeStamp * pDest );
 epicsShareFunc int epicsShareAPI epicsTimeGetEvent (
     epicsTimeStamp *pDest, int eventNumber);
+
+/* These are callable from an Interrupt Service Routine */
+epicsShareFunc int epicsTimeGetCurrentInt(epicsTimeStamp *pDest);
+epicsShareFunc int epicsTimeGetEventInt(epicsTimeStamp *pDest, int eventNumber);
 
 /* convert to and from ANSI C's "time_t" */
 epicsShareFunc int epicsShareAPI epicsTimeToTime_t (
@@ -249,8 +251,21 @@ epicsShareFunc int epicsShareAPI epicsTime_gmtime ( const time_t * clock, struct
 }
 #endif /* __cplusplus */
 
-/* epicsTime inline member functions ,*/
+/* inline member functions ,*/
 #ifdef __cplusplus
+
+/* epicsTimeEvent */
+
+inline epicsTimeEvent::epicsTimeEvent (const int &number) :
+    eventNumber(number) {}
+
+inline epicsTimeEvent::operator int () const
+{
+    return this->eventNumber;
+}
+
+
+/* epicsTime */
 
 inline epicsTime epicsTime::operator - ( const double & rhs ) const
 {

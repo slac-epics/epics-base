@@ -7,21 +7,17 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  RULES_DIRS,v 1.14.2.2 2006/11/20 16:25:01 anj Exp
+#  RULES_DIRS,v 1.14.2.6 2009/04/24 08:59:42 lange Exp
 #
 
 
 ARCHS += $(BUILD_ARCHS)
-# Jason Tiller, 7-13-09:
-#    Removed 'clean' from this variable because it generates a
-#    single-colon 'clean:' rule, which conflicts the other
-#    double-colon 'clean::' rules that we use.
 ACTIONS += inc build install buildInstall clean realclean archclean runtests
-ACTIONS_NO_CLEAN += inc build install buildInstall archclean runtests
 
-dirPart = $(word 1, $(subst $(DIVIDER), ,$@))
-actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$@)), \
-    $(addprefix $(DIVIDER),$(word 3, $(subst $(DIVIDER), ,$@))))
+dirPart = $(join $(dir $@), $(word 1, $(subst $(DIVIDER), ,$(notdir $@))))
+
+actionArchPart = $(join $(word 2, $(subst $(DIVIDER), ,$(notdir $@))), \
+ $(addprefix $(DIVIDER),$(word 3, $(subst $(DIVIDER), ,$(notdir $@))))) 
 
 dirActionArchTargets = $(foreach dir, $(DIRS), \
                        $(foreach action, $(ACTIONS),\
@@ -37,27 +33,43 @@ actionArchTargets = $(foreach action, $(ACTIONS),\
                     $(foreach arch, $(ARCHS), \
                     $(action)$(DIVIDER)$(arch)))
 
-all: install
+all : install
 
-rebuild: clean install
+rebuild : clean install
+
+# Create directory dependancies lines for GNU make -j option
+# Only works with GNU make 3.81 or later (uses eval function)
+define DEP_template1
+$(1): $$($(1)_DEPEND_DIRS)
+endef
+$(foreach dir, $(DIRS),$(eval $(call DEP_template1,$(dir))))
+
+define DEP_template2
+$(1)$$(DIVIDER)$(2) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2),$$(ddir)))
+endef
+$(foreach action, $(ACTIONS), $(foreach dir, $(DIRS),$(eval $(call DEP_template2,$(dir),$(action)))))
+
+define DEP_template3
+$(1)$$(DIVIDER)$(2) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2),$$(ddir)))
+endef
+$(foreach arch, $(ARCHS), $(foreach dir, $(DIRS),$(eval $(call DEP_template3,$(dir),$(arch)))))
+
+define DEP_template4
+$(1)$$(DIVIDER)$(2)$$(DIVIDER)$(3) : $$(foreach ddir, $$($(1)_DEPEND_DIRS),$$(addsuffix $$(DIVIDER)$(2)$$(DIVIDER)$(3),$$(ddir)))
+endef
+$(foreach arch, $(ARCHS), $(foreach action, $(ACTIONS), $(foreach dir, $(DIRS), \
+              $(eval $(call DEP_template4,$(dir),$(action),$(arch))))))
+
 
 $(DIRS) $(dirActionTargets) $(dirArchTargets) $(dirActionArchTargets) :
 	$(MAKE) -C $(dirPart) $(actionArchPart)
 
-# Jason Tiller, 7-22-09:
-#    Restore the 'clean' rule, but make it 'clean::', not
-#    single-colon.  This allows other 'clean::'s to still function.
-
-$(ARCHS) $(ACTIONS_NO_CLEAN) $(actionArchTargets): %: \
+$(ARCHS) $(ACTIONS) $(actionArchTargets) :%: \
 	$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
-
-clean::%:$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
-
-realclean::%:$(foreach dir, $(DIRS), $(dir)$(DIVIDER)%)
 
 .PHONY : $(DIRS) all rebuild
 .PHONY : $(ARCHS) $(ACTIONS)
 .PHONY : $(dirActionTargets) $(dirArchTargets)
 .PHONY : $(dirActionArchTargets)
 .PHONY : $(actionArchTargets)
-.PHONY : clean
+

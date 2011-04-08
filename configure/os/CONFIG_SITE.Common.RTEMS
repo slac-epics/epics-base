@@ -1,12 +1,12 @@
 #
-# Site-specific information for all RTEMS targets
+# SLAC LCLS information for all RTEMS targets
 #
 #-------------------------------------------------------
 
 #
 # Specify your desired command-line-input library
 #
-# RTEMS Genericy System has tecla already built in so
+# RTEMS Generic System has tecla already built in so
 #       use that:
 #        - reentrant (readline is not)
 #        - more powerful than EPICS commandline
@@ -31,7 +31,8 @@ endif
 ifeq ($(shell if [ -e $(RTEMS_SITE_TOP)/CVS -o -e $(RTEMS_SITE_TOP)/.svn ]; then echo 1; fi ),1)
 	RTEMS_VER=
 else
-	RTEMS_VER?=rtems-4.7.1
+#	RTEMS_VER?=rtems-4.7.1
+ 	RTEMS_VER?=rtems-4.9.3
 endif
 
 #
@@ -67,6 +68,7 @@ endif
 
 # RTEMS Tools
 RTEMS_BASE	= $(RTEMS_SITE_TOP)/$(RTEMS_VER)/host/i386_linux2x/
+RTEMS_TOOLS	= $(RTEMS_BASE)
 
 # RTEMS Makefile Path
 RTEMS_MAKEFILE_PATH	= $(RTEMS_SITE_TOP)/$(RTEMS_VER)/target/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/

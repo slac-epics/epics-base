@@ -1,14 +1,13 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// epicsThread.cpp,v 1.16.2.15 2006/11/10 22:43:02 anj Exp
+// epicsThread.cpp,v 1.16.2.31 2009/08/24 17:08:41 jhill Exp
 //
 // Author: Jeff Hill
 //
@@ -19,34 +18,61 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <float.h>
+#include <string.h>
+
+// The following is required for Solaris builds
+#undef __EXTENSIONS__
 
 #define epicsExportSharedSymbols
+#include "epicsAlgorithm.h"
 #include "epicsTime.h"
 #include "epicsThread.h"
 #include "epicsAssert.h"
 #include "epicsGuard.h"
 #include "errlog.h"
 
+using namespace std;
+
 epicsThreadRunable::~epicsThreadRunable () {}
 void epicsThreadRunable::run () {}
 void epicsThreadRunable::show ( unsigned int ) const {}
 
-// vxWorks 5.4 gcc fails during compile when I use std::exception
-using namespace std;
-
-// exception payload
-class epicsThread::unableToCreateThread : public exception {
-    const char * what () const throw () {
-        return "epicsThread class was unable to  create a new thread";
-    }
+class epicsThread :: unableToCreateThread : 
+    public exception {
+public:
+    const char * what () const throw ();
 };
 
-// exception payload
-class epicsThread::exitException : public exception {
-    const char * what () const throw () {
-        return "epicsThread class's private exit exception";
+const char * epicsThread :: 
+    unableToCreateThread :: what () const throw ()
+{
+    return "unable to create thread";
+}
+
+void epicsThread :: printLastChanceExceptionMessage ( 
+    const char * pExceptionTypeName,
+    const char * pExceptionContext )
+{ 
+    char date[64];
+    try {
+        epicsTime cur = epicsTime :: getCurrent ();
+        cur.strftime ( date, sizeof ( date ), "%a %b %d %Y %H:%M:%S.%f");
     }
-};
+    catch ( ... ) {
+        strcpy ( date, "<UKN DATE>" );
+    }
+    char name [128];
+    epicsThreadGetName ( this->id, name, sizeof ( name ) );
+    errlogPrintf ( 
+        "epicsThread: Unexpected C++ exception \"%s\" "
+        "with type \"%s\" in thread \"%s\" at %s\n",
+        pExceptionContext, pExceptionTypeName, name, date );
+    errlogFlush ();
+    // this should behave as the C++ implementation intends when an 
+    // exception isnt handled. If users dont like this behavior, they 
+    // can install an application specific unexpected handler.
+    std::unexpected ();
+}
 
 extern "C" void epicsThreadCallEntryPoint ( void * pPvt )
 {
@@ -66,34 +92,14 @@ extern "C" void epicsThreadCallEntryPoint ( void * pPvt )
     }
     catch ( std::exception & except ) {
         if ( ! waitRelease ) {
-            epicsTime cur = epicsTime::getCurrent ();
-            char date[64];
-            cur.strftime ( date, sizeof ( date ), "%a %b %d %Y %H:%M:%S.%f");
-            char name [128];
-            epicsThreadGetName ( pThread->id, name, sizeof ( name ) );
-            errlogPrintf ( 
-                "epicsThread: Unexpected C++ exception \"%s\" with type \"%s\" in thread \"%s\" at %s\n",
-                except.what (), typeid ( except ).name (), name, date );
-            // this should behave as the C++ implementation intends when an 
-            // exception isnt handled. If users dont like this behavior, they 
-            // can install an application specific unexpected handler.
-            unexpected (); 
+            pThread->printLastChanceExceptionMessage ( 
+                typeid ( except ).name (), except.what () );
         }
     }
     catch ( ... ) {
         if ( ! waitRelease ) {
-            epicsTime cur = epicsTime::getCurrent ();
-            char date[64];
-            cur.strftime ( date, sizeof ( date ), "%a %b %d %Y %H:%M:%S.%f");
-            char name [128];
-            epicsThreadGetName ( pThread->id, name, sizeof ( name ) );
-            errlogPrintf ( 
-                "epicsThread: Unknown C++ exception in thread \"%s\" at %s\n",
-                name, date );
-            // this should behave as the C++ implementation intends when an 
-            // exception isnt handled. If users dont like this behavior, they 
-            // can install an application specific unexpected handler.
-            unexpected ();
+            pThread->printLastChanceExceptionMessage ( 
+                "catch ( ... )", "Non-standard C++ exception" );
         }
     }
     if ( ! waitRelease ) {
@@ -122,33 +128,46 @@ void epicsThread::exit ()
 
 void epicsThread::exitWait () throw ()
 {
-    assert ( this->exitWait ( DBL_MAX ) );
+    bool success = this->exitWait ( DBL_MAX );
+    assert ( success );
 }
 
 bool epicsThread::exitWait ( const double delay ) throw ()
 {
-    // if destructor is running in managed thread then of 
-    // course we will not wait for the managed thread to 
-    // exit
-    if ( this->isCurrentThread() ) {
-        if ( this->pWaitReleaseFlag ) {
-            *this->pWaitReleaseFlag = true;
+    try {
+        // if destructor is running in managed thread then of 
+        // course we will not wait for the managed thread to 
+        // exit
+        if ( this->isCurrentThread() ) {
+            if ( this->pWaitReleaseFlag ) {
+                *this->pWaitReleaseFlag = true;
+            }
+            return true;
         }
-        return true;
+        epicsTime exitWaitBegin = epicsTime::getCurrent ();
+        double exitWaitElapsed = 0.0;
+        epicsGuard < epicsMutex > guard ( this->mutex );
+        this->cancel = true;
+        while ( ! this->terminated && exitWaitElapsed < delay ) {
+            epicsGuardRelease < epicsMutex > unguard ( guard );
+            this->event.signal ();
+            this->exitEvent.wait ( delay - exitWaitElapsed );
+            epicsTime current = epicsTime::getCurrent ();
+            exitWaitElapsed = current - exitWaitBegin;
+        }
     }
-    epicsTime exitWaitBegin = epicsTime::getCurrent ();
-    double exitWaitElapsed = 0.0;
-    epicsGuard < epicsMutex > guard ( this->mutex );
-    this->cancel = true;
-    while ( ! this->terminated ) {
-        epicsGuardRelease < epicsMutex > unguard ( guard );
-        this->event.signal ();
-        this->exitEvent.wait ( delay - exitWaitElapsed );
-        epicsTime current = epicsTime::getCurrent ();
-        exitWaitElapsed = current - exitWaitBegin;
-        if ( exitWaitElapsed >= delay ) {
-            break;
-        }
+    catch ( std :: exception & except ) {
+        errlogPrintf ( 
+            "epicsThread::exitWait(): Unexpected exception "
+            " \"%s\"\n", 
+            except.what () );
+        epicsThreadSleep ( epicsMin ( delay, 5.0 ) );
+    }
+    catch ( ... ) {
+        errlogPrintf ( 
+            "Non-standard unexpected exception in "
+            "epicsThread::exitWait()\n" );
+        epicsThreadSleep ( epicsMin ( delay, 5.0 ) );
     }
     return this->terminated;
 }
@@ -271,16 +290,30 @@ void epicsThread::setOkToBlock(bool isOkToBlock) throw ()
     epicsThreadSetOkToBlock(static_cast<int>(isOkToBlock));
 }
 
-class epicsThreadPrivateBase::unableToCreateThreadPrivate : public exception {
-    const char * what () const throw ()
-    {
-        return "epicsThreadPrivate:: unable to create thread private variable";
-    }
-};
-
 void epicsThreadPrivateBase::throwUnableToCreateThreadPrivate ()
 {
     throw epicsThreadPrivateBase::unableToCreateThreadPrivate ();
+}
+
+void epicsThread :: show ( unsigned level ) const throw ()
+{
+    ::printf ( "epicsThread at %p\n", this->id );
+    if ( level > 0u ) {
+        epicsThreadShow ( this->id, level - 1 );
+        if ( level > 1u ) {
+            ::printf ( "pWaitReleaseFlag = %p\n", this->pWaitReleaseFlag );
+            ::printf ( "begin = %c, cancel = %c, terminated = %c\n",
+                this->begin ? 'T' : 'F',
+                this->cancel ? 'T' : 'F',
+                this->terminated ? 'T' : 'F' );
+            this->runable.show ( level - 2u );
+            this->mutex.show ( level - 2u );
+            ::printf ( "general purpose event\n" );
+            this->event.show ( level - 2u );
+            ::printf ( "exit event\n" );
+            this->exitEvent.show ( level - 2u );
+        }
+    }
 }
 
 extern "C" {
@@ -320,3 +353,6 @@ extern "C" {
         return id;
     }
 } // extern "C"
+
+// Ensure the main thread gets a unique ID
+epicsThreadId epicsThreadMainId = epicsThreadGetIdSelf();

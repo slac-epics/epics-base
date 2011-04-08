@@ -1,10 +1,9 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* osi/os/posix/osdEvent.c */
@@ -20,6 +19,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#define epicsExportSharedSymbols
 #include "epicsEvent.h"
 #include "cantProceed.h"
 #include "epicsTime.h"
@@ -78,7 +78,7 @@ static int condWait(pthread_cond_t *condId, pthread_mutex_t *mutexId)
     }
 }
 
-epicsEventId epicsEventCreate(epicsEventInitialState initialState)
+epicsShareFunc epicsEventId epicsShareAPI epicsEventCreate(epicsEventInitialState initialState)
 {
     epicsEventOSD *pevent;
     int           status;
@@ -92,14 +92,14 @@ epicsEventId epicsEventCreate(epicsEventInitialState initialState)
     return((epicsEventId)pevent);
 }
 
-epicsEventId epicsEventMustCreate(epicsEventInitialState initialState)
+epicsShareFunc epicsEventId epicsShareAPI epicsEventMustCreate(epicsEventInitialState initialState)
 {
     epicsEventId id = epicsEventCreate (initialState);
     assert (id);
     return id;
 }
 
-void epicsEventDestroy(epicsEventId pevent)
+epicsShareFunc void epicsShareAPI epicsEventDestroy(epicsEventId pevent)
 {
     int   status;
 
@@ -110,7 +110,7 @@ void epicsEventDestroy(epicsEventId pevent)
     free(pevent);
 }
 
-void epicsEventSignal(epicsEventId pevent)
+epicsShareFunc void epicsShareAPI epicsEventSignal(epicsEventId pevent)
 {
     int   status;
 
@@ -125,7 +125,7 @@ void epicsEventSignal(epicsEventId pevent)
     checkStatusQuit(status,"pthread_mutex_unlock","epicsEventSignal");
 }
 
-epicsEventWaitStatus epicsEventWait(epicsEventId pevent)
+epicsShareFunc epicsEventWaitStatus epicsShareAPI epicsEventWait(epicsEventId pevent)
 {
     int   status;
 
@@ -143,7 +143,7 @@ epicsEventWaitStatus epicsEventWait(epicsEventId pevent)
     return(epicsEventWaitOK);
 }
 
-epicsEventWaitStatus epicsEventWaitWithTimeout(epicsEventId pevent, double timeout)
+epicsShareFunc epicsEventWaitStatus epicsShareAPI epicsEventWaitWithTimeout(epicsEventId pevent, double timeout)
 {
     struct timespec wakeTime;
     int   status = 0;
@@ -165,11 +165,11 @@ epicsEventWaitStatus epicsEventWaitWithTimeout(epicsEventId pevent, double timeo
     return(epicsEventWaitError);
 }
 
-epicsEventWaitStatus epicsEventTryWait(epicsEventId id)
+epicsShareFunc epicsEventWaitStatus epicsShareAPI epicsEventTryWait(epicsEventId id)
 {
     return(epicsEventWaitWithTimeout(id,0.0));
 }
 
-void epicsEventShow(epicsEventId id,unsigned int level)
+epicsShareFunc void epicsShareAPI epicsEventShow(epicsEventId id,unsigned int level)
 {
 }

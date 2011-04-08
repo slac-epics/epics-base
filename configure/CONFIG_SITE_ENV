@@ -7,7 +7,7 @@
 # and higher are distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-#	CONFIG_SITE_ENV,v 1.9.2.4 2006/11/16 16:09:15 lange Exp
+#	CONFIG_SITE_ENV,v 1.9.2.6 2009/03/10 20:40:22 anj Exp
 #	Author:	Andrew Johnson
 #	Date:	1 May 1995
 #
@@ -33,18 +33,15 @@
 #	where the start and end are mmddhh - that is month,day,hour
 #	eg EPICS_TIMEZONE=CUS::360:033102:102802
 #
-#	DST for 2007  US: Mar 11 - Nov 04
-#	              EU: Mar 25 - Oct 28
+#	DST for 2009  US: Mar 08 - Nov 01
+#	              EU: Mar 29 - Oct 25
 #	(see: http://www.worldtimezone.org/daylight.html)
 #
 # EPICS_TS_NTP_INET
 #	NTP or Unix time server ip address.  Uses boot host if not set.
 
-#EPICS_TIMEZONE=EUS::300:031102:110402
-#EPICS_TIMEZONE=CUS::360:031102:110402
 EPICS_TIMEZONE=PUS::480:031102:110402
-
-#EPICS_TIMEZONE=MET::-60:032502:102802
+#EPICS_TIMEZONE=MET::-60:032902:102502
 EPICS_TS_NTP_INET=
 
 # IOC Shell:
@@ -53,7 +50,7 @@ EPICS_TS_NTP_INET=
 # IOCSH_HISTSIZE
 #	Number of lines of command history to keep.
 IOCSH_PS1="epics> "
-IOCSH_HISTSIZE=50
+IOCSH_HISTSIZE=100
 
 # Log Server:
 # EPICS_IOC_LOG_INET 

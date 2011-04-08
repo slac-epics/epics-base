@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution.
 #*************************************************************************
 #
-#  CONFIG_SITE,v 1.42.2.15 2006/12/11 17:04:54 anj Exp
+#  CONFIG_SITE,v 1.42.2.20 2009/04/24 20:01:35 anj Exp
 #
 #  CONFIG_SITE  - Global site configuration file
 #
@@ -24,21 +24,18 @@
 #	darwin-ppcx86          (Universal binaries for both CPUs)
 #	freebsd-x86            (GNU compiler used for host builds)
 #	freebsd-x86_64         (GNU compiler used for host builds)
-#	hpux-parisc            (HP compiler used for host builds)
-#	hpux-parisc-gnu        (GNU compiler used for host builds)
 #	linux-ppc              (GNU compiler used for host builds)
 #	linux-x86              (GNU compiler used for host builds)
 #	linux-x86_64           (GNU compiler used for host builds)
 #	linux-x86-borland      (Borland C++ compiler used for host builds)
-#	solaris-sparc          (sun compiler used for host builds)
+#	solaris-sparc          (Sun compiler used for host builds)
 #	solaris-sparc-gnu      (GNU compiler used for host builds)
-#	solaris-sparc64        (sun compiler used for host builds)
+#	solaris-sparc64        (Sun compiler used for host builds)
 #	solaris-sparc64-gnu    (GNU compiler used for host builds)
-#	solaris-x86            (sun compiler used for host builds)
+#	solaris-x86            (Sun compiler used for host builds)
 #	solaris-x86-gnu        (GNU compiler used for host builds)
 #	win32-x86              (MS Visual C++ compiler used for host builds)
 #	win32-x86-mingw        (MinGW compiler used for host builds)
-#	win32-x86-borland      (Borland C++ compiler used for host builds)
 #	win32-x86-cygwin       (WIN32 API with cygwin GNU compiler used for host builds)
 
 #  Debugging builds 
@@ -56,71 +53,62 @@
 #  The cross-compiler architectures to build EPICS for
 #
 #  Currently Supporting:
-#       linux-386     (linux-x86 host)
-#       linux-486     (linux-x86 host)
-#       linux-586     (linux-x86 host)
-#       linux-686     (linux-x86 host)
-#       linux-athlon  (linux-x86 host)
+#       linux-386               (linux-x86 host)
+#       linux-486               (linux-x86 host)
+#       linux-586               (linux-x86 host)
+#       linux-686               (linux-x86 host)
 #       linux-arm
+#       linux-arm_eb
+#       linux-arm_el
+#       linux-athlon            (linux-x86 host)
+#       linux-cris              (Axis GNU crosscompiler on linux-x86 host)
+#       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
+#       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
+#       linux-xscale_be
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
 #       vxWorks-ppc603
-#       vxWorks63-ppc603
 #       vxWorks-ppc603_long
-#       vxWorks63-ppc603_long
 #       vxWorks-ppc604
-#       vxWorks63-ppc604
 #       vxWorks-ppc604_long
-#       vxWorks63-ppc604_long
 #       vxWorks-ppc604_altivec
-#       vxWorks63-ppc604_altivec
 #       vxWorks-mpc8540
-#       vxWorks63-mpc8540
+#       RTEMS-at91rm9200ek
+#       RTEMS-beatnik
 #       RTEMS-gen68360
 #       RTEMS-mcp750
 #       RTEMS-mvme167
 #       RTEMS-mvme2100
+#       RTEMS-mvme3100
 #       RTEMS-mvme5500
 #       RTEMS-pc386
 #       RTEMS-psim
 #       RTEMS-uC5282
-#       RTEMS-pmc405
-
-# If EPICS_HOST_ARCH is not set, derive it
-ifndef EPICS_HOST_ARCH
-EPICS_HOST_ARCH=$(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
-export EPICS_HOST_ARCH
-endif
+#
 
 # Definitions of CROSS_COMPILER_TARGET_ARCHS in
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
 #CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks6-ppc604_long
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik linux-x86
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
+CROSS_COMPILER_TARGET_ARCHS	=	linux-x86
+CROSS_COMPILER_TARGET_ARCHS +=	RTEMS-beatnik
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
 #  uncomment the following line and specify them.
-#
-CROSS_COMPILER_HOST_ARCHS=
+#CROSS_COMPILER_HOST_ARCHS=
 
-# Default ANSI level, individual Makefiles will override
-#  if they cannot support ANSI compilation.
-#   STRICT -  ANSI C - force warning flags
-#   ANSI   -  ANSI C
-#   TRAD   -  Standard C - Not appropriate here.
-CMPLR=STRICT
-
-# Default C++ compiler ANSI level
-#   STRICT -  ANSI C++ force strict warning flags
-#   NORMAL -  ANSI C++ optional warning flags
-#   Individual Makefiles may override
-CXXCMPLR=STRICT
+###################################
+# PCDS build targets:
+#  linux-x86    host: linux-x86
+#  linux-x86_64 host: RTEMS-beatnik linux-x86 linux-x86_64
+CROSS_COMPILER_HOST_ARCHS=linux-x86_64
+BUILD_FOR_HOST_ARCH = 1
 
 #  Build shared libraries?
 #        must be either YES or NO
@@ -131,12 +119,14 @@ CXXCMPLR=STRICT
 #                   SHARED_LIBRARIES=YES and STATIC_BUILD=NO
 #                   SHARED_LIBRARIES=NO  and STATIC_BUILD=YES
 #
-SHARED_LIBRARIES=YES
+#SHARED_LIBRARIES=YES
+SHARED_LIBRARIES=NO
 
 #  Build client objects statically ?
 #        must be either YES or NO
 #
-STATIC_BUILD=NO
+#STATIC_BUILD=NO
+STATIC_BUILD=YES
 
 #  Should header dependancy files be automatically generated
 #  for each C/C++ created object file?
@@ -165,7 +155,7 @@ CROSS_WARN=YES
 #  NOTE: Set to YES only if you have existing R3.13 extensions to be
 #  built with this base
 #
-COMPAT_TOOLS_313=NO
+#COMPAT_TOOLS_313=YES
 
 #  Create and/or install files for R3.13 ioc application and extension builds?
 #  must be either YES or NO
@@ -185,10 +175,9 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-EPICS_SITE_VERSION = pcds-r$(shell svnversion $(EPICS_SITE_TOP))
+EPICS_SITE_VERSION = 0.1.0
 
-# =================================================================
-# If you would like the EPICS module to be built for 
-# the EPICS_HOST_ARCH set this variable
-# =================================================================
-BUILD_FOR_HOST_ARCH=1
+# For GNU compiler, use pipes rather than temporary files for communication 
+# between the various stages of compilation.
+GCC_PIPE = YES
+

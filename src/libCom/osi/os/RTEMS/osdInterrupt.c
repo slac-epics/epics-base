@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdInterrupt.c
- *	osdInterrupt.c,v 1.6 2002/07/12 21:34:45 jba Exp
+ *	osdInterrupt.c,v 1.6.2.2 2009/04/24 17:01:39 anj Exp
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055
@@ -65,7 +65,7 @@ void
 InterruptContextMessageDaemon (void *unused)
 {
     const char *message;
-    rtems_unsigned32 size;
+    size_t size;
     rtems_status_code sc;
 
     sc = rtems_message_queue_create (rtems_build_name ('I', 'C', 'M', 'Q'),
@@ -90,6 +90,6 @@ InterruptContextMessageDaemon (void *unused)
         if (size == sizeof message)
             syslog (LOG_ERR, "%s", message);
 	else
-            errlogPrintf ("Received %d-byte message from interrupt context", size);
+            errlogPrintf ("Received %u-byte message from interrupt context", (unsigned int)size);
     }
 }

@@ -7,7 +7,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* cvtFast.c,v 1.33 2002/12/06 14:13:35 mrk Exp*/
+/* cvtFast.c,v 1.33.2.1 2008/08/11 21:55:02 anj Exp*/
 /* Very efficient routines to convert numbers to strings
  *      Author: Bob Dalesio wrote cvtFloatToString (called FF_TO_STR)
  *			Code is same for cvtDoubleToString
@@ -30,6 +30,7 @@
 
 #define epicsExportSharedSymbols
 #include "cvtFast.h"
+#include "epicsMath.h"
 
 /*
  * This routine converts numbers less than 10,000,000. It defers to f_to_str for
@@ -49,7 +50,7 @@ int epicsShareAPI cvtFloatToString(
 	char		*startAddr;
 
 	/* can this routine handle this conversion */
-	if (precision > 8 || flt_value > 10000000.0 || flt_value < -10000000.0) {
+	if (isnan(flt_value) || precision > 8 || flt_value > 10000000.0 || flt_value < -10000000.0) {
 		sprintf(pstr_value,"%12.5e",(double)flt_value);
 		return((int)strlen(pstr_value));
 	}
@@ -123,7 +124,7 @@ int epicsShareAPI cvtDoubleToString(
 	char		*startAddr;
 
 	/* can this routine handle this conversion */
-	if (precision > 8 || flt_value > 10000000.0 || flt_value < -10000000.0) {
+	if (isnan(flt_value) || precision > 8 || flt_value > 10000000.0 || flt_value < -10000000.0) {
 		if (precision > 8 || flt_value > 1e16 || flt_value < -1e16) {
 		    if(precision>17) precision=17;
 		    sprintf(pstr_value,"%*.*e",precision+7,precision,

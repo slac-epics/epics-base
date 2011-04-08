@@ -1,13 +1,12 @@
 /*************************************************************************\
-* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+* Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* postfix.c,v 1.39.2.6 2006/11/30 22:29:26 jhill Exp
+/* postfix.c,v 1.39.2.11 2009/04/23 18:49:39 anj Exp
  *
  * Subroutines used to convert an infix expression to a postfix expression
  *
@@ -36,6 +35,7 @@ typedef enum {
 	LITERAL_OPERAND,
 	STORE_OPERATOR,
 	UNARY_OPERATOR,
+	VARARG_OPERATOR,
 	BINARY_OPERATOR,
 	SEPERATOR,
 	CLOSE_PAREN,
@@ -61,6 +61,8 @@ typedef struct expression_element{
  * NOTE: Keep these lists sorted. Elements are searched in reverse order,
  *  and where two names start with the same substring we must pick out the
  *  longest name first (hence the sort requirement).
+ * NOTE: All VARARG_OPERATORs have to be made known to the calcExprDump()
+ *  routine at the end of this file.
  */
 static const ELEMENT operands[] = {
 /* name 	prio's	stack	element type	opcode */
@@ -94,22 +96,22 @@ static const ELEMENT operands[] = {
 {"E",		0, 0,	1,	OPERAND,	FETCH_E},
 {"EXP",		7, 8,	0,	UNARY_OPERATOR,	EXP},
 {"F",		0, 0,	1,	OPERAND,	FETCH_F},
-{"FINITE",	7, 8,	0,	UNARY_OPERATOR,	FINITE},
+{"FINITE",	7, 8,	0,	VARARG_OPERATOR,FINITE},
 {"FLOOR",	7, 8,	0,	UNARY_OPERATOR,	FLOOR},
 {"G",		0, 0,	1,	OPERAND,	FETCH_G},
 {"H",		0, 0,	1,	OPERAND,	FETCH_H},
 {"I",		0, 0,	1,	OPERAND,	FETCH_I},
 {"INF",		0, 0,	1,	LITERAL_OPERAND,LITERAL},
 {"ISINF",	7, 8,	0,	UNARY_OPERATOR,	ISINF},
-{"ISNAN",	7, 8,	0,	UNARY_OPERATOR,	ISNAN},
+{"ISNAN",	7, 8,	0,	VARARG_OPERATOR,ISNAN},
 {"J",		0, 0,	1,	OPERAND,	FETCH_J},
 {"K",		0, 0,	1,	OPERAND,	FETCH_K},
 {"L",		0, 0,	1,	OPERAND,	FETCH_L},
 {"LN",		7, 8,	0,	UNARY_OPERATOR,	LOG_E},
 {"LOG",		7, 8,	0,	UNARY_OPERATOR,	LOG_10},
 {"LOGE",	7, 8,	0,	UNARY_OPERATOR,	LOG_E},
-{"MAX",		7, 8,	-1,	UNARY_OPERATOR,	MAX},
-{"MIN",		7, 8,	-1,	UNARY_OPERATOR,	MIN},
+{"MAX",		7, 8,	0,	VARARG_OPERATOR,MAX},
+{"MIN",		7, 8,	0,	VARARG_OPERATOR,MIN},
 {"NINT",	7, 8,	0,	UNARY_OPERATOR,	NINT},
 {"NAN",		0, 0,	1,	LITERAL_OPERAND,LITERAL},
 {"NOT",		7, 8,	0,	UNARY_OPERATOR,	BIT_NOT},
@@ -122,6 +124,7 @@ static const ELEMENT operands[] = {
 {"SQRT",	7, 8,	0,	UNARY_OPERATOR,	SQU_RT},
 {"TAN",		7, 8,	0,	UNARY_OPERATOR,	TAN},
 {"TANH",	7, 8,	0,	UNARY_OPERATOR,	TANH},
+{"VAL",		0, 0,	1,	OPERAND,	FETCH_VAL},
 {"~",		7, 8,	0,	UNARY_OPERATOR, BIT_NOT},
 };
 
@@ -171,7 +174,7 @@ static int
 
     *ppel = NULL;
 
-    while (isspace(**ppsrc)) ++*ppsrc;
+    while (isspace((int) (unsigned char) **ppsrc)) ++*ppsrc;
     if (**ppsrc == '\0') return FALSE;
 
     if (opnd) {
@@ -183,7 +186,8 @@ static int
     }
 
     while (pel >= ptable) {
-	int len = strlen(pel->name);
+	size_t len = strlen(pel->name);
+
 	if (epicsStrnCaseCmp(*ppsrc, pel->name, len) == 0) {
 	    *ppel = pel;
 	    *ppsrc += len;
@@ -263,10 +267,14 @@ epicsShareFunc long
 	    break;
 
 	case UNARY_OPERATOR:
+	case VARARG_OPERATOR:
 	    /* Move operators of >= priority to the output */
 	    while ((pstacktop > stack) &&
 		   (pstacktop->in_stack_pri >= pel->in_coming_pri)) {
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
@@ -281,6 +289,9 @@ epicsShareFunc long
 	    while ((pstacktop > stack) &&
 		   (pstacktop->in_stack_pri >= pel->in_coming_pri)) {
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
@@ -300,10 +311,14 @@ epicsShareFunc long
 		    goto bad;
 		}
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
 	    operand_needed = TRUE;
+	    pstacktop->runtime_effect -= 1;
 	    break;
 
 	case CLOSE_PAREN:
@@ -314,10 +329,24 @@ epicsShareFunc long
 		    goto bad;
 		}
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
 	    pstacktop--;	/* remove ( from stack */
+	    /* if there is a vararg operator before the opening paren,
+	       it inherits the (opening) paren's stack effect */
+	    if ((pstacktop > stack) &&
+		pstacktop->type == VARARG_OPERATOR) {
+		pstacktop->runtime_effect = (pstacktop+1)->runtime_effect;
+		/* check for no arguments */
+		if (pstacktop->runtime_effect > 0) {
+		    *perror = CALC_ERR_INCOMPLETE;
+		    goto bad;
+		}
+	    }
 	    break;
 
 	case CONDITIONAL:
@@ -325,6 +354,9 @@ epicsShareFunc long
 	    while ((pstacktop > stack) &&
 		   (pstacktop->in_stack_pri > pel->in_coming_pri)) {
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
@@ -358,6 +390,9 @@ epicsShareFunc long
 		    goto bad;
 		}
 		*pout++ = pstacktop->code;
+		if (pstacktop->type == VARARG_OPERATOR) {
+		    *pout++ = 1 - pstacktop->runtime_effect;
+		}
 		runtime_depth += pstacktop->runtime_effect;
 		pstacktop--;
 	    }
@@ -401,6 +436,9 @@ epicsShareFunc long
 	    goto bad;
 	}
 	*pout++ = pstacktop->code;
+	if (pstacktop->type == VARARG_OPERATOR) {
+	    *pout++ = 1 - pstacktop->runtime_effect;
+	}
 	runtime_depth += pstacktop->runtime_effect;
 	pstacktop--;
     }
@@ -462,7 +500,7 @@ epicsShareFunc void
     static const char *opcodes[] = {
 	"End Expression",
     /* Operands */
-	"LITERAL",
+	"LITERAL", "VAL",
 	"FETCH_A", "FETCH_B", "FETCH_C", "FETCH_D", "FETCH_E", "FETCH_F",
 	"FETCH_G", "FETCH_H", "FETCH_I", "FETCH_J", "FETCH_K", "FETCH_L",
     /* Assignment */
@@ -533,13 +571,23 @@ epicsShareFunc void
 	"NOT_GENERATED"
     };
     char op;
+    double lit;
+    
     while ((op = *pinst) != END_EXPRESSION) {
-	if (op == LITERAL) {
-	    double lit;
+	switch (op) {
+	case LITERAL:
 	    memcpy((void *)&lit, ++pinst, sizeof(double));
 	    printf("\tLiteral: %g\n", lit);
 	    pinst += sizeof(double);
-	} else {
+	    break;
+	case MIN:
+	case MAX:
+	case FINITE:
+	case ISNAN:
+	    printf("\t%s, %d arg(s)\n", opcodes[(int) op], *++pinst);
+	    pinst++;
+	    break;
+	default:
 	    printf("\t%s\n", opcodes[(int) op]);
 	    pinst++;
 	}

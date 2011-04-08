@@ -144,31 +144,35 @@ MAIN(epicsEventTest)
     epicsEventId event;
     int status;
 
-    testPlan(10);
+    testPlan(11);
 
     event = epicsEventMustCreate(epicsEventEmpty);
 
-    status = epicsEventWaitWithTimeout(event, 2.0);
+    status = epicsEventWaitWithTimeout(event, 0.0);
     testOk(status == epicsEventWaitTimeout,
-        "epicsEventWaitWithTimeout(event, 2.0) = %d", status);
+        "epicsEventWaitWithTimeout(event, 0.0) = %d", status);
+
+    status = epicsEventWaitWithTimeout(event, 1.0);
+    testOk(status == epicsEventWaitTimeout,
+        "epicsEventWaitWithTimeout(event, 1.0) = %d", status);
 
     status = epicsEventTryWait(event);
     testOk(status == epicsEventWaitTimeout,
         "epicsEventTryWait(event) = %d", status);
 
     epicsEventSignal(event);
-    status = epicsEventWaitWithTimeout(event,2.0);
-    testOk(status == 0,
-        "epicsEventWaitWithTimeout(event, 2.0) = %d", status);
+    status = epicsEventWaitWithTimeout(event, 1.0);
+    testOk(status == epicsEventWaitOK,
+        "epicsEventWaitWithTimeout(event, 1.0) = %d", status);
 
     epicsEventSignal(event);
     status = epicsEventWaitWithTimeout(event,DBL_MAX);
-    testOk(status == 0,
+    testOk(status == epicsEventWaitOK,
         "epicsEventWaitWithTimeout(event, DBL_MAX) = %d", status);
 
     epicsEventSignal(event);
     status = epicsEventTryWait(event);
-    testOk(status == 0,
+    testOk(status == epicsEventWaitOK,
         "epicsEventTryWait(event) = %d", status);
 
     info *pinfo = (info *)calloc(1,sizeof(info));
@@ -181,7 +185,7 @@ MAIN(epicsEventTest)
     id = (epicsThreadId *)calloc(nthreads, sizeof(epicsThreadId));
     name = (char **)calloc(nthreads, sizeof(char *));
     for(int i = 0; i < nthreads; i++) {
-        name[i] = (char *)calloc(10, sizeof(char));
+        name[i] = (char *)calloc(16, sizeof(char));
         sprintf(name[i],"producer %d",i);
         id[i] = epicsThreadCreate(name[i], 40, stackSize, producer, pinfo);
         epicsThreadSleep(0.1);

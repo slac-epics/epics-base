@@ -37,6 +37,7 @@ LIBSRCS += devSASoft.c
 LIBSRCS += devSiSoft.c
 LIBSRCS += devSoSoft.c
 LIBSRCS += devWfSoft.c
+LIBSRCS += devGeneralTime.c
 
 LIBSRCS += devAoSoftCallback.c
 LIBSRCS += devBoSoftCallback.c
@@ -46,11 +47,12 @@ LIBSRCS += devMbboSoftCallback.c
 LIBSRCS += devMbboDirectSoftCallback.c
 LIBSRCS += devSoSoftCallback.c
 
-LIBSRCS += devTimestampSI.c
+LIBSRCS += devTimestamp.c
+LIBSRCS += devSoStdio.c
 
 LIBRARY_IOC += softDevIoc
-softDevIoc_LIBS += recIoc asIoc dbIoc registryIoc dbStaticIoc ca Com
-softDevIoc_RCS_WIN32 = softDevIoc.rc
+softDevIoc_LIBS += miscIoc recIoc asIoc dbIoc registryIoc dbStaticIoc ca Com
+softDevIoc_RCS = softDevIoc.rc
 
 # For R3.13 compatability
 ifeq ($(strip $(COMPAT_313)),YES)

@@ -11,7 +11,7 @@
  * Author: Jim Kowalkowski
  * Date: 2/96
  *
- * aitGen.c,v 1.16.2.1 2004/08/12 16:51:03 jhill Exp
+ * aitGen.c,v 1.16.2.3 2009/04/03 17:46:23 lange Exp
  *
  */
 
@@ -51,7 +51,6 @@ void MakeStringFuncTo(int i,int j,int k);
 void MakeFStringFuncFrom(int i,int j,int k);
 void MakeFStringFuncTo(int i,int j,int k);
 
-#define FILE_NAME "aitConvertGenerated.cc"
 #define pr fprintf
 
 #define AIT_TO_NET		0
@@ -77,7 +76,7 @@ static FILE *dfd;
 /*
  * maximum, minimum value for each ait type - joh
  */
-void initMinMaxAIT ()
+void initMinMaxAIT (void)
 {
     unsigned i;
 
@@ -116,9 +115,15 @@ int main(int argc,char* argv[])
 
     initMinMaxAIT ();
 
-	if((dfd=fopen(FILE_NAME,"w"))==NULL)
+	if(argc<2)
 	{
-		pr(stderr,"file %s failed to open\n",FILE_NAME);
+		fprintf(stderr,"You must enter a file name on command line\n");
+		return -1;
+	}
+
+	if((dfd=fopen(argv[1],"w"))==NULL)
+	{
+		pr(stderr,"file %s failed to open\n",argv[1]);
 		return -1;
 	}
 
