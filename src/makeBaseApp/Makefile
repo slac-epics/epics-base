@@ -104,6 +104,7 @@ TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
 ## Additional RULES
 ## ================================================
 TEMPLATES += top/configure/RULES.archive
+TEMPLATES += top/configure/RULES.autosave
 TEMPLATES += top/configure/RULES.copy
 
 ######################################################################
@@ -251,15 +252,22 @@ TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.substitutions
 TEMPLATES += top/pcdsMotorApp/Makefile
 
 TEMPLATES += top/pcdsMotorApp/Db/Makefile
-TEMPLATES += top/pcdsMotorApp/Db/archive__APPNAME_.substitutions
-TEMPLATES += top/pcdsMotorApp/Db/autosave__APPNAME_.substitutions
+TEMPLATES += top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
+TEMPLATES += top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
 TEMPLATES += top/pcdsMotorApp/Db/iocAdmin.substitutions
-TEMPLATES += top/pcdsMotorApp/Db/motors.substitutions
 
+TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
+TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/motor.edl
+TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl
+TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl
+
+TEMPLATES += top/pcdsMotorApp/configure/CONFIG_SITE
 TEMPLATES += top/pcdsMotorApp/configure/RELEASE
 
 TEMPLATES += top/pcdsMotorApp/src/Makefile
 TEMPLATES += top/pcdsMotorApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsMotorApp/srcProtocol/Makefile
 
 TEMPLATES += top/pcdsMotorBoot/Makefile
 TEMPLATES += top/pcdsMotorBoot/nfsCommands@RTEMS
@@ -267,7 +275,10 @@ TEMPLATES += top/pcdsMotorBoot/nfsCommands@RTEMS
 TEMPLATES += top/pcdsMotorBoot/ioc/Makefile@Common
 TEMPLATES += top/pcdsMotorBoot/ioc/README@Common
 TEMPLATES += top/pcdsMotorBoot/ioc/README@RTEMS
-TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.substitutions
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_-motors.sub-db
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.sub-req
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
 TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@Common*
 TEMPLATES += top/pcdsMotorBoot/ioc/st.cmd@RTEMS*
 TEMPLATES += top/pcdsMotorBoot/ioc/startup.cmd@Common*

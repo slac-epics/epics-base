@@ -14,7 +14,7 @@ $RUNUSER "mkdir -p $IOC_DATA/$IOC/iocInfo"
 $RUNUSER "chmod ug+w -R $IOC_DATA/$IOC"
 
 # For release
-#cd $EPICS_SITE_TOP/ioc/_APPNAME_/R0.1.0/iocBoot/_IOC_
+#cd $EPICS_SITE_TOP/ioc/xxx/_APPNAME_/R0.1.0/iocBoot/_IOC_
 
 # Copy the archive file to iocData
 $RUNUSER "cp ../../archive/$IOC.archive $IOC_DATA/$IOC/archive"

@@ -22,8 +22,9 @@ _APPNAME__DBD += generalTimeNonVx.dbd
 _APPNAME__DBD += drvAsynSerialPort.dbd
 _APPNAME__DBD += drvAsynIPPort.dbd
 _APPNAME__DBD += motorSupport.dbd
-_APPNAME__DBD += devSoftMotor.dbd
 _APPNAME__DBD += devImsMotor.dbd
+_APPNAME__DBD += devSoftMotor.dbd
+_APPNAME__DBD += stream.dbd
 
 # <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
 _APPNAME__SRCS += _APPNAME__registerRecordDeviceDriver.cpp
@@ -36,6 +37,7 @@ _APPNAME__LIBS += devIocStats
 _APPNAME__LIBS += autosave
 _APPNAME__LIBS += generalTime
 _APPNAME__LIBS += asyn
+_APPNAME__LIBS += stream
 _APPNAME__LIBS += motor
 _APPNAME__LIBS += softMotor
 _APPNAME__LIBS += Ims
