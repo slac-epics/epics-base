@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdSock.h
- *	osdSock.h,v 1.14.2.3 2005/11/14 17:05:27 jhill Exp
+ *	Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055
@@ -61,7 +61,7 @@ typedef socklen_t osiSocklen_t;
 #define SOCK_EINTR EINTR
 #define SOCK_EPIPE EPIPE
 #define SOCK_EMFILE EMFILE
-#define SOCK_SHUTDOWN ESHUTDOWN
+#define SOCK_SHUTDOWN EPIPE
 #define SOCK_ENOTSOCK ENOTSOCK
 #define SOCK_EBADF EBADF
 

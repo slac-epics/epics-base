@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /*
- * osdSock.h,v 1.6.2.2 2005/06/28 20:33:41 norume Exp
+ * Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
  *
  * Author: Eric Norum
  */

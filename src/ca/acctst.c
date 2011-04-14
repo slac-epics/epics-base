@@ -830,9 +830,9 @@ void verifyBlockInPendIO ( chid chan, unsigned interestLevel  )
         if ( status == ECA_NORMAL ) {
             if ( resp != req ) {
                 printf (
-    "get block test failed - val written %d\n", req );
+    "short tmo get block test failed - val written %d\n", req );
                 printf (
-    "get block test failed - val read %d\n", resp );
+    "short tmo tmo get block test failed - val read %d\n", resp );
                 verify ( 0 );
             }
         }
@@ -847,9 +847,9 @@ void verifyBlockInPendIO ( chid chan, unsigned interestLevel  )
         SEVCHK ( ca_pend_io (timeoutToPendIO) , NULL );
         if ( resp != req ) {
             printf (
-    "get block test failed - val written %d\n", req);
+    "long tmo get block test failed - val written %d\n", req);
             printf (
-    "get block test failed - val read %d\n", resp);
+    "long tmo get block test failed - val read %d\n", resp);
             verify (0);
         }
         showProgressEnd ( interestLevel );
@@ -2218,14 +2218,14 @@ void monitorAddConnectionCallbackTest ( const char *pName, unsigned interestLeve
     while ( eventCount < 2 ) {
         ca_pend_event ( 0.1 );
     }
-    verify ( eventCount == 2u );
+    verify ( eventCount >= 2u );
     
     status = ca_get_callback ( DBR_DOUBLE, chan, nUpdatesTester, &getCallbackCount );
     SEVCHK ( status, "monitorAddConnectionCallback get callback" );
     while ( getCallbackCount == 0 ) {
         ca_pend_event ( 0.1 );
     }
-    verify ( eventCount == 2u );
+    verify ( eventCount >= 2u );
     verify ( getCallbackCount == 1u );
 
     status = ca_clear_channel ( chan );

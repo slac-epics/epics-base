@@ -13,6 +13,8 @@
 #        - consistent line editor functionality with CEXP
 COMMANDLINE_LIBRARY = LIBTECLA
 #COMMANDLINE_LIBRARY = EPICS
+RTEMS_VERSION=4.9.2
+RTEMS_BASE=/usr/local/rtems/rtems-$(RTEMS_VERSION)
 
 
 # Where to find RTEMS and specify version as well:

@@ -8,7 +8,7 @@
 \*************************************************************************/
 //
 // casStreamOS.cc
-// casStreamOS.cc,v 1.38.2.7 2009/08/13 23:55:03 jhill Exp
+// Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
 //
 // TO DO:
 // o armRecv() and armSend() should return bad status when

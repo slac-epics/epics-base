@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 //
-// epicsThread.cpp,v 1.16.2.31 2009/08/24 17:08:41 jhill Exp
+// Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
 //
 // Author: Jeff Hill
 //
