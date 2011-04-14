@@ -1,16 +1,2 @@
 #RULES.ioc
-include $(CONFIG)/RULES.ioc
-
-# Inflate the IOC archive file, if any
-$(INSTALL_ARCHIVE)/%.archive: %.substitutions
-	@echo "Inflating archive file from $<"
-	@$(RM) $@
-	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-	$(MV) msi.tmp $@
-
-$(INSTALL_ARCHIVE)/%.archive: %.sub-arch
-	@echo "Inflating archive file from $<"
-	@$(RM) $@
-	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-	$(MV) msi.tmp $@
-
+include $(EPICS_BASE)/configure/RULES.ioc
