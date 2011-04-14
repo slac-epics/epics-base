@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- *  epicsSingleton.h,v 1.15.2.10 2009/02/23 21:40:52 jhill Exp
+ *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
  *
  *  Author: Jeffrey O. Hill
  *

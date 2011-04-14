@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS network configuration for EPICS
- *  rtems_netconfig.c,v 1.6.2.7 2004/11/30 19:40:48 norume Exp
+ *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
  *      Author: W. Eric Norum
  *              eric.norum@usask.ca
  *              (306) 966-5394

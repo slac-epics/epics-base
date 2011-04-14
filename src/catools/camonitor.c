@@ -70,7 +70,10 @@ void usage (void)
     "  -e <nr>: Use %%e format, with a precision of <nr> digits\n"
     "  -f <nr>: Use %%f format, with a precision of <nr> digits\n"
     "  -g <nr>: Use %%g format, with a precision of <nr> digits\n"
-    "  -s:      Get value as string (may honour server-side precision)\n"
+    "  -s:      Get value as string (honors server-side precision)\n"
+    "  -lx:     Round to long integer and print as hex number\n"
+    "  -lo:     Round to long integer and print as octal number\n"
+    "  -lb:     Round to long integer and print as binary number\n"
     "Integer number format:\n"
     "  Default: Print as decimal number\n"
     "  -0x: Print as hex number\n"
@@ -104,6 +107,7 @@ static void event_handler (evargs args)
     if (args.status == ECA_NORMAL)
     {
         pv->dbrType = args.type;
+        pv->nElems = args.count;
         memcpy(pv->value, args.dbr, dbr_size_n(args.type, args.count));
 
         print_time_val_sts(pv, reqElems);
@@ -147,11 +151,9 @@ static void connection_handler ( struct connection_handler_args args )
             ppv->dbrType = DBR_TIME_STRING;
         }
                                 /* Adjust array count */
-        if (reqElems == 0 || ppv->nElems < reqElems){
-            ppv->reqElems = ppv->nElems; /* Use full number of points */
-        } else {
-            ppv->reqElems = reqElems; /* Limit to specified number */
-        }
+        if (reqElems > ppv->nElems)
+            reqElems = ppv->nElems;
+        ppv->reqElems = reqElems;
 
         ppv->onceConnected = 1;
         nConn++;
@@ -160,7 +162,7 @@ static void connection_handler ( struct connection_handler_args args )
         /* install monitor once with first connect */
         if ( ! ppv->value ) {
                                     /* Allocate value structure */
-            ppv->value = calloc(1, dbr_size_n(ppv->dbrType, ppv->reqElems));
+            ppv->value = calloc(1, dbr_size_n(ppv->dbrType, ppv->nElems));
             if ( ppv->value ) {
                 ppv->status = ca_create_subscription(ppv->dbrType,
                                                 ppv->reqElems,
@@ -204,6 +206,7 @@ int main (int argc, char *argv[])
     int returncode = 0;
     int n = 0;
     int result;                 /* CA result */
+    IntFormatT outType;         /* Output type */
 
     int opt;                    /* getopt() current option */
     int digits = 0;             /* getopt() no. of float digits */
@@ -213,7 +216,7 @@ int main (int argc, char *argv[])
 
     setvbuf(stdout,NULL,_IOLBF,BUFSIZ);   /* Set stdout to line buffering */
 
-    while ((opt = getopt(argc, argv, ":nhm:sSe:f:g:#:d:0:w:t:p:F:")) != -1) {
+    while ((opt = getopt(argc, argv, ":nhm:sSe:f:g:l:#:0:w:t:p:F:")) != -1) {
         switch (opt) {
         case 'h':               /* Print usage */
             usage();
@@ -307,14 +310,20 @@ int main (int argc, char *argv[])
                             "out of range - ignored.\n", digits, opt);
             }
             break;
+        case 'l':               /* Convert to long and use integer format */
         case '0':               /* Select integer format */
             switch ((char) *optarg) {
-            case 'x': outType = hex; break;    /* 0x print Hex */
-            case 'b': outType = bin; break;    /* 0b print Binary */
-            case 'o': outType = oct; break;    /* 0o print Octal */
+            case 'x': outType = hex; break;    /* x print Hex */
+            case 'b': outType = bin; break;    /* b print Binary */
+            case 'o': outType = oct; break;    /* o print Octal */
             default :
+                outType = dec;
                 fprintf(stderr, "Invalid argument '%s' "
-                        "for option '-0' - ignored.\n", optarg);
+                        "for option '-%c' - ignored.\n", optarg, opt);
+            }
+            if (outType != dec) {
+              if (opt == '0') outTypeI = outType;
+              else            outTypeF = outType;
             }
             break;
         case 'F':               /* Store this for output and tool_lib formatting */

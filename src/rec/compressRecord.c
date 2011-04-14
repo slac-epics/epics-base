@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* compressRecord.c,v 1.19.2.3 2009/04/02 21:40:37 lange Exp */
+/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
 /*
  *      Original Author: Bob Dalesio
  *      Date:            7-14-89 
@@ -80,10 +80,14 @@ epicsExportAddress(rset,compressRSET);
 static void reset(compressRecord *prec)
 {
     prec->nuse = 0;
-    prec->off= 0;
+    prec->off = 0;
     prec->inx = 0;
     prec->cvb = 0.0;
     prec->res = 0;
+    /* allocate memory for the summing buffer for conversions requiring it */
+    if (prec->alg == compressALG_Average && prec->sptr == 0){
+        prec->sptr = (double *)calloc(prec->nsam,sizeof(double));
+    }
 }
 
 static void monitor(compressRecord *prec)
@@ -292,10 +296,6 @@ static long init_record(compressRecord *prec, int pass)
     if (pass==0){
 	if(prec->nsam<1) prec->nsam = 1;
 	prec->bptr = (double *)calloc(prec->nsam,sizeof(double));
-	/* allocate memory for the summing buffer for conversions requiring it */
-	if (prec->alg == compressALG_Average){
-                prec->sptr = (double *)calloc(prec->nsam,sizeof(double));
-	}
         reset(prec);
     }
     return(0);

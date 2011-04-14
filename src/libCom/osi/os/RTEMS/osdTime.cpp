@@ -6,7 +6,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- * osdTime.cpp,v 1.6.2.13 2008/10/11 16:40:46 norume Exp
+ * Revision-Id: ralph.lange@bessy.de-20101020143551-76qdww31y8v01l24
  *
  * Author: W. Eric Norum
  */
@@ -14,6 +14,7 @@
 #include <epicsStdio.h>
 #include <rtems.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -54,7 +55,7 @@ void osdNTPInit(void)
     }
     memset (&myAddr, 0, sizeof myAddr);
     myAddr.sin_family = AF_INET;
-    myAddr.sin_port = htons (123);
+    myAddr.sin_port = htons (0);
     myAddr.sin_addr.s_addr = htonl (INADDR_ANY);
     if (bind (ntpSocket, (struct sockaddr *)&myAddr, sizeof myAddr) < 0) {
         printf("osdNTPInit() Can't bind socket: %s\n", strerror (errno));
