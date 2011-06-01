@@ -47,8 +47,7 @@ override EXE = .obj
 
 
 #OP_SYS_LDLIBS = -lrtemsCom
-# To strip debugging symbols add
-#OP_SYS_LDFLAGS = -Wl,-S
+OP_SYS_LDFLAGS = -Wl,-S
 
 LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
 LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
@@ -59,11 +58,11 @@ LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
 # SSRLAPPS package. 
 # ===========================================================================================
 # Top location (for specific CPU and BSP):
-SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
+##SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
 
 # If anything, apps need the headers
 
-OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
+##OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
 
 # Very unlikely that they need a library from there, too
 # since things are usually contained in modules that are
@@ -74,5 +73,5 @@ OP_SYS_INCLUDES += -I$(SSRLAPPS)/include
 # their Makefile should say:
 #
 # foo_DIR=$(SSRLAPPS_LIB)
-SSRLAPPS_LIB=$(SSRLAPPS)/lib
+##SSRLAPPS_LIB=$(SSRLAPPS)/lib
 
