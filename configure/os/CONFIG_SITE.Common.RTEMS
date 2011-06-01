@@ -47,6 +47,32 @@ override EXE = .obj
 
 
 #OP_SYS_LDLIBS = -lrtemsCom
-OP_SYS_LDFLAGS = -Wl,-S
+# To strip debugging symbols add
+#OP_SYS_LDFLAGS = -Wl,-S
+
 LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
 LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
+
+ 
+# ===========================================================================================
+#
+# SSRLAPPS package. 
+# ===========================================================================================
+# Top location (for specific CPU and BSP):
+SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
+
+# If anything, apps need the headers
+
+OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
+
+# Very unlikely that they need a library from there, too
+# since things are usually contained in modules that are
+# run-time loaded prior to EPICS.
+
+#
+# If any application really needs a library 'foo' then
+# their Makefile should say:
+#
+# foo_DIR=$(SSRLAPPS_LIB)
+SSRLAPPS_LIB=$(SSRLAPPS)/lib
+

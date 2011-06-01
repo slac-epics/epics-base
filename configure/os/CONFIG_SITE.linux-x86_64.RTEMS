@@ -1,0 +1,19 @@
+
+#
+# Site-specific information for all RTEMS targets
+#
+#-------------------------------------------------------
+
+# CEXP run-time loading
+override EXE=.obj
+OP_SYS_LDFLAGS = $(CPU_CFLAGS) -Wl,-r -nostdlib
+
+# To strip debugging symbols add
+#OP_SYS_LDFLAGS += -Wl,-S
+
+#Don't bother to build munched binaries
+MUNCH_CMD=
+MUNCHNAME=
+ 
+#
+OP_SYS_LDLIBS=
