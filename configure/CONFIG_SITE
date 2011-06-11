@@ -78,7 +78,6 @@
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
-#       vxWorks-pentium4
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
@@ -95,7 +94,6 @@
 #       RTEMS-mvme3100
 #       RTEMS-mvme5500
 #       RTEMS-pc386
-#       RTEMS-pc586
 #       RTEMS-psim
 #       RTEMS-uC5282
 #
@@ -104,10 +102,10 @@
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
-#CROSS_COMPILER_TARGET_ARCHS=RTEMS-pc586
+#CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-CROSS_COMPILER_TARGET_ARCHS=
 CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec
+#CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
 
 
 #  If only a subset of the host architectures perform
@@ -188,4 +186,5 @@ GCC_PIPE = NO
 #  Include RPATH when linking executables and libraries.
 #       must be either YES or NO
 LINKER_USE_RPATH=YES
+#LINKER_USE_RPATH=NO
 
