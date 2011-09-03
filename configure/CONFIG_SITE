@@ -98,14 +98,23 @@
 #       RTEMS-uC5282
 #
 
+# SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
+ifndef EPICS_HOST_ARCH
+EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
+export EPICS_HOST_ARCH
+endif
+
 # Definitions of CROSS_COMPILER_TARGET_ARCHS in
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
-#CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-CROSS_COMPILER_TARGET_ARCHS	=	linux-x86
-CROSS_COMPILER_TARGET_ARCHS +=	RTEMS-beatnik
+CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS	+= vxWorks-68040
+CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
+# Don't make linux-x86 be a cross compile if it's the host
+ifneq '$(EPICS_HOST_ARCH)' 'linux-x86'
+CROSS_COMPILER_TARGET_ARCHS		+=  linux-x86
+endif
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
@@ -116,8 +125,8 @@ CROSS_COMPILER_TARGET_ARCHS +=	RTEMS-beatnik
 # PCDS build targets:
 #  linux-x86    host: linux-x86
 #  linux-x86_64 host: RTEMS-beatnik linux-x86 linux-x86_64
-CROSS_COMPILER_HOST_ARCHS=linux-x86_64
-BUILD_FOR_HOST_ARCH = 1
+CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64
+BUILD_FOR_HOST_ARCH				=	1
 
 #  Build shared libraries?
 #        must be either YES or NO
