@@ -17,7 +17,9 @@ $(ARCH): buildInstall
 ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
 buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
 
-clean$(DIVIDER)$(ARCH) clean:
+clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
+
+ioc-targets_clean:
 	$(RM) cdCommands envPaths dllPath.bat
 
 else 

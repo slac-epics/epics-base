@@ -60,7 +60,9 @@ include $(TOP)/configure/RULES
 # Extra rule since dbLexRoutines.c is included in dbYacc.c
 dbYacc.c: dbLex.c ../dbLexRoutines.c
 
-clean::
+clean: dbStatic_clean
+
+dbStatic_clean:
 	@$(RM) dbLex.c dbYacc.c 
 
 #	EOF Makefile.Host for base/src/dbStatic

@@ -89,6 +89,8 @@ cas_RCS = cas.rc
 
 include $(TOP)/configure/RULES
 
-clean::
+clean: cas_build_clean
+
+cas_build_clean:
 	@$(RM) Templates.DB
 
