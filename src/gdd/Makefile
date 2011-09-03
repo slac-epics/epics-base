@@ -90,7 +90,9 @@ $(COMMON_DIR)/aitConvertGenerated.cc: $(TOOLS)/aitGen$(HOSTEXE)
 $(COMMON_DIR)/gddApps.h : $(TOOLS)/genApps$(HOSTEXE)
 	$(TOOLS)/genApps$(HOSTEXE) $@
 
-clean::
+clean: gdd_clean
+
+gdd_clean:
 	@$(RM) $(COMMON_DIR)/aitConvertGenerated.cc
 
 #	EOF base/src/gdd/Makefile

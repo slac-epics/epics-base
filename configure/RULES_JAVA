@@ -103,7 +103,9 @@ build:  $(COMMON_TESTCLASSES)
 buildInstall : $(INSTALL_JAR) $(INSTALL_JAVADOC)
 
 #This clean works only from O.* dirs.
-clean:: 
+clean: java_clean
+
+java_clean:
 	@$(RMDIR) $(INSTALL_CLASSES) $(PACKAGEDIRS)
 	@$(RM) $(INSTALL_JAR) $(INSTALL_JAVADOC)
 	@$(RM) $(COMMON_TESTCLASSES) $(COMMON_JAVAINC)

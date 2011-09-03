@@ -64,7 +64,7 @@ $(INSTALL_FILES): $(COPY_FILES)
 	@echo "RULES.copy: Installing $(?F) -> $(INSTALL_DIR)"
 	@$(INSTALL) -d -m 644 $? $(INSTALL_DIR)
 
-clean::
+clean:
 	@echo RULES.copy: Cleaning $(INSTALL_DIR)
 	rm -rf $(INSTALL_DIR)
 
@@ -91,7 +91,7 @@ $(INSTALL_FILES): $(COPY_FILES)
 	@echo "RULES.copy: Installing $(?F) -> $(INSTALL_DIR)"
 	@$(INSTALL) -d -m 644 $? $(INSTALL_DIR)
 
-clean::
+clean:
 	@echo RULES.copy: Cleaning $(INSTALL_DIR)
 	rm -rf $(INSTALL_DIR)
 

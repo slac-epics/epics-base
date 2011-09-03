@@ -76,19 +76,22 @@ O.Common:
 #
 # special clean rule
 #
-clean ::
+clean : archs_common_clean
+
+archs_common_clean:
 	$(RMDIR) $(addprefix O.,$(BUILD_ARCHS)) O.Common
 
-archclean ::
+archclean :
 	$(RMDIR) $(addprefix O.,$(BUILD_ARCHS))
 
-$(cleanArchTargets) ::
+$(cleanArchTargets) :
 	$(RMDIR) O.$(archPart)
 
-realclean ::
+realclean :
 	$(RMDIR) O.*
 
 .PHONY : $(actionArchTargets)
 .PHONY : $(cleanArchTargets)
 .PHONY : $(BUILD_ARCHS) rebuild
 .PHONY : $(ACTIONS) clean realclean archclean all
+

@@ -33,7 +33,9 @@ include $(TOP)/configure/RULES
 pcaDirServ: $(PRODUCT_OBJS) $(PROD_RESS) $(PROD_DEPLIBS)
 	$(PURIFY_$(OS_CLASS)) $(LINK.cpp)
 
-clean::
+clean: directoryService_clean
+
+directoryService_clean:
 	@$(RM) caDirServ
 	@$(RM) pcaDirServ
 	@$(RM) Templates.DB

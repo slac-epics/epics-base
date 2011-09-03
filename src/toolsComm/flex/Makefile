@@ -38,7 +38,9 @@ PROD_LIBS = Com
 
 include $(TOP)/configure/RULES
 
-clean::
+clean: flex_clean
+
+flex_clean:
 	$(RM) parse.c parse.h
 
 #	EOF Makefile.Host for base/src/toolsComm/flex

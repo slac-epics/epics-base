@@ -39,6 +39,8 @@ include $(TOP)/configure/RULES
 #
 dbLoadTemplate.c: dbLoadTemplate_lex.c ../dbLoadTemplate.h
 
-clean::
+clean: dbtools_clean
+
+dbtools_clean:
 	@$(RM) dbLoadTemplate_lex.c dbLoadTemplate.c 
 

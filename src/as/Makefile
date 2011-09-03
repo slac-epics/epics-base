@@ -46,6 +46,8 @@ include $(TOP)/configure/RULES
 # Extra rule since asLib_lex.c is included by asLib.c
 asLib$(OBJ): asLib_lex.c
 
-clean::
+clean: as_clean
+
+as_clean:
 	@$(RM) asLib.c asLib_lex.c
 

@@ -59,6 +59,8 @@ ifdef T_A
 	$(RM) $@
 	podchecker $< && pod2html --infile=$< --outfile=$@
 
-  clean::
+  clean: cap5_clean
+
+  cap5_clean:
 	$(RM) Cap5.c
 endif
