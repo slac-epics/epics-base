@@ -2,7 +2,7 @@
 # RULES for building and installing archive files
 
 # Display how this makefile was called
-$(info RULES.archive: '$(MAKECMDGOALS)')
+#$(info RULES.archive: '$(MAKECMDGOALS)')
 
 ####################################################
 # Where to find and install files for archive
@@ -13,14 +13,14 @@ vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMO
 vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 
-# INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
+INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
 
 ####################################################
 # archive Flags (-I path)
 
 INSTALL_ARCHIVEFLAGS = -I $(INSTALL_ARCHIVE)
 RELEASE_ARCHIVEFLAGS = $(patsubst %/dbd,%/archive, $(RELEASE_DBDFLAGS))
-ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) -I. $(GENERIC_SRC_INCLUDES) $(INSTALL_ARCHIVEFLAGS) $(RELEASE_ARCHIVEFLAGS)
+ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) -I. -I.. $(GENERIC_SRC_INCLUDES) $(INSTALL_ARCHIVEFLAGS) $(RELEASE_ARCHIVEFLAGS)
 ARCHIVEFLAGS += -I$(COMMON_DIR)
 
 ####################################################
@@ -34,9 +34,11 @@ rebuild:        clean install
 
 buildInstall:	$(INSTALL_ARCHIVES)
 
-realclean:: clean
+realclean: clean
 
-clean::
+clean: archive_clean
+
+archive_clean:
 	@$(RM) $(COMMONS)
 	@$(RM) $(TARGETS)
 	@echo "Cleaning"
@@ -87,4 +89,8 @@ $(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 #.PRECIOUS: $(COMMON_DIR)/%.template
+
+printme:
+	@echo ARCHIVEFLAGS=:$(ARCHIVEFLAGS):
+	@echo INSTALL_ARCHIVES=:$(INSTALL_ARCHIVES):
 

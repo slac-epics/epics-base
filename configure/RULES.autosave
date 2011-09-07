@@ -2,7 +2,7 @@
 # RULES for building and installing autosave files
 
 # Display how this makefile was called
-$(info RULES.autosave: '$(MAKECMDGOALS)')
+#$(info RULES.autosave: '$(MAKECMDGOALS)')
 
 ####################################################
 # Where to find and install files for autosave
@@ -13,14 +13,14 @@ vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DI
 vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
 vpath %.tpl-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
 
-# INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
+INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
 
 ####################################################
 # Autosave Flags (-I path)
 
 INSTALL_AUTOSAVEFLAGS = -I $(INSTALL_AUTOSAVE)
 RELEASE_AUTOSAVEFLAGS = $(patsubst %/dbd,%/autosave, $(RELEASE_DBDFLAGS))
-AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) -I. $(GENERIC_SRC_INCLUDES) $(INSTALL_AUTOSAVEFLAGS) $(RELEASE_AUTOSAVEFLAGS)
+AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) -I. -I.. $(GENERIC_SRC_INCLUDES) $(INSTALL_AUTOSAVEFLAGS) $(RELEASE_AUTOSAVEFLAGS)
 AUTOSAVEFLAGS += -I$(COMMON_DIR)
 
 ####################################################
@@ -34,9 +34,11 @@ rebuild:        clean install
 
 buildInstall:	$(INSTALL_REQS)
 
-realclean:: clean
+realclean: clean
 
-clean::
+clean: autosave_clean
+
+autosave_clean:
 	@$(RM) $(COMMONS)
 	@$(RM) $(TARGETS)
 	@echo "Cleaning"
