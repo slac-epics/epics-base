@@ -73,12 +73,13 @@
 #       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-xscale_be
-#       rt-linux                (Really this should be changed to linux-686-rt)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
+#       vxWorks-pentium4
+#       vxWorks-pentium4-smp
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
@@ -105,10 +106,7 @@
 #
 #CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-#CROSS_COMPILER_TARGET_ARCHS=rt-linux
-
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec vxWorks-mpc8548 vxWorks-pentium4 vxWorks-pentium4-smp rt-linux
-
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec vxWorks-mpc8548 vxWorks-pentium4 vxWorks-pentium4-smp
 
 
 #  If only a subset of the host architectures perform
@@ -189,5 +187,4 @@ GCC_PIPE = NO
 #  Include RPATH when linking executables and libraries.
 #       must be either YES or NO
 LINKER_USE_RPATH=YES
-#LINKER_USE_RPATH=NO
 
