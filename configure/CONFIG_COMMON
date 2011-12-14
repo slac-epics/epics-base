@@ -77,6 +77,9 @@ INSTALL_DB                  = $(INSTALL_LOCATION)/db
 INSTALL_CONFIG              = $(INSTALL_LOCATION)/configure
 INSTALL_JAVA                = $(INSTALL_LOCATION)/javalib
 
+# SLAC Specific Installs
+INSTALL_RESTORE                 = $(INSTALL_LOCATION)/restore
+
 #Directory for OS independant build created files
 COMMON_DIR = ../O.Common
 
