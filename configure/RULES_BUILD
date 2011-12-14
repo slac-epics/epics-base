@@ -72,6 +72,8 @@ all:	install
 
 -include $(CONFIG)/RULES_JAVA
 
+-include $(CONFIG)/RULES.Restore
+
 ifneq (,$(strip $(HDEPENDS_FILES)))
 -include $(HDEPENDS_FILES)
 endif
