@@ -4,12 +4,18 @@
 # Display how this makefile was called
 #$(info RULES.autosave: '$(MAKECMDGOALS)')
 
+########################################################
+# NOTE: The rules for generating autosave files from
+# %.substitutions files shouldn't be needed any more.
+# If you think you need them, please see Bruce Hill, bhill,
+# so we can discuss.
+
 ####################################################
 # Where to find and install files for autosave
 
 vpath %.req           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ))
 vpath %.sub-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
-vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
+#vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
 vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
 vpath %.tpl-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
 
@@ -46,11 +52,11 @@ autosave_clean:
 ####################################################
 # Build and install Rules
 
-$(COMMON_DIR)/%.req: %.substitutions
-	@echo "Inflating autosave request from $<"
-	@$(RM) $@
-	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
-	$(MV) msi.tmp $@
+#$(COMMON_DIR)/%.req: %.substitutions
+#	@echo "Inflating autosave request from $<"
+#	@$(RM) $@
+#	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
+#	$(MV) msi.tmp $@
 
 $(COMMON_DIR)/%.req: %.sub-req
 	@echo "Inflating autosave request from $<"
@@ -74,9 +80,9 @@ $(INSTALL_AUTOSAVE)/%.sub-req:	%.sub-req
 
 #.PRECIOUS: $(COMMON_DIR)/%.req
 
-$(INSTALL_AUTOSAVE)/%.substitutions: %.substitutions
-	@echo "Installing autosave substitutions file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
+#$(INSTALL_AUTOSAVE)/%.substitutions: %.substitutions
+#	@echo "Installing autosave substitutions file $@"
+#	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_AUTOSAVE)/%.sub-req: %.sub-req
 	@echo "Installing autosave substitutions file $@"

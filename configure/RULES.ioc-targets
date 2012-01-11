@@ -36,6 +36,6 @@ else
 endif
 
 
-realclean:
-	$(RM) cdCommands envPaths dllPath.bat
+realclean: ioc-targets_clean
+
 
