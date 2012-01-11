@@ -44,7 +44,7 @@
 #	              EU: Mar 29 - Oct 25
 #	(see: http://www.worldtimezone.org/daylight.html)
 #
-# These values are for 2011:
+# These values are for 2012:
 EPICS_TIMEZONE=PUS::480:031102:110402
 #EPICS_TIMEZONE=MET::-60:032902:102502
 
