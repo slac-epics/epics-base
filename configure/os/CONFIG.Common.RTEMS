@@ -1,7 +1,7 @@
 #
 # This file contains definitions for RTEMS builds
 #
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# CONFIG.Common.RTEMS,v 1.44.2.8 2004/11/30 19:41:55 norume Exp
 # Author: W. Eric Norum
 #         University of Saskatchewan
 #         eric.norum@usask.ca
@@ -18,16 +18,17 @@
 -include $(CONFIG)/os/CONFIG.Common.UnixCommon
 
 GNU_TARGET_INCLUDE_DIR =
-
-RTEMS_BSP = $(subst RTEMS-,,$(T_A))
+unexport GCC_EXEC_PREFIX
 
 #--------------------------------------------------
 # Get RTEMS_BASE definition
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
-#-------------------------------------------------------
-# Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
+ifneq ($(CONFIG),$(TOP)/configure)
+-include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
+endif
+
+
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
@@ -75,10 +76,10 @@ $(BASE_CPPFLAGS) $(TARGET_CPPFLAGS) $(USR_CPPFLAGS) $(ARCH_DEP_CPPFLAGS)\
 CROSS_CPPFLAGS =
 CROSS_LDFLAGS =
 SHRLIB_CFLAGS =
-#OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
-#OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
-#OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
-#OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V)
+OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
+OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
+OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
+OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V)
 
 #--------------------------------------------------
 # operating system class (include/os/<os_class>)
@@ -86,7 +87,8 @@ OS_CLASS = RTEMS
 
 #--------------------------------------------------
 # Operating system flags
-OP_SYS_LDLIBS += -lrtemsCom -lrtemscpu -lCom -lrtemsNfs -lm
+#OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lrtemsNfs -lm
+OP_SYS_LDLIBS=
 OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
                  $(PROJECT_RELEASE)/lib/no-dpmem.rel \
                  $(PROJECT_RELEASE)/lib/no-mp.rel \
@@ -102,9 +104,15 @@ CODE_CFLAGS =
 CODE_CXXFLAGS =
 
 #--------------------------------------------------
+# Override the usual RTEMS verbosity from ar
+ARFLAGS = rc
+
+#--------------------------------------------------
 # RTEMS uses the inline keyword so -pedantic causes too many problems.
-CONFORM_CFLAGS_STRICT = -ansi
-CONFORM_CXXFLAGS_STRICT = -ansi
+# -ansi also causes problems, as it defines __STRICT_ANSI__  which ifdef's
+# out needed functions like tzset().
+CONFORM_CFLAGS_STRICT = -std=gnu89
+CONFORM_CXXFLAGS_STRICT = -std=gnu++98
 
 #--------------------------------------------------
 # Command-line input support
@@ -113,4 +121,4 @@ LDLIBS_READLINE = -lreadline -lncurses
 
 #--------------------------------------------------
 # Allow site overrides
--include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
+-include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
