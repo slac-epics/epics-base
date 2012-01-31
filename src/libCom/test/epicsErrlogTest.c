@@ -143,7 +143,7 @@ MAIN(epicsErrlogTest)
     pvt.expect = "Testing";
     pvt.checkLen = strlen(pvt.expect);
 
-    errlogPrintfNoConsole(pvt.expect);
+    errlogPrintfNoConsole("%s", pvt.expect);
     errlogFlush();
 
     testOk1(pvt.count == 1);
@@ -153,7 +153,7 @@ MAIN(epicsErrlogTest)
     pvt2.expect = pvt.expect = "Testing2";
     pvt2.checkLen = pvt.checkLen = strlen(pvt.expect);
 
-    errlogPrintfNoConsole(pvt.expect);
+    errlogPrintfNoConsole("%s", pvt.expect);
     errlogFlush();
 
     testOk1(pvt.count == 2);
@@ -165,7 +165,7 @@ MAIN(epicsErrlogTest)
     pvt2.expect = "Testing3";
     pvt2.checkLen = strlen(pvt2.expect);
 
-    errlogPrintfNoConsole(pvt2.expect);
+    errlogPrintfNoConsole("%s", pvt2.expect);
     errlogFlush();
 
     testOk1(pvt.count == 2);
@@ -188,7 +188,7 @@ MAIN(epicsErrlogTest)
     pvt.expect = truncmsg;
     pvt.checkLen = 255;
 
-    errlogPrintfNoConsole(longmsg);
+    errlogPrintfNoConsole("%s", longmsg);
     errlogFlush();
 
     testOk1(pvt.count == 3);
@@ -201,7 +201,7 @@ MAIN(epicsErrlogTest)
      */
     pvt.jam = 1;
 
-    errlogPrintfNoConsole(longmsg);
+    errlogPrintfNoConsole("%s", longmsg);
     epicsThreadSleep(0.1);
 
     testOk1(pvt.count == 3);
@@ -227,7 +227,7 @@ MAIN(epicsErrlogTest)
         pvt.jam = 1;
 
         for (i = 0; i < N; i++) {
-            errlogPrintfNoConsole(msg);
+            errlogPrintfNoConsole("%s", msg);
         }
 
         epicsEventSignal(pvt.jammer);
@@ -258,31 +258,33 @@ MAIN(epicsErrlogTest)
     testDiag("Filling with %d messages of size %d", (int) N, (int) mlen);
 
     for (i = 0; i < N; i++) {
-        errlogPrintfNoConsole(msg);
+        errlogPrintfNoConsole("%s", msg);
     }
+    epicsThreadSleep(0.1); /* should really be a second Event */
 
     testOk1(pvt.count == 0);
 
-    epicsThreadSleep(0.1); /* should really be a second Event */
-
-    pvt.jam = -2; /* Block before #th message */
+    /* Extract the first 2 messages, 2*(sizeof(msgNode) + 128) bytes */
+    pvt.jam = -2;
     epicsEventSignal(pvt.jammer);
     epicsThreadSleep(0.1);
 
-    testDiag("Drain %u messages", pvt.count);
+    testDiag("Drained %u messages", pvt.count);
     testOk1(pvt.count == 2);
 
-    testDiag("Add two more (%d total)", (int) N+2);
-    errlogPrintfNoConsole(msg);
-    errlogPrintfNoConsole(msg);
+    /* The buffer has space for 1 more message: sizeof(msgNode) + 256 bytes */
+    errlogPrintfNoConsole("%s", msg); /* Use up that space */
+
+    testDiag("Overflow the buffer");
+    errlogPrintfNoConsole("%s", msg);
 
     testOk1(pvt.count == 2);
 
-    epicsEventSignal(pvt.jammer);
+    epicsEventSignal(pvt.jammer); /* Empty */
     errlogFlush();
-    testDiag("Logged %u messages", pvt.count);
 
-    testOk1(pvt.count == N+2);
+    testDiag("Logged %u messages", pvt.count);
+    testOk1(pvt.count == N+1);
 
     /* Clean up */
     errlogRemoveListener(&logClient);

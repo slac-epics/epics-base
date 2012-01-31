@@ -2,12 +2,17 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
     if $running_under_some_shell; # makeBaseApp 
 
 # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# Revision-Id: anj@aps.anl.gov-20111108235119-b2yn7ucijl5dbsuu
+
+use FindBin qw($Bin);
+use lib ("$Bin/../../lib/perl", $Bin);
 
 use Cwd;
 use Getopt::Std;
 use File::Find;
-use File::Path;
+use File::Path 'mkpath';
+use EPICS::Path;
+use EPICS::Release;
 
 $app_top  = cwd();
 
@@ -16,12 +21,10 @@ $app_top  = cwd();
 
 $bad_ident_chars = '[^0-9A-Za-z_]';
 
-&GetUser;               # Ensure we know who's in charge
-&readRelease("configure/RELEASE", \%release, \@apps) if (-r "configure/RELEASE");
-&readRelease("configure/RELEASE.$ENV{EPICS_HOST_ARCH}", \%release, \@apps)
-   if (-r "configure/RELEASE.$ENV{EPICS_HOST_ARCH}");
-&expandRelease(\%release, \@apps);
-&get_commandline_opts;  # Check command-line options
+&GetUser;		# Ensure we know who's in charge
+&readReleaseFiles("configure/RELEASE", \%release, \@apps);
+&expandRelease(\%release);
+&get_commandline_opts;	# Check command-line options
 
 #
 # Declare two default callback routines for file copy plus two

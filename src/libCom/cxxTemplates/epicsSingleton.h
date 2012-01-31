@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ *  Revision-Id: ralph.lange@gmx.de-20110808163119-szktwmb8pwbw5cec
  *
  *  Author: Jeffrey O. Hill
  *
@@ -34,7 +34,7 @@ public:
     void * pInstance () const;
 private:
     void * _pInstance;
-    size_t _refCount;
+    std :: size_t _refCount;
     SingletonUntyped ( const SingletonUntyped & );
     SingletonUntyped & operator = ( const SingletonUntyped & );
 };

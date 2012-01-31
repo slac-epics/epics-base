@@ -1,14 +1,13 @@
 #*************************************************************************
-# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2011 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
-# EPICS BASE Versions 3.13.7
-# and higher are distributed subject to a Software License Agreement found
+# EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  Revision-Id: jba@aps.anl.gov-20101111194353-td0hfhkjg56whjgn
+#  Revision-Id: anj@aps.anl.gov-20111202201024-6naufg256gbustg2
 #
 #  CONFIG_COMMON
 #
@@ -51,7 +50,7 @@ DB_OPT = NO
 #-------------------------------------------------------
 # Check configure/RELEASE file for consistency
 CHECK_RELEASE_YES = checkRelease
-CHECK_RELEASE_NO =
+CHECK_RELEASE_NO = noCheckRelease
 CHECK_RELEASE_WARN = warnRelease
 
 #-------------------------------------------------------
@@ -89,7 +88,8 @@ COMMON_DIR = ../O.Common
 
 #-------------------------------------------------------
 # Make echo output - suppress echoing if make's '-s' flag is set
-ECHO := $(if $(findstring s,$(MAKEFLAGS)),\#,@echo)
+COMMENT = \#
+ECHO = @$(if $(findstring s,$(patsubst T_A=%,,$(MAKEFLAGS))),$(COMMENT),echo)
 
 #-------------------------------------------------------
 ifdef T_A
@@ -342,7 +342,7 @@ HDEPENDS_CFLAGS = $(HDEPENDS_CFLAGS_$(HDEPENDS))
 #--------------------------------------------------
 # depends definition
 
-TARGET_SRCS = $(foreach name, $(TESTPROD) $(PROD) $(LIBRARY), $($(name)_SRCS))
+TARGET_SRCS = $(foreach name, $(TESTPROD) $(PROD) $(LIBRARY) $(LOADABLE_LIBRARY), $($(name)_SRCS))
 SRC_FILES = $(LIB_SRCS) $(LIBSRCS) $(SRCS) $(USR_SRCS) $(PROD_SRCS) $(TARGET_SRCS)
 HDEPENDS_FILES_YES = $(addsuffix $(DEP),$(notdir $(basename $(SRC_FILES))))
 HDEPENDS_FILES = $(if $(filter NO,$(HDEPENDS)),,$(HDEPENDS_FILES_YES))
