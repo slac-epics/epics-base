@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS startup task for EPICS
- *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ *  Revision-Id: anj@aps.anl.gov-20110405222154-yxqbrt7rvbn21o5z
  *      Author: W. Eric Norum
  *              eric.norum@usask.ca
  *              (306) 966-5394
@@ -209,7 +209,17 @@ initialize_remote_filesystem(char **argv, int hasLocalFilesystem)
 {
 #ifdef OMIT_NFS_SUPPORT
     printf ("***** Initializing TFTP *****\n");
+#if __RTEMS_MAJOR__>4 || \
+   (__RTEMS_MAJOR__==4 && __RTEMS_MINOR__>9) || \
+   (__RTEMS_MAJOR__==4 && __RTEMS_MINOR__==9 && __RTEMS_REVISION__==99)
+    mount_and_make_target_path(NULL,
+                               "/TFTP",
+                               RTEMS_FILESYSTEM_TYPE_TFTPFS,
+                               RTEMS_FILESYSTEM_READ_WRITE,
+                               NULL);
+#else
     rtems_bsdnet_initialize_tftp_filesystem ();
+#endif
     if (!hasLocalFilesystem) {
         char *path;
         int pathsize = 200;

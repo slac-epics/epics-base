@@ -1,6 +1,6 @@
 # CONFIG.win32-x86.win32-x86
 #
-# Revision-Id: jba@aps.anl.gov-20101021200611-k20b8rbfxat4nk3i
+# Revision-Id: jba@aps.anl.gov-20110805170230-c0yd86k1a0ujy7fu
 # This file is maintained by the build community.
 #
 # Definitions for win32-x86 target archs when host arch is win32-x86
@@ -31,7 +31,9 @@ BAFCMD = bscmake /nologo /o $@
 # Configure OS vendor C compiler
 CC = cl
 
+# Override CONFIG.gnuCommon for cross builds.
 GNU = NO
+HDEPENDS_METHOD = CMD
 
 #
 # /W<N> use warning level N

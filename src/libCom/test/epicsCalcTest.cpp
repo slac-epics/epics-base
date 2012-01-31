@@ -4,7 +4,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
-// Revision-Id: anj@aps.anl.gov-20101007191624-sqws79ec9gxn7reb
+// Revision-Id: anj@aps.anl.gov-20110407222502-um4y5q4rzq5vlk3e
 //	Author: Andrew Johnson
 
 #include "epicsUnitTest.h"
@@ -223,6 +223,14 @@ static inline double MIN(double a, double b, double c, double d, double e,
     double f, double g, double h, double i, double j, double k, double l) {
     return MIN(MIN(a,b,c,d,e,f,g,h,i,j,k),l);
 }
+
+/* The test code below generates lots of spurious warnings because
+ * it's making sure that our operator priorities match those of C.
+ * Disable them to quieten the compilation process where possible.
+ */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
+#  pragma GCC diagnostic ignored "-Wparentheses"
+#endif
 
 MAIN(epicsCalcTest)
 {

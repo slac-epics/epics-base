@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution.
 #*************************************************************************
 #
-#  Revision-Id: jba@aps.anl.gov-20101026200048-yl4pqc4jl040iqea
+#  Revision-Id: anj@aps.anl.gov-20110419200536-zulwts6vf1tr4uuc
 #
 #  CONFIG_SITE  - Global site configuration file
 #
@@ -78,12 +78,15 @@
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
+#       vxWorks-ppc32           (32-bit PowerPC CPUs with full FPU)
+#       vxWorks-ppc32sf         (32-bit PowerPC CPUs without FPU)
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
 #       vxWorks-ppc604_long
 #       vxWorks-ppc604_altivec
 #       vxWorks-mpc8540
+#       vxWorks-mpc8548
 #       RTEMS-at91rm9200ek
 #       RTEMS-beatnik
 #       RTEMS-gen68360

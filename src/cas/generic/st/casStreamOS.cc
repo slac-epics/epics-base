@@ -8,7 +8,7 @@
 \*************************************************************************/
 //
 // casStreamOS.cc
-// Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+// Revision-Id: anj@aps.anl.gov-20110405210849-s4tyb3vn88bb0e16
 //
 // TO DO:
 // o armRecv() and armSend() should return bad status when
@@ -321,7 +321,7 @@ inline void casStreamOS::disarmRecv ()
 //
 // casStreamOS::armSend()
 //
-inline void casStreamOS::armSend()
+void casStreamOS::armSend()
 {
 	if ( this->outBufBytesPending() == 0u ) {
 		return;

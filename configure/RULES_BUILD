@@ -6,7 +6,7 @@
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# Revision-Id: anj@aps.anl.gov-20111202201024-6naufg256gbustg2
 #
 #	Rules for making things specified in Makefile
 #
@@ -173,6 +173,10 @@ checkRelease:
 	$(CONVERTRELEASE) checkRelease
 warnRelease:
 	-$(CONVERTRELEASE) checkRelease
+noCheckRelease:
+ifeq ($(EPICS_HOST_ARCH),$(T_A))
+	@echo "Warning: RELEASE file consistency checks have been disabled"
+endif
 
 #---------------------------------------------------------------
 #  The order of the following rules is
@@ -207,11 +211,6 @@ $(OBJLIBNAME):%$(OBJ):
 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
 
 %$(OBJ): %.cpp
-	@$(HDEPENDS_CMD)
-	@$(RM) $@
-	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
-
-%$(OBJ): %.C
 	@$(HDEPENDS_CMD)
 	@$(RM) $@
 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
@@ -469,7 +468,7 @@ $(INSTALL_TEMPLATES_SUBDIR)/%: %
 .PRECIOUS: $(COMMON_INC)
 
 .PHONY: all inc build install clean rebuild buildInstall
-.PHONY: runtests checkRelease warnRelease
+.PHONY: runtests checkRelease warnRelease noCheckRelease
 
 endif # BASE_RULES_BUILD
 #	EOF RULES_BUILD
