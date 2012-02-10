@@ -89,12 +89,7 @@ OS_CLASS = RTEMS
 # Operating system flags
 #OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lrtemsNfs -lm
 OP_SYS_LDLIBS=
-OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
-                 $(PROJECT_RELEASE)/lib/no-dpmem.rel \
-                 $(PROJECT_RELEASE)/lib/no-mp.rel \
-                 $(PROJECT_RELEASE)/lib/no-part.rel \
-                 $(PROJECT_RELEASE)/lib/no-signal.rel \
-                 $(PROJECT_RELEASE)/lib/no-rtmon.rel
+OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init
 
 #--------------------------------------------------
 # RTEMS has neither shared libraries nor dynamic loading
@@ -121,4 +116,5 @@ LDLIBS_READLINE = -lreadline -lncurses
 
 #--------------------------------------------------
 # Allow site overrides
+-include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 -include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
