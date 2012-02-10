@@ -5,15 +5,15 @@ include $(TOP)/RELEASE_SITE
 # ===============================================================
 # Define the location and version of EPICS base
 # ===============================================================
-BASE_MODULE_VERSION=R3.14.9-0.3.0
+BASE_MODULE_VERSION=R3.14.12-0.4.0
 EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 
 # ===============================================================
 # Define the version of modules needed by
 # IOC apps or other Support apps
 # ===============================================================
-AUTOSAVE_MODULE_VERSION=R4.2.1.2-1.1.0
-IOCADMIN_MODULE_VERSION=R2.0.0-1.0.0
+AUTOSAVE_MODULE_VERSION=R4.2.1.2-2.7.0
+IOCADMIN_MODULE_VERSION=R3.0.0-1.6.0
 
 # ============================================================
 # External Support module path definitions

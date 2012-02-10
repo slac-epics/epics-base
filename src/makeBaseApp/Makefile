@@ -178,8 +178,8 @@ TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
 TEMPLATES += top/pcdsIocApp/Replace.pl
 TEMPLATES += top/pcdsIocApp/Makefile
 TEMPLATES += top/pcdsIocApp/Db/Makefile
-TEMPLATES += top/pcdsIocApp/Db/autosave__APPNAME_.substitutions
-TEMPLATES += top/pcdsIocApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsIocApp/Db/autosave__APPNAME_.sub-req
+TEMPLATES += top/pcdsIocApp/Db/archive__APPNAME_.sub-arch
 TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
@@ -202,7 +202,7 @@ TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
 
 TEMPLATES += top/pcdsIocBoot/ioc/README@Common
 
-TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.substitutions
+TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.sub-arch
 
 
 ######################################################################
@@ -215,8 +215,8 @@ TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.substitutions
 TEMPLATES += top/pcdsEvrApp/Makefile
 
 TEMPLATES += top/pcdsEvrApp/Db/Makefile
-TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.substitutions
-TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.sub-req
+TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.sub-arch
 TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evr.substitutions
 
@@ -241,7 +241,7 @@ TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
 
 TEMPLATES += top/pcdsEvrBoot/ioc/README@Common
 
-TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.substitutions
+TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.sub-arch
 
 ######################################################################
 # PCDS templates: 'pcdsMotorApp' and 'pcdsMotorBoot'.
@@ -296,10 +296,10 @@ TEMPLATES += top/pcdsModuleLib/Makefile
 TEMPLATES += top/pcdsModuleLib/Db/Makefile
 TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.substitutions
 TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.template
-TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.substitutions
-TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.template
-TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.substitutions
-TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.template
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
+TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
+TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
 
 TEMPLATES += top/pcdsModuleLib/configure/RELEASE
 
