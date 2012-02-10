@@ -54,7 +54,7 @@ OP_SYS_CPPFLAGS =
 override EXE = .obj
 
 
-#OP_SYS_LDLIBS = -lrtemsCom
+OP_SYS_LDLIBS = 
 OP_SYS_LDFLAGS = -Wl,-S
 
 LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
