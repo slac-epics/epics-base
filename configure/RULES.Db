@@ -311,7 +311,7 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 
 $(COMMON_DIR)/%.db$(RAW): %.substitutions
 	@$(RM) $(notdir $@)$(DEP)
-	@$(MAKEDBDEPENDS) $@ $< $(TEMPLATE_FILENAME) >> $(notdir $@)$(DEP)
+	$(MAKEDBDEPENDS) $@ $< $(TEMPLATE_FILENAME) >> $(notdir $@)$(DEP)
 	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
 	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 	@$(RM) $@ $*.tmp
@@ -320,7 +320,7 @@ $(COMMON_DIR)/%.db$(RAW): %.substitutions
 
 $(COMMON_DIR)/%.db$(RAW): %.template
 	@$(RM) $(notdir $@)$(DEP)
-	@$(MAKEDBDEPENDS) $@ $^  >> $(notdir $@)$(DEP)
+	$(MAKEDBDEPENDS) $@ $^  >> $(notdir $@)$(DEP)
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
 	$(MSI) $(DBFLAGS) $< > $*.tmp
