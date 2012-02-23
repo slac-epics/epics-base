@@ -11,7 +11,8 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install)
 # databases, templates, substitutions like this
 DB += iocAdmin.db
-DB += evr.db
+DB += evrPmc230.db
+DB += evrVme230.db
 
 #----------------------------------------------------
 # Create and install (or just install)
