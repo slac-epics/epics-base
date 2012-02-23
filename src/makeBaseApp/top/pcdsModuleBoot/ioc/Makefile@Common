@@ -11,5 +11,5 @@ COPY_ONLY_IF_NON_LOCAL=1
 COPY_SUBDIR=iocBoot/ioc_APPNAME_
 COPY_FILES=st.cmd
 
-include $(TOP)/configure/RULES.ioc
-include $(TOP)/configure/RULES.copy
+include $(TOP)/configure/RULES
+include $(TOP)/configure/RULES.ioc-targets

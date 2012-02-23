@@ -17,16 +17,14 @@ DB += _APPNAME_.substitutions
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
-# REQ += autosave__APPNAME_.req
-REQ += autosave__APPNAME_.template
-REQ += autosave__APPNAME_.substitutions
+# REQ += autosave_APPNAME_.req
+REQ += _APPNAME_.tpl-req
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Archive files, templates, substitutions like this
-# ARCHIVE += archive__APPNAME_.archive
-ARCHIVE += archive__APPNAME_.template
-ARCHIVE += archive__APPNAME_.substitutions
+# ARCHIVE += archive_APPNAME_.archive
+ARCHIVE += _APPNAME_.tpl-arch
 
 include $(TOP)/configure/RULES
 #----------------------------------------
