@@ -10,7 +10,7 @@
 #
 
 # Generate iocAdmin autosave request 
-file autosave_iocAdmin.template
+file autosave_iocAdmin.tpl-req
 {
 	{
 		IOC=$(IOC)

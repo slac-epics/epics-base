@@ -30,10 +30,10 @@ _APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
 
 _APPNAME__LIBS += devIocStats
 _APPNAME__LIBS += autosave
-_APPNAME__LIBS += generalTime
 _APPNAME__LIBS += evrSupport
 _APPNAME__LIBS += devMrfEr
-_APPNAME__LIBS += drvMrf
+_APPNAME__LIBS_RTEMS += mrfVme64x
+_APPNAME__LIBS_Linux += drvMrf
 _APPNAME__LIBS_Linux += mrfApi
 _APPNAME__LIBS += $(EPICS_BASE_IOC_LIBS)
 

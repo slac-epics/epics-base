@@ -12,7 +12,7 @@
 # Generate iocAdmin archive PV's 
 #	Macros:
 #		IOC		- PV prefix for all iocAdmin PV's
-file archive_iocAdmin.template
+file archive_iocAdmin.tpl-arch
 {
 	{
 		IOC=$(IOC)
@@ -22,7 +22,7 @@ file archive_iocAdmin.template
 # Generate Save/Restore archive PV's
 #	Macros:
 #		IOC		- PV prefix for all IOC Save/Restore PV's
-file archive_SR.template
+file archive_SR.tpl-arch
 {
 	{
 		IOC=$(IOC)

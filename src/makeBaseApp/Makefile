@@ -106,6 +106,7 @@ TEMPLATES += top/_APPNAME_Screens/_APPNAME_.edl
 TEMPLATES += top/configure/RULES.archive
 TEMPLATES += top/configure/RULES.autosave
 TEMPLATES += top/configure/RULES.copy
+TEMPLATES += top/configure/RULES.ioc-targets
 
 ######################################################################
 # PCDS templates: 'pcdsDemoApp' and 'pcdsDemoBoot'.
@@ -218,7 +219,8 @@ TEMPLATES += top/pcdsEvrApp/Db/Makefile
 TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.sub-req
 TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.sub-arch
 TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
-TEMPLATES += top/pcdsEvrApp/Db/evr.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/evrPmc230.substitutions
+TEMPLATES += top/pcdsEvrApp/Db/evrVme230.substitutions
 
 TEMPLATES += top/pcdsEvrApp/src/Makefile
 TEMPLATES += top/pcdsEvrApp/src/_APPNAME_Main.cpp
@@ -275,7 +277,7 @@ TEMPLATES += top/pcdsMotorBoot/nfsCommands@RTEMS
 TEMPLATES += top/pcdsMotorBoot/ioc/Makefile@Common
 TEMPLATES += top/pcdsMotorBoot/ioc/README@Common
 TEMPLATES += top/pcdsMotorBoot/ioc/README@RTEMS
-TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_-motors.sub-db
+TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions
 TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.sub-arch
 TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_.sub-req
 TEMPLATES += top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
@@ -296,10 +298,8 @@ TEMPLATES += top/pcdsModuleLib/Makefile
 TEMPLATES += top/pcdsModuleLib/Db/Makefile
 TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.substitutions
 TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.template
-TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
-TEMPLATES += top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
-TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
-TEMPLATES += top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.tpl-arch
+TEMPLATES += top/pcdsModuleLib/Db/_APPNAME_.tpl-req
 
 TEMPLATES += top/pcdsModuleLib/configure/RELEASE
 

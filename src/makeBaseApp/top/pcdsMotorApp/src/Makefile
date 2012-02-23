@@ -18,7 +18,6 @@ DBD += _APPNAME_.dbd
 _APPNAME__DBD += base.dbd
 _APPNAME__DBD += iocAdmin.dbd
 _APPNAME__DBD += autosaveSupport.dbd
-_APPNAME__DBD += generalTimeNonVx.dbd
 _APPNAME__DBD += drvAsynSerialPort.dbd
 _APPNAME__DBD += drvAsynIPPort.dbd
 _APPNAME__DBD += motorSupport.dbd
@@ -35,7 +34,6 @@ _APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
 
 _APPNAME__LIBS += devIocStats
 _APPNAME__LIBS += autosave
-_APPNAME__LIBS += generalTime
 _APPNAME__LIBS += asyn
 _APPNAME__LIBS += stream
 _APPNAME__LIBS += motor
