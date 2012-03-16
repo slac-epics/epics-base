@@ -2586,7 +2586,7 @@ static long putStringEnum(
 	    status = (*prset->get_enum_strs)(paddr,&enumStrs);
 	    if(!status) {
 		nchoices = enumStrs.no_str;
-		nargs = sscanf(pbuffer," %u %n",&ind,&nchars);
+		nargs = sscanf(pbuffer,"%u%n",&ind,&nchars);
 		if(nargs==1 && nchars==strlen(pbuffer) && ind<nchoices) {
 		    *pfield = ind;
 		    return(0);
@@ -2635,7 +2635,7 @@ static long putStringMenu(
 		return(0);
 	    }
 	}
-	nargs = sscanf(pbuffer," %u %n",&ind,&nchars);
+	nargs = sscanf(pbuffer,"%u%n",&ind,&nchars);
 	if(nargs==1 && nchars==strlen(pbuffer) && ind<nChoice) {
 	    *pfield = ind;
 	    return(0);
@@ -2673,7 +2673,7 @@ static long putStringDevice(
 		return(0);
 	    }
 	}
-	nargs = sscanf(pbuffer," %u %n",&ind,&nchars);
+	nargs = sscanf(pbuffer,"%u%n",&ind,&nchars);
 	if(nargs==1 && nchars==strlen(pbuffer) && ind<nChoice) {
 	    *pfield = ind;
 	    return(0);
