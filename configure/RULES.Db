@@ -309,13 +309,20 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 	@$(REPLACEVAR) < $*.VAR > $@
 	@$(RM) $*.VAR
 
+# Note:
+# MSI expansion command was
+#	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
+# This is wrong for our msi usage as all our substitution
+# files specify their template(s), and specifying one on
+# the command line overrides the ones specified in the
+# substitutions file.
+#
 $(COMMON_DIR)/%.db$(RAW): %.substitutions
 	@$(RM) $(notdir $@)$(DEP)
-	$(MAKEDBDEPENDS) $@ $< $(TEMPLATE_FILENAME) >> $(notdir $@)$(DEP)
-	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
+	$(MAKEDBDEPENDS) $@ $< >> $(notdir $@)$(DEP)
+	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
-	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > $*.tmp
+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
 	$(MV) $*.tmp $@
 
 $(COMMON_DIR)/%.db$(RAW): %.template
