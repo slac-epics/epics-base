@@ -107,8 +107,8 @@ CROSS_LDFLAGS =
 SHRLIB_CFLAGS =
 OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
 OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
-OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
-OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V)
+OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V) -g
+OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V) -g
 
 #--------------------------------------------------
 # operating system class (include/os/<os_class>)
