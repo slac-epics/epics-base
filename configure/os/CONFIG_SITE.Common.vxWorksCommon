@@ -17,9 +17,9 @@
 #VXWORKS_VERSION = 6.3
 #VXWORKS_VERSION = 6.4
 #VXWORKS_VERSION = 6.5
-#VXWORKS_VERSION = 6.6
+VXWORKS_VERSION = 6.6
 #VXWORKS_VERSION = 6.7
-VXWORKS_VERSION = 6.8
+#VXWORKS_VERSION = 6.8
 
 
 # Sites may override the following path for a particular host
@@ -44,21 +44,36 @@ WIND_BASE = /afs/slac/package/vxworks/devel/$(VXWORKS_VERSION)
 # wrong.
 # =====================================================================
 #BSD_DEFINE_VERSION_6.7 = -DBSD=44
-BSD_DEFINE_VERSION_6.8 = -DBSD=44
-OP_BSD_DEFINE = $(BSD_DEFINE_VERSION_$(VXWORKS_VERSION))
+##BSD_DEFINE_VERSION_6.8 = -DBSD=44
+##OP_BSD_DEFINE = $(BSD_DEFINE_VERSION_$(VXWORKS_VERSION))
 
-OP_SYS_CPPFLAGS += -DvxWorks $(OP_BSD_DEFINE)
-OP_SYS_CFLAGS += -fno-builtin $(OP_BSD_DEFINE)
+##OP_SYS_CPPFLAGS += -DvxWorks $(OP_BSD_DEFINE)
+##OP_SYS_CFLAGS += -fno-builtin $(OP_BSD_DEFINE)
+
+# For vxWorks 6.6 we just need:
+OP_SYS_CPPFLAGS += -DvxWorks
+OP_SYS_CFLAGS += -fno-builtin
+
 # =====================================================================
+
+#--------------------------------------------------
+# Optimization: Officially vxWorks only supports -O2 or less.
+# =====================================================================
+# Recommended by Till Strauman:
+# For Cross Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES = -O2 -g
+OPT_CXXFLAGS_YES = -O2 -g
 
 
 
 # WorkBench Version number, required for vxWorks 6.x
 
 #WORKBENCH_VERSION = 2.6
-#WORKBENCH_VERSION = 3.0
+WORKBENCH_VERSION = 3.0
 #WORKBENCH_VERSION = 3.1
-WORKBENCH_VERSION = 3.2
+#WORKBENCH_VERSION = 3.2
 
 
 # Utilities Version number, required from vxWorks 6.8 and later
