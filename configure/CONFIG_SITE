@@ -73,13 +73,13 @@
 #       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-xscale_be
+#       linuxRT-x86             (linux-rt with uClibc; created by Till Strauman)
+#       linuxRT-ppcP2020        (linux-rt with uClibc; created by Till Strauman)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
-#       vxWorks-pentium4
-#       vxWorks-pentium4-smp
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
@@ -106,7 +106,10 @@
 #
 #CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec vxWorks-mpc8548 vxWorks-pentium4 vxWorks-pentium4-smp rt-linux
+#CROSS_COMPILER_TARGET_ARCHS=rt-linux
+
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec linuxRT-x86 linuxRT-ppcP2020
+
 
 
 #  If only a subset of the host architectures perform
@@ -138,11 +141,11 @@ HDEPENDS=YES
 
 #  Host build optimization
 #	must be either YES or NO
-HOST_OPT=NO
+HOST_OPT=YES
 
 #  Cross build optimization
 #	must be either YES or NO
-CROSS_OPT=NO
+CROSS_OPT=YES
 
 #  Generate Verbose Compiler Warnings for Host builds
 #	must be either YES or NO
@@ -178,7 +181,8 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-EPICS_SITE_VERSION = SLAC_1
+# Optimized Build
+EPICS_SITE_VERSION = SLAC_2
 
 # For GNU compiler, use pipes rather than temporary files for communication 
 # between the various stages of compilation.
@@ -187,4 +191,5 @@ GCC_PIPE = NO
 #  Include RPATH when linking executables and libraries.
 #       must be either YES or NO
 LINKER_USE_RPATH=YES
+#LINKER_USE_RPATH=NO
 
