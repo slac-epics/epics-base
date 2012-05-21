@@ -115,7 +115,8 @@ CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS	+= vxWorks-68040
 CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
 # Don't make linux-x86 be a cross compile if it's the host
-ifneq '$(EPICS_HOST_ARCH)' 'linux-x86'
+# A linux-x86_64 host can also cross compile to linux-x86
+ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
 CROSS_COMPILER_TARGET_ARCHS		+=  linux-x86
 endif
 
@@ -129,6 +130,7 @@ endif
 #  linux-x86    host: linux-x86
 #  linux-x86_64 host: RTEMS-beatnik linux-x86 linux-x86_64
 CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64
+#CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
 BUILD_FOR_HOST_ARCH				=	1
 
 #  Build shared libraries?
@@ -140,8 +142,8 @@ BUILD_FOR_HOST_ARCH				=	1
 #                   SHARED_LIBRARIES=YES and STATIC_BUILD=NO
 #                   SHARED_LIBRARIES=NO  and STATIC_BUILD=YES
 #
-#SHARED_LIBRARIES=YES
-SHARED_LIBRARIES=NO
+SHARED_LIBRARIES=YES
+#SHARED_LIBRARIES=NO
 
 #  Build client objects statically ?
 #        must be either YES or NO
