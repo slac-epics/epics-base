@@ -11,7 +11,7 @@
 
 # Include definitions common to all Unix targets
 include $(CONFIG)/os/CONFIG.Common.linuxCommon
-VALID_BUILDS = Ioc
+VALID_BUILDS = Host Ioc
 ARCH_CLASS = ppc
 ARCH_DEP_CPPFLAGS += -D_ppc_
 
