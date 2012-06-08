@@ -30,11 +30,22 @@ print "$EpicsHostArch$suffix";
 
 sub GetEpicsHostArch { # no args
     $arch=$Config{'archname'};
+    #print "Config['archname'}=".$arch."\n";
     if ($arch =~ /sun4-solaris/)       { return "solaris-sparc";
     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
-    } elsif ($arch =~ m/i[3-6]86-linux/)    { return "linux-x86";
-    } elsif ($arch =~ m/x86_64-linux/)    { return "linux-x86_64";
-    } elsif ($arch =~ m/i[3-6]86_linux24/)  { return "rhel6-x86_64";
+    } elsif ($arch =~ m/linux/)        {
+            my($kernel, $hostname, $release, $version, $cpu) = POSIX::uname();
+    		#print "kernel=".$kernel."\n";
+    		#print "hostname=".$hostname."\n";
+    		#print "release=".$release."\n";
+    		#print "version=".$version."\n";
+    		#print "cpu=".$cpu."\n";
+            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
+            if ($cpu =~ m/x86_64/)	{
+				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
+			}
+            else							{ return "unsupported"; }
     } elsif ($arch =~ m/MSWin32-x86/)   { return "win32-x86";
     } elsif ($arch =~ m/cygwin/)        { return "cygwin-x86";
     } elsif ($arch =~ m/darwin/)        {
