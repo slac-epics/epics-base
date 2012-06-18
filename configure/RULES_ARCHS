@@ -31,6 +31,8 @@ cleanArchTargets = $(foreach arch,$(BUILD_ARCHS), clean$(DIVIDER)$(arch))
 buildDirs = $(addprefix O.,$(BUILD_ARCHS))
 
 #*************************************************************************
+# PCDS Change: Only generate these dependencies if we're building $EPICS_HOST_ARCH
+ifeq ($(filter $(EPICS_HOST_ARCH),$(BUILD_ARCHS)),$(EPICS_HOST_ARCH))
 # Create epics_host_arch dependancies for GNU make -j option
 # Only works with GNU make 3.81 or later (uses eval function)
 # Needed in dirs where EPICS_HOST_ARCH build creates a tool used in 
@@ -50,7 +52,8 @@ endef
 $(foreach action, $(ACTIONS), $(foreach arch,\
       $(CROSS_ARCHS),$(eval $(call DEP_template,$(action),$(arch)))))
 
-#endif
+endif
+
 #*************************************************************************
 
 # Allows rebuild to work with parallel builds option, -j.
