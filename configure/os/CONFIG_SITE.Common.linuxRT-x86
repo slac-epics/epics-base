@@ -1,6 +1,6 @@
 # Location of linuxRT GNU ToolChain
 LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
-GNU_DIR=$(LINUX_RT_HOME)/buildroot/buildroot-2012.02-x86/output/host/usr/
+GNU_DIR=$(LINUX_RT_HOME)/buildroot/buildroot-2012.02/output/host/usr/
 
 # Cross Target Architecture
 GNU_TARGET=i686-linux
