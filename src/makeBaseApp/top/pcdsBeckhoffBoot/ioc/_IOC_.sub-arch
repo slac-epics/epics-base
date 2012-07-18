@@ -5,6 +5,6 @@
 # Generate IOC archive request 
 file archive__APPNAME_.archive
 {
-	{ IOC = "_IOCPVROOT_" }
+	{ IOC = "_IOCPVROOT_", COUPLER_LOC = $(COUPLER_LOC) }
 }
 
