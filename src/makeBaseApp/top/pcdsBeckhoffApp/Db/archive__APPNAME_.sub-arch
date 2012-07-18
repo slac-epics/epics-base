@@ -2,15 +2,11 @@
 # _APPNAME_ substitutions file
 #
 
-#
-# _APPNAME_ substitutions file
-#
-
 # Generate iocAdmin archive request 
 #	Macros:
 #		IOC		- PV prefix for all iocAdmin PV's
 # Typically, IOC will be expanded in the iocBoot/<ioc_name>/Makefile
-file archive_iocAdmin.template
+file archive_iocAdmin.tpl-arch
 {
 	{
 		# Hack till msi supports empty substitutions
@@ -23,11 +19,24 @@ file archive_iocAdmin.template
 #	Macros:
 #		IOC		- PV prefix for all IOC Save/Restore PV's
 # Typically, IOC will be expanded in the iocBoot/<ioc_name>/Makefile
-file archive_SR.template
+file archive_SR.tpl-arch
 {
 	{
 		# Hack till msi supports empty substitutions
 		IOC		=	$(IOC),
+	}
+}
+
+
+# Generate Beckhoff coupler status archive requests
+#	Macros:
+#		COUPLER_LOC		- PV prefix for Bx9000.db
+# 
+file Bx9000.tpl-arch
+{
+	{
+		# Hack till msi supports empty substitutions
+		COUPLER_LOC		=	$(COUPLER_LOC),
 	}
 }
 
