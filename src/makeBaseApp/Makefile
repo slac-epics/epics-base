@@ -309,6 +309,44 @@ TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.dbd
 TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.h
 
 ######################################################################
+# PCDS templates: 'pcdsBeckhoffApp' and 'pcdsBeckhoffBoot'.
+# Author: Garth Brown
+######################################################################
+
+# pcdsBeckhoffApp - Mostly the same as pcdsEvr, but for Beckhoff instead of evr.
+
+TEMPLATES += top/pcdsBeckhoffApp/Makefile
+
+TEMPLATES += top/pcdsBeckhoffApp/Db/Makefile
+TEMPLATES += top/pcdsBeckhoffApp/Db/autosave__APPNAME_.sub-req
+TEMPLATES += top/pcdsBeckhoffApp/Db/archive__APPNAME_.sub-arch
+TEMPLATES += top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsBeckhoffApp/Db/Bx9000.substitutions
+
+TEMPLATES += top/pcdsBeckhoffApp/src/Makefile
+TEMPLATES += top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsBeckhoffApp/configure/RELEASE
+
+# pcdsBeckhoffBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsBeckhoffBoot/Makefile
+
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
+
+######################################################################
 # End of PCDS additions
 ######################################################################
 
