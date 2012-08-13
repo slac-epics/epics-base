@@ -10,7 +10,7 @@ include $(TOP)/configure/CONFIG
 # ================================================
 # This will attempt to build an IOC application 
 # for every target including the host computer.
-PROD_IOC = _APPNAME
+PROD_IOC = _APPNAME_
 _
 # Use the following for RTEMS Only IOCs
 #PROD_IOC_RTEMS = _APPNAME_
