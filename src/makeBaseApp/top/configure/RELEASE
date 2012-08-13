@@ -47,7 +47,7 @@ BASE_MODULE_VERSION=$(EPICS_BASE_VER)
 # IOC apps or other Support apps
 # =============================================================
 SEQ_MODULE_VERSION=seq-R2-1-6_1-0
-AUTOSAVE_MODULE_VERSION=autosave-R4-8-lcls3
+AUTOSAVE_MODULE_VERSION=autosave-R4-8_4-0
 CAPUTLOG_MODULE_VERSION=caPutLog-R3-3-0
 IOCADMIN_MODULE_VERSION=iocAdmin-R3-1-9_1-0
 
