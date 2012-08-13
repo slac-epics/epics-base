@@ -24,6 +24,15 @@ TEMPLATES += top/configure/RULES.ioc
 TEMPLATES += top/configure/RULES_DIRS
 TEMPLATES += top/configure/RULES_TOP
 
+## ================================================
+## SLAC Installed Templates (Added by ELW)
+## ================================================
+TEMPLATES += top/configure/RULES.Restore
+
+# =================================================
+## End addition by ELW
+## ================================================
+
 TEMPLATES += top/supportApp/Makefile
 TEMPLATES += top/supportApp/Db/Makefile
 TEMPLATES += top/supportApp/src/Makefile
