@@ -71,11 +71,13 @@ ifneq ($(SNCSEQ),)
     _APPNAME__LIBS += seq pv
 
     # The following builds sncProgram as a standalone application
+  ifneq ($(T_A),linuxRT-x86)
     PROD_HOST += sncProgram
     sncProgram_SNCFLAGS += +m
     sncProgram_SRCS += sncProgram.st
     sncProgram_LIBS += seq pv
     sncProgram_LIBS += $(EPICS_BASE_HOST_LIBS)
+  endif
 endif
 
 _APPNAME__LIBS += $(EPICS_BASE_IOC_LIBS)
