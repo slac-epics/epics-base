@@ -19,13 +19,57 @@
 # Build settings that are NOT module paths should appear in a
 # CONFIG_SITE file.
 
+# If you don't want to install into $(TOP) then
+# define INSTALL_LOCATION_APP here
+#INSTALL_LOCATION_APP=<fullpathname>
+
+# EPICS Templates
 TEMPLATE_TOP=_TEMPLATE_TOP_
 
-# If using the sequencer, point SNCSEQ at its top directory:
-#SNCSEQ=$(EPICS_BASE)/../modules/soft/seq
+# =============================================================
+# All needed variables come in via the following include:
+# =============================================================
+include $(TOP)/RELEASE_SITE
+
+# =============================================================
+# Define location of the modules tree
+# =============================================================
+EPICS_MODULES=$(MODULES_SITE_TOP)
+
+
+# ==============================================================
+# Define the cvs module version of EPICS BASE that you will use
+# =============================================================
+BASE_MODULE_VERSION=$(EPICS_BASE_VER)
+
+# =============================================================
+# Define the version of modules needed by
+# IOC apps or other Support apps
+# =============================================================
+SEQ_MODULE_VERSION=seq-R2-1-6_1-0
+AUTOSAVE_MODULE_VERSION=autosave-R4-8-lcls3
+CAPUTLOG_MODULE_VERSION=caPutLog-R3-3-0
+IOCADMIN_MODULE_VERSION=iocAdmin-R3-1-9_1-0
+
+MISCUTILS_MODULE_VERSION=miscUtils-R2-2-2
+EVENT_MODULE_VERSION=event-R3-2-2-br_generaltime-2-4
+
+# ============================================================
+#  Module Location
+# ============================================================
+
+SNCSEQ=$(EPICS_MODULES)/seq/$(SEQ_MODULE_VERSION)
+AUTOSAVE=$(EPICS_MODULES)/autosave/$(AUTOSAVE_MODULE_VERSION)
+CAPUTLOG=$(EPICS_MODULES)/caPutLog/$(CAPUTLOG_MODULE_VERSION)
+IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
+
+MISCUTILS=$(EPICS_MODULES)/miscUtils/$(MISCUTILS_MODULE_VERSION)
+EVENT=$(EPICS_MODULES)/event/$(EVENT_MODULE_VERSION)
+
+
 
 # EPICS_BASE usually appears last so other apps can override stuff:
-EPICS_BASE=_EPICS_BASE_
+EPICS_BASE=$(BASE_SITE_TOP)/$(BASE_MODULE_VERSION)
 
 # Set RULES here if you want to take build rules from somewhere
 # other than EPICS_BASE:
