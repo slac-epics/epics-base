@@ -1,0 +1,2 @@
+/usr/bin/chrt -pf 95  `/bin/ps  -Leo pid,tid,rtprio,comm | /usr/bin/awk '/mrfevr/{printf $1}'`
+/usr/bin/chrt -pf 90  `/bin/ps  -Leo pid,tid,rtprio,comm | /usr/bin/awk '/sis8300/{printf $1}'`
