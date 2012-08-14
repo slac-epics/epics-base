@@ -1,3 +1,6 @@
+# Build types
+VALID_BUILDS = Ioc
+
 # Location of linuxRT GNU ToolChain
 LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
 GNU_DIR=$(LINUX_RT_HOME)/buildroot/buildroot-2011.08-p2020/output/host/usr/
