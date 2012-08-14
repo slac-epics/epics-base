@@ -54,6 +54,8 @@ IOCADMIN_MODULE_VERSION=iocAdmin-R3-1-9_1-0
 MISCUTILS_MODULE_VERSION=miscUtils-R2-2-2
 EVENT_MODULE_VERSION=event-R3-2-2-br_generaltime-2-4
 
+RTEMSUTILS_MODULE_VERSION=rtemsutils-R1-0-0-lcls5
+
 # ============================================================
 #  Module Location
 # ============================================================
@@ -66,7 +68,7 @@ IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 MISCUTILS=$(EPICS_MODULES)/miscUtils/$(MISCUTILS_MODULE_VERSION)
 EVENT=$(EPICS_MODULES)/event/$(EVENT_MODULE_VERSION)
 
-
+RTEMSUTILS=$(EPICS_MODULES)/rtemsutils/$(RTEMSUTILS_MODULE_VERSION)
 
 # EPICS_BASE usually appears last so other apps can override stuff:
 EPICS_BASE=$(BASE_SITE_TOP)/$(BASE_MODULE_VERSION)
