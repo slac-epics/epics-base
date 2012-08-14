@@ -145,8 +145,17 @@ TEMPLATES += top/slacBoot/ioc/st.cmd@Common
 TEMPLATES += top/slacBoot/ioc/st.cmd@Cross
 TEMPLATES += top/slacBoot/ioc/st.cmd@vxWorks
 TEMPLATES += top/slacBoot/ioc/st.cmd@RTEMS
+
+# =============================================================
+# Added by ELW to support linuxRT
+# =============================================================
+TEMPLATES += top/slacBoot/ioc/st.cmd@linuxRT
+TEMPLATES += top/slacBoot/ioc/rtPrioritySetup.cmd@linuxRT
+# =============================================================
+
 TEMPLATES += top/slacBoot/ioc/README@Common
 TEMPLATES += top/slacBoot/ioc/README@vxWorks
+TEMPLATES += top/slacBoot/ioc/
 
 ## ==========================================
 ## End Changes needed for SLAC ==============
