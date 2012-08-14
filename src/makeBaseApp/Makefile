@@ -112,12 +112,23 @@ TEMPLATES += top/iocBoot/ioc/st.cmd@RTEMS
 TEMPLATES += top/slacApp/Makefile
 TEMPLATES += top/slacApp/Db/Makefile
 TEMPLATES += top/slacApp/Db/dbExample.db
+TEMPLATES += top/slacApp/Db/IOCNAME-bsa.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-evr.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-pattern.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-trig.substitutions
 
 TEMPLATES += top/slacApp/src/Makefile
 TEMPLATES += top/slacApp/src/sncExample.stt
 TEMPLATES += top/slacApp/src/sncProgram.st
 TEMPLATES += top/slacApp/src/sncExample.dbd
 TEMPLATES += top/slacApp/src/_APPNAME_Main.cpp
+# =====================================================
+# Added by ELW to support linuxRT
+# =====================================================
+TEMPLATES += top/slacApp/src/_APPNAME__linuxRT_Main_.cpp
+TEMPLATES += top/slacApp/src/systemCommand.c
+TEMPLATES += top/slacApp/src/systemCommand.dbd
+# ======================================================
 
 TEMPLATES += top/slacApp/srcDisplay/Makefile
 TEMPLATES += top/slacApp/srcDisplay/CONFIG_EDL

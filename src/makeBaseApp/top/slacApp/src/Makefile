@@ -24,17 +24,33 @@ _APPNAME__DBD += devIocStats.dbd
 _APPNAME__DBD += autosave.dbd
 _APPNAME__DBD += caPutLog.dbd
 
+ifeq ($(T_A),linuxRT-x86)
+ _APPNAME__DBD += systemCommand.dbd
+endif
+
 # If you have an EVR uncomment the following two lines:
 # _APPNAME__DBD += evrSupport.dbd
 # _APPNAME__DBD += devMrfEr.dbd
 
+# ======================================================================
 # <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
 _APPNAME__SRCS += _APPNAME__registerRecordDeviceDriver.cpp
-_APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
+
+ifneq ($(T_A),linuxRT-x86)
+ _APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
+endif
+
 _APPNAME__SRCS_vxWorks += -nil-
 
+ifeq ($(T_A),linuxRT-x86)
+_APPNAME__SRCS_DEFAULT += _APPNAME__linuxRT_Main_.cpp
+_APPNAME__SRCS += systemCommand.c
+endif
+# ========================================================================
+# ========================================================================
 # Add locally compiled object code
 # For example, subroutines
+# ========================================================================
 # _APPNAME__SRCS += file1.c
 # _APPNAME__SRCS += file2.c
 
@@ -53,11 +69,21 @@ _APPNAME__LIBS += autosave
 # Needed to link caPutLog support
 _APPNAME__LIBS += caPutLog
 
+# ===================================
 # Needed to link in the EVR support
+# ===================================
 # _APPNAME__LIBS += evrSupport
 # _APPNAME__LIBS += devMrfEr
-# _APPNAME__LIBS += mrfVme64x
 
+# ifneq ($(T_A),linuxRT-x86)
+#  _APPNAME__LIBS += mrfVme64x
+# endif
+
+# ifeq ($(T_A),linuxRT-x86)
+#  _APPNAME__LIBS += drvMrf
+#  _APPNAME__LIBS += mrfApi
+# endif
+ 
 # =====================================================
 
 # NOTE: To build SNL programs, SNCSEQ must be defined
