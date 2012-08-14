@@ -12,6 +12,14 @@ include $(TOP)/configure/CONFIG
 # databases, templates, substitutions like this
 DB += dbExample.db
 
+# ========================================
+# Install timing/event related databases
+# ========================================
+#DB += IOCNAME-evr.db
+#DB += IOCNAME-pattern.db
+#DB += IOCNAME-trig.db
+#DB += IOCNAME-bsa.db
+
 # Install Common databases needed by All IOCs
 # ========================================================
 # Install databases from iocAdmin package
