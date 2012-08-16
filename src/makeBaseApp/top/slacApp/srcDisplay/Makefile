@@ -1,5 +1,4 @@
 #  -*- Makefile -*-
-T_A=$EPICS_HOST_ARCH
 TOP=../..
 include $(TOP)/configure/CONFIG
 #----------------------------------------
