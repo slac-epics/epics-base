@@ -76,7 +76,9 @@ _APPNAME__LIBS += caPutLog
 # _APPNAME__LIBS += devMrfEr
 
 # ifneq ($(T_A),linuxRT-x86)
-#  _APPNAME__LIBS += mrfVme64x
+#   ifneq ($(T_A),linux-x86)
+#       _APPNAME__LIBS += mrfVme64x
+#   endif
 # endif
 
 # ifeq ($(T_A),linuxRT-x86)
@@ -84,6 +86,13 @@ _APPNAME__LIBS += caPutLog
 #  _APPNAME__LIBS += mrfApi
 # endif
  
+# ifeq ($(T_A),linux-x86)
+#  _APPNAME__LIBS += drvMrf
+#  _APPNAME__LIBS += mrfApi
+# endif
+
+
+
 # =====================================================
 
 # NOTE: To build SNL programs, SNCSEQ must be defined
