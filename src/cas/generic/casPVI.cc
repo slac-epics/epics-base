@@ -210,7 +210,7 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
             }
         }
         else {
-         	errPrintf( S_cas_badType, __FILE__, __LINE__,
+            errPrintf( S_cas_badType, __FILE__, __LINE__,
                 "application type \"enums\" string conversion"
                 " table for enumerated PV %s", getName() );
         }
@@ -246,9 +246,9 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
             }
         }
         else {
-            errMessage ( S_cas_badType, 
-                "application type \"enums\" string conversion"
-                " table for enumerated PV isnt a string type?" );
+            errPrintf( S_cas_badType, __FILE__, __LINE__,
+                "app type \"enums\" string conversion"
+                " table for enumerated PV %s", getName() );
         }
     }
     else {
