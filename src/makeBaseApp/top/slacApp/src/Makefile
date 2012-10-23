@@ -43,7 +43,7 @@ endif
 _APPNAME__SRCS_vxWorks += -nil-
 
 ifeq ($(T_A),linuxRT-x86)
-_APPNAME__SRCS_DEFAULT += _APPNAME__linuxRT_Main_.cpp
+_APPNAME__SRCS_DEFAULT += _APPNAME_linuxRT_Main_.cpp
 _APPNAME__SRCS += systemCommand.c
 endif
 # ========================================================================

@@ -125,7 +125,7 @@ TEMPLATES += top/slacApp/src/_APPNAME_Main.cpp
 # =====================================================
 # Added by ELW to support linuxRT
 # =====================================================
-TEMPLATES += top/slacApp/src/_APPNAME__linuxRT_Main_.cpp
+TEMPLATES += top/slacApp/src/_APPNAME_linuxRT_Main_.cpp
 TEMPLATES += top/slacApp/src/systemCommand.c
 TEMPLATES += top/slacApp/src/systemCommand.dbd
 # ======================================================
