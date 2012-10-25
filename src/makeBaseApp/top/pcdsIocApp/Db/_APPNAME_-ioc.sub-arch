@@ -2,10 +2,6 @@
 # _APPNAME_ substitutions file
 #
 
-#
-# _APPNAME_ substitutions file
-#
-
 # Generate iocAdmin archive request 
 #	Macros:
 #		IOC		- PV prefix for all iocAdmin PV's

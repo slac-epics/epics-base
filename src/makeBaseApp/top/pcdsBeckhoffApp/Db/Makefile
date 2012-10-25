@@ -18,13 +18,13 @@ DB += Bx9000.db
 # Create and install (or just install)
 # Archive files, templates, substitutions like this
 #
-ARCHIVE += archive__APPNAME_.archive
+ARCHIVE += _APPNAME_-ioc.archive
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
 #
-REQ += autosave__APPNAME_.req
+REQ += _APPNAME_-ioc.req
 
 # Nothing to build for autosave, just install from $AUTOSAVE/db
 DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db

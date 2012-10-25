@@ -1,11 +1,11 @@
 #!/bin/bash
 
+# Set the IOC name
+export IOC="_IOC_"
+
 # Setup the IOC user environment
 # TODO: Change xxx as needed for your hutch
 source /reg/d/iocCommon/All/xxx_env.sh
-
-# Set the IOC name
-export IOC="_IOC_"
 
 # Make sure the IOC's data directories are ready for use
 $RUNUSER "mkdir -p $IOC_DATA/$IOC/autosave"

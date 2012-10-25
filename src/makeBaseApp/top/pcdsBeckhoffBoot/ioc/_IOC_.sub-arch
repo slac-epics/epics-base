@@ -3,7 +3,7 @@
 ## iocAdmin PV's on this IOC
 
 # Generate IOC archive request 
-file archive__APPNAME_.archive
+file _APPNAME_-ioc.archive
 {
 	{ IOC = "_IOCPVROOT_", COUPLER_LOC = $(COUPLER_LOC) }
 }

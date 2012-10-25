@@ -11,11 +11,6 @@ TARGETS = envPaths
 USR_ARCHIVEFLAGS += -V
 
 #----------------------------------------------------
-# Create and install IOC motors db file
-#
-DB += _IOC_-motors.db
-
-#----------------------------------------------------
 # Create and install IOC archive file
 #
 ARCHIVE += _IOC_.archive
@@ -24,7 +19,6 @@ ARCHIVE += _IOC_.archive
 # Create and install IOC autosave file
 #
 REQ += _IOC_.req
-REQ += _IOC_-positions.req
 
-include $(TOP)/configure/RULES
-include $(TOP)/configure/RULES.ioc-targets
+include $(CONFIG)/RULES
+include $(CONFIG)/RULES.ioc-targets
