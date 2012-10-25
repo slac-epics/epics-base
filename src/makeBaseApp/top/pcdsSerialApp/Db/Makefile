@@ -11,20 +11,21 @@ include $(TOP)/configure/CONFIG
 # Create and install (or just install)
 # databases, templates, substitutions like this
 DB += iocAdmin.db
-DB += evrPmc230.db
-DB += evrVme230.db
+DB += exampleDevice.db
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Archive files, templates, substitutions like this
 #
 ARCHIVE += _APPNAME_-ioc.archive
+ARCHIVE += exampleDevice.tpl-arch
 
 #----------------------------------------------------
 # Create and install (or just install)
 # Autosave request files, templates, substitutions like this
 #
 REQ += _APPNAME_-ioc.req
+REQ += exampleDevice.tpl-req
 
 # Nothing to build for autosave, just install from $AUTOSAVE/db
 DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db

@@ -176,11 +176,10 @@ TEMPLATES += top/pcdsDemoBoot/ioc/README@vxWorks6
 
 # pcdsIocApp - Basic pcds IOC including autosave and iocAdmin
 
-TEMPLATES += top/pcdsIocApp/Replace.pl
 TEMPLATES += top/pcdsIocApp/Makefile
 TEMPLATES += top/pcdsIocApp/Db/Makefile
-TEMPLATES += top/pcdsIocApp/Db/autosave__APPNAME_.sub-req
-TEMPLATES += top/pcdsIocApp/Db/archive__APPNAME_.sub-arch
+TEMPLATES += top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
+TEMPLATES += top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
@@ -204,6 +203,7 @@ TEMPLATES += top/pcdsIocBoot/ioc/startup.cmd@RTEMS
 TEMPLATES += top/pcdsIocBoot/ioc/README@Common
 
 TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.sub-req
 
 
 ######################################################################
@@ -216,8 +216,8 @@ TEMPLATES += top/pcdsIocBoot/ioc/_IOC_.sub-arch
 TEMPLATES += top/pcdsEvrApp/Makefile
 
 TEMPLATES += top/pcdsEvrApp/Db/Makefile
-TEMPLATES += top/pcdsEvrApp/Db/autosave__APPNAME_.sub-req
-TEMPLATES += top/pcdsEvrApp/Db/archive__APPNAME_.sub-arch
+TEMPLATES += top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
+TEMPLATES += top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evrPmc230.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evrVme230.substitutions
@@ -244,6 +244,7 @@ TEMPLATES += top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
 TEMPLATES += top/pcdsEvrBoot/ioc/README@Common
 
 TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsEvrBoot/ioc/_IOC_.sub-req
 
 ######################################################################
 # PCDS templates: 'pcdsMotorApp' and 'pcdsMotorBoot'.
@@ -318,8 +319,8 @@ TEMPLATES += top/pcdsModuleLib/src/_APPNAME_.h
 TEMPLATES += top/pcdsBeckhoffApp/Makefile
 
 TEMPLATES += top/pcdsBeckhoffApp/Db/Makefile
-TEMPLATES += top/pcdsBeckhoffApp/Db/autosave__APPNAME_.sub-req
-TEMPLATES += top/pcdsBeckhoffApp/Db/archive__APPNAME_.sub-arch
+TEMPLATES += top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
+TEMPLATES += top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsBeckhoffApp/Db/Bx9000.substitutions
 
@@ -345,6 +346,53 @@ TEMPLATES += top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
 TEMPLATES += top/pcdsBeckhoffBoot/ioc/README@Common
 
 TEMPLATES += top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req
+
+######################################################################
+# PCDS templates: 'pcdsSerialApp' and 'pcdsSerialBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsSerialApp - Basic pcds IOC including autosave, iocAdmin, and EVR
+
+TEMPLATES += top/pcdsSerialApp/Makefile
+
+TEMPLATES += top/pcdsSerialApp/Db/Makefile
+TEMPLATES += top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
+TEMPLATES += top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
+TEMPLATES += top/pcdsSerialApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.db
+TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.tpl-arch
+TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.tpl-req
+
+TEMPLATES += top/pcdsSerialApp/src/Makefile
+TEMPLATES += top/pcdsSerialApp/src/_APPNAME_Main.cpp
+
+TEMPLATES += top/pcdsSerialApp/srcProtocol/Makefile
+TEMPLATES += top/pcdsSerialApp/srcProtocol/example.proto
+
+TEMPLATES += top/pcdsSerialApp/configure/RELEASE
+TEMPLATES += top/pcdsSerialApp/configure/CONFIG_SITE
+
+# pcdsSerialBoot - based on lclsBoot.  Will copy 'iocBoot' (and st.cmd!)
+# into INSTALL_LOCATION if you aren't building in your development
+# directory.
+
+TEMPLATES += top/pcdsSerialBoot/Makefile
+
+TEMPLATES += top/pcdsSerialBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsSerialBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsSerialBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsSerialBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsSerialBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsSerialBoot/ioc/README@Common
+TEMPLATES += top/pcdsSerialBoot/ioc/README@RTEMS
+
+TEMPLATES += top/pcdsSerialBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsSerialBoot/ioc/_IOC_.sub-req
 
 ######################################################################
 # End of PCDS additions

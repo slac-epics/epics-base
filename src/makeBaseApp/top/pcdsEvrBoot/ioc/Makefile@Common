@@ -1,5 +1,6 @@
-# Makefile to install the st.cmd into the correctly location.
-# Author: Jason Tiller
+# IOC instance Makefile
+# Generates envPaths and expands the instance
+# specific substitution files.
 
 TOP = ../..
 include $(TOP)/configure/CONFIG
@@ -14,10 +15,10 @@ USR_ARCHIVEFLAGS += -V
 #
 ARCHIVE += _IOC_.archive
 
-# See RULES.copy for more information on these variables.
-COPY_ONLY_IF_NON_LOCAL=1
-COPY_SUBDIR=iocBoot/_IOC_
-COPY_FILES=st.cmd
+#----------------------------------------------------
+# Create and install IOC autosave file
+#
+REQ += _IOC_.req
 
 include $(TOP)/configure/RULES
 include $(TOP)/configure/RULES.ioc-targets
