@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20110608161626-57vf3rfrk73ppemb */
 /*
  *      Original Author: Bob Dalesio
  *      Date:            7-14-89 
@@ -92,12 +92,14 @@ static void reset(compressRecord *prec)
 
 static void monitor(compressRecord *prec)
 {
-	unsigned short	monitor_mask;
+    unsigned short alarm_mask = recGblResetAlarms(prec);
+    unsigned short monitor_mask = alarm_mask | DBE_LOG | DBE_VALUE;
 
-        monitor_mask = recGblResetAlarms(prec);
-	monitor_mask |= (DBE_LOG|DBE_VALUE);
-	if(monitor_mask) db_post_events(prec,prec->bptr,monitor_mask);
-	return;
+    if (alarm_mask || prec->nuse != prec->ouse) {
+        db_post_events(prec, &prec->nuse, monitor_mask);
+        prec->ouse = prec->nuse;
+    }
+    db_post_events(prec, prec->bptr, monitor_mask);
 }
 
 static void put_value(compressRecord *prec,double *psource, epicsInt32 n)

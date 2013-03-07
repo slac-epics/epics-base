@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution.
 #*************************************************************************
 #
-#  Revision-Id: jba@aps.anl.gov-20101026200048-yl4pqc4jl040iqea
+#  Revision-Id: anj@aps.anl.gov-20121203223927-t0rimstup8p1sn9m
 #
 #  CONFIG_SITE  - Global site configuration file
 #
@@ -72,20 +72,22 @@
 #       linux-cris              (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
+#       linux-microblaze
 #       linux-xscale_be
-#       linuxRT-x86             (linux-rt with uClibc; created by Till Strauman)
-#       linuxRT-ppcP2020        (linux-rt with uClibc; created by Till Strauman)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
+#       vxWorks-ppc32           (32-bit PowerPC CPUs with full FPU)
+#       vxWorks-ppc32sf         (32-bit PowerPC CPUs without FPU)
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
 #       vxWorks-ppc604_long
 #       vxWorks-ppc604_altivec
 #       vxWorks-mpc8540
+#       vxWorks-mpc8548
 #       RTEMS-at91rm9200ek
 #       RTEMS-beatnik
 #       RTEMS-gen68360
@@ -104,13 +106,8 @@
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
-#CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
-#CROSS_COMPILER_TARGET_ARCHS=rt-linux
-
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec linuxRT-x86 
-
-
+CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
@@ -123,9 +120,9 @@ CROSS_COMPILER_HOST_ARCHS=
 #     NOTE: os/CONFIG.$(EPICS_HOST_ARCH).$(EPICS_HOST_ARCH) files and
 #     os/CONFIG_SITE.$(EPICS_HOST_ARCH).$(EPICS_HOST_ARCH) files may override
 #
-#     NOTE WIN32: YES results in a DLL.  Valid settings are
-#                   SHARED_LIBRARIES=YES and STATIC_BUILD=NO
-#                   SHARED_LIBRARIES=NO  and STATIC_BUILD=YES
+#     NOTE Windows: YES results in a DLL.  Valid settings are
+#        SHARED_LIBRARIES=YES  and  STATIC_BUILD=NO
+#        SHARED_LIBRARIES=NO   and  STATIC_BUILD=YES
 #
 SHARED_LIBRARIES=YES
 
@@ -177,19 +174,19 @@ COMPAT_313=NO
 #INSTALL_LOCATION=<fullpathname>
 
 # Use POSIX thread priority scheduling (YES or NO)
-USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
+USE_POSIX_THREAD_PRIORITY_SCHEDULING = NO
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-# Optimized Build
-EPICS_SITE_VERSION = SLAC_2
+EPICS_SITE_VERSION =
 
 # For GNU compiler, use pipes rather than temporary files for communication 
 # between the various stages of compilation.
 GCC_PIPE = NO
 
-#  Include RPATH when linking executables and libraries.
-#       must be either YES or NO
-LINKER_USE_RPATH=YES
-#LINKER_USE_RPATH=NO
+# Set RPATH when linking executables and libraries.
+#  Must be either YES or NO.  If you set this to NO you must also provide a
+#  way for Base executables to find their shared libraries when they are
+#  run at build-time, e.g. set the LD_LIBRARY_PATH environment variable.
+LINKER_USE_RPATH = YES
 

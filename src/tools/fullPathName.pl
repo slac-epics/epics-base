@@ -7,7 +7,7 @@ eval 'exec perl -S -w  $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# Revision-Id: anj@aps.anl.gov-20101026142747-yfjkhakzmp4rnj0g
+# Revision-Id: anj@aps.anl.gov-20110608171518-onrlqi2bcf4wmbhs
 
 # Determines an absolute pathname for its argument,
 # which may be either a relative or absolute path and
@@ -29,7 +29,7 @@ $Getopt::Std::OUTPUT_HELP_VERSION = 1;
 my $path = AbsPath(shift);
 
 # Escape shell special characters unless on Windows, which doesn't allow them.
-$path =~ s/([!"\$&'\(\)*,:;<=>?\[\\\]^`{|}])/\\\1/g unless $^O eq 'MSWin32';
+$path =~ s/([!"\$&'\(\)*,:;<=>?\[\\\]^`{|}])/\\$1/g unless $^O eq 'MSWin32';
 
 print "$path\n";
 

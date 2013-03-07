@@ -10,7 +10,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+// Revision-Id: anj@aps.anl.gov-20111129221419-re5dzg24xgranr6t
 // 
 
 #include <stdio.h>
@@ -1109,7 +1109,7 @@ gddStatus gdd::clearData(void)
 			str->clear();
         }
         else if ( this->primitiveType() == aitEnumFixedString ) {
-            memset ( this->data.FString, '\0', sizeof ( this->data.FString ) );
+            memset ( this->data.FString, '\0', sizeof(aitFixedString) );
         }
         else {
             memset ( & this->data, '\0', sizeof ( this->data ) );

@@ -34,11 +34,6 @@
 #   pragma warning ( pop )
 #endif
 
-/* Suggested by Till Strauman to support linuxRT from SLAC */
-#ifdef isfinite
-#define finite(x) isfinite(x)
-#endif
-
 template class tsFreeList < epicsTimerForC, 0x20 >;
 
 epicsTimer::~epicsTimer () {}

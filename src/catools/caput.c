@@ -251,7 +251,6 @@ int caget (pv *pvs, int nPvs, OutputT format,
 
 int main (int argc, char *argv[])
 {
-    int n = 0;
     int i;
     int result;                 /* CA result */
     OutputT format = plain;     /* User specified format */
@@ -273,10 +272,10 @@ int main (int argc, char *argv[])
     struct dbr_gr_enum bufGrEnum;
 
     int nPvs;                   /* Number of PVs */
-    pv* pvs = 0;                /* Array of PV structures */
+    pv* pvs;                /* Array of PV structures */
 
-    setvbuf(stdout,NULL,_IOLBF,BUFSIZ);   /* Set stdout to line buffering */
-    putenv("POSIXLY_CORRECT=");      /* Behave correct on GNU getopt systems */
+    LINE_BUFFER(stdout);        /* Configure stdout buffering */
+    putenv("POSIXLY_CORRECT="); /* Behave correct on GNU getopt systems */
 
     while ((opt = getopt(argc, argv, ":cnlhatsS#:w:p:F:")) != -1) {
         switch (opt) {
@@ -372,7 +371,7 @@ int main (int argc, char *argv[])
     result = ca_context_create(ca_enable_preemptive_callback);
     if (result != ECA_NORMAL) {
         fprintf(stderr, "CA error %s occurred while trying "
-                "to start channel access '%s'.\n", ca_message(result), pvs[n].name);
+                "to start channel access.\n", ca_message(result));
         return 1;
     }
                                 /* Allocate PV structure array */
@@ -493,12 +492,12 @@ int main (int argc, char *argv[])
         if (charArrAsStr) {
             count = len;
             dbrType = DBR_CHAR;
-            ebuf = calloc(strlen(cbuf), sizeof(char));
+            ebuf = calloc(strlen(cbuf)+1, sizeof(char));
             if(!ebuf) {
                 fprintf(stderr, "Memory allocation failed\n");
                 return 1;
             }
-            epicsStrnRawFromEscaped(ebuf, strlen(cbuf), cbuf, strlen(cbuf));
+            epicsStrnRawFromEscaped(ebuf, strlen(cbuf)+1, cbuf, strlen(cbuf));
         } else {
             for (i = 0; i < count; ++i) {
                 epicsStrnRawFromEscaped(sbuf[i], sizeof(EpicsStr), *(argv+optind+i), sizeof(EpicsStr));
