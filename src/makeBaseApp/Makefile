@@ -5,6 +5,16 @@ include $(TOP)/configure/CONFIG
 TEMPLATES_DIR = makeBaseApp
 
 TEMPLATES += top/Makefile
+## ================================================
+## SLAC Installed Templates (Added by ELW)
+## ================================================
+TEMPLATES += top/README
+TEMPLATES += top/RELEASE_NOTES
+TEMPLATES += top/RELEASE_SITE
+# =================================================
+## End addition by ELW
+## ================================================
+
 TEMPLATES += top/configure/CONFIG
 TEMPLATES += top/configure/CONFIG_SITE
 TEMPLATES += top/configure/Makefile
@@ -13,6 +23,15 @@ TEMPLATES += top/configure/RULES
 TEMPLATES += top/configure/RULES.ioc
 TEMPLATES += top/configure/RULES_DIRS
 TEMPLATES += top/configure/RULES_TOP
+
+## ================================================
+## SLAC Installed Templates (Added by ELW)
+## ================================================
+TEMPLATES += top/configure/RULES.Restore
+
+# =================================================
+## End addition by ELW
+## ================================================
 
 TEMPLATES += top/supportApp/Makefile
 TEMPLATES += top/supportApp/Db/Makefile
@@ -86,6 +105,61 @@ TEMPLATES += top/iocBoot/ioc/st.cmd@Common
 TEMPLATES += top/iocBoot/ioc/st.cmd@Cross
 TEMPLATES += top/iocBoot/ioc/st.cmd@vxWorks
 TEMPLATES += top/iocBoot/ioc/st.cmd@RTEMS
+
+## ============================================
+## SLAC Style Templates (Added by ELW)
+## ============================================
+TEMPLATES += top/slacApp/Makefile
+TEMPLATES += top/slacApp/Db/Makefile
+TEMPLATES += top/slacApp/Db/dbExample.db
+TEMPLATES += top/slacApp/Db/IOCNAME-bsa.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-evr.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-pattern.substitutions
+TEMPLATES += top/slacApp/Db/IOCNAME-trig.substitutions
+
+TEMPLATES += top/slacApp/src/Makefile
+TEMPLATES += top/slacApp/src/sncExample.stt
+TEMPLATES += top/slacApp/src/sncProgram.st
+TEMPLATES += top/slacApp/src/sncExample.dbd
+TEMPLATES += top/slacApp/src/_APPNAME_Main.cpp
+# =====================================================
+# Added by ELW to support linuxRT
+# =====================================================
+TEMPLATES += top/slacApp/src/_APPNAME_linuxRT_Main_.cpp
+TEMPLATES += top/slacApp/src/systemCommand.c
+TEMPLATES += top/slacApp/src/systemCommand.dbd
+# ======================================================
+
+TEMPLATES += top/slacApp/srcDisplay/Makefile
+TEMPLATES += top/slacApp/srcDisplay/CONFIG_EDL
+TEMPLATES += top/slacApp/srcDisplay/example.edl
+
+TEMPLATES += top/slacApp/srcRestore/Makefile
+TEMPLATES += top/slacApp/srcRestore/example.cwConfig
+
+TEMPLATES += top/slacBoot/Makefile
+TEMPLATES += top/slacBoot/ioc/Makefile@Common
+TEMPLATES += top/slacBoot/ioc/Makefile@vxWorks
+TEMPLATES += top/slacBoot/ioc/Makefile@RTEMS
+TEMPLATES += top/slacBoot/ioc/st.cmd@Common
+TEMPLATES += top/slacBoot/ioc/st.cmd@Cross
+TEMPLATES += top/slacBoot/ioc/st.cmd@vxWorks
+TEMPLATES += top/slacBoot/ioc/st.cmd@RTEMS
+
+# =============================================================
+# Added by ELW to support linuxRT
+# =============================================================
+TEMPLATES += top/slacBoot/ioc/st.cmd@linuxRT
+TEMPLATES += top/slacBoot/ioc/rtPrioritySetup.cmd@linuxRT
+# =============================================================
+
+TEMPLATES += top/slacBoot/ioc/README@Common
+TEMPLATES += top/slacBoot/ioc/README@vxWorks
+TEMPLATES += top/slacBoot/ioc/
+
+## ==========================================
+## End Changes needed for SLAC ==============
+## ==========================================
 
 SCRIPTS_HOST += makeBaseApp.pl
 

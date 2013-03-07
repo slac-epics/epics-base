@@ -49,8 +49,14 @@ static int mutexLock(pthread_mutex_t *id)
 
 /* Until these can be demonstrated to work leave them undefined*/
 /* On solaris 8 _POSIX_THREAD_PRIO_INHERIT fails*/
+/* We need this for linux; so we will try them now.
 #undef _POSIX_THREAD_PROCESS_SHARED
 #undef _POSIX_THREAD_PRIO_INHERIT
+*/
+
+
+#define _POSIX_THREAD_PROCESS_SHARED
+#define _POSIX_THREAD_PRIO_INHERIT
 
 /* Two completely different implementations are provided below
  * If support is available for PTHREAD_MUTEX_RECURSIVE then
@@ -136,6 +142,7 @@ void epicsMutexOsdShow(struct epicsMutexOSD * pmutex, unsigned int level)
 }
 
 #else /*defined(_XOPEN_SOURCE) && (_XOPEN_SOURCE)>=500 */
+#error "PTHREAD_MUTEX_RECURSIVE is not allowed... Sorry about it :(" 
 
 typedef struct epicsMutexOSD {
     pthread_mutexattr_t mutexAttr;

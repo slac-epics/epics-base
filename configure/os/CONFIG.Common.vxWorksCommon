@@ -171,8 +171,8 @@ OP_SYS_INCLUDE_CPPFLAGS += -include $(VX_DIR)/target/h/vxWorks.h
 
 #--------------------------------------------------
 # Optimization: Officially vxWorks only supports -O2 or less.
-OPT_CFLAGS_YES = -O2
-OPT_CXXFLAGS_YES = -O2
+OPT_CFLAGS_YES = -O2 
+OPT_CXXFLAGS_YES = -O2 
 
 #--------------------------------------------------
 # code flags
