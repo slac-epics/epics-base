@@ -6,7 +6,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /*
- * Revision-Id: ralph.lange@bessy.de-20101020143551-76qdww31y8v01l24
+ * Revision-Id: anj@aps.anl.gov-20110823182000-bubidbqy4olqqdvq
  *
  * Author: W. Eric Norum
  */

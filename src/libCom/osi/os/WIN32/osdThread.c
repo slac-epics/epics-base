@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- * Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ * Revision-Id: anj@aps.anl.gov-20120618195203-fn89v5ir0faou35v
  *
  * Author: Jeff Hill
  * 
@@ -124,7 +124,7 @@ BOOL WINAPI DllMain (
 #if _WIN32_WINNT >= 0x0501 
         /* 
          * Only in WXP 
-         * Thats a shame becaus ethis is probably much faster
+         * Thats a shame because this is probably much faster
          */
         success = GetModuleHandleEx (
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
@@ -268,13 +268,10 @@ static void threadCleanupWIN32 ( void )
         return;
     }
 
-    while ( ( pParm = ( win32ThreadParam * ) ellFirst ( & pGbl->threadList ) ) ) {
+    while ( ( pParm = ( win32ThreadParam * ) 
+        ellFirst ( & pGbl->threadList ) ) ) {
         epicsParmCleanupWIN32 ( pParm );
     }
-
-    TlsFree ( pGbl->tlsIndexThreadLibraryEPICS );
-
-    DeleteCriticalSection ( & pGbl->mutex );
 }
 
 /*
@@ -446,9 +443,13 @@ epicsShareFunc epicsThreadBooleanStatus epicsShareAPI epicsThreadHighestPriority
 /*
  * epicsThreadGetStackSize ()
  */
-epicsShareFunc unsigned int epicsShareAPI epicsThreadGetStackSize ( epicsThreadStackSizeClass stackSizeClass ) 
+epicsShareFunc unsigned int epicsShareAPI 
+    epicsThreadGetStackSize ( epicsThreadStackSizeClass stackSizeClass ) 
 {
-    static const unsigned stackSizeTable[epicsThreadStackBig+1] = {4000, 6000, 11000};
+    #define STACK_SIZE(f) (f * 0x10000 * sizeof(void *))
+    static const unsigned stackSizeTable[epicsThreadStackBig+1] = {
+        STACK_SIZE(1), STACK_SIZE(2), STACK_SIZE(4)
+    };
 
     if (stackSizeClass<epicsThreadStackSmall) {
         fprintf ( stderr,
@@ -635,9 +636,9 @@ epicsShareFunc epicsThreadId epicsShareAPI epicsThreadCreate (const char *pName,
 
     wstat =  ResumeThread ( pParmWIN32->handle );
     if (wstat==0xFFFFFFFF) {
-        EnterCriticalSection ( & pGbl->mutex );
-        ellDelete ( & pGbl->threadList, & pParmWIN32->node );
-        LeaveCriticalSection ( & pGbl->mutex );
+		    EnterCriticalSection ( & pGbl->mutex );
+		    ellDelete ( & pGbl->threadList, & pParmWIN32->node );
+		    LeaveCriticalSection ( & pGbl->mutex );
         CloseHandle ( pParmWIN32->handle ); 
         free ( pParmWIN32 );
         return NULL;
@@ -778,17 +779,14 @@ epicsShareFunc void epicsShareAPI epicsThreadSleep ( double seconds )
     static const unsigned mSecPerSec = 1000;
     DWORD milliSecDelay;
 
-    if ( seconds <= 0.0 ) {
+    if ( seconds > 0.0 ) {
+        seconds *= mSecPerSec;
+        seconds += 0.99999999;  /* 8 9s here is optimal */
+        milliSecDelay = ( seconds >= INFINITE ) ?
+            INFINITE - 1 : ( DWORD ) seconds;
+    }
+    else {  /* seconds <= 0 or NAN */
         milliSecDelay = 0u;
-    }
-    else if ( seconds >= INFINITE / mSecPerSec ) {
-        milliSecDelay = INFINITE - 1;
-    }
-    else {
-        milliSecDelay = ( DWORD ) ( ( seconds * mSecPerSec ) + 0.5 );
-        if ( milliSecDelay == 0 ) {
-            milliSecDelay = 1;
-        }
     }
     Sleep ( milliSecDelay );
 }
@@ -958,10 +956,17 @@ static void epicsThreadShowPrivate ( epicsThreadId id, unsigned level )
             (void *) pParm, idForFormat, pParm->epicsPriority,
             epics_GetThreadPriorityAsString ( pParm->handle ),
             epicsThreadIsSuspended ( id ) ? "suspend" : "ok" );
+        if ( level ) {
+            fprintf (epicsGetStdout(), " %-8p %-8p ",
+                (void *) pParm->handle, (void *) pParm->parm );
+        }
     }
     else {
         fprintf (epicsGetStdout(), 
             "NAME            EPICS-ID WIN32-ID EPICS-PRI WIN32-PRI STATE  " );
+        if ( level ) {
+            fprintf (epicsGetStdout(), " HANDLE   FUNCTION PARAMETER" );
+        }
     }
     fprintf (epicsGetStdout(),"\n" );
 }

@@ -9,7 +9,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20101026142747-yfjkhakzmp4rnj0g
+# Revision-Id: anj@aps.anl.gov-20110713153813-utpd5swcmji6ce4l
 #
 # Convert configure/RELEASE file(s) into something else.
 #
@@ -19,7 +19,7 @@ use strict;
 use FindBin qw($Bin);
 use lib ("$Bin/../../lib/perl", $Bin);
 
-use Cwd qw(cwd abs_path);
+use Cwd qw(cwd);
 use Getopt::Std;
 use EPICS::Path;
 use EPICS::Release;
@@ -215,7 +215,7 @@ sub checkRelease {
         
         while (my ($parent, $ppath) = each %check) {
             if (exists $macros{$parent} &&
-                abs_path($macros{$parent}) ne abs_path($ppath)) {
+                AbsPath($macros{$parent}) ne AbsPath($ppath)) {
                 print "\n" unless ($status);
                 print "Definition of $parent conflicts with $app support.\n";
                 print "In this application a RELEASE file defines\n";

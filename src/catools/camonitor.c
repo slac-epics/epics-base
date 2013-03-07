@@ -6,8 +6,7 @@
 *     Operator of Los Alamos National Laboratory.
 * Copyright (c) 2002 Berliner Elektronenspeicherringgesellschaft fuer
 *     Synchrotronstrahlung.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
+* EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
@@ -43,45 +42,49 @@ static int nConn = 0;                                     /* Number of connected
 
 void usage (void)
 {
-    fprintf (stderr, "\nUsage: camonitor [options] <PV name> ...\n\n"
-    "  -h: Help: Print this message\n"
+    fprintf (stderr, "\nUsage: camonitor [options] <PV name> ...\n"
+    "\n"
+    "  -h:       Help; Print this message\n"
     "Channel Access options:\n"
-    "  -w <sec>:  Wait time, specifies CA timeout, default is %f second(s)\n"
-    "  -m <mask>: Specify CA event mask to use, with <mask> being any combination of\n"
-    "             'v' (value), 'a' (alarm), 'l' (log/archive), 'p' (property). Default: va\n"
-    "  -p <prio>: CA priority (0-%u, default 0=lowest)\n"
+    "  -w <sec>: Wait time, specifies CA timeout, default is %f second(s)\n"
+    "  -m <msk>: Specify CA event mask to use.  <msk> is any combination of\n"
+    "            'v' (value), 'a' (alarm), 'l' (log/archive), 'p' (property).\n"
+    "            Default event mask is 'va'\n"
+    "  -p <pri>: CA priority (0-%u, default 0=lowest)\n"
     "Timestamps:\n"
-    "  Default: Print absolute timestamps (as reported by CA server)\n"
-    "  -t <key>:  Specify timestamp source(s) and type, with <key> containing\n"
-    "             's' = CA server (remote) timestamps\n"
-    "             'c' = CA client (local) timestamps (shown in '()'s)\n"
-    "             'n' = no timestamps\n"
-    "             'r' = relative timestamps (time elapsed since start of program)\n"
-    "             'i' = incremental timestamps (time elapsed since last update)\n"
-    "             'I' = incremental timestamps (time elapsed since last update, by channel)\n"
+    "  Default:  Print absolute timestamps (as reported by CA server)\n"
+    "  -t <key>: Specify timestamp source(s) and type, with <key> containing\n"
+    "            's' = CA server (remote) timestamps\n"
+    "            'c' = CA client (local) timestamps (shown in '()'s)\n"
+    "            'n' = no timestamps\n"
+    "            'r' = relative timestamps (time elapsed since start of program)\n"
+    "            'i' = incremental timestamps (time elapsed since last update)\n"
+    "            'I' = incremental timestamps (time since last update, by channel)\n"
+    "            'r', 'i' or 'I' require 's' or 'c' to select the time source\n"
     "Enum format:\n"
-    "  -n: Print DBF_ENUM values as number (default are enum string values)\n"
-    "Arrays: Value format: print number of requested values, then list of values\n"
-    "  Default:    Print all values\n"
-    "  -# <count>: Print first <count> elements of an array\n"
-    "  -S:         Print array of char as a string (long string)\n"
-    "Floating point type format:\n"
-    "  Default: Use %%g format\n"
-    "  -e <nr>: Use %%e format, with a precision of <nr> digits\n"
-    "  -f <nr>: Use %%f format, with a precision of <nr> digits\n"
-    "  -g <nr>: Use %%g format, with a precision of <nr> digits\n"
-    "  -s:      Get value as string (honors server-side precision)\n"
-    "  -lx:     Round to long integer and print as hex number\n"
-    "  -lo:     Round to long integer and print as octal number\n"
-    "  -lb:     Round to long integer and print as binary number\n"
+    "  -n:       Print DBF_ENUM values as number (default is enum string)\n"
+    "Array values: Print number of elements, then list of values\n"
+    "  Default:  Request and print all elements (dynamic arrays supported)\n"
+    "  -# <num>: Request and print up to <num> elements\n"
+    "  -S:       Print arrays of char as a string (long string)\n"
+    "Floating point format:\n"
+    "  Default:  Use %%g format\n"
+    "  -e <num>: Use %%e format, with a precision of <num> digits\n"
+    "  -f <num>: Use %%f format, with a precision of <num> digits\n"
+    "  -g <num>: Use %%g format, with a precision of <num> digits\n"
+    "  -s:       Get value as string (honors server-side precision)\n"
+    "  -lx:      Round to long integer and print as hex number\n"
+    "  -lo:      Round to long integer and print as octal number\n"
+    "  -lb:      Round to long integer and print as binary number\n"
     "Integer number format:\n"
-    "  Default: Print as decimal number\n"
-    "  -0x: Print as hex number\n"
-    "  -0o: Print as octal number\n"
-    "  -0b: Print as binary number\n"
+    "  Default:  Print as decimal number\n"
+    "  -0x:      Print as hex number\n"
+    "  -0o:      Print as octal number\n"
+    "  -0b:      Print as binary number\n"
     "Alternate output field separator:\n"
-    "  -F <ofs>: Use <ofs> as an alternate output field separator\n"
-    "\nExample: camonitor -f8 my_channel another_channel\n"
+    "  -F <ofs>: Use <ofs> to separate fields in output\n"
+    "\n"
+    "Example: camonitor -f8 my_channel another_channel\n"
     "  (doubles are printed as %%f with precision of 8)\n\n"
              , DEFAULT_TIMEOUT, CA_PRIORITY_MAX);
 }
@@ -93,7 +96,7 @@ void usage (void)
  * Function:	event_handler
  *
  * Description:	CA event_handler for request type callback
- * 		Allocates the dbr structure and copies the data
+ * 		Prints the event data
  *
  * Arg(s) In:	args  -  event handler args (see CA manual)
  *
@@ -108,10 +111,12 @@ static void event_handler (evargs args)
     {
         pv->dbrType = args.type;
         pv->nElems = args.count;
-        memcpy(pv->value, args.dbr, dbr_size_n(args.type, args.count));
+        pv->value = (void *) args.dbr;    /* casting away const */
 
         print_time_val_sts(pv, reqElems);
         fflush(stdout);
+
+        pv->value = NULL;
     }
 }
 
@@ -130,51 +135,39 @@ static void connection_handler ( struct connection_handler_args args )
 {
     pv *ppv = ( pv * ) ca_puser ( args.chid );
     if ( args.op == CA_OP_CONN_UP ) {
+        nConn++;
+        if (!ppv->onceConnected) {
+            ppv->onceConnected = 1;
                                 /* Set up pv structure */
                                 /* ------------------- */
 
                                 /* Get natural type and array count */
-        ppv->nElems  = ca_element_count(ppv->chid);
-        ppv->dbfType = ca_field_type(ppv->chid);
+            ppv->dbfType = ca_field_type(ppv->chid);
+            ppv->dbrType = dbf_type_to_DBR_TIME(ppv->dbfType); /* Use native type */
+            if (dbr_type_is_ENUM(ppv->dbrType))                /* Enums honour -n option */
+            {
+                if (enumAsNr) ppv->dbrType = DBR_TIME_INT;
+                else          ppv->dbrType = DBR_TIME_STRING;
+            }
+            else if (floatAsString &&
+                     (dbr_type_is_FLOAT(ppv->dbrType) || dbr_type_is_DOUBLE(ppv->dbrType)))
+            {
+                ppv->dbrType = DBR_TIME_STRING;
+            }
+                                /* Set request count */
+            ppv->nElems   = ca_element_count(ppv->chid);
+            ppv->reqElems = reqElems > ppv->nElems ? ppv->nElems : reqElems;
 
-                                /* Set up value structures */
-        ppv->dbrType = dbf_type_to_DBR_TIME(ppv->dbfType); /* Use native type */
-        if (dbr_type_is_ENUM(ppv->dbrType))                  /* Enums honour -n option */
-        {
-            if (enumAsNr) ppv->dbrType = DBR_TIME_INT;
-            else          ppv->dbrType = DBR_TIME_STRING;
-        }
-
-        else if (floatAsString &&
-                 (dbr_type_is_FLOAT(ppv->dbrType) || dbr_type_is_DOUBLE(ppv->dbrType)))
-        {
-            ppv->dbrType = DBR_TIME_STRING;
-        }
-                                /* Adjust array count */
-        if (reqElems > ppv->nElems)
-            reqElems = ppv->nElems;
-        ppv->reqElems = reqElems;
-
-        ppv->onceConnected = 1;
-        nConn++;
                                 /* Issue CA request */
                                 /* ---------------- */
-        /* install monitor once with first connect */
-        if ( ! ppv->value ) {
-                                    /* Allocate value structure */
-            ppv->value = calloc(1, dbr_size_n(ppv->dbrType, ppv->nElems));
-            if ( ppv->value ) {
-                ppv->status = ca_create_subscription(ppv->dbrType,
+            /* install monitor once with first connect */
+            ppv->status = ca_create_subscription(ppv->dbrType,
                                                 ppv->reqElems,
                                                 ppv->chid,
                                                 eventMask,
                                                 event_handler,
                                                 (void*)ppv,
                                                 NULL);
-                if ( ppv->status != ECA_NORMAL ) {
-                    free ( ppv->value );
-                }
-            }
         }
     }
     else if ( args.op == CA_OP_CONN_DOWN ) {
@@ -204,7 +197,7 @@ static void connection_handler ( struct connection_handler_args args )
 int main (int argc, char *argv[])
 {
     int returncode = 0;
-    int n = 0;
+    int n;
     int result;                 /* CA result */
     IntFormatT outType;         /* Output type */
 
@@ -212,9 +205,9 @@ int main (int argc, char *argv[])
     int digits = 0;             /* getopt() no. of float digits */
 
     int nPvs;                   /* Number of PVs */
-    pv* pvs = 0;                /* Array of PV structures */
+    pv* pvs;                    /* Array of PV structures */
 
-    setvbuf(stdout,NULL,_IOLBF,BUFSIZ);   /* Set stdout to line buffering */
+    LINE_BUFFER(stdout);        /* Configure stdout buffering */
 
     while ((opt = getopt(argc, argv, ":nhm:sSe:f:g:l:#:0:w:t:p:F:")) != -1) {
         switch (opt) {
@@ -357,7 +350,7 @@ int main (int argc, char *argv[])
     result = ca_context_create(ca_disable_preemptive_callback);
     if (result != ECA_NORMAL) {
         fprintf(stderr, "CA error %s occurred while trying "
-                "to start channel access '%s'.\n", ca_message(result), pvs[n].name);
+                "to start channel access.\n", ca_message(result));
         return 1;
     }
                                 /* Allocate PV structure array */

@@ -1,8 +1,7 @@
 #
-# CONFIG.Common.RTEMS-mvme2100,v 1.1.2.4 2004/10/28 18:23:41 norume Exp
-# Author: W. Eric Norum
-#         Canadian Light Source
-#         eric@cls.usask.ca
+# CONFIG.Common.RTEMS-mvme3100
+# Revision-Id: anj@aps.anl.gov-20110426174446-11te76tq9ieughhv
+# Author: W. Eric Norum <wenorum@lbl.gov>
 #
 # All RTEMS targets use the same Makefile fragment
 #

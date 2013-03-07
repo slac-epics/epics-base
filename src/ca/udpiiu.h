@@ -88,8 +88,7 @@ static const double beaconAnomalySearchPeriod = 5.0; // seconds
 class udpiiu : 
     private netiiu, 
     private searchTimerNotify, 
-    private disconnectGovernorNotify,
-    private repeaterTimerNotify {
+    private disconnectGovernorNotify {
 public:
     udpiiu ( 
         epicsGuard < epicsMutex > & cacGuard,
@@ -139,9 +138,25 @@ private:
     private:
         udpiiu & _udpiiu;
     };
+    class M_repeaterTimerNotify : 
+        public repeaterTimerNotify {
+    public:
+        M_repeaterTimerNotify ( udpiiu & iiu ) : 
+            m_udpiiu ( iiu ) {}
+        ~M_repeaterTimerNotify (); /* for sunpro compiler */
+        // repeaterTimerNotify
+        void repeaterRegistrationMessage ( 
+            unsigned attemptNumber );
+        int printFormated ( 
+            epicsGuard < epicsMutex > & callbackControl, 
+            const char * pformat, ... );
+    private:
+        udpiiu & m_udpiiu;
+    };
     char xmitBuf [MAX_UDP_SEND];   
     char recvBuf [MAX_UDP_RECV];
     udpRecvThread recvThread;
+    M_repeaterTimerNotify m_repeaterTimerNotify;
     repeaterSubscribeTimer repeaterSubscribeTmr;
     disconnectGovernorTimer govTmr;
     tsDLList < SearchDest > _searchDestList;
@@ -149,8 +164,8 @@ private:
     double rtteMean;
     double rtteMeanDev;
     cac & cacRef;
-    mutable epicsMutex & cbMutex;
-    mutable epicsMutex & cacMutex;
+    epicsMutex & cbMutex;
+    epicsMutex & cacMutex;
     epics_auto_ptr < epics_auto_ptr < class searchTimer >, eapt_array > ppSearchTmr;
     unsigned nBytesInXmitBuf;
     unsigned nTimers;
@@ -278,14 +293,6 @@ private:
     void govExpireNotify ( 
         epicsGuard < epicsMutex > &, nciu & );
 
-    // repeaterTimerNotify
-    void repeaterRegistrationMessage ( 
-        unsigned attemptNumber );
-
-    int printFormated ( 
-        epicsGuard < epicsMutex > & callbackControl, 
-        const char * pformat, ... );
-
 	udpiiu ( const udpiiu & );
 	udpiiu & operator = ( const udpiiu & );
 
@@ -294,6 +301,7 @@ private:
     // These are needed for the vxWorks 5.5 compiler:
     friend class udpiiu::SearchDestUDP;
     friend class udpiiu::SearchRespCallback;
+    friend class udpiiu::M_repeaterTimerNotify;
 };
 
 #endif // udpiiuh

@@ -1,8 +1,7 @@
 #
-# CONFIG.Common.RTEMS-mvme5500,v 1.1.2.2 2004/10/28 18:23:41 norume Exp
-# Author: W. Eric Norum
-#         Advanced Photon Source
-#         norume@aps.anl.gov
+# CONFIG.Common.RTEMS-mvme5500
+# Revision-Id: anj@aps.anl.gov-20110426174446-11te76tq9ieughhv
+# Author: W. Eric Norum <wenorum@lbl.gov>
 #
 # All RTEMS targets use the same Makefile fragment
 #

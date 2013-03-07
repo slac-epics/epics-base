@@ -81,8 +81,9 @@ udpiiu::udpiiu (
         cac::lowestPriorityLevelAbove (
             cac::lowestPriorityLevelAbove (
                 cac.getInitializingThreadsPriority () ) ) ),
+    m_repeaterTimerNotify ( *this ),
     repeaterSubscribeTmr (
-        *this, timerQueue, cbMutexIn, ctxNotifyIn ),
+        m_repeaterTimerNotify, timerQueue, cbMutexIn, ctxNotifyIn ),
     govTmr ( *this, timerQueue, cacMutexIn ),
     maxPeriod ( maxSearchPeriodDefault ),
     rtteMean ( minRoundTripEstimate ),
@@ -396,15 +397,20 @@ void udpRecvThread::run ()
     } while ( ! this->iiu.shutdownCmd );
 }
 
+/* for sunpro compiler */
+udpiiu::M_repeaterTimerNotify::~M_repeaterTimerNotify () 
+{
+}
+
 /*
- *  udpiiu::repeaterRegistrationMessage ()
+ *  udpiiu::M_repeaterTimerNotify::repeaterRegistrationMessage ()
  *
  *  register with the repeater 
  */
-void udpiiu::repeaterRegistrationMessage ( unsigned attemptNumber )
+void udpiiu :: M_repeaterTimerNotify :: repeaterRegistrationMessage ( unsigned attemptNumber )
 {
-    epicsGuard < epicsMutex > cbGuard ( this->cacMutex );
-    caRepeaterRegistrationMessage ( this->sock, this->repeaterPort, attemptNumber );
+    epicsGuard < epicsMutex > cbGuard ( m_udpiiu.cacMutex );
+    caRepeaterRegistrationMessage ( m_udpiiu.sock, m_udpiiu.repeaterPort, attemptNumber );
 }
 
 /*
@@ -1233,16 +1239,16 @@ void udpiiu::govExpireNotify (
     this->ppSearchTmr[0]->installChannel ( guard, chan );
 }
 
-int udpiiu :: printFormated ( 
-    epicsGuard < epicsMutex > & cbGuard, 
-                    const char * pformat, ... )
+int udpiiu :: M_repeaterTimerNotify :: printFormated ( 
+                            epicsGuard < epicsMutex > & cbGuard, 
+                            const char * pformat, ... )
 {
     va_list theArgs;
     int status;
 
     va_start ( theArgs, pformat );
     
-    status = this->cacRef.varArgsPrintFormated ( cbGuard, pformat, theArgs );
+    status = m_udpiiu.cacRef.varArgsPrintFormated ( cbGuard, pformat, theArgs );
     
     va_end ( theArgs );
     
