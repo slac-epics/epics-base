@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution.
 #*************************************************************************
 #
-#  Revision-Id: jba@aps.anl.gov-20101026200048-yl4pqc4jl040iqea
+#  Revision-Id: anj@aps.anl.gov-20121203223927-t0rimstup8p1sn9m
 #
 #  CONFIG_SITE  - Global site configuration file
 #
@@ -72,18 +72,22 @@
 #       linux-cris              (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
+#       linux-microblaze
 #       linux-xscale_be
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
 #       vxWorks-68060
 #       vxWorks-pentium
+#       vxWorks-ppc32           (32-bit PowerPC CPUs with full FPU)
+#       vxWorks-ppc32sf         (32-bit PowerPC CPUs without FPU)
 #       vxWorks-ppc603
 #       vxWorks-ppc603_long
 #       vxWorks-ppc604
 #       vxWorks-ppc604_long
 #       vxWorks-ppc604_altivec
 #       vxWorks-mpc8540
+#       vxWorks-mpc8548
 #       RTEMS-at91rm9200ek
 #       RTEMS-beatnik
 #       RTEMS-gen68360
@@ -103,7 +107,7 @@
 # override 
 #
 CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
@@ -116,9 +120,9 @@ CROSS_COMPILER_HOST_ARCHS=
 #     NOTE: os/CONFIG.$(EPICS_HOST_ARCH).$(EPICS_HOST_ARCH) files and
 #     os/CONFIG_SITE.$(EPICS_HOST_ARCH).$(EPICS_HOST_ARCH) files may override
 #
-#     NOTE WIN32: YES results in a DLL.  Valid settings are
-#                   SHARED_LIBRARIES=YES and STATIC_BUILD=NO
-#                   SHARED_LIBRARIES=NO  and STATIC_BUILD=YES
+#     NOTE Windows: YES results in a DLL.  Valid settings are
+#        SHARED_LIBRARIES=YES  and  STATIC_BUILD=NO
+#        SHARED_LIBRARIES=NO   and  STATIC_BUILD=YES
 #
 SHARED_LIBRARIES=YES
 
@@ -180,7 +184,9 @@ EPICS_SITE_VERSION =
 # between the various stages of compilation.
 GCC_PIPE = NO
 
-#  Include RPATH when linking executables and libraries.
-#       must be either YES or NO
-LINKER_USE_RPATH=YES
+# Set RPATH when linking executables and libraries.
+#  Must be either YES or NO.  If you set this to NO you must also provide a
+#  way for Base executables to find their shared libraries when they are
+#  run at build-time, e.g. set the LD_LIBRARY_PATH environment variable.
+LINKER_USE_RPATH = YES
 

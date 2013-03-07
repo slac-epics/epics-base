@@ -41,7 +41,6 @@
 /*Declare storage for errVerbose */
 epicsShareDef int errVerbose = 0;
 
-static void errlogCleanup(void);
 static void exitHandler(void *);
 static void errlogThread(void);
 
@@ -119,10 +118,11 @@ epicsShareFunc int errlogPrintf(const char *pFormat, ...)
     errlogInit(0);
     if (pvtData.atExit || (isOkToBlock && pvtData.toConsole)) {
         va_start(pvar, pFormat);
-        vfprintf(stderr, pFormat, pvar);
+        nchar = vfprintf(stderr, pFormat, pvar);
         va_end (pvar);
         fflush(stderr);
     }
+    if (pvtData.atExit) return nchar;
     pbuffer = msgbufGetFree(isOkToBlock);
     if (!pbuffer) return 0;
     va_start(pvar, pFormat);
@@ -390,8 +390,15 @@ static void exitHandler(void *pvt)
     pvtData.atExit = 1;
     epicsEventSignal(pvtData.waitForWork);
     epicsEventMustWait(pvtData.waitForExit);
+
+    free(pvtData.pbuffer);
+    epicsMutexDestroy(pvtData.flushLock);
+    epicsEventDestroy(pvtData.flush);
+    epicsEventDestroy(pvtData.waitForFlush);
+    epicsMutexDestroy(pvtData.listenerLock);
+    epicsMutexDestroy(pvtData.msgQueueLock);
+    epicsEventDestroy(pvtData.waitForWork);
     epicsEventDestroy(pvtData.waitForExit);
-    return;
 }
 
 struct initArgs {
@@ -430,18 +437,6 @@ static void errlogInitPvt(void *arg)
     if (tid) {
         pvtData.errlogInitFailed = FALSE;
     }
-}
-
-static void errlogCleanup(void)
-{
-    free(pvtData.pbuffer);
-    epicsMutexDestroy(pvtData.flushLock);
-    epicsEventDestroy(pvtData.flush);
-    epicsEventDestroy(pvtData.waitForFlush);
-    epicsMutexDestroy(pvtData.listenerLock);
-    epicsMutexDestroy(pvtData.msgQueueLock);
-    epicsEventDestroy(pvtData.waitForWork);
-    /*Note that exitHandler must destroy waitForExit*/
 }
 
 epicsShareFunc int epicsShareAPI errlogInit2(int bufsize, int maxMsgSize)
@@ -494,9 +489,7 @@ static void errlogThread(void)
     epicsAtExit(exitHandler,0);
     while (TRUE) {
         epicsEventMustWait(pvtData.waitForWork);
-        if (pvtData.atExit) break;
         while ((pmessage = msgbufGetSend(&noConsoleMessage))) {
-            if (pvtData.atExit) break;
             epicsMutexMustLock(pvtData.listenerLock);
             if (pvtData.toConsole && !noConsoleMessage) {
                 fprintf(stderr,"%s",pmessage);
@@ -515,7 +508,6 @@ static void errlogThread(void)
         epicsThreadSleep(.2); /*just wait an extra .2 seconds*/
         epicsEventSignal(pvtData.waitForFlush);
     }
-    errlogCleanup();
     epicsEventSignal(pvtData.waitForExit);
 }
 
@@ -533,8 +525,10 @@ static msgNode *msgbufGetNode(void)
         char *plimit = pbuffer + pvtData.buffersize;
 
         pnextFree = plast->message + adjustToWorstCaseAlignment(plast->length);
-        if (pfirst <= plast &&
-            pnextFree + pvtData.msgNeeded > plimit) {
+        if (pfirst > plast) {
+            plimit = (char *)pfirst;
+        }
+        else if (pnextFree + pvtData.msgNeeded > plimit) {
             pnextFree = pbuffer;    /* Hit end, wrap to start */
             plimit = (char *)pfirst;
         }
