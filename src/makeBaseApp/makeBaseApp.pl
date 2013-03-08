@@ -1,5 +1,4 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # makeBaseApp 
+#!/usr/bin/env perl
 
 # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
 # Revision-Id: anj@aps.anl.gov-20120731184723-1d99w9yb9b7a6m1d
