@@ -1,0 +1,8 @@
+#This files contains a list of patches that have been applied to this version of base.
+#Some of these patches have been submitted to the collaboration; there is a column here if the patch has been accepted.
+
+Patch,Date,Submitted,Accepted,Brief_description
+DBDump.patch,03/08/2013,No,No,DBDump adds commands to make life easier for the IRMIS crawler
+OSDThread.patch,03/08/2013,No,No,OSDThread.patch adds some code to the POSIX OSDThread once function to memlock all if the appropriate limits are set
+envPerl.patch,03/12/2013,No,Yes,This patches the various perl utilities in base to use the version of perl that is obtained from the environment
+
