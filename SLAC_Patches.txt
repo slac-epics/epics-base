@@ -5,4 +5,4 @@ Patch,Date,Submitted,Accepted,Brief_description
 DBDump.patch,03/08/2013,No,No,DBDump adds commands to make life easier for the IRMIS crawler
 OSDThread.patch,03/08/2013,No,No,OSDThread.patch adds some code to the POSIX OSDThread once function to memlock all if the appropriate limits are set
 envPerl.patch,03/12/2013,No,Yes,This patches the various perl utilities in base to use the version of perl that is obtained from the environment
-
+dbScan.patch,03/21/2013,No,Yes,A fix for bug 597054 for sites that want their period scan tasks to not drift on workstaion OSs. Patch prints warning messages when repeated over-run errors occur
