@@ -1,0 +1,241 @@
+=== modified file 'src/cap5/caget.pl'
+--- src/cap5/caget.pl	2010-09-20 21:21:50 +0000
++++ src/cap5/caget.pl	2013-01-18 21:53:35 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ use strict;
+ 
+
+=== modified file 'src/cap5/cainfo.pl'
+--- src/cap5/cainfo.pl	2009-06-25 20:16:00 +0000
++++ src/cap5/cainfo.pl	2013-01-18 21:53:32 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ use strict;
+ 
+
+=== modified file 'src/cap5/camonitor.pl'
+--- src/cap5/camonitor.pl	2010-09-17 19:11:00 +0000
++++ src/cap5/camonitor.pl	2013-01-18 21:53:29 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ use strict;
+ 
+
+=== modified file 'src/cap5/capr.pl'
+--- src/cap5/capr.pl	2010-07-02 16:34:38 +0000
++++ src/cap5/capr.pl	2013-01-18 21:53:25 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl -w
++#!/usr/bin/env perl
+ 
+ #######################################################################
+ #
+
+=== modified file 'src/cap5/caput.pl'
+--- src/cap5/caput.pl	2009-06-25 20:22:35 +0000
++++ src/cap5/caput.pl	2013-01-18 21:52:19 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ use strict;
+ 
+
+=== modified file 'src/cap5/perlConfig.pl'
+--- src/cap5/perlConfig.pl	2008-06-27 22:19:30 +0000
++++ src/cap5/perlConfig.pl	2013-01-18 21:52:00 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ 
+ # This script is used to extract information about the Perl build
+ # configuration, so the EPICS build system uses the same settings.
+
+=== modified file 'src/makeBaseApp/makeBaseApp.pl'
+--- src/makeBaseApp/makeBaseApp.pl	2012-07-31 18:47:23 +0000
++++ src/makeBaseApp/makeBaseApp.pl	2013-01-18 22:14:09 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # makeBaseApp 
++#!/usr/bin/env perl
+ 
+ # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
+ # $Revision-Id$
+
+=== modified file 'src/makeBaseExt/makeBaseExt.pl'
+--- src/makeBaseExt/makeBaseExt.pl	2010-10-05 19:27:37 +0000
++++ src/makeBaseExt/makeBaseExt.pl	2013-01-18 22:14:12 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # makeBaseExt 
++#!/usr/bin/env perl
+ 
+ # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
+ # $Revision-Id$
+
+=== modified file 'src/registry/registerRecordDeviceDriver.pl'
+--- src/registry/registerRecordDeviceDriver.pl	2010-12-16 23:02:15 +0000
++++ src/registry/registerRecordDeviceDriver.pl	2013-01-18 22:13:38 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # registerRecordDeviceDriver 
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/convertRelease.pl'
+--- src/tools/convertRelease.pl	2011-07-13 15:38:13 +0000
++++ src/tools/convertRelease.pl	2013-01-18 22:11:14 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # convertRelease.pl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/cvsclean.pl'
+--- src/tools/cvsclean.pl	2010-10-05 19:27:37 +0000
++++ src/tools/cvsclean.pl	2013-01-18 22:11:17 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # cvsclean.pl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ # National Laboratory.
+
+=== modified file 'src/tools/dos2unix.pl'
+--- src/tools/dos2unix.pl	2010-10-05 19:27:37 +0000
++++ src/tools/dos2unix.pl	2013-01-18 22:11:21 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # makeConfigAppInclude.pl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/expandVars.pl'
+--- src/tools/expandVars.pl	2010-10-26 14:27:47 +0000
++++ src/tools/expandVars.pl	2013-01-18 21:57:00 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #
+ # Tool to expand @VAR@ variables while copying a file.
+ # The file will *not* be copied if it already exists.
+
+=== modified file 'src/tools/filterWarnings.pl'
+--- src/tools/filterWarnings.pl	2010-10-05 19:27:37 +0000
++++ src/tools/filterWarnings.pl	2013-01-18 22:11:28 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'      # -*- Mode: perl -*-
+-	if $running_under_some_shell; # filterWarnings.pl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/fullPathName.pl'
+--- src/tools/fullPathName.pl	2011-06-08 17:15:18 +0000
++++ src/tools/fullPathName.pl	2013-01-18 22:11:30 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S -w  $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if 0;
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/installEpics.pl'
+--- src/tools/installEpics.pl	2011-10-28 18:19:08 +0000
++++ src/tools/installEpics.pl	2013-01-18 21:57:17 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2011 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/makeIncludeDbd.pl'
+--- src/tools/makeIncludeDbd.pl	2010-10-05 19:27:37 +0000
++++ src/tools/makeIncludeDbd.pl	2013-01-18 21:57:22 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/makeMakefile.pl'
+--- src/tools/makeMakefile.pl	2008-03-24 22:17:06 +0000
++++ src/tools/makeMakefile.pl	2013-01-18 21:57:28 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/makeTestfile.pl'
+--- src/tools/makeTestfile.pl	2008-09-11 22:42:17 +0000
++++ src/tools/makeTestfile.pl	2013-01-18 21:57:34 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/mkmf.pl'
+--- src/tools/mkmf.pl	2012-07-31 15:44:33 +0000
++++ src/tools/mkmf.pl	2013-01-18 21:57:40 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2009 Helmholtz-Zentrum Berlin fuer Materialien und Energie.
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+
+=== modified file 'src/tools/munch.pl'
+--- src/tools/munch.pl	2010-10-05 19:27:37 +0000
++++ src/tools/munch.pl	2013-01-18 21:57:43 +0000
+@@ -1,4 +1,4 @@
+-#!/usr/bin/perl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2010 UChicago Argonne LLC, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/replaceVAR.pl'
+--- src/tools/replaceVAR.pl	2010-07-29 19:58:14 +0000
++++ src/tools/replaceVAR.pl	2013-01-18 22:11:37 +0000
+@@ -1,5 +1,4 @@
+-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-    if $running_under_some_shell; # replaceVAR.pl
++#!/usr/bin/env perl
+ #*************************************************************************
+ # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+ #     National Laboratory.
+
+=== modified file 'src/tools/useManifestTool.pl'
+--- src/tools/useManifestTool.pl	2010-07-12 19:54:51 +0000
++++ src/tools/useManifestTool.pl	2013-01-18 22:11:59 +0000
+@@ -1,6 +1,4 @@
+-eval 'exec perl -S -w  $0 ${1+"$@"}'  # -*- Mode: perl -*-
+-        if 0; 
+-
++#!/usr/bin/env perl
+ #
+ # Use MS Visual C++ compiler version number to determine if
+ # we want to use the Manifest Tool (status=1) or not (status=0)
+
