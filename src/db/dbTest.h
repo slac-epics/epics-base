@@ -27,12 +27,14 @@ epicsShareFunc long epicsShareAPI dbnr(int verbose);
 epicsShareFunc long epicsShareAPI dbla(const char *pmask);
 /*list records with mask*/
 epicsShareFunc long epicsShareAPI dbgrep(const char *pmask);
+/*dump database fields*/
+long epicsShareAPI dbdump(const int interest_level);
 /*get field value*/
 epicsShareFunc long epicsShareAPI dbgf(const char *pname);
 /*put field value*/
 epicsShareFunc long epicsShareAPI dbpf(const char *pname,const char *pvalue);
 /*print record*/
-epicsShareFunc long epicsShareAPI dbpr(const char *pname,int interest_level);
+epicsShareFunc long epicsShareAPI dbpr(const char *pname,int interest_level,int tab_size);
 /*test record*/
 epicsShareFunc long epicsShareAPI dbtr(const char *pname);
 /*test get field*/
