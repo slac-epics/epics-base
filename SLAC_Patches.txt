@@ -7,4 +7,5 @@ OSDThread.patch,03/08/2013,No,No,OSDThread.patch adds some code to the POSIX OSD
 envPerl.patch,03/12/2013,No,Yes,This patches the various perl utilities in base to use the version of perl that is obtained from the environment
 dbScan.patch,03/21/2013,No,Yes,A fix for bug 597054 for sites that want their period scan tasks to not drift on workstaion OSs. Patch prints warning messages when repeated over-run errors occur
 1091401.patch,03/21/2013,No,Yes,A race condition can occur when reloading the access security file from a subroutine record that is processed using caput rather than a longer-running CA client such as MEDM or caput -c. 
-DBDump.patch,03/08/2013,No,No,Reversed the DBDump.patch as Ernest had issues with dbpf
+DBDump.patch,03/22/2013,No,No,Reversed the DBDump.patch as Ernest had issues with dbpf
+DBDump.patch,03/25/2013,No,No,Reapplied the DBDump.patch with fixes for Ernest's issue

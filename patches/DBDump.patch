@@ -228,7 +228,7 @@ diff -u -8 -p -r1.1.1.1 -r1.2
  
 -    if (!((tab_size == 10) || (tab_size == 20))) {
 -	printf("tab_size not 10 or 20 - dbpr_msgOut()\n");
-+    if (!((tab_size == 0) || (tab_size == 20) || (tab_size == 20))) {
++    if (!((tab_size == 0) || (tab_size == 10) || (tab_size == 20))) {
 +	printf("tab_size not 10 or 20 - dbpr_msgOut()\n"); /* Why does tab_size matter? */
  	return;
      }
