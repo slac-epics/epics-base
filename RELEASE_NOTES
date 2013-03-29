@@ -31,3 +31,36 @@ dbScan.patch - EPICS collaboration
     A race condition can occur when reloading the access security file from a subroutine record that is processed using "caput" rather than a longer-running CA client such as MEDM or "caput -c". 
     This patch fixes the problem.
 -----------------------------------
+Notes: Migration for IOC Application Engineers:
+Some additional notes for those that start new applications and want to use the slac style templates.
+You will be able to do the same as before:
+
+makeBaseApp.pl  -t slac  <yourAppName>
+
+The templates have been moved outside of EPICS BASE and now live in the modules area.
+EPICS_MBA_TEMPLATE_TOP=${EPICS_MODULES_TOP}/icdTemplates/MAIN_TRUNK
+
+When logging into the DEV system sourcing: "$EPICS_SETUP/go_epics_3-14-12-3_1-0.bash"
+will setup the EPICS environment as well the ENV Var mentioned above.
+
+If you have an existing application and would like to migrate, please use the sample slac template as your guide/reference.
+
+When checking out modules from CVS including IOC application modules please use the "eco" utility.
+
+Note: For engineers that had applications for linuxRT targets, it is now easier.
+To migrate your existing linuxRT application follow the "slac" template for sure.
+If you try to use the new EPICS BASE as is, your App will not build.
+
+Note: For engineers that would like to try and build 
+softIOCs for linux-x86 as a static based executable; we now support this in the new EPICS BASE.
+Here, I am referring only to softIOCs on linux hosts since they are all currently dynamically built.
+All of our cross targets namely, RTEMS and linuxRT-x86 create static binaries already.
+
+So, to have your softIOC build statically you just need to do the following:
+Add two variables below in your "<TOP>"/configure/CONFIG_SITE" file:
+===============================================
+SHARED_LIBRARIES=NO
+STATIC_BUILD=YES
+===============================================
+Do not touch the "CHECK_RELEASE = YES"  variable
+
