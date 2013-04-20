@@ -4,12 +4,12 @@
 
 # Where to find RTEMS
 #
-RTEMS_SITE_TOP=/reg/g/pcds/package/rtems/rtems-4.9.4/
-RTEMS_PATCHLVL=rtems_p0
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+RTEMS_SITE_TOP=/reg/g/pcds/package/rtems/rtems-4.9.4-x86_64/
+RTEMS_PATCHLVL=rtems_p1
+SSRLAPPS_PATCHLVL=ssrlApps_p4
 
 RTEMS_BSP=$(subst RTEMS-,,$(T_A))
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 
 # Cross-compile toolchain in $(RTEMS_TOOLS)/bin
@@ -52,7 +52,6 @@ OP_SYS_CPPFLAGS =
 
 #no LDLIBS whatsoever - we now do dynamic loading
 override EXE = .obj
-
 
 OP_SYS_LDLIBS = 
 OP_SYS_LDFLAGS = -Wl,-S
