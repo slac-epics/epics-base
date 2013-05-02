@@ -10,14 +10,16 @@
 
 #####################################################  vpath
 
-vpath %.dbd $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
-vpath %.db $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB)) $(RELEASE_DIRS_DB) $(COMMON_DIR)
-vpath %.vdb $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB)) $(RELEASE_DIRS_DBD)
+vpath %.dbd           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
+vpath %.db            $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB)) $(RELEASE_DIRS_DB) $(COMMON_DIR)
+vpath %.vdb           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB)) $(RELEASE_DIRS_DBD)
 vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-vpath %.template $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(RELEASE_DIRS_DB)
-vpath bpt%.data $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-vpath %.acf $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-vpath %.acs $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+vpath %.sub-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(RELEASE_DIRS_DB)
+vpath %.tpl-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(RELEASE_DIRS_DB)
+vpath bpt%.data       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+vpath %.acf           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+vpath %.acs           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
 
 ##################################################### dbdflags
 
@@ -68,7 +70,8 @@ SOURCE_DB_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_DB_aaa)  )
 SOURCE_DB_aaa = $(addsuffix /$(file), $(dir) )
 
 COMMONS = $(COMMON_DIR)/*.dbd $(COMMON_DIR)/*.db $(COMMON_DIR)/*.h \
-          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template
+          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template \
+          $(COMMON_DIR)/*.sub-db        $(COMMON_DIR)/*.tpl-db
 
 # Remove trailing numbers (to 99) on stem
 TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
@@ -204,6 +207,10 @@ $(INSTALL_DB)/%.substitutions: %.substitutions
 	$(ECHO) "Installing db substitutions file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
+$(INSTALL_DB)/%.sub-db: %.sub-db
+	$(ECHO) "Installing db substitutions file $@"
+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
+
 .PRECIOUS: $(COMMON_DIR)/%.substitutions
 
 ##################################################### Template files
@@ -318,6 +325,14 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 # substitutions file.
 #
 $(COMMON_DIR)/%.db$(RAW): %.substitutions
+	@$(RM) $(notdir $@)$(DEP)
+	$(MAKEDBDEPENDS) $@ $< >> $(notdir $@)$(DEP)
+	$(ECHO) "Inflating database from $<"
+	@$(RM) $@ $*.tmp
+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
+	$(MV) $*.tmp $@
+
+$(COMMON_DIR)/%.db$(RAW): %.sub-db
 	@$(RM) $(notdir $@)$(DEP)
 	$(MAKEDBDEPENDS) $@ $< >> $(notdir $@)$(DEP)
 	$(ECHO) "Inflating database from $<"
