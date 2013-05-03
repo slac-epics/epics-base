@@ -10,16 +10,19 @@
 #RULES.ioc-targets
 # This file contains targets needed in IOC instance directories
 
-$(ARCH): buildInstall
+$(ARCH): build
 
 ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
-buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
+build$(DIVIDER)$(ARCH) build: $(TARGETS)
 
 clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
 
+install$(DIVIDER)$(ARCH) install: $(TARGETS)
+
 else 
-buildInstall$(DIVIDER)$(ARCH) buildInstall:
+build$(DIVIDER)$(ARCH) build:
 clean$(DIVIDER)$(ARCH) clean:
+install$(DIVIDER)$(ARCH) install:
 endif
 
 ioc-targets_clean:
