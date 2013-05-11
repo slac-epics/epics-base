@@ -21,9 +21,11 @@
 #include <ctype.h>
 #include <errno.h>
 
+#include <epicsVersion.h>
 #include <dbDefs.h>
 #include <macLib.h>
 #include <ellLib.h>
+#include <errlog.h>
 
 #define MAX_BUFFER_SIZE 4096
 
@@ -53,7 +55,8 @@ static char *substituteGetReplacements(void *substitutePvt);
 
 /*Exit status*/
 static int exitStatus = 0;
-static int mustExpand = 0;
+
+int opt_V = 0;
 
 
 int main(int argc,char **argv)
@@ -86,8 +89,8 @@ int main(int argc,char **argv)
 	    strcpy(substitutionName,pval);
 	} else if(strncmp(argv[1],"-V",2)==0) {
 	    macSuppressWarning(macPvt,0);
+	    opt_V = 1;
 	    narg = 1; /* no argument for this option */
-	    mustExpand = 1;
 	} else {
 	    usageExit();
 	}
@@ -124,6 +127,7 @@ int main(int argc,char **argv)
         }
         substituteDestruct(substitutePvt);
     }
+    errlogFlush();
     inputDestruct(inputPvt);
     free((void *)templateName);
     free((void *)substitutionName);
@@ -232,11 +236,13 @@ endif:
 	    n = macExpandString(macPvt,input,buffer,MAX_BUFFER_SIZE-1);
 	    fputs(buffer,stdout);
 	    if (!unexpWarned && n<0) {
-		fprintf(stderr,"%s: Unexpanded macros in ouput!\n",
-				mustExpand ? "Error" : "Warning" );
+	    	const char * pErrMsg = "Warning: Undefined macros present, use msi -V to list\n";
+		if ( opt_V ) {
+		    exitStatus = 2;
+		    pErrMsg = "Error: Undefined macros present\n";
+		}
+		fprintf( stderr, pErrMsg );
 		unexpWarned++;
-		if ( mustExpand )
-		    exitStatus = 1;
 	    }
 	}
     }
