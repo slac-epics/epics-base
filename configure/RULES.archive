@@ -2,7 +2,7 @@
 # RULES for building and installing archive files
 
 # Display how this makefile was called
-#$(info RULES.archive: '$(MAKECMDGOALS)')
+$(info RULES.archive: '$(MAKECMDGOALS)')
 
 ########################################################
 # NOTE: The rules for generating archive files from
@@ -15,30 +15,41 @@
 
 vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
 vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
-#vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
-vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 
 INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
 
 ####################################################
 # archive Flags (-I path)
+define  ARCHIVE_DIRS_template
+  RELEASE_ARCHIVE_DIRS += $$(wildcard $$(strip $$($(1)))/archive)
+endef
+$(foreach top, $(RELEASE_TOPS), $(eval $(call ARCHIVE_DIRS_template,$(top)) ))
+ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(RELEASE_ARCHIVE_DIRS)
+ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
+ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
 
-INSTALL_ARCHIVEFLAGS = -I $(INSTALL_ARCHIVE)
-RELEASE_ARCHIVEFLAGS = $(patsubst %/dbd,%/archive, $(RELEASE_DBDFLAGS))
-ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) -I. -I.. $(GENERIC_SRC_INCLUDES) $(INSTALL_ARCHIVEFLAGS) $(RELEASE_ARCHIVEFLAGS)
-ARCHIVEFLAGS += -I$(COMMON_DIR)
+####################################################
+# Generate COMMON_ARCHIVES list
+COMMON_ARCHIVES  += $(filter $(COMMON_DIR)/%, $(foreach file, $(ARCHIVE), \
+	$(firstword $(SOURCE_ARCHIVE) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_ARCHIVE = $(wildcard $(file) $(SOURCE_ARCHIVE_bbb) )
+SOURCE_ARCHIVE_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ARCHIVE_aaa)  )
+SOURCE_ARCHIVE_aaa = $(addsuffix /$(file), $(dir) )
+INSTALL_ARCHIVES += $(addprefix $(INSTALL_ARCHIVE)/, $(notdir $(ARCHIVE)))
+
+####################################################
+# Generate ARCHIVE_DEPENDS_FILES list
+ARCHIVEDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_ARCHIVES)))
 
 ####################################################
 # Build targets
 
-INSTALL_ARCHIVES += $(addprefix $(INSTALL_ARCHIVE)/,$(notdir $(ARCHIVE)))
-
-build:	$(INSTALL_ARCHIVES)
+build:	$(COMMON_ARCHIVES) $(INSTALL_ARCHIVES)
 
 rebuild:        clean install
 
-buildInstall:	$(INSTALL_ARCHIVES)
+buildInstall:	build
 
 realclean: clean
 
@@ -52,15 +63,11 @@ archive_clean:
 ####################################################
 # Build and install Rules
 
-#$(COMMON_DIR)/%.archive: %.substitutions
-#	@echo "Inflating archive file from $<"
-#	@$(RM) $@
-#	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-
 $(COMMON_DIR)/%.archive: %.sub-arch
-	@echo "Inflating archive file from $<"
-	@$(RM) $@
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m$(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
+	$(ECHO) "Inflating archive file from $<"
+	@$(RM) $@ msi.tmp
 	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
 
@@ -81,18 +88,16 @@ $(INSTALL_ARCHIVE)/%.archive:	%.archive
 #	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_ARCHIVE)/%.sub-arch: %.sub-arch
-	@echo "Installing archive substitutions file $@"
-	@$(INSTALL) -d -m 644 $< $(@D)
-
-#.PRECIOUS: $(COMMON_DIR)/%.substitutions
-
-$(INSTALL_ARCHIVE)/%.template: %.template
-	@echo "Installing archive template file $@"
+	$(ECHO) "Installing archive substitutions file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
 	@echo "Installing archive template file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
-#.PRECIOUS: $(COMMON_DIR)/%.template
+#####################################################
+# Include archive dependency files
+ifneq (,$(strip $(ARCHIVEDEPENDS_FILES)))
+-include $(ARCHIVEDEPENDS_FILES)
+endif
 

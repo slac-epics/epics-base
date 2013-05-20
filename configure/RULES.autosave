@@ -2,7 +2,7 @@
 # RULES for building and installing autosave files
 
 # Display how this makefile was called
-#$(info RULES.autosave: '$(MAKECMDGOALS)')
+$(info RULES.autosave: '$(MAKECMDGOALS)')
 
 ########################################################
 # NOTE: The rules for generating autosave files from
@@ -23,22 +23,35 @@ INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
 
 ####################################################
 # Autosave Flags (-I path)
+define  AUTOSAVE_DIRS_template
+  RELEASE_AUTOSAVE_DIRS += $$(wildcard $$(strip $$($(1)))/autosave)
+endef
+$(foreach top, $(RELEASE_TOPS), $(eval $(call AUTOSAVE_DIRS_template,$(top)) ))
+AUTOSAVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_AUTOSAVE) $(RELEASE_AUTOSAVE_DIRS)
+AUTOSAVE_INCLUDES  = $(addprefix -I, $(AUTOSAVE_SEARCH_DIRS))
+AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) $(AUTOSAVE_INCLUDES)
 
-INSTALL_AUTOSAVEFLAGS = -I $(INSTALL_AUTOSAVE)
-RELEASE_AUTOSAVEFLAGS = $(patsubst %/dbd,%/autosave, $(RELEASE_DBDFLAGS))
-AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) -I. -I.. $(GENERIC_SRC_INCLUDES) $(INSTALL_AUTOSAVEFLAGS) $(RELEASE_AUTOSAVEFLAGS)
-AUTOSAVEFLAGS += -I$(COMMON_DIR)
+####################################################
+# Generate COMMON_REQS list
+COMMON_REQS  += $(filter $(COMMON_DIR)/%, $(foreach file, $(REQ), \
+	$(firstword $(SOURCE_REQ) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_REQ = $(wildcard $(file) $(SOURCE_REQ_bbb) )
+SOURCE_REQ_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_REQ_aaa)  )
+SOURCE_REQ_aaa = $(addsuffix /$(file), $(dir) )
+INSTALL_REQS += $(addprefix $(INSTALL_AUTOSAVE)/, $(notdir $(REQ)))
+
+####################################################
+# Generate REQ_DEPENDS_FILES list
+REQDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_REQS)))
 
 ####################################################
 # Build targets
 
-INSTALL_REQS += $(addprefix $(INSTALL_AUTOSAVE)/,$(notdir $(REQ)))
-
-build:	$(INSTALL_REQS)
+build:	$(COMMON_REQS) $(INSTALL_REQS)
 
 rebuild:        clean install
 
-buildInstall:	$(INSTALL_REQS)
+buildInstall:	build
 
 realclean: clean
 
@@ -52,15 +65,11 @@ autosave_clean:
 ####################################################
 # Build and install Rules
 
-#$(COMMON_DIR)/%.req: %.substitutions
-#	@echo "Inflating autosave request from $<"
-#	@$(RM) $@
-#	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-
 $(COMMON_DIR)/%.req: %.sub-req
-	@echo "Inflating autosave request from $<"
-	@$(RM) $@
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m$(notdir $@)$(DEP) $(AUTOSAVE_INCLUDES) $@ $< 
+	$(ECHO) "Inflating autosave request from $<"
+	@$(RM) $@ msi.tmp
 	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
 
@@ -99,4 +108,10 @@ $(INSTALL_AUTOSAVE)/%.tpl-req: %.tpl-req
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 #.PRECIOUS: $(COMMON_DIR)/%.template
+
+#####################################################
+# Include autosave dependency files
+ifneq (,$(strip $(REQDEPENDS_FILES)))
+-include $(REQDEPENDS_FILES)
+endif
 
