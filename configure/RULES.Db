@@ -23,6 +23,7 @@ vpath %.acs           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
 
 ##################################################### dbdflags
 
+# dbExpand
 DBD_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DBD) $(RELEASE_DBD_DIRS)
 DB_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DB) $(RELEASE_DB_DIRS)
 
@@ -80,8 +81,9 @@ TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(pats
 TEMPLATE2=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
           $(patsubst %5,%,$(patsubst %6,%,$(patsubst %7,%,$(patsubst %8,%,$(patsubst %9,%, \
           $(TEMPLATE1)))))))))))
-TEMPLATE3=$(addsuffix .template,$(addprefix ../,$(TEMPLATE2)))
-TEMPLATE_FILENAME=$(firstword $(wildcard $($*_TEMPLATE) $(addprefix ../,$($*_TEMPLATE)) ../$*.template $(TEMPLATE3) ../template))
+TEMPLATE3 =$(addsuffix .template,$(addprefix ../,$(TEMPLATE2)))
+TEMPLATE3+=$(addsuffix .tpl-db,  $(addprefix ../,$(TEMPLATE2)))
+TEMPLATE_FILENAME=$(firstword $(wildcard $($*_TEMPLATE) $(addprefix ../,$($*_TEMPLATE)) ../$*.template ../$*.tpl-db $(TEMPLATE3) ../template))
 
 # dbst based database optimization
 ifeq '$(DB_OPT)' 'YES'
@@ -323,9 +325,9 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 #
 $(COMMON_DIR)/%.db$(RAW): %.substitutions
 	@$(RM) $(notdir $@)$(DEP)
-	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
-	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+	$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
+	$(ECHO) "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+	$(ECHO) "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
 	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 	@$(RM) $@ $*.tmp
 	$(MSI) $(DBFLAGS) -S$< > $*.tmp
@@ -333,7 +335,10 @@ $(COMMON_DIR)/%.db$(RAW): %.substitutions
 
 $(COMMON_DIR)/%.db$(RAW): %.sub-db
 	@$(RM) $(notdir $@)$(DEP)
-	$(MAKEDBDEPENDS) $@ $< >> $(notdir $@)$(DEP)
+	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
+	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
 	$(MSI) $(DBFLAGS) -S$< > $*.tmp
@@ -344,7 +349,7 @@ $(COMMON_DIR)/%.db$(RAW): %.template
 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
-	$(MSI) $(DBFLAGS) $< > $*.tmp
+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
 	$(MV) $*.tmp $@
 
 $(COMMON_DIR)/%.acf: %.acs
