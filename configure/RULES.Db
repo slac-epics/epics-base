@@ -342,7 +342,7 @@ $(COMMON_DIR)/%.db$(RAW): %.sub-db
 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
 	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
 	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-	$(ECHO) "Inflating database from $<"
+	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 	@$(RM) $@ $*.tmp
 	$(MSI) $(DBFLAGS) -S$< > $*.tmp
 	$(MV) $*.tmp $@
@@ -352,7 +352,7 @@ $(COMMON_DIR)/%.db$(RAW): %.template
 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
-	$(MSI) $(DBFLAGS) $< > $*.tmp
+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
 	$(MV) $*.tmp $@
 
 $(COMMON_DIR)/%.acf: %.acs
