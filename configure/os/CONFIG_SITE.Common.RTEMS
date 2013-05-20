@@ -7,23 +7,22 @@
 RTEMS_SITE_TOP=/reg/g/pcds/package/rtems/rtems-4.9.4-x86_64/
 RTEMS_PATCHLVL=rtems_p1
 SSRLAPPS_PATCHLVL=ssrlApps_p4
-
 RTEMS_BSP=$(subst RTEMS-,,$(T_A))
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 
 # Cross-compile toolchain in $(RTEMS_TOOLS)/bin
 #
-RTEMS_TOOLS=$(RTEMS_BASE)
+RTEMS_TOOLS = $(RTEMS_BASE)
 
-#
-# If you're not using BOOTP/DHCP to pick up your IOC network configuration
-# you may need to specify your Internet Domain Name here
-#
-#OP_SYS_CFLAGS += -DRTEMS_NETWORK_CONFIG_DNS_DOMAINNAME=aps.anl.gov
 
+# If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
+# network configuration you must uncomment and specify your Internet
+# Domain Name here
 #
-# Specify your desired command-line-input library
+#OP_SYS_CFLAGS += -DRTEMS_NETWORK_CONFIG_DNS_DOMAINNAME=<domainname>
+
+# Select the command-line-input library to use
 #
 #EPICSCOMMANDLINE_LIBRARY = READLINE
 
