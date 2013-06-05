@@ -14,8 +14,9 @@ EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 # ===============================================================
 AUTOSAVE_MODULE_VERSION=R4.2.1.2-2.7.0
 IOCADMIN_MODULE_VERSION=R3.0.0-1.6.0
-EVENT_MODULE_VERSION=R3.2.2-0.3.0
-MISCUTILS_MODULE_VERSION=R2.2.2-0.3.0
+EVENT_MODULE_VERSION=R3.3.0-2.5.0
+MISCUTILS_MODULE_VERSION=R2.2.2-0.4.0
+
 
 # ============================================================
 # External Support module path definitions

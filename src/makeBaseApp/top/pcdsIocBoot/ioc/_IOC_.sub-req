@@ -1,4 +1,4 @@
-# _APPNAME_ IOC instance archive file
+# _APPNAME_ IOC instance autosave file
 
 # Generate autosave PV list for IOC specific PV's
 file _APPNAME_-ioc.req

@@ -136,6 +136,8 @@ TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Main.cpp
 TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.c
 TEMPLATES += top/pcdsDemoApp/src/_APPNAME_Hello.dbd
 
+TEMPLATES += top/pcdsDemoApp/configure/RELEASE
+
 TEMPLATES += top/pcdsDemoApp/srcDisplay/Makefile
 TEMPLATES += top/pcdsDemoApp/srcDisplay/example.edl
 
