@@ -2,4 +2,5 @@ TOP = ../..
 include $(TOP)/configure/CONFIG
 ARCH = _ARCH_
 TARGETS = cdCommands
-include $(TOP)/configure/RULES.ioc
+include $(TOP)/configure/RULES
+include $(TOP)/configure/RULES.ioc-targets
