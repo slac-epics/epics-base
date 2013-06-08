@@ -579,6 +579,7 @@ long epicsShareAPI dbProcess(dbCommon *precord)
 		if (precord->stat==SCAN_ALARM) goto all_done;
 		if (precord->lcnt++ !=MAX_LOCK) goto all_done;
 		if (precord->sevr>=INVALID_ALARM) goto all_done;
+		recGblRecordError(status, precord, "Active scan count exceeded!");
 		recGblSetSevr(precord, SCAN_ALARM, INVALID_ALARM);
 		monitor_mask = recGblResetAlarms(precord);
 		monitor_mask |= DBE_VALUE|DBE_LOG;
@@ -886,6 +887,7 @@ long epicsShareAPI dbGetLinkValue(struct link *plink, short dbrType,
 
         status=dbCaGetLink(plink,dbrType,pbuffer,&stat,&sevr,pnRequest);
         if (status) {
+            recGblRecordError(status, precord, "dbCaGetLink error!");
             recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
         } else {
             inherit_severity(pcalink,precord,stat,sevr);
@@ -922,14 +924,18 @@ long epicsShareAPI dbPutLinkValue(struct link *plink, short dbrType,
                 status = dbScanLink(psource, pdest);
             }
         }
-        if (status)
+        if (status) {
+            recGblRecordError(status, psource, "Error processing record via PROC field!");
             recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+		}
     } else if (plink->type == CA_LINK) {
         struct dbCommon *psource = plink->value.pv_link.precord;
 
         status = dbCaPutLink(plink, dbrType, pbuffer, nRequest);
-        if (status < 0)
+        if (status < 0) {
+            recGblRecordError(status, psource, "dbCaPutLink error, unable to write to record!");
             recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+		}
     } else {
         cantProceed("dbPutLinkValue: Illegal link type");
     }
