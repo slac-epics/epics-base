@@ -894,7 +894,14 @@ long epicsShareAPI dbGetLinkValue(struct link *plink, short dbrType,
 
         status=dbCaGetLink(plink,dbrType,pbuffer,&stat,&sevr,pnRequest);
         if (status) {
-            recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+        	struct dbCommon *psource = plink->value.pv_link.precord;
+			if ( !dbCaIsLinkConnected( plink ) ) {
+				recGblRecordError(status, psource, "dbCaGetLink error, link not connected!");
+				recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+			} if ( !dbCaHasReadAccess( plink ) ) {
+				recGblRecordError(status, psource, "dbCaGetLink error, no read access!");
+				recGblSetSevr(psource, READ_ACCESS_ALARM, INVALID_ALARM);
+			}
         } else {
             inherit_severity(pcalink,precord,stat,sevr);
         }
@@ -928,16 +935,28 @@ long epicsShareAPI dbPutLinkValue(struct link *plink, short dbrType,
                 pdest->rpro = TRUE;
             } else { /* otherwise ask for the record to be processed*/
                 status = dbScanLink(psource, pdest);
+				if (status) {
+					recGblRecordError(status, psource, "Error processing record via PROC field!");
+					recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+				}
             }
         }
-        if (status)
-            recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
     } else if (plink->type == CA_LINK) {
         struct dbCommon *psource = plink->value.pv_link.precord;
 
         status = dbCaPutLink(plink, dbrType, pbuffer, nRequest);
-        if (status < 0)
-            recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+        if (status < 0) {
+			if ( !dbCaIsLinkConnected( plink ) ) {
+				recGblRecordError(status, psource, "dbCaPutLink error, link not connected!");
+				recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
+			} if ( !dbCaHasReadAccess( plink ) ) {
+				recGblRecordError(status, psource, "dbCaPutLink error, no read access!");
+				recGblSetSevr(psource, READ_ACCESS_ALARM, INVALID_ALARM);
+			} if ( !dbCaHasWriteAccess( plink ) ) {
+				recGblRecordError(status, psource, "dbCaPutLink error, no write access!");
+				recGblSetSevr(psource, WRITE_ACCESS_ALARM, INVALID_ALARM);
+			}
+		}
     } else {
         cantProceed("dbPutLinkValue: Illegal link type");
     }

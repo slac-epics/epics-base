@@ -40,6 +40,8 @@ epicsShareFunc long dbCaPutLinkCallback(struct link *plink,
 #define dbCaPutLink(plink, dbrType, pbuffer, nRequest) \
     dbCaPutLinkCallback((plink), (dbrType), (pbuffer), (nRequest), 0, 0)
 epicsShareFunc int dbCaIsLinkConnected(const struct link *plink);
+epicsShareFunc int dbCaHasReadAccess(  const struct link *plink);
+epicsShareFunc int dbCaHasWriteAccess( const struct link *plink);
 
 /* The following are available after the link is connected*/
 epicsShareFunc long dbCaGetNelements(const struct link *plink,
