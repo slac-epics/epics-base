@@ -71,6 +71,10 @@ my @apps   = ('TOP');   # Records the order of definitions in RELEASE file
 my $relfile = "$top/configure/RELEASE";
 die "Can't find $relfile" unless (-f $relfile);
 readReleaseFiles($relfile, \%macros, \@apps, $arch);
+#print "Initial expandRelease call for macros:\n";
+#while ( my ( $macro, $val ) = each %macros ) {
+#	print "\t$macro\t=\t$val\n";
+#}
 expandRelease(\%macros, \@apps);
 
 
@@ -209,6 +213,10 @@ sub checkRelease {
         my @order = ();
         my $relfile = "$path/configure/RELEASE";
         readReleaseFiles($relfile, \%check, \@order, $arch);
+		#print "checkRelease checking macros:\n";
+		#while ( my ( $macro, $val ) = each %check ) {
+		#	print "\t$macro\t=\t$val\n";
+		#}
         expandRelease(\%check, \@order);
         delete $check{TOP};
         delete $check{EPICS_HOST_ARCH};
