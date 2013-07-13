@@ -100,7 +100,7 @@ sub expandRelease {
 
     while (my ($macro, $val) = each %$Rmacros) {
         while (my ($pre,$var,$post) = $val =~ m/ (.*) \$\( (\w+) \) (.*) /x) {
-            warn "EPICS/Release.pm: Undefined macro \$($var) used\n"
+            warn "EPICS/Release.pm: Undefined macro \$($var) used under $Rmacros->{'TOP'}\n"
                 unless exists $Rmacros->{$var};
             die "EPICS/Release.pm: Circular definition of macro $macro\n"
                 if $macro eq $var;
