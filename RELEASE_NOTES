@@ -5,6 +5,10 @@ base-R3-14-12-3_1-0: Shankar/Ernest/Strauman (Mar/28/2012)
     For the sequence and location of the patches please see SLAC_Patches.txt
 -----------------------------------
 Patches:
+TSEL.patch - EPICS collaboration - Applied Sep/16/2013
+    Reading back a .TSEL field that is pointed to another record's .TIME field was exposing internal details
+    (that the link target field gets changed internally to point the .VAL field) which don't need to be made visible. 
+    This patch hides the change, and should allow a .TSEL field to be saved and restored properly using autosave.
 OSDThread.patch - Strauman/Shankar
     Realtime (RT) scheduling is a feature of all Linux operating systems (not just those with an 'RT Kernel') that enables an application to meet timing deadlines more reliably.
     A feature that contributes significantly to the application's ability to meet timing deadlines is the ability to lock  part  or  all  of  the process's virtual address space into RAM, preventing that memory from being paged to the swap area. 
