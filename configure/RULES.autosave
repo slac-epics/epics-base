@@ -47,7 +47,9 @@ REQDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_RE
 ####################################################
 # Build targets
 
-build:	$(COMMON_REQS) $(INSTALL_REQS)
+build:		$(INSTALL_REQS)
+
+install:	$(INSTALL_REQS)
 
 rebuild:        clean install
 
@@ -72,6 +74,7 @@ $(COMMON_DIR)/%.req: %.sub-req
 	@$(RM) $@ msi.tmp
 	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
+
 
 INSTALL = $(PERL) $(TOOLS)/installEpics.pl
 
