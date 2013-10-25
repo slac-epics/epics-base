@@ -47,6 +47,11 @@ void epicsAssert (const char *pFile, const unsigned line,
     errlogPrintf("Please E-mail this message to %s or to tech-talk@aps.anl.gov\n",
         pAuthorName);
 
+#if 1
+    errlogPrintf("Calling abort()\n");
+	abort();
+#else
     errlogPrintf("Calling epicsThreadSuspendSelf()\n");
     epicsThreadSuspendSelf ();
+#endif
 }
