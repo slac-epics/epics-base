@@ -11,6 +11,31 @@
 include $(CONFIG)/RULES_DIRS
 include $(CONFIG)/RULES.ioc-targets
 
+## PCDS additions to install archive and autosave files
+## These rules are needed to build autosave and archive files
+## from IOC directories whose Makefile's end like this:
+## include $(CONFIG)/RULES.ioc
+## -include $(CONFIG)/RULES.archive
+## -include $(CONFIG)/RULES.autosave
+##
+## However, this style of Makefile works better as it builds
+## and checks dependencies
+## include $(CONFIG)/RULES
+## include $(CONFIG)/RULES.ioc-targets
+## 
+
+$(INSTALL_ARCHIVE)/%.archive: %.sub-arch
+	@echo "Inflating ioc archive file from $<"
+	@$(RM) $@
+	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
+	$(MV) msi.tmp $@
+	
+$(INSTALL_AUTOSAVE)/%.req: %.sub-req
+	@echo "Inflating ioc autosave file from $<"
+	@$(RM) $@ msi.tmp
+	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
+	$(MV) msi.tmp $@
+
 ########################################################
 # NOTE: The following rules shouldn't be needed any more.
 # If you think you need them, please see Bruce Hill, bhill,
@@ -39,12 +64,6 @@ include $(CONFIG)/RULES.ioc-targets
 #
 ## Inflate the IOC autosave file, if any
 #$(INSTALL_AUTOSAVE)/%.req: %.substitutions
-#	@echo "Inflating ioc autosave file from $<"
-#	@$(RM) $@
-#	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-#
-#$(INSTALL_AUTOSAVE)/%.req: %.sub-req
 #	@echo "Inflating ioc autosave file from $<"
 #	@$(RM) $@
 #	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp

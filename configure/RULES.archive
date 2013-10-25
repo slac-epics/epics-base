@@ -45,7 +45,9 @@ ARCHIVEDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMO
 ####################################################
 # Build targets
 
-build:	$(COMMON_ARCHIVES) $(INSTALL_ARCHIVES)
+build:		$(INSTALL_ARCHIVES)
+
+install:		$(INSTALL_ARCHIVES)
 
 rebuild:        clean install
 
@@ -74,7 +76,7 @@ $(COMMON_DIR)/%.archive: %.sub-arch
 INSTALL = $(PERL) $(TOOLS)/installEpics.pl
 
 $(INSTALL_ARCHIVE)/%: $(COMMON_DIR)/%
-	@echo "Installing archive file $@"
+	@echo "Installing common archive file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_ARCHIVE)/%.archive:	%.archive  
@@ -92,7 +94,7 @@ $(INSTALL_ARCHIVE)/%.sub-arch: %.sub-arch
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
-	@echo "Installing archive template file $@"
+	@echo "Installing archive tpl-arch file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
 #####################################################
