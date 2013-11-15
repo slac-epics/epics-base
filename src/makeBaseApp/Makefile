@@ -397,6 +397,46 @@ TEMPLATES += top/pcdsSerialBoot/ioc/_IOC_.sub-arch
 TEMPLATES += top/pcdsSerialBoot/ioc/_IOC_.sub-req
 
 ######################################################################
+# PCDS templates: 'pcdsTemplateIocApp' and 'pcdsIocTemplateBoot'.
+# Author: Bruce Hill
+######################################################################
+
+# pcdsTemplateIocApp - Basic pcds IOC including autosave and iocAdmin
+
+TEMPLATES += top/pcdsTemplateIocApp/Makefile
+TEMPLATES += top/pcdsTemplateIocApp/Db/Makefile
+TEMPLATES += top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
+TEMPLATES += top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
+TEMPLATES += top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
+TEMPLATES += top/pcdsTemplateIocApp/configure/RELEASE
+TEMPLATES += top/pcdsTemplateIocApp/src/Makefile
+TEMPLATES += top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp
+
+
+# pcdsTemplateIocBoot - Generate a sample parent templated ioc
+
+TEMPLATES += top/pcdsTemplateIocBoot/Makefile
+
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/Makefile@Common
+
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/st.cmd@Common
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS
+
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/startup.cmd@Common
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS
+
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/README@Common
+
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch
+TEMPLATES += top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req
+
+TEMPLATES += top/pcdsTemplateIocBoot/templates/st.cmd
+TEMPLATES += top/pcdsTemplateIocBoot/templates/Makefile
+TEMPLATES += top/pcdsTemplateIocBoot/templates/ioc.sub-arch
+TEMPLATES += top/pcdsTemplateIocBoot/templates/ioc.sub-req
+TEMPLATES += top/pcdsTemplateIocBoot/templates/ioc-sample.cfg
+
+######################################################################
 # End of PCDS additions
 ######################################################################
 

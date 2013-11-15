@@ -1,0 +1,10 @@
+# IOC archive file
+## Replace _IOCPVROOT_ with the PV prefix used for
+## iocAdmin PV's on this IOC
+
+# Generate IOC archive request 
+file _APPNAME_-ioc.archive
+{
+	{ IOC = "_IOCPVROOT_" }
+}
+
