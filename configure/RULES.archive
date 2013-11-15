@@ -15,6 +15,7 @@ $(info RULES.archive: '$(MAKECMDGOALS)')
 
 vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
 vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
 
 INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
@@ -25,7 +26,7 @@ define  ARCHIVE_DIRS_template
   RELEASE_ARCHIVE_DIRS += $$(wildcard $$(strip $$($(1)))/archive)
 endef
 $(foreach top, $(RELEASE_TOPS), $(eval $(call ARCHIVE_DIRS_template,$(top)) ))
-ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(RELEASE_ARCHIVE_DIRS)
+ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(TOP)/archive $(RELEASE_ARCHIVE_DIRS)
 ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
 ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
 
@@ -92,6 +93,12 @@ $(INSTALL_ARCHIVE)/%.archive:	%.archive
 $(INSTALL_ARCHIVE)/%.sub-arch: %.sub-arch
 	$(ECHO) "Installing archive substitutions file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
+
+# This rule is obsolete
+# Please rename any archive template files <basename>.tpl-arch
+#$(INSTALL_ARCHIVE)/%.template: %.template
+#	@echo "Installing archive template file $@"
+#	@$(INSTALL) -d -m 644 $< $(@D)
 
 $(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
 	@echo "Installing archive tpl-arch file $@"
