@@ -67,6 +67,8 @@ my $outfile = $ARGV[0];
 my %macros = (TOP => LocalPath($top));
 my @apps   = ('TOP');   # Records the order of definitions in RELEASE file
 
+$ENV{MAKEFLAGS} = "";
+
 # Read the RELEASE file(s)
 my $relfile = "$top/configure/RELEASE";
 die "Can't find $relfile" unless (-f $relfile);
