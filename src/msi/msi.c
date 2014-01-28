@@ -235,12 +235,9 @@ endif:
 	if (expand) {
 	    n = macExpandString(macPvt,input,buffer,MAX_BUFFER_SIZE-1);
 	    fputs(buffer,stdout);
-	    if (!unexpWarned && n<0) {
-	    	const char * pErrMsg = "Warning: Undefined macros present, use msi -V to list\n";
-		if ( opt_V ) {
-		    exitStatus = 2;
-		    pErrMsg = "Error: Undefined macros present\n";
-		}
+	    if ( !unexpWarned && n<0 && opt_V ) {
+	    	const char * pErrMsg = "Error: Undefined macros present\n";
+		exitStatus = 2;
 		fprintf( stderr, pErrMsg );
 		unexpWarned++;
 	    }
