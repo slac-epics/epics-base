@@ -93,6 +93,7 @@ expandRelease(\%macros, \@apps);
 for ($outfile) {
     m/releaseTops/       and do { &releaseTops;         last; };
     m/dllPath\.bat/      and do { &dllPath;             last; };
+    m/relPaths\.sh/      and do { &relPaths;            last; };
     m/cdCommands/        and do { &cdCommands;          last; };
     m/envPaths/          and do { &envPaths;            last; };
     m/checkRelease/      and do { &checkRelease;        last; };
@@ -111,7 +112,8 @@ Usage: convertRelease.pl [-a arch] [-d] [-T top] [-t ioctop] outfile
 	-t can be used if IOC has a different \$TOP
     where outfile is one of:
         releaseTops - lists the module names defined in RELEASE*s
-        dllPath.bat - path changes for cmd.exe to find WIN32 DLLs
+        dllPath.bat - path changes for cmd.exe to find Windows DLLs
+        relPaths.sh - path changes for bash to add RELEASE bin dir's
         cdCommands - generate cd path strings for vxWorks IOCs
         envPaths - generate epicsEnvSet commands for other IOCs
         checkRelease - checks consistency with support modules
@@ -128,13 +130,21 @@ sub releaseTops {
 }
 
 #
-# Generate Path files so Windows can find our DLLs
+# Generate Path files so Windows/Cygwin can find our DLLs
 #
 sub dllPath {
     unlink $outfile;
     open(OUT, ">$outfile") or die "$! creating $outfile";
     print OUT "\@ECHO OFF\n";
-    print OUT "PATH %PATH%;", join(';', binDirs()), "\n";
+    print OUT "PATH \%PATH\%;", join(';', binDirs()), "\n";
+    close OUT;
+}
+
+sub relPaths {
+    unlink $outfile;
+    open(OUT, ">$outfile") or die "$! creating $outfile";
+    print OUT "export PATH=\$PATH:",
+        join(':', map {m/\s/ ? "\"$_\"" : $_ } binDirs()), "\n";
     close OUT;
 }
 
