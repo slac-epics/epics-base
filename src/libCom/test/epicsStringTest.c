@@ -43,14 +43,16 @@ MAIN(epicsStringTest)
     const char * const empty = "";
     const char * const space = " ";
     const char * const A     = "A";
+    const char * const ABC   = "ABC";
     const char * const ABCD  = "ABCD";
     const char * const ABCDE = "ABCDE";
     const char * const a     = "a";
     const char * const abcd  = "abcd";
     const char * const abcde = "abcde";
+    char result[20];
     char *s;
 
-    testPlan(281);
+    testPlan(285);
 
     testChars();
 
@@ -84,6 +86,18 @@ MAIN(epicsStringTest)
     testOk1(epicsStrHash(abcd, 0) != epicsStrHash("bacd", 0));
     testOk1(epicsStrHash(abcd, 0) == epicsMemHash(abcde, 4, 0));
     testOk1(epicsStrHash(abcd, 0) != epicsMemHash("abcd\0", 5, 0));
+
+	/* Test for buffer overflow and NULL termination on epicsStrnEscapedFromRaw */
+    epicsStrnEscapedFromRaw( result, sizeof(result), ABCDE, strlen(ABCDE) );
+    epicsStrnEscapedFromRaw( result, strlen(ABCD),   ABCD,  strlen(ABCD) );
+    testOk( result[strlen(ABCDE)-1] == 'E', "epicsStrnEscapedFromRaw buffer overflow");
+    testOk( strcmp(result, ABC) == 0,		"epicsStrnEscapedFromRaw NULL termination");
+
+	/* Test for buffer overflow and NULL termination on epicsStrnRawFromEscaped */
+    epicsStrnRawFromEscaped( result, sizeof(result), ABCDE, strlen(ABCDE) );
+    epicsStrnRawFromEscaped( result, strlen(ABCD),   ABCD,  strlen(ABCD) );
+    testOk( result[strlen(ABCDE)-1] == 'E', "epicsStrnRawFromEscaped buffer overflow");
+    testOk( strcmp(result, ABC) == 0,		"epicsStrnRawFromEscaped NULL termination");
 
     return testDone();
 }
