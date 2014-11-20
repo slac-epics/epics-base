@@ -266,6 +266,7 @@ static long process(aSubRecord *prec)
         return 0;
 
     prec->pact = TRUE;
+    recGblGetTimeStamp(prec);
 
     /* Push the output link values */
     if (!status) {
@@ -276,7 +277,6 @@ static long process(aSubRecord *prec)
                 (&prec->neva)[i]);
     }
 
-    recGblGetTimeStamp(prec);
     monitor(prec);
     recGblFwdLink(prec);
     prec->pact = FALSE;
@@ -360,6 +360,8 @@ static void monitor(aSubRecord *prec)
             if (nev != onv || memcmp(povl, pval, alen)) {
                 memcpy(povl, pval, alen);
                 db_post_events(prec, pval, monitor_mask);
+				if ( prec->tpro >= 5 )
+					printf( "%s.OUT%c changed!\n", prec->name, 'A' + i );
                 if (nev != onv) {
                     *ponv = nev;
                     db_post_events(prec, pnev, monitor_mask);
