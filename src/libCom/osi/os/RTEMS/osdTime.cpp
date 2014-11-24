@@ -17,7 +17,13 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+ /*
+ 	 * SSRLAPPS
+ */
+#include <time.h>
+#include <sys/timex.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include <rtems/rtems_bsdnet_internal.h>
 #include "epicsTime.h"
 #include "osdTime.h"
@@ -25,16 +31,51 @@
 #include "osiClockTime.h"
 #include "generalTimeSup.h"
 
+ /*
+  * RTEMS time begins January 1, 1988 (local time).
+  * EPICS time begins January 1, 1990 (GMT).
+  *
+  * FIXME: How to handle daylight-savings time?
+ */
+#define EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH ((366+365)*86400)
+#define POSIX_TIME_SECONDS_1970_THROUGH_1988 \
+ 	(((1987 - 1970 + 1)  * TOD_SECONDS_PER_NON_LEAP_YEAR) + \
+ 	  (4 * TOD_SECONDS_PER_DAY))
+
+
 extern "C" {
 
 extern rtems_interval rtemsTicksPerSecond;
 int rtems_bsdnet_get_ntp(int, int(*)(), struct timespec *);
 static int ntpSocket = -1;
 
+static unsigned long timeoffset;
+ 	 
+ /*
+  * get current time via NTP.
+  */
+ 	 static int ntpNanoclockTimeGet (epicsTimeStamp *pDest)
+ 	 {
+ 	 struct ntptimeval ntv;
+ 	 
+ 	         if ( ntp_gettime( &ntv ) )
+ 	                 return epicsTimeERROR;
+ 	         pDest->nsec         = ntv.time.tv_nsec;
+ 	         pDest->secPastEpoch = ntv.time.tv_sec - timeoffset;
+ 	         return epicsTimeOK;
+ 	 }
+
+
 void osdTimeRegister(void)
 {
     /* Init NTP first so it can be used to sync ClockTime */
-    NTPTime_Init(100);
+   /*  NTPTime_Init(100); */
+  
+    timeoffset  = EPICS_EPOCH_SEC_PAST_RTEMS_EPOCH;
+    timeoffset += POSIX_TIME_SECONDS_1970_THROUGH_1988;
+    generalTimeRegisterCurrentProvider("NTP Nanoclock", 100,
+ 	                               ntpNanoclockTimeGet);
+  
     ClockTime_Init(CLOCKTIME_SYNC);
 }
 
@@ -125,14 +166,15 @@ static int staticTimeRegister(void)
     rtems_clock_get (RTEMS_CLOCK_GET_TICKS_PER_SECOND, &rtemsTicksPerSecond);
     rtemsTicksPerSecond_double = rtemsTicksPerSecond;
     rtemsTicksPerTwoSeconds_double = rtemsTicksPerSecond_double * 2.0;
-
+     
     /* If networking is already up at the time static constructors
      * are executed then we are probably run-time loaded and it's
      * OK to osdTimeRegister() at this point.
      */
     if (rtems_bsdnet_ticks_per_second != 0)
-        osdTimeRegister();
+         osdTimeRegister(); 
 
     return 1;
 }
 static int done = staticTimeRegister();
+

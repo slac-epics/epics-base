@@ -1,0 +1,65 @@
+Index: src/libCom/osi/os/posix/osdThread.c
+===================================================================
+RCS file: /scratch/Work/MyCVS/baseR3_14_12_3/src/libCom/osi/os/posix/osdThread.c,v
+retrieving revision 1.1.1.1
+retrieving revision 1.2
+diff -u -8 -p -r1.1.1.1 -r1.2
+--- src/libCom/osi/os/posix/osdThread.c	25 Jan 2013 21:55:26 -0000	1.1.1.1
++++ src/libCom/osi/os/posix/osdThread.c	28 Jan 2013 22:09:43 -0000	1.2
+@@ -31,16 +31,23 @@
+ #include "epicsMutex.h"
+ #include "epicsString.h"
+ #include "epicsThread.h"
+ #include "cantProceed.h"
+ #include "errlog.h"
+ #include "epicsAssert.h"
+ #include "epicsExit.h"
+ 
++#if defined(linux) 
++#include <unistd.h>
++#if _POSIX_MEMLOCK > 0
++#include <sys/mman.h>
++#endif
++#endif
++
+ static int mutexLock(pthread_mutex_t *id)
+ {
+     int status;
+ 
+     while(1) {
+         status = pthread_mutex_lock(id);
+         if(status!=EINTR) return status;
+         fprintf(stderr,"pthread_mutex_lock returned EINTR. Violates SUSv3\n");
+@@ -340,16 +347,32 @@ static void once(void)
+         fprintf(stderr,"sched_get_priority_max failed set to %d\n",
+             pcommonAttr->maxPriority);
+     }
+     if(pcommonAttr->minPriority == -1) {
+         pcommonAttr->minPriority = pcommonAttr->schedParam.sched_priority;
+         fprintf(stderr,"sched_get_priority_min failed set to %d\n",
+             pcommonAttr->maxPriority);
+     }
++
++#if _POSIX_MEMLOCK > 0
++    if(errVerbose)  { 
++        fprintf(stderr, "LRT: min priority: %d max priority %d\n", 
++            pcommonAttr->minPriority, pcommonAttr->maxPriority);
++    }
++    if (pcommonAttr->maxPriority > pcommonAttr->minPriority) {
++        status = mlockall(MCL_CURRENT | MCL_FUTURE);
++        if(status) { 
++            fprintf(stderr, "Unable to lock the virtual address space using mlockall\n");
++        } else { 
++            fprintf(stderr,"Successfully locked memory using mlockAll\n");
++        }
++    }
++#endif
++
+ #else
+     if(errVerbose) fprintf(stderr,"task priorities are not implemented\n");
+ #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
+     pthreadInfo = init_threadInfo("_main_",0,epicsThreadGetStackSize(epicsThreadStackSmall),0,0);
+     status = pthread_setspecific(getpthreadInfo,(void *)pthreadInfo);
+     checkStatusOnceQuit(status,"pthread_setspecific","epicsThreadInit");
+     status = mutexLock(&listLock);
+     checkStatusQuit(status,"pthread_mutex_lock","epicsThreadInit");

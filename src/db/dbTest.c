@@ -293,6 +293,34 @@ long epicsShareAPI dbgrep(const char *pmask)
     return 0;
 }
 
+long epicsShareAPI dbdump(int interest_level)
+{
+    DBENTRY dbentry;
+    DBENTRY *pdbentry = &dbentry;
+    long status;
+
+    if (!pdbbase) {
+        printf("No database loaded\n");
+        return 0;
+    }
+    dbInitEntry(pdbbase, pdbentry);
+    status = dbFirstRecordType(pdbentry);
+    while (!status) {
+        status = dbFirstRecord(pdbentry);
+        while (!status) {
+            char *pname = dbGetRecordName(pdbentry);
+            puts("----------");
+            puts(pname);
+            dbpr(pname, interest_level, 0);
+            status = dbNextRecord(pdbentry);
+        }
+        status = dbNextRecordType(pdbentry);
+    }
+    dbFinishEntry(pdbentry);
+    return 0;
+}
+
+
 long epicsShareAPI dbgf(const char *pname)
 {
     /* declare buffer long just to ensure correct alignment */
@@ -379,13 +407,12 @@ long epicsShareAPI dbpf(const char *pname,const char *pvalue)
     return dbgf(pname);
 }
 
-long epicsShareAPI dbpr(const char *pname,int interest_level)
+long epicsShareAPI dbpr(const char *pname,int interest_level, int tab_size)
 {
     static TAB_BUFFER msg_Buff;
     TAB_BUFFER *pMsgBuff = &msg_Buff;
     DBADDR addr;
     char *pmsg;
-    int tab_size = 20;
 
     if (!pname || !*pname) {
         printf("Usage: dbpr \"pv name\", level\n");
@@ -432,7 +459,7 @@ long epicsShareAPI dbtr(const char *pname)
     if (status)
         recGblRecordError(status, precord, "dbtr(dbProcess)");
 
-    dbpr(pname, 3);
+    dbpr(pname, 3, 20);
     return 0;
 }
 
@@ -1258,9 +1285,9 @@ static void dbpr_msgOut(TAB_BUFFER *pMsgBuff,int tab_size)
     char       *pmsg = pMsgBuff->message;
     static int last_tabsize;
 
-    if (!((tab_size == 10) || (tab_size == 20))) {
-        printf("tab_size not 10 or 20 - dbpr_msgOut()\n");
-        return;
+    if (!((tab_size == 0) || (tab_size == 10) || (tab_size == 20))) {
+       printf("tab_size not 10 or 20 - dbpr_msgOut()\n"); /* Why does tab_size matter? */
+       return;
     }
     /* init if first time */
     if (!(pMsgBuff->pNext))
