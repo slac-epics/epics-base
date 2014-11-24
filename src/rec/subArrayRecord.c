@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101112220909-zd1pn4qnqsafag0l */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recSubArray.c - Record Support Routines for SubArray records 
  *
@@ -37,6 +37,7 @@
 #include "recSup.h"
 #include "recGbl.h"
 #include "cantProceed.h"
+
 #define GEN_SIZE_OFFSET
 #include "subArrayRecord.h"
 #undef  GEN_SIZE_OFFSET

@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*  
- *  Revision-Id: johill@lanl.gov-20111019180700-7u25j7zwo2w1894n
+ *  Revision-Id: johill@lanl.gov-20130516183331-ccgep7u4xccqzaw3
  *
  *                              
  *                    L O S  A L A M O S
@@ -59,10 +59,11 @@ dbPutNotifyBlocker::~dbPutNotifyBlocker ()
 {
 }
 
-void dbPutNotifyBlocker::destructor ( epicsGuard < epicsMutex > & guard )
+void dbPutNotifyBlocker::destructor ( CallbackGuard & cbGuard, 
+                                  epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
-    this->cancel ( guard );
+    this->cancel ( cbGuard, guard );
     if ( this->maxValueSize > sizeof ( this->dbrScalarValue ) ) {
         char * pBuf = static_cast < char * > ( this->pn.pbuffer );
         delete [] pBuf;
@@ -71,6 +72,7 @@ void dbPutNotifyBlocker::destructor ( epicsGuard < epicsMutex > & guard )
 }
 
 void dbPutNotifyBlocker::cancel ( 
+    CallbackGuard & cbGuard,
     epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -210,13 +212,6 @@ void * dbPutNotifyBlocker::operator new ( size_t size,
     tsFreeList < dbPutNotifyBlocker, 64, epicsMutexNOOP > & freeList )
 {
     return freeList.allocate ( size );
-}
-
-void * dbPutNotifyBlocker::operator new ( size_t ) // X aCC 361
-{
-    // The HPUX compiler seems to require this even though no code
-    // calls it directly
-    throw std::logic_error ( "why is the compiler calling private operator new" );
 }
 
 #ifdef CXX_PLACEMENT_DELETE

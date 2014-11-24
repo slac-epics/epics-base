@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*  
- *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ *  Revision-Id: johill@lanl.gov-20130516183331-ccgep7u4xccqzaw3
  *
  *                              
  *                    L O S  A L A M O S
@@ -42,11 +42,11 @@
 class dbPutNotifyBlocker : public dbBaseIO {
 public:
     dbPutNotifyBlocker ( epicsMutex & );
-    void destructor ( epicsGuard < epicsMutex > & );
+    void destructor ( CallbackGuard &, epicsGuard < epicsMutex > & );
     void initiatePutNotify ( epicsGuard < epicsMutex > &, 
             cacWriteNotify &, struct dbAddr &, 
             unsigned type, unsigned long count, const void * pValue );
-    void cancel ( epicsGuard < epicsMutex > & );
+    void cancel ( CallbackGuard &, epicsGuard < epicsMutex > & );
     void show ( epicsGuard < epicsMutex > &, unsigned level ) const;
     void show ( unsigned level ) const;
     void * operator new ( size_t size, 
@@ -82,7 +82,6 @@ private:
 	dbPutNotifyBlocker ( const dbPutNotifyBlocker & );
 	dbPutNotifyBlocker & operator = ( const dbPutNotifyBlocker & );
     virtual ~dbPutNotifyBlocker ();
-    void * operator new ( size_t size );
     void operator delete ( void * );
 };
 

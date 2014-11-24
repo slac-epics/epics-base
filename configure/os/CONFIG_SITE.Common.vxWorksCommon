@@ -20,6 +20,7 @@
 VXWORKS_VERSION = 6.6
 #VXWORKS_VERSION = 6.7
 #VXWORKS_VERSION = 6.8
+#VXWORKS_VERSION = 6.9
 
 
 # Sites may override the following path for a particular host
@@ -74,6 +75,7 @@ OPT_CXXFLAGS_YES = -O2 -g
 WORKBENCH_VERSION = 3.0
 #WORKBENCH_VERSION = 3.1
 #WORKBENCH_VERSION = 3.2
+#WORKBENCH_VERSION = 3.3
 
 
 # Utilities Version number, required from vxWorks 6.8 and later

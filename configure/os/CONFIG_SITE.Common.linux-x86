@@ -1,6 +1,6 @@
 # CONFIG_SITE.Common.linux-x86
 #
-# Revision-Id: anj@aps.anl.gov-20111207195604-heciohzgvyhhpgrb
+# Revision-Id: jba@aps.anl.gov-20130725154926-szg53grbkd982szq
 #
 # Site Specific definitions for linux-x86 target
 # Only the local epics system manager should modify this file
@@ -38,3 +38,4 @@ COMMANDLINE_LIBRARY = READLINE_NCURSES
 # This does cost disk space, but not memory as debug symbols are not
 # loaded into RAM when the binary is loaded.
 OPT_CFLAGS_YES += -g
+OPT_CXXFLAGS_YES += -g

@@ -6,12 +6,13 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120004245-drexj41vy3vynah9 */
 
 #include <stdlib.h>
 
+#define epicsExportSharedSymbols
 #include "devLibVME.h"
 
 /* This file must contain no definitions other than the following: */
 
-devLibVME *pdevLibVME;
+epicsShareDef devLibVME *pdevLibVME;
