@@ -13,11 +13,6 @@
 #include "postfix.h"
 #include "testMain.h"
 
-/* Suggested by Till Strauman to support linuxRT from SLAC */
-#ifdef isfinite
-#define finite(x) isfinite(x)
-#endif
-
 /* Infrastructure for running tests */
 
 double doCalc(const char *expr) {

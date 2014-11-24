@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20121007024801-ndvgugwghwahg899 */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recDfanout.c - Record Support Routines for Dfanout records */
 /*
@@ -38,6 +38,7 @@
 #include "recGbl.h"
 #include "special.h"
 #include "menuOmsl.h"
+
 #define GEN_SIZE_OFFSET
 #include "dfanoutRecord.h"
 #undef  GEN_SIZE_OFFSET

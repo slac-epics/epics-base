@@ -809,7 +809,7 @@ void epicsShareAPI dbPrint(dbCommon *precord )
      return;
 
   printf("\n");
-  dbpr(precord->name, 2, 20);
+  dbpr(precord->name, 2);
   printf("-> ");
 }
 
@@ -830,7 +830,7 @@ long epicsShareAPI dbp(const char *record_name, int interest_level)
   }
 
  /* print out record's fields */
-  dbpr(precord->name, (interest_level == 0) ? 2 : interest_level, 20);
+  dbpr(precord->name, (interest_level == 0) ? 2 : interest_level);
 
   epicsMutexUnlock(bkpt_stack_sem);
   return(0);

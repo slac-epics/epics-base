@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-# Added By Ernest Williams
-#
-# Definitions for vxWorks-mpc8548 targets: MPC8548 CPU with >32MB RAM.
-# Site-specific overrides go in CONFIG_SITE.Common.vxWorks-mpc8548
-#
-# This file is maintained by the EPICS build community.
-=======
 # CONFIG.Common.vxWorks-mpc8548
 #
 # Revision-Id: anj@aps.anl.gov-20110215221926-fx2lar4mhcbfav2s
@@ -13,17 +5,11 @@
 #
 # Definitions for vxWorks-mpc8548 target archs
 # Sites may override these definitions in CONFIG_SITE.Common.vxWorks-mpc8548
->>>>>>> 3.14.12.3_merge
 #-------------------------------------------------------
 
 # Include definitions common to all vxWorks target archs
 include $(CONFIG)/os/CONFIG.Common.vxWorksCommon
 
-<<<<<<< HEAD
-GNU_DIR_5 = $(WIND_BASE)/gnu/3.3/$(WIND_HOST_TYPE)
-
-=======
->>>>>>> 3.14.12.3_merge
 # Vx GNU cross compiler suffix
 CMPLR_SUFFIX = ppc
 
@@ -31,16 +17,10 @@ ARCH_CLASS = ppc
 
 # Architecture specific build flags
 ARCH_DEP_CPPFLAGS = -DCPU=PPC32
-<<<<<<< HEAD
-ARCH_DEP_CFLAGS = -DCPU_VARIANT=_ppc85XX_e500v2 -te500v2
-ARCH_DEP_CFLAGS += -mlongcall
-
-=======
 ARCH_DEP_CFLAGS = -DCPU_VARIANT=_ppc85XX_e500v2
 ARCH_DEP_CFLAGS += -mlongcall
 
 # This flag isn't present in early vxWorks 6.x versions
 #ARCH_DEP_CFLAGS += -te500v2
 
->>>>>>> 3.14.12.3_merge
 GNU_TARGET = powerpc-wrs-vxworks

@@ -3,13 +3,12 @@
 *     National Laboratory.
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
-* EPICS BASE Versions 3.13.7
-* and higher are distributed subject to a Software License Agreement found
-* in file LICENSE that is included with this distribution. 
+* EPICS BASE is distributed subject to a Software License Agreement found
+* in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
 /*
- * Revision-Id: anj@aps.anl.gov-20120618195203-fn89v5ir0faou35v
+ * Revision-Id: anj@aps.anl.gov-20131120004245-drexj41vy3vynah9
  *
  * Author: Jeff Hill
  * 
@@ -23,8 +22,8 @@
 
 #define VC_EXTRALEAN
 #define STRICT
-#if _WIN64
-#   define _WIN32_WINNT 0x400 /* defining this drops support for W95 */
+#ifndef _WIN32_WINNT
+#   define _WIN32_WINNT 0x400 /* No support for W95 */
 #endif
 #include <windows.h>
 #include <process.h> /* for _endthread() etc */
@@ -246,10 +245,7 @@ static void epicsParmCleanupWIN32 ( win32ThreadParam * pParm )
         ellDelete ( & pGbl->threadList, & pParm->node );
         LeaveCriticalSection ( & pGbl->mutex );
 
-        /* close the handle if its an implicit thread id */
-        if ( ! pParm->funptr ) {
-            CloseHandle ( pParm->handle );
-        }
+        CloseHandle ( pParm->handle );
         free ( pParm );
         TlsSetValue ( pGbl->tlsIndexThreadLibraryEPICS, 0 );
     }
