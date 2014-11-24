@@ -1,5 +1,4 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # registerRecordDeviceDriver 
+#!/usr/bin/env perl
 #*************************************************************************
 # Copyright (c) 2009 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
@@ -9,6 +8,10 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 
+use FindBin qw($Bin);
+use lib "$Bin/../../lib/perl";
+use EPICS::Path;
+
 ($file, $subname, $bldTop) = @ARGV;
 $numberRecordType = 0;
 $numberDeviceSupport = 0;
@@ -17,6 +20,10 @@ $numberDriverSupport = 0;
 # Eliminate chars not allowed in C symbol names
 $c_bad_ident_chars = '[^0-9A-Za-z_]';
 $subname =~ s/$c_bad_ident_chars/_/g;
+
+# Process bldTop like convertRelease.pl does
+$bldTop = LocalPath(UnixPath($bldTop));
+$bldTop =~ s/([\\"])/\\\1/g; # escape back-slashes and double-quotes
 
 open(INP,"$file") or die "$! opening file";
 while(<INP>) {

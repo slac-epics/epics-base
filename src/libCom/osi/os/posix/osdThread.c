@@ -75,6 +75,13 @@ typedef struct epicsThreadOSD {
     char              *name;
 } epicsThreadOSD;
 
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
+typedef struct {
+    int min_pri, max_pri;
+    int policy;
+} priAvailable;
+#endif
+
 static pthread_key_t getpthreadInfo;
 static pthread_mutex_t onceLock;
 static pthread_mutex_t listLock;
@@ -201,6 +208,101 @@ static void free_threadInfo(epicsThreadOSD *pthreadInfo)
     free(pthreadInfo);
 }
 
+#if defined (_POSIX_THREAD_PRIORITY_SCHEDULING) 
+/*
+ * The actually available range priority range (at least under linux)
+ * may be restricted by resource limitations (but that is ignored
+ * by sched_get_priority_max()). See bug #835138 which is fixed by
+ * this code.
+ */
+
+static int try_pri(int pri, int policy)
+{
+struct sched_param  schedp;
+
+    schedp.sched_priority = pri;
+    return pthread_setschedparam(pthread_self(), policy, &schedp);
+}
+
+static void*
+find_pri_range(void *arg)
+{
+priAvailable *prm = arg;
+int           min = sched_get_priority_min(prm->policy);
+int           max = sched_get_priority_max(prm->policy);
+int           low, try;
+
+    if ( -1 == min || -1 == max ) {
+        /* something is very wrong; maintain old behavior
+         * (warning message if sched_get_priority_xxx() fails
+         * and use default policy's sched_priority [even if
+         * that is likely to cause epicsThreadCreate to fail
+         * because that priority is not suitable for SCHED_FIFO]).
+         */
+        prm->min_pri = prm->max_pri = -1;
+        return 0;
+    }
+
+
+    if ( try_pri(min, prm->policy) ) {
+        /* cannot create thread at minimum priority;
+         * probably no permission to use SCHED_FIFO
+         * at all. However, we still must return
+         * a priority range accepted by the SCHED_FIFO
+         * policy. Otherwise, epicsThreadCreate() cannot
+         * detect the unsufficient permission (EPERM)
+         * and fall back to a non-RT thread (because
+         * pthread_attr_setschedparam would fail with
+         * EINVAL due to the bad priority).
+         */
+        prm->min_pri = prm->max_pri = min;
+        return 0;
+    }
+
+
+    /* Binary search through available priorities.
+     * The actually available range may be restricted
+     * by resource limitations (but that is ignored
+     * by sched_get_priority_max() [linux]).
+     */
+    low = min;
+
+    while ( low < max ) {
+        try = (max+low)/2;
+        if ( try_pri(try, prm->policy) ) {
+            max = try;
+        } else {
+            low = try + 1;
+        }
+    }
+
+    prm->min_pri = min;
+    prm->max_pri = try_pri(max, prm->policy) ? max-1 : max;
+
+    return 0;
+}
+
+static void findPriorityRange(commonAttr *a_p)
+{
+priAvailable arg;
+pthread_t    id;
+void         *dummy;
+int          status;
+
+    arg.policy = a_p->schedPolicy;
+
+    status = pthread_create(&id, 0, find_pri_range, &arg);
+    checkStatusQuit(status, "pthread_create","epicsThreadInit");
+
+    status = pthread_join(id, &dummy);
+    checkStatusQuit(status, "pthread_join","epicsThreadInit");
+
+    a_p->minPriority = arg.min_pri;
+    a_p->maxPriority = arg.max_pri;
+}
+#endif
+
+
 static void once(void)
 {
     epicsThreadOSD *pthreadInfo;
@@ -230,13 +332,14 @@ static void once(void)
     status = pthread_attr_getschedparam(
         &pcommonAttr->attr,&pcommonAttr->schedParam);
     checkStatusOnce(status,"pthread_attr_getschedparam");
-    pcommonAttr->maxPriority = sched_get_priority_max(pcommonAttr->schedPolicy);
+
+    findPriorityRange(pcommonAttr);
+
     if(pcommonAttr->maxPriority == -1) {
         pcommonAttr->maxPriority = pcommonAttr->schedParam.sched_priority;
         fprintf(stderr,"sched_get_priority_max failed set to %d\n",
             pcommonAttr->maxPriority);
     }
-    pcommonAttr->minPriority = sched_get_priority_min(pcommonAttr->schedPolicy);
     if(pcommonAttr->minPriority == -1) {
         pcommonAttr->minPriority = pcommonAttr->schedParam.sched_priority;
         fprintf(stderr,"sched_get_priority_min failed set to %d\n",
@@ -295,9 +398,6 @@ static void epicsThreadInit(void)
 }
 
 
-#define ARCH_STACK_FACTOR 1024
-
-
 epicsShareFunc unsigned int epicsShareAPI epicsThreadGetStackSize (epicsThreadStackSizeClass stackSizeClass)
 {
 #if ! defined (_POSIX_THREAD_ATTR_STACKSIZE)
@@ -305,8 +405,10 @@ epicsShareFunc unsigned int epicsShareAPI epicsThreadGetStackSize (epicsThreadSt
 #elif defined (OSITHREAD_USE_DEFAULT_STACK)
     return 0;
 #else
-    static const unsigned stackSizeTable[epicsThreadStackBig+1] =
-        {128*ARCH_STACK_FACTOR, 256*ARCH_STACK_FACTOR, 512*ARCH_STACK_FACTOR};
+    #define STACK_SIZE(f) (f * 0x10000 * sizeof(void *))
+    static const unsigned stackSizeTable[epicsThreadStackBig+1] = {
+        STACK_SIZE(1), STACK_SIZE(2), STACK_SIZE(4)
+    };
     if (stackSizeClass<epicsThreadStackSmall) {
         errlogPrintf("epicsThreadGetStackSize illegal argument (too small)");
         return stackSizeTable[epicsThreadStackBig];
@@ -422,7 +524,7 @@ static epicsThreadOSD *createImplicit(void)
     int status;
 
     tid = pthread_self();
-    sprintf(name, "non-EPICS_%d", (int)tid);
+    sprintf(name, "non-EPICS_%ld", (long)tid);
     pthreadInfo = create_threadInfo(name);
     pthreadInfo->tid = tid;
     pthreadInfo->osiPriority = 0;
@@ -571,9 +673,15 @@ epicsShareFunc void epicsShareAPI epicsThreadSleep(double seconds)
     struct timespec remainingTime;
     double nanoseconds;
 
-    delayTime.tv_sec = (time_t)seconds;
-    nanoseconds = (seconds - (double)delayTime.tv_sec) *1e9;
-    delayTime.tv_nsec = (long)nanoseconds;
+    if (seconds > 0) {
+        delayTime.tv_sec = seconds;
+        nanoseconds = (seconds - delayTime.tv_sec) *1e9;
+        delayTime.tv_nsec = nanoseconds;
+    }
+    else {
+        delayTime.tv_sec = 0;
+        delayTime.tv_nsec = 0;
+    }
     while (nanosleep(&delayTime, &remainingTime) == -1 &&
            errno == EINTR)
         delayTime = remainingTime;

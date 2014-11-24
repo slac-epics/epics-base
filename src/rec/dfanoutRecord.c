@@ -5,7 +5,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recDfanout.c - Record Support Routines for Dfanout records */
 /*
@@ -38,6 +38,7 @@
 #include "recGbl.h"
 #include "special.h"
 #include "menuOmsl.h"
+
 #define GEN_SIZE_OFFSET
 #include "dfanoutRecord.h"
 #undef  GEN_SIZE_OFFSET
@@ -267,7 +268,7 @@ static void monitor(dfanoutRecord *prec)
         /* check for value change */
         delta = prec->mlst - prec->val;
         if(delta<0) delta = -delta;
-        if (delta > prec->mdel) {
+        if (!(delta <= prec->mdel)) { /* Handles MDEL == NAN */
                 /* post events for value change */
                 monitor_mask |= DBE_VALUE;
                 /* update last value monitored */
@@ -276,7 +277,7 @@ static void monitor(dfanoutRecord *prec)
         /* check for archive change */
         delta = prec->alst - prec->val;
         if(delta<0) delta = -delta;
-        if (delta > prec->adel) {
+        if (!(delta <= prec->adel)) { /* Handles ADEL == NAN */
                 /* post events on value field for archive change */
                 monitor_mask |= DBE_LOG;
                 /* update last archive value monitored */

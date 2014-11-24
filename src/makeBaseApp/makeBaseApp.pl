@@ -1,13 +1,17 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # makeBaseApp 
+#!/usr/bin/env perl
 
 # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# Revision-Id: anj@aps.anl.gov-20130819204651-8fvycjecojsfsnwl
+
+use FindBin qw($Bin);
+use lib ("$Bin/../../lib/perl", $Bin);
 
 use Cwd;
 use Getopt::Std;
 use File::Find;
-use File::Path;
+use File::Path 'mkpath';
+use EPICS::Path;
+use EPICS::Release;
 
 $app_top  = cwd();
 
@@ -16,12 +20,10 @@ $app_top  = cwd();
 
 $bad_ident_chars = '[^0-9A-Za-z_]';
 
-&GetUser;		# Ensure we know who's in charge
-&readRelease("configure/RELEASE", \%release, \@apps) if (-r "configure/RELEASE");
-&readRelease("configure/RELEASE.$ENV{EPICS_HOST_ARCH}", \%release, \@apps)
-   if (-r "configure/RELEASE.$ENV{EPICS_HOST_ARCH}");
-&expandRelease(\%release, \@apps);
+&readReleaseFiles("configure/RELEASE", \%release, \@apps);
+&expandRelease(\%release);
 &get_commandline_opts;	# Check command-line options
+&GetUser;		# Ensure we know who's in charge
 
 #
 # Declare two default callback routines for file copy plus two
@@ -161,7 +163,7 @@ exit 0;				# END OF SCRIPT
 # Get commandline options and check for validity
 #
 sub get_commandline_opts { #no args
-    getopts("a:b:dhilp:T:t:") or Cleanup(1);
+    getopts("a:b:dhilp:T:t:u:") or Cleanup(1);
     
     # Options help
     Cleanup(0) if $opt_h;
@@ -298,57 +300,6 @@ sub get_commandline_opts { #no args
 }
 
 #
-# Parse a configure/RELEASE file.
-#
-# NB: This subroutine also appears in base/configure/tools/convertRelease.pl
-# If you make changes here, they will be needed there as well.
-#
-sub readRelease {
-    my ($file, $Rmacros, $Rapps) = @_;
-    # $Rmacros is a reference to a hash, $Rapps a ref to an array
-    my ($pre, $var, $post, $macro, $path);
-    local *IN;
-    open(IN, $file) or die "Can't open $file: $!\n";
-    while (<IN>) {
-	chomp;
-	s/\r$//;		# Shouldn't need this, but sometimes...
-	s/\s*#.*$//;		# Remove trailing comments
-        next if /^\s*$/;	# Skip blank lines
-	
-	# Expand all already-defined macros in the line:
-	while (($pre,$var,$post) = /(.*)\$\((\w+)\)(.*)/) {
-	    last unless (exists $Rmacros->{$var});
-	    $_ = $pre . $Rmacros->{$var} . $post;
-	}
-	
-	# Handle "<macro> = <path>"
-	($macro, $path) = /^\s*(\w+)\s*=\s*(.*)/;
-	if ($macro ne "") {
-	    $Rmacros->{$macro} = $path;
-	    push @$Rapps, $macro;
-	    next;
-	}
-	# Handle "include <path>" syntax
-	($path) = /^\s*include\s+(.*)/;
-	&readRelease($path, $Rmacros, $Rapps) if (-r $path);
-    }
-    close IN;
-}
-
-sub expandRelease {
-    my ($Rmacros, $Rapps) = @_;
-    # $Rmacros is a reference to a hash, $Rapps a ref to an array
-    
-    # Expand any (possibly nested) macros that were defined after use
-    while (($macro, $path) = each %$Rmacros) {
-	while (($pre,$var,$post) = $path =~ /(.*)\$\((\w+)\)(.*)/) {
-	    $path = $pre . $Rmacros->{$var} . $post;
-	    $Rmacros->{$macro} = $path;
-	}
-    }
-}
-
-#
 # List application types
 #
 sub ListAppTypes { # no args
@@ -443,7 +394,7 @@ EOF
  -d       Enable debug messages
  -i       Specifies that ioc boot directories will be generated
  -l       List valid application types for this installation
-	  If this is specified the other options are not used
+          If this is specified the other options are not used
  -p app   Set the application name for use with -i
           If not specified, you will be prompted
  -T top   Set the template top directory (where the application templates are)
@@ -453,6 +404,7 @@ EOF
  -t type  Set the application type (-l for a list of valid types)
           If not specified, type is taken from environment
           If not found in environment, \"default\" is used
+ -u user  Set username; overrides OS defaults
 
 Environment:
 EPICS_MBA_DEF_APP_TYPE  Application type you want to use as default
@@ -467,10 +419,7 @@ EOF
 }
 
 sub GetUser {
-    # add to this list if new possibilities arise,
-    # currently it's UNIX and WIN32:
-    $user = $ENV{USER} || $ENV{USERNAME} || Win32::LoginName();
-    $user =~ s/\s+//g;   # Bl**dy Windows stupidity...
+    $user = $opt_u || $ENV{USER} || $ENV{USERNAME} || Win32::LoginName();
 
     unless ($user) {
 	print "Strange, I cannot figure out your user name!\n";
@@ -478,31 +427,6 @@ sub GetUser {
 	$user = <STDIN>;
 	chomp $user;
     }
+    $user =~ tr/-a-zA-Z0-9_:;[]<>//cd;  # Sanitize; these are the legal chars
     die "No user name" unless $user;
-}
-
-# Path rewriting rules for various OSs
-# These functions are duplicated in configure/convertRelease.pl
-sub UnixPath {
-    my ($newpath) = @_;
-    if ($^O eq 'cygwin') {
-	$newpath =~ s{\\}{/}go;
-	$newpath =~ s{^([a-zA-Z]):/}{/cygdrive/$1/};
-    } elsif ($^O eq 'MSWin32') {
-	$newpath =~ s{\\}{/}go;
-    } elsif ($^O eq 'sunos') {
-	$newpath =~ s{^/tmp_mnt/}{/};
-    }
-    return $newpath;
-}
-
-sub LocalPath {
-    my ($newpath) = @_;
-    if ($^O eq "cygwin") {
-	$newpath =~ s{^/cygdrive/([a-zA-Z])/}{$1:/};
-    } elsif ($^O eq "darwin") {
-	# These rules are likely to be site-specific
-	$newpath =~ s{^/private/var/auto\.home/}{/home/};    # APS
-    }
-    return $newpath;
 }

@@ -3,15 +3,657 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  <title>EPICS Base R3.14.12 Release Notes</title>
+  <title>EPICS Base R3.14.12.4 Release Notes</title>
 </head>
 
 <body lang="en">
-<h1 align="center">EPICS Base Release 3.14.12</h1>
+<h1 align="center">EPICS Base Release 3.14.12.4</h1>
+
+<h2 align="center">Changes between 3.14.12.3 and 3.14.12.4</h2>
+
+<!-- Insert new items immediately below here ... -->
+
+<h3>New test for environment variables</h3>
+
+<p>A new test program epicsEnvTest has been added to the libCom tests which
+checks environment variable APIs. It was written to confirm that threads see
+environment variable values that have been set in their parent thread. VxWorks
+6.x boot images must be configured with ENV_VAR_USE_HOOKS set to FALSE for the
+correct behaviour to occur (a test failure on VxWorks explains this).</p>
+
+<h3>Inclusion of &lt;top&gt;/cfg/* files refined</h3>
+
+<p>The way the build system includes files installed in the &lt;top&gt;/cfg/*
+directory has been cleaned up. Files whose names begin with CONFIG will now get
+included by the CONFIG step, and files whose names begin with RULES will get
+included in the RULES step. These files are only ever included when GNUMake is
+working in an application build (O.) directory and T_A is defined, so they
+cannot be used to create generic build targets at other levels.</p>
+
+<p>Files whose names don't start with either CONFIG or RULES are no longer
+included automatically, but such files can still be installed into
+&lt;top&gt;/cfg by naming them in the CFG variable.</p>
+
+<h3>Fixed iocsh stream redirection for several commands</h3>
+
+<p>A number of iocsh commands did not respond correctly to redirection of their
+output using the iocsh '>file' or '2>error-file' syntax, and redirecting an
+empty command could create files with garbage names. There may still be a few
+commands that do not properly redirect their output, please notify the core
+developers if you discover any. Thanks to Eric Norum for the iocsh changes.</p>
+
+<p>For externally developed commands, the simplest way to support redirection in
+your C/C++ code is to <tt>#include "epicsStdioRedirect.h"</tt> instead of
+<tt>stdio.h</tt>.</p>
+
+<h3>Fixed crash on loading record instance of unknown type</h3>
+
+<p>Fixed segfault when dbLoadRecords tried to load a record of a type that was
+not defined in its DBD files.</p>
+
+<h3>Hex literal support in epicStrtod()</h3>
+
+<p>Some OS implementations of the standard C library routine strtod() do not
+recognize hexadecimal integers, in particular the libraries provided on Windows
+and VxWorks. The internal implementation of epicsStrtod() that these targets use
+now recognizes the 0x prefix and will convert hex numbers correctly. Thanks to
+Dirk Zimoch for suggesting this change.</p>
+
+<h3>Added support for 64-bit Cygwin and MinGW targets</h3>
+
+<p>Both windows-x64-mingw and cygwin-x86_64 build targets are now provided.</p>
+
+<h3>Windows build issues</h3>
+
+<p>Thanks to Peter Heesterman for suggesting a number of small changes that
+clean up build issues on Windows, mostly related to symbol import and export
+to/from DLLs.</p>
+
+<h3>CAS: GDD Reference Count Underflow</h3>
+
+<p>Thanks to Bruce Hill a source of an underflow in a GDD reference count in the
+CAS code has been fixed.</p>
+
+<h3>Support for Apple Xcode 5.0</h3>
+
+<p>This adds the ability to build for iOS 7.0 and the ARMv8 64-bit CPU on the
+newest iPhone 5S device. Unfortunately the Xcode upgrade breaks the build of the
+ios-x86 simulator target, although the ios-arm target successfully builds code
+which runs fine on the real hardware.</p>
+
+<h3>Reading TSEL field</h3>
+
+<p>The TSEL link field has two complementary uses; it is read to fetch a
+time-stamp event number for the TSE field, or if pointed to the .TIME field of
+another record the record's timestamp is copied directly from the target record.
+However with the latter usage if the TSEL link is itself read back instead of
+pointing to the .TIME field the link appears to have changed to point to the VAL
+field. This is due to an internal detail, and makes it impossible to save the
+TSEL field's value using autosave. This has been fixed, and now the TSEL field
+should always read back the same PV that it was pointed to.</p>
+
+<h3>dbLoadTemplate variable limits adjustable</h3>
+
+<p>The <tt>dbLoadTemplate</tt> command used to allocate a fixed amount of memory
+for the template macro values that it used to 5000 bytes, and also limited the
+number of variables that could defined to 100. These limits can now be changed
+at runtime using the variable <tt>dbTemplateMaxVars</tt> which sets the maximum
+number of macro variables that can be used; the amount of memory allocated for
+value storage is 50 times this number. This variable is registered as an iocsh
+variable in the base.dbd file, and can be adjusted as necessary before each
+individual call to <tt>dbLoadTemplate</tt>.</p>
+
+<p>The code now checks for and prevents any attempt to define more than the set
+number of variables, but it does not check for overruns of the storage buffer.
+This means that template files which define many long macro value strings could
+still cause a buffer overflow and crash the IOC at startup, but increasing the
+variable is all that is needed to allow that template file to be loaded.</p>
+
+<h3>Improvements to dbpf</h3>
+
+<p>It is now possible to use the <tt>dbpf</tt> command to put a long string
+value into a UCHAR array field, previously only CHAR arrays were supported by
+this command even though through Channel Access could put a long string to
+either type. The error message printed by <tt>dbpf</tt> when a value conversion
+fails has also been significantly improved.</p>
+
+<h3>Support for VxWorks 6.9</h3>
+
+<p>Various changes have been made that were needed to allow Base to build and
+run properly on VxWorks 6.9.</p>
+
+<h3>Improvements to aToIPAddr()</h3>
+
+<p>The libCom routine aToIPAddr() and the vxWorks implementation of the
+associated hostToIPAddr() function have been modified to be able to look up
+hostnames that begin with one or more digits. The epicsSockResolveTest program
+was added to check this functionality.</p>
+
+<h4>Added osdFindSymbol for Windows</h4>
+
+<p>Dirk Zimoch implemented the epicsLoadLibrary(), epicsLoadError() and
+epicsFindSymbol() routines for Windows OS targets.</p>
+
+<h4>More dbStatic commands accept "" or "*" to mean 'all'</h4>
+
+<p>The IOC commands dbDumpRecordType, dbDumpMenu and dbDumpRecord will now
+accept either an empty string or any string beginning with an asterisk '*' to
+mean all record types or menus.  Previously the 'all' option for these commands
+required passing in a NULL value, which could be done from the vxWorks shell but
+was not possible from iocsh.</p>
+
+<h4>VxWorks sysAtReboot Registration</h4>
+
+<p>The increasing intelligence of the GNU compiler and linker broke the method
+that was being used by the VxWorks code to register a reboot hook that can close
+down TCP connections nicely before the network stack gets disabled. This has
+been fixed and no longer uses a C++ static contructor to execute that code.</p>
+
+<h4>IOCS_APPL_TOP and INSTALL_LOCATION</h4>
+
+<p>An IOC application that sets INSTALL_LOCATION in its configure/CONFIG_SITE
+file no longer has to set IOCS_APPL_TOP there as well, unless the IOC uses a
+different path than the build host to reach the application's top directory in
+its filesystem. The IOCS_APPL_TOP variable now defaults to the value of
+INSTALL_LOCATION, so setting the latter automatically sets the former. This
+change fixes <a href="https://bugs.launchpad.net/bugs/1165257">Launchpad bug
+1165257</a>.</p>
+
+<h4>devLibVME.h</h4>
+
+<p>Moved the declaration of bcopyLongs() from this header into RTEMS/osdVME.h.
+Its original location broke the build for vxWorks 6.9 (the int nlongs argument
+becomes size_t in 6.9, thus conflicting with this declaration). The only local
+implementation of this routine is found in RTEMS/devLibVMEOSD.c, but it is not
+used anywhere in Base.</p>
+
+<h4>Allow empty database files</h4>
+
+<p>The IOC used to report an error if dbLoadRecords or dbLoadDatabase was asked
+to load an empty file or one containing just whitespace and/or comments. Such
+files are now permitted, simplifying the task of automated database generation
+programs which might discover they have nothing to output.</p>
+
+<h4>High-Resolution Time Provider on MacOS</h4>
+
+<p>MacOS does not provide the clock_gettime() API with CLOCK_REALTIME that other
+Posix systems implement, so we previously used gettimeofday() to fetch the
+current date & time from the OS. That older routine only provides the time with
+a resolution of 1 microsecond though, whereas clock_gettime() gives results with
+a nanosecond resolution.  This release uses a new MachTime time provider on
+MacOS which uses the Mach Kernel's CALENDAR_CLOCK service to fetch the time, and
+provides nanosecond resolution.</p>
+
+<h4>Time drift in periodic scans</h4>
+
+<p>The implementation of the periodic scan code has been modified to remove
+long-term drift associated with OS thread sheduling. The new code keeps scan
+times much more closely tied to the system clock tick, only allowing the scan
+period to drift if the record processing time takes longer to execute than the
+interval between scans. If this happens the scan thread is made to wait for an
+additional half-period but at most 1 second before the records are scanned
+again, to allow lower priority threads some time to process on a preemptive
+priority scheduled OS. After 10 repeated over-runs a warning will be logged,
+with an increasing delay between messages up to hourly.</p>
+
+<p>This fixes <a href="https://bugs.launchpad.net/bugs/597054">launchpad bug
+597054</a>.</p>
+
+<h2 align="center">Changes between 3.14.12.2 and 3.14.12.3</h2>
+
+<h4>Hex literals in CALC expressions</h4>
+
+<p>In previous releases, CALC expressions could contain hexadecimal literal
+integers on a target if the OS implementation of strtod() allows them (the
+vxWorks implementation does not). Now hex literal integers can be used in CALC
+expressions on all architectures. Hexadecimal floating point literals may have
+worked on some architectures in the past, but will no longer be accepted.</p>
+
+<h4>CAS: Added propertyEventMask support</h4>
+
+<p>Server tools should now be able to detect subscriptions to and send updates
+for DBE_PROPERTY events, using a casEventMask value returned by the new
+caServer::propertyEventMask() method.</p>
+
+<h4>caRepeater now built by default</h4>
+
+<p>Previously caRepeater was only built for host architectures, so builds for
+cross-compiled but workstation-type targets like linux-arm did not build it.
+Explicit exceptions prevent it being built on architectures like vxWorks, RTEMS
+and iOS which do not support normal executable programs.</p>
+
+<h4>Array Subroutine (aSub) record type fixes</h4>
+
+<ul>
+  <li>Changing the number of valid elements in a VALx field now triggers
+    monitors</li>
+  <li>The NEVx fields now post monitors, following the EFLG setting</li>
+  <li>The artificial limit of 10,000,000 array elements has been removed</li>
+</ul>
+
+<h4>Problem with NAN values in MLST/ALST fields</h4>
+
+<p>The ai, ao, calc, calcout, dfanout, sel and sub record types could stop
+posting monitors if they got NAN values in their MLST or ALST fields. A change
+has been included so this should no longer be the case.</p>
+
+<h4>MacOS build defaults changed</h4>
+
+<p>The default build settings for darwin-x86 targets have been changed to match
+the latest version of XCode; see configure/os/CONFIG_SITE.Common.darwin-x86
+if you need to revert back to building with GCC or to include the i386 CPU
+architecture.</p>
+
+<h4>Build problem with db dependencies</h4>
+
+<p>The dependency output for .db and .acf files created by makeDbDepends.pl did
+not show the directories of the depended files. The makeDbDepends.pl script has
+been replaced by mkmf.pl for this purpose after modifying it to accept multiple
+-I include directory options and more than one source file on the command line.
+The makeDbDepends.pl script has been removed from Base.</p>
+
+<h4>Native linux-arm builds added</h4>
+
+<p>The configuration files needed for a linux-arm system to build Base for
+itself have now been added. Both the Shell and Perl versions of the startup
+EpicsHostArch scripts now recognize both arm6l and arm7l CPUs and return the
+generic linux-arm host architecture name for them.</p>
+
+<h4>New Microblaze Target Architecture</h4>
+
+<p>A new cross-compiled target architecture is included for the Xilinx
+Microblaze FPGA soft-core CPU architecture running Linux.</p>
+
+<h4>Win32 Numeric string to enum/menu/device conversions</h4>
+
+<p>Microsoft's C run-time library has a bug in the sscanf() function such that
+the "%n" format specifier does not always work. The string to enum, menu and
+device conversion functions have been modified to avoid this problem, but a
+numeric string will no longer be converted properly on any architecture if it
+has trailing whitespace characters.</p>
+
+<h4>Launchpad Bugs Resolved</h4>
+
+<p>The following are links to bugs in the Launchpad bug tracker that have been
+fixed in this release:</p>
+
+<ul>
+<li>1090009
+  <a href="https://bugs.launchpad.net/bugs/1090009">
+    osdSufficentSpaceInPoolQuery fails on vxWorks 2 GB system</a></li>
+<li>999167
+  <a href="https://launchpad.net/bugs/999167">
+    Missing epicsShareFunc for casStatsFetch</a></li>
+<li>950555
+  <a href="https://launchpad.net/bugs/950555">
+    String substitution removes part of path when linking versioned shared
+    libraries</a></li>
+<li>907761
+  <a href="https://launchpad.net/bugs/907761">
+    reading only 1st char of link in "long string" ($) syntax fails in read
+    error</a></li>
+<li>903448
+  <a href="https://launchpad.net/bugs/903448">
+    RHEL5 nss ldap update cause stack size related failure</a>
+  <p>
+    This bug fix changed the stack sizes for both Posix and Windows targets as
+    follows:</p>
+  <table>
+    <tr><th>epicsThreadStackSizeClass</th><th>New Stack Size</th></tr>
+    <tr><td>epicsThreadStackSmall</td>
+      <td>0x10000 &times; sizeof (void *)</td></tr>
+    <tr><td>epicsThreadStackMedium</td>
+      <td>0x20000 &times; sizeof (void *)</td></tr>
+    <tr><td>epicsThreadStackBig</td>
+      <td>0x40000 &times; sizeof (void *)</td></tr>
+  </table></li>
+
+</ul>
+
+<h4>Calcout and Seq record timestamps</h4>
+
+<p>Both the calcout and seq record types were not updating the record's
+timestamp before calling db_post_events() for some field updates.  The calcout
+record type will now update the record's timestamp before it posts a channel
+access monitor on the DLYA field; this happens twice during record processing if
+the ODLY field is larger than 0.</p>
+
+<p>Timestamps from all seq record monitor events have been wrong since 1995 or
+earlier, the time being provided was from the last time the record processed. 
+Now the record timestamp will be updated between reading each DOL1..DOLA link
+and posting the monitor on the associated DO1..DOA field.  The VAL field is
+never given a value by the record processing code, but is used for posting
+monitors when the alarm status or severity gets updated at the end of record
+processing.  Alarm monitors are now timestamped properly at that time.</p>
+
+<h4>Comments in iocsh scripts</h4>
+
+<p>The IOC shell was very particular about comments in previous versions of
+Base. If the <tt>#</tt> character was indented using white-space characters it
+had to be followed immediately by a white-space, comma or parenthesis character,
+and macLib would report errors if the rest of the comment contained any
+undefined macros. These restrictions have now been removed. The comment
+character can come from expanding a macro without it having to be followed by
+white-space, although in this case macLib will still report errors due to
+undefined or circular macro definitions.</p>
+
+<h4>MacOS-X: Don't use Ports/Fink unless configured</h4>
+
+<p>Previous releases would automatically use headers and link to libraries found
+in the DarwinPorts and Fink installation directories. This is now controlled by
+entries in the <tt>CONFIG_SITE.darwinCommon.darwinCommon</tt> file in the
+<tt>configure/os</tt> directory, which are commented out by default. Recent
+versions of MacOS-X come with an implementation of readline, so those additional
+code repositories are no longer required.</p>
+
+<h2 align="center">Changes between 3.14.12.1 and 3.14.12.2</h2>
+
+<h4>Path for Cap5 loadable library changed</h4>
+
+<p>The perl CA module makes use of a loadable library, which used to be loaded
+from the base/lib/&lt;host-arch&gt; directory.  However different versions of
+Perl require different loadable library binaries as the Perl ABI can change.
+Now the library will be installed into and loaded from the directory
+base/lib/perl/&lt;version&gt;/&lt;archname&gt; where both &lt;version&gt; and
+&lt;archname&gt; are taken from the Perl configuration.  This makes it possible
+for the same Perl script to be run on both RHEL5 and RHEL6 workstations say, even
+though they use different versions of Perl.</p>
+
+<p>To achieve that, first build EPICS Base using the older OS version.  Then
+on a machine running the newer version, go into the base/src/cap5 directory and
+run a <tt>make rebuild</tt> command.  This will rebuild the libCap5.so file and
+install it into the location appropriate for its Perl version and architecture.</p>
+
+<h4>Build configurations updated for Apple iOS targets</h4>
+
+<p>The build process can now construct universal binaries containing both ARMv6
+and ARMv7 code, and several defaults have been changed when building for iOS
+targets:</p>
+
+<ul>
+
+<li>The default value for IOS_VERSION is now 5.0, edit the setting in
+<tt>configure/os/CONFIG_SITE.Common.iosCommon</tt> to use an older version.</li>
+
+<li>With the introduction of iOS 5.0 we have switched the C++ compiler for
+ios-arm from GNU g++ to using the LLVM-based clang++ (the GNU compilers are
+apparetnly no longer included with the SDK).  This can be switched back by
+editing the new <tt>CONFIG_SITE.Common.ios-arm</tt> file.</li>
+
+<li>Like the Darwin builds, universal binaries can now be compiled for the
+ios-arm target, containing either or both ARMv6 and ARMv7 instructions. This is
+configured by setting ARCH_CLASS in the new <tt>CONFIG_SITE.Common.ios-arm</tt>
+file. The default is now to build for ARMv7 only, which is not compatible with
+the original iPhone 1 or 3G, or with the iPod Touch Generations 1 or 2.</li>
+
+</ul>
+
+<h4>Added <tt>-b</tt> option to dbExpand</h4>
+
+<p>This turns off monotonic checking of breakpoint tables.</p>
+
+<h4>Launchpad Bugs Resolved</h4>
+
+<p>The following are links to bugs in the Launchpad bug tracker that have been
+fixed in this release:</p>
+
+<ul>
+<li>697509
+  <a href="https://launchpad.net/bugs/697509">
+    Thread synchronization issue in libCom/osi/os/WIN32/osdTime.cpp</a></li>
+<li>697516
+  <a href="https://launchpad.net/bugs/697516">
+    Crash occurs in Com.dll if filetime is before the EPICS epoch </a></li>
+<li>697517
+  <a href="https://launchpad.net/bugs/697517">
+    WIN32 osdtime should handle the system time change properly</a></li>
+<li>697519
+  <a href="https://launchpad.net/bugs/697519">
+    The incorrect way to compute the roll-over in WIN32 osdTime.cpp</a></li>
+<li>736273
+  <a href="https://launchpad.net/bugs/736273">
+    nonstandard c++ mutable ref in cac</a></li>
+<li>786979
+  <a href="https://launchpad.net/bugs/786979">
+    incorrect ref counting for timer queues</a></li>
+<li>794749
+  <a href="https://launchpad.net/bugs/794749">
+    3.14.12 caget without -c always requests maximum element count</a></li>
+<li>816678
+  <a href="https://launchpad.net/bugs/816678">
+    g++ generic thunk generation fails virtual varargs</a></li>
+<li>831648
+  <a href="https://launchpad.net/bugs/831648">
+    RTEMS dynamically loaded app fails to execute osdTimeRegister</a></li>
+<li>835138
+  <a href="https://launchpad.net/bugs/835138">
+    Incorrect calculation oss priorities for posix threads</a></li>
+<li>861214
+  <a href="https://launchpad.net/bugs/861214">
+    epicsThreadOnce crashes in static object destructor on win32</a></li>
+<li>861627
+  <a href="https://launchpad.net/bugs/861627">
+    RULES.db has incorrect dbExpand flags</a></li>
+<li>878372
+  <a href="https://launchpad.net/bugs/878372">
+    in-memory channel, ca client subscribe isnt thread safe</a></li>
+<li>878387
+  <a href="https://launchpad.net/bugs/878387">
+    In memory channel clear fails from put callback function</a></li>
+</ul>
+
+<h4>Added database sanity checks to iocInit</h4>
+
+<p>Two menus may legitimately be modified by users; some checks have been added
+that run at iocInit and make sure the choices haven't been changed too much for
+the IOC to function properly:</p>
+
+<ul>
+<li><tt>menuConvert</tt> is checked to flag problems with IOCs converted from
+  3.13.x, where the SLOPE choice didn't exist.</p>
+<li><tt>menuScan</tt> is checked to ensure the three initial choices are still
+  present and that there is at least one periodic scan rate.</li>
+</ul>
+
+<h4>Fix various catools issues</h4>
+
+<p>Array handling in the caget and camonitor programs has been debugged, fixing
+<a href="https://bugs.launchpad.net/bugs/794749">launchpad bug 794749</a> along
+with a few other related issues dating back to the addition of variable length
+array support.</p>
+
+<h4>Another race condition in errlog cleaned up</h4>
+
+<p>If it was still busy when the IOC was closed down, the errlog thread could
+have preempted the exit handler and freed the various internal pvtData mutex and
+event objects too soon.</p>
+
+<h4>Top-level make target changes</h4>
+
+<p>Several make targets have been changed. Note that these can only be used from
+an application's &lt;top&gt; directory.</p>
+
+<dl>
+  <dt><code>make uninstall.&lt;arch&gt;</code></dt>
+  <dd>Deletes the bin/&lt;arch&gt; and lib/&lt;arch&gt; directories for
+    &lt;arch&gt; only. Note that &lt;arch&gt; does not have to be an
+    architecture that this host is configured to build, it works for any
+    arch.</dd>
+
+  <dt><code>make archuninstall</code></dt>
+  <dd>Deletes the bin/&lt;arch&gt; and lib/&lt;arch&gt; directories for all
+    architectures that this host is configured to build. Should not affect files
+    used for multiple architectures, or for host or target architectures that
+    this host is not configured to build.</dd>
+
+  <dt><code>make uninstall</code></dt>
+  <dd>Does archuninstall and also deletes the other install directories include,
+    db, dbd, doc, html, templates and java. This will affect subsequent builds
+    for other architectures, but it doesn't delete their bin/&lt;arch&gt; or
+    lib/&lt;arch&gt; contents.</dd>
+
+  <dt><code>make realuninstall</code></dt>
+  <dd>Deletes all install directories for all architectures.</dd>
+
+  <dt><code>make distclean</code></dt>
+  <dd>Does realclean realuninstall as before, and also now does a cvsclean,
+    which removes file remnants from CVS operations named <code>.#*</code> and
+    editor backups named <code>*~</code> throughout the source tree.</dd>
+
+</dl>
+
+<h4>Compress record type</h4>
+
+<p>This record now posts monitors on its NUSE field whenever its value changes.
+A new field OUSE was added to support this.</p>
+
+<h4>Remove C++ build rule for <code>.C</code> files</h4>
+
+<p>An early convention on Unix systems was to name C++ files with an upper-case
+extention, <code>.C</code>. This does not work on Windows or MacOS where the
+filesystems are case-insensitive, and the C++ build rule was causing problems so
+has been eliminated. Any remaining C++ source files that are still using this
+convention will have to be renamed, preferably to <code>.cpp</code></p>
+
+<h4>Support <code>make -s</code> on Windows</h4>
+
+<p>The flag to silence build output did not work on some Windows architecture
+combinations. This has now been fixed.</p>
+
+<h4>iocLogServer now supports logrotate</h4>
+
+<p>The feature in the iocLogServer that closed and reopened the logfile used to
+ignore the SIGHUP signal when the log filename did not change. This has now been
+changed so these logfiles can be used with the standard Linux logrotate
+package.</p>
+
+
+<h2 align="center">Changes between 3.14.12 and 3.14.12.1</h2>
+
+<p>This release only contains changes that fix bugs or add build configuration
+files for new or updated target architectures.  No functionality has been
+changed, and as this is a patch release the software has not gone through as
+rigorous a testing regime as it does for a normal minor release.</p>
+
+<h4>Launchpad Bugs Resolved</h4>
+
+<p>The following are links to bugs in the Launchpad bug tracker that have been
+fixed in this release:</p>
+
+<ul>
+<li>693534
+  <a href="https://launchpad.net/bugs/693534">
+    errlog causes crash on IOC exit</a></li>
+<li>701673
+  <a href="https://launchpad.net/bugs/701673">
+    Large array problem in 3.14.12</a></li>
+<li>717252
+  <a href="https://launchpad.net/bugs/771252">
+    local caput causes ioc crash on win32</a></li>
+<li>750549 
+  <a href="https://launchpad.net/bugs/750549 ">
+    epicsTime has non-portable c++ static initialization</a></li>
+<li>753137
+  <a href="https://launchpad.net/bugs/753137">
+    Makefile dependency checking of database files is broken</a></li>
+</ul>
+
+<h4>New/Updated target architectures</h4>
+
+<p>The following target architectures have been added or updated:</p>
+
+<dl>
+<dt>vxWorks-mpc8548</dt>
+<dt>vxWorks-mpc8548-debug</dt>
+<dd style="margin-bottom: 1ex">This PowerPC CPU is used on the Emerson MVME4100
+  VME CPU board (from Ernest Williams, SLAC).</dd>
+
+<dt>vxWorks-ppc32</dt>
+<dt>vxWorks-ppc32sf</dt>
+<dt>vxWorks-ppc32-debug</dt>
+<dt>vxWorks-ppc32sf-debug</dt>
+<dd style="margin-bottom: 1ex">New generic 32-bit PowerPC targets for vxWorks
+  6.x, using hardware or software floating-point. These targets can be used
+  instead of the CPU-specific ppc603, ppc604, mpc8540 and mpc8548 targets (and
+  their _long alternatives, these targets are all compiled with the -mlongcall
+  flag) to reduce the number of distinct build targets needed when supporting
+  multiple PowerPC board types.</dd>
+
+<dt>ios-386</dt>
+<dt>ios-arm</dt>
+<dd style="margin-bottom: 1ex">Updated for iOS 4.3, which is now the default OS
+  version (from Tom Palaia, ORNL).</dd>
+
+</dl>
+
+<h4>IOCSH_STARTUP_SCRIPT environment variable</h4>
+
+<p>The function <tt>iocsh(const char *pathname)</tt> now sets the environment
+variable <tt>IOCSH_STARTUP_SCRIPT</tt> to the value of its pathname
+argument before it starts executing the script commands.</p>
+
+<h4>RTEMS-mvme5500</h4>
+
+<p>This target now automatically links binary files with the bspExt library, and
+adds the extension <tt>.elf</tt> to their filenames, matching the other mvme
+targets.</p>
+
+<h4>RTEMS Network Buffer Configuration</h4>
+
+<p>Add the macros <tt>RTEMS_NETWORK_CONFIG_MBUF_SPACE</tt> and
+<tt>RTEMS_NETWORK_CONFIG_MBUF_SPACE</tt> to rtems_netconfig.c to allow
+customization of the network buffer space allocated.  The configuration files
+for the RTEMS-mvme3100, RTEMS-mvme5500 and RTEMS-beatnik targets now default to
+allocating 2MB for mbufs and 5MB for clusters; other RTEMS targets will continue
+to use 180KB and 350KB rspectively.</p>
+
+<h4>RTEMS TFTP filesystem</h4>
+
+<p>Use the new mount API to initialize TFTP on newer RTEMS versions.</p>
+
+<h4>C++ build issues on older Solaris compiler</h4>
+
+<p>Dirk Zimoch reported some problems building with an older SUNWspro C++
+compiler which have been resolved where possible.</p>
+
+<h4>FreeBSD broadcast problem</h4>
+
+<p>The <tt>ifreq_size</tt> macro in freebsd/osdsock.h must be different in BSD
+4.4.</p>
+
+<h4>Thread exit synchronization</h4>
+
+<p>When finished waiting for a thread to exit, signal the event in case other
+  threads are waiting also.</p>
+
+<h4>Win32 osdTime provider fix</h4>
+
+<p>Jeff Hill fixed the last time compare in PLL drift factor update loop.</p>
+
+<h4>Errlog can lose messages</h4>
+
+<p>Systems that generate large numbers of errlog messages or have a slow message
+  listener could overwrite older messages in the message buffer after the buffer
+  wraps. This also corrects and annotates the test code to describe what's being
+  checked.</p>
+
+<p>When the IOC is shutting down, the errlog thread should process all queued
+  messages before it quits.</p>
+
+<h4>Back-slash escapes for Win32</h4>
+
+<p>Stephen Norum pointed out the need for various Perl scripts to escape
+back-slash characters in Windows file paths.</p>
+
+<h4>catools on Windows</h4>
+
+<p>Windows 7 does not properly support line-mode buffering of stdio streams; the
+catools programs used this mode to ensure that they could be used in pipelines,
+but in Windows 7 they became fully buffered and are not flushed when the program
+exits, so buffering of stdout has now been completely disabled on Windows.</p>
 
 
 <h2 align="center">Changes between 3.14.11 and 3.14.12</h2>
-<!-- Insert new items immediately below here ... -->
 
 <h4>Launchpad Bugs Resolved</h4>
 

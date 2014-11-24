@@ -37,6 +37,11 @@ epicsEllTest_SRCS += epicsEllTest.c
 testHarness_SRCS += epicsEllTest.c
 TESTS += epicsEllTest
 
+TESTPROD_HOST += epicsEnvTest
+epicsEnvTest_SRCS += epicsEnvTest.c
+testHarness_SRCS += epicsEnvTest.c
+TESTS += epicsEnvTest
+
 TESTPROD_HOST += epicsErrlogTest
 epicsErrlogTest_SRCS += epicsErrlogTest.c
 testHarness_SRCS += epicsErrlogTest.c
@@ -46,6 +51,12 @@ TESTPROD_HOST += epicsStdioTest
 epicsStdioTest_SRCS += epicsStdioTest.c
 testHarness_SRCS += epicsStdioTest.c
 TESTS += epicsStdioTest
+
+TESTPROD_HOST += epicsSockResolveTest
+epicsSockResolveTest_SRCS += epicsSockResolveTest.c
+testHarness_SRCS += epicsSockResolveTest.c
+epicsSockResolveTest_SYS_LIBS_WIN32 = ws2_32
+TESTS += epicsSockResolveTest
 
 TESTPROD_HOST += epicsStringTest
 epicsStringTest_SRCS += epicsStringTest.c

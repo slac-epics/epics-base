@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*  
- *  Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ *  Revision-Id: johill@lanl.gov-20130516183331-ccgep7u4xccqzaw3
  *
  *                              
  *                    L O S  A L A M O S
@@ -59,10 +59,11 @@ dbPutNotifyBlocker::~dbPutNotifyBlocker ()
 {
 }
 
-void dbPutNotifyBlocker::destructor ( epicsGuard < epicsMutex > & guard )
+void dbPutNotifyBlocker::destructor ( CallbackGuard & cbGuard, 
+                                  epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
-    this->cancel ( guard );
+    this->cancel ( cbGuard, guard );
     if ( this->maxValueSize > sizeof ( this->dbrScalarValue ) ) {
         char * pBuf = static_cast < char * > ( this->pn.pbuffer );
         delete [] pBuf;
@@ -71,10 +72,11 @@ void dbPutNotifyBlocker::destructor ( epicsGuard < epicsMutex > & guard )
 }
 
 void dbPutNotifyBlocker::cancel ( 
+    CallbackGuard & cbGuard,
     epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
-    if ( this->pn.paddr ) {
+    if ( this->pNotify ) {
         epicsGuardRelease < epicsMutex > unguard ( guard );
         dbNotifyCancel ( &this->pn );
     }
@@ -100,26 +102,31 @@ void dbPutNotifyBlocker::expandValueBuf (
 
 extern "C" void putNotifyCompletion ( putNotify *ppn )
 {
-    dbPutNotifyBlocker * pBlocker = static_cast < dbPutNotifyBlocker * > ( ppn->usrPvt );
-    {
-        epicsGuard < epicsMutex > guard ( pBlocker->mutex );
-        if ( pBlocker->pNotify ) {
-            if ( pBlocker->pn.status != putNotifyOK) {
-                pBlocker->pNotify->exception ( 
-                    guard, ECA_PUTFAIL,  "put notify unsuccessful",
-                    static_cast <unsigned> (pBlocker->pn.dbrType), 
-                    static_cast <unsigned> (pBlocker->pn.nRequest) );
-            }
-            else {
-                pBlocker->pNotify->completion ( guard );
-            }
+    dbPutNotifyBlocker * const pBlocker = 
+            static_cast < dbPutNotifyBlocker * > ( ppn->usrPvt );
+    epicsGuard < epicsMutex > guard ( pBlocker->mutex );
+    cacWriteNotify * const pNtfy = pBlocker->pNotify;
+    if ( pNtfy ) {
+        pBlocker->pNotify = 0;
+        // Its necessary to signal the initiators now before we call
+        // the user callback. This is less efficent, and potentially
+        // causes more thread context switching, but its probably 
+        // unavoidable because its possible that the use callback 
+        // might destroy this object.
+        pBlocker->block.signal ();
+        if ( pBlocker->pn.status != putNotifyOK ) {
+            pNtfy->exception ( 
+                guard, ECA_PUTFAIL,  "put notify unsuccessful",
+                static_cast < unsigned > (pBlocker->pn.dbrType), 
+                static_cast < unsigned > (pBlocker->pn.nRequest) );
         }
         else {
-            errlogPrintf ( "put notify completion with nill pNotify?\n" );
+            pNtfy->completion ( guard );
         }
-        pBlocker->pNotify = 0;
     }
-    pBlocker->block.signal ();
+    else {
+        errlogPrintf ( "put notify completion with nill pNotify?\n" );
+    }
 }
 
 void dbPutNotifyBlocker::initiatePutNotify ( 
@@ -205,13 +212,6 @@ void * dbPutNotifyBlocker::operator new ( size_t size,
     tsFreeList < dbPutNotifyBlocker, 64, epicsMutexNOOP > & freeList )
 {
     return freeList.allocate ( size );
-}
-
-void * dbPutNotifyBlocker::operator new ( size_t ) // X aCC 361
-{
-    // The HPUX compiler seems to require this even though no code
-    // calls it directly
-    throw std::logic_error ( "why is the compiler calling private operator new" );
 }
 
 #ifdef CXX_PLACEMENT_DELETE

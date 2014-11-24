@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* selRecord.c - Record Support Routines for Select records */
 /*
@@ -31,6 +31,7 @@
 #include "errMdef.h"
 #include "recSup.h"
 #include "recGbl.h"
+
 #define GEN_SIZE_OFFSET
 #include "selRecord.h"
 #undef  GEN_SIZE_OFFSET
@@ -300,7 +301,7 @@ static void monitor(selRecord *prec)
     /* check for value change */
     delta = prec->mlst - prec->val;
     if(delta<0.0) delta = -delta;
-    if (delta > prec->mdel) {
+    if (!(delta <= prec->mdel)) { /* Handles MDEL == NAN */
         /* post events for value change */
         monitor_mask |= DBE_VALUE;
         /* update last value monitored */
@@ -309,7 +310,7 @@ static void monitor(selRecord *prec)
     /* check for archive change */
     delta = prec->alst - prec->val;
     if(delta<0.0) delta = -delta;
-    if (delta > prec->adel) {
+    if (!(delta <= prec->adel)) { /* Handles ADEL == NAN */
         /* post events on value field for archive change */
         monitor_mask |= DBE_LOG;
         /* update last archive value monitored */

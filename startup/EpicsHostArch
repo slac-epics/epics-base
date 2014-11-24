@@ -1,11 +1,10 @@
 #!/bin/sh
 #*************************************************************************
-# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2011 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
-# EPICS BASE Versions 3.13.7
-# and higher are distributed subject to a Software License Agreement found
+# EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
@@ -25,21 +24,24 @@ case $sysname in
     Linux )
         os=linux
         cpu=`uname -m`
-        case $cpu in i386 | i486 | i586 | i686 )
-            cpu=x86
-            ;;
+        case $cpu in
+            i386 | i486 | i586 | i686 )
+                cpu=x86 ;;
+            x86_64 )
+                ;; # $cpu is correct
+            armv6l | armv7l )
+                cpu=arm ;;
         esac
-        if [ ${cpu} = "x86_64" ]; then
-            cpu=x86_64
-        fi
         echo ${os}-${cpu}${suffix}
         ;;
     Darwin )
         os=darwin
         cpu=`uname -m`
-        case "$cpu" in
-            "Power Macintosh") cpu=ppc ;;
-            "i386") cpu=x86 ;;
+        case $cpu in
+            "Power Macintosh")
+                cpu=ppc ;;
+            i386 | x86_64 )
+                cpu=x86 ;;
         esac
         echo ${os}-${cpu}${suffix}
         ;;

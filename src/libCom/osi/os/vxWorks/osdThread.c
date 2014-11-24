@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include <vxWorks.h>
 #include <taskLib.h>
@@ -42,12 +43,8 @@
 static const unsigned stackSizeTable[epicsThreadStackBig+1] = 
    {4000*ARCH_STACK_FACTOR, 6000*ARCH_STACK_FACTOR, 11000*ARCH_STACK_FACTOR};
 
-/*The following forces atReboot to be loaded*/
-extern int atRebootExtern;
-static struct pext {
-    int *pExtern;
-    struct pext *pext;
-} pext = {&atRebootExtern, &pext};
+/* This routine is found in atReboot.cpp */
+extern void atRebootRegister(void);
 
 /* definitions for implementation of epicsThreadPrivate */
 static void **papTSD = 0;
@@ -92,6 +89,7 @@ static void epicsThreadInit(void)
         epicsThreadOnceMutex = semMCreate(
                 SEM_DELETE_SAFE|SEM_INVERSION_SAFE|SEM_Q_PRIORITY);
         assert(epicsThreadOnceMutex);
+        atRebootRegister();
     }
     lock = 0;
 }
@@ -279,11 +277,13 @@ void epicsThreadSleep(double seconds)
     STATUS status;
     int ticks;
 
-    if(seconds<=0.0) {
+    if (seconds > 0.0) {
+        seconds *= sysClkRateGet();
+        seconds += 0.99999999;  /* 8 9s here is optimal */
+        ticks = (seconds >= INT_MAX) ? INT_MAX : (int) seconds;
+    }
+    else {  /* seconds <= 0 or NAN */
         ticks = 0;
-    } else {
-        ticks = seconds*sysClkRateGet() + 0.5;
-        if(ticks<=0) ticks = 1;
     }
     status = taskDelay(ticks);
     if(status) errlogPrintf("epicsThreadSleep\n");

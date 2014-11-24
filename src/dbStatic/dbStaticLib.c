@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20130913165718-nz75kavfqj9pv93v */
 
 #include <stdio.h>
 #include <errno.h>
@@ -901,6 +901,11 @@ long epicsShareAPI dbWriteRecordFP(
 
     dctonly = ((level>1) ? FALSE : TRUE);
     dbInitEntry(pdbbase,pdbentry);
+    if (precordTypename) {
+        if (*precordTypename == 0 || *precordTypename == '*')
+            precordTypename = 0;
+    }
+
     if(!precordTypename) {
 	status = dbFirstRecordType(pdbentry);
 	if(status) {
@@ -997,6 +1002,10 @@ long epicsShareAPI dbWriteMenuFP(DBBASE *pdbbase,FILE *fp,const char *menuName)
 	fprintf(stderr,"pdbbase not specified\n");
 	return(-1);
     }
+    if (menuName) {
+        if (*menuName == 0 || *menuName == '*')
+            menuName = 0;
+    }
     pdbMenu = (dbMenu *)ellFirst(&pdbbase->menuList);
     while(pdbMenu) {
 	if(menuName) {
@@ -1042,6 +1051,11 @@ long epicsShareAPI dbWriteRecordTypeFP(
 	fprintf(stderr,"pdbbase not specified\n");
 	return(-1);
     }
+    if (recordTypeName) {
+        if (*recordTypeName == 0 || *recordTypeName == '*')
+            recordTypeName = 0;
+    }
+
     for(pdbRecordType = (dbRecordType *)ellFirst(&pdbbase->recordTypeList);
     pdbRecordType; pdbRecordType = (dbRecordType *)ellNext(&pdbRecordType->node)) {
 	if(recordTypeName) {
@@ -2027,9 +2041,11 @@ char * epicsShareAPI dbGetString(DBENTRY *pdbentry)
 		else if(pvlMask&pvlOptCP) ppind=3;
 		else if(pvlMask&pvlOptCPP) ppind=4;
 		else ppind=0;
-		if(plink->value.pv_link.pvname)
-		    strcpy(message,plink->value.pv_link.pvname);
-		else
+		if (plink->value.pv_link.pvname) {
+		    strcpy(message, plink->value.pv_link.pvname);
+		    if (pvlMask & pvlOptTSELisTime)
+			strcat(message, ".TIME");
+		} else
 		    strcpy(message,"");
 		strcat(message," ");
 		strcat(message,ppstring[ppind]);
@@ -3916,7 +3932,7 @@ void  epicsShareAPI dbDumpField(
 	    else
 		printf("\t     field_type: %s\n", pamapdbfType[j].strvalue);
 	    printf("\tprocess_passive: %hd\n",pdbFldDes->process_passive);
-	    printf("\t           base: %hd\n",pdbFldDes->base);
+	    printf("\t           base: %d\n",pdbFldDes->base);
 	    if(!pdbFldDes->promptgroup) {
 		printf("\t    promptgroup: %d\n",pdbFldDes->promptgroup);
 	    } else {
@@ -3929,7 +3945,7 @@ void  epicsShareAPI dbDumpField(
 		}
 	    }
 	    printf("\t       interest: %hd\n", pdbFldDes->interest);
-	    printf("\t       as_level: %hd\n",pdbFldDes->as_level);
+	    printf("\t       as_level: %d\n",pdbFldDes->as_level);
             printf("\t        initial: %s\n",
                 (pdbFldDes->initial ? pdbFldDes->initial : ""));
 	    if(pdbFldDes->field_type==DBF_MENU) {
@@ -3962,8 +3978,9 @@ void  epicsShareAPI dbDumpDevice(DBBASE *pdbbase,const char *recordTypeName)
     devSup	*pdevSup;
     int		gotMatch;
 
-    if(recordTypeName) {
-        if(recordTypeName[0]==0 || recordTypeName[0] == '*') recordTypeName = 0;
+    if (recordTypeName) {
+        if (*recordTypeName == 0 || *recordTypeName == '*')
+            recordTypeName = 0;
     }
     if(!pdbbase) {
 	fprintf(stderr,"pdbbase not specified\n");
@@ -4059,12 +4076,12 @@ void  epicsShareAPI dbReportDeviceConfig(dbBase *pdbbase,FILE *report)
     DBENTRY	dbentry;
     DBENTRY	*pdbentry=&dbentry;
     long	status;
-    char	busName[40];
-    char	linkValue[40];
-    char	dtypValue[40];
+    char	linkValue[messagesize];
+    char	dtypValue[50];
     char	cvtValue[40];
     int		ilink,nlinks;
     struct link	*plink;
+    int         linkType;
     FILE        *stream = (report==0) ? stdout : report;
 
     if(!pdbbase) {
@@ -4081,8 +4098,8 @@ void  epicsShareAPI dbReportDeviceConfig(dbBase *pdbbase,FILE *report)
 		status = dbGetLinkField(pdbentry,ilink);
 		if(status || dbGetLinkType(pdbentry)!=DCT_LINK_FORM) continue;
 		plink = pdbentry->pfield;
-		strcpy(busName,bus[plink->type]);
-		if(strlen(busName)==0) continue;
+		linkType = plink->type;
+		if(bus[linkType][0]==0) continue;
 		strcpy(linkValue,dbGetString(pdbentry));
 		status = dbFindField(pdbentry,"DTYP");
 		if(status) break;
@@ -4106,7 +4123,7 @@ void  epicsShareAPI dbReportDeviceConfig(dbBase *pdbbase,FILE *report)
 		    }
 		}
 		fprintf(stream,"%-8s %-20s %-20s %-20s %-s\n",
-			busName,linkValue,dtypValue,
+			bus[linkType],linkValue,dtypValue,
 			dbGetRecordName(pdbentry),cvtValue);
 		break;
 	    }

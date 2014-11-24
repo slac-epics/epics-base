@@ -1,6 +1,6 @@
 # CONFIG.win32-x86.win32-x86
 #
-# Revision-Id: jba@aps.anl.gov-20101021200611-k20b8rbfxat4nk3i
+# Revision-Id: anj@aps.anl.gov-20120330194058-if1zwps4ful5rxsr
 # This file is maintained by the build community.
 #
 # Definitions for win32-x86 target archs when host arch is win32-x86
@@ -31,7 +31,9 @@ BAFCMD = bscmake /nologo /o $@
 # Configure OS vendor C compiler
 CC = cl
 
+# Override CONFIG.gnuCommon for cross builds.
 GNU = NO
+HDEPENDS_METHOD = CMD
 
 #
 # /W<N> use warning level N
@@ -210,7 +212,8 @@ MUNCH_CMD =  $(CCC) /Fo $@ $^
 #	But: if there are no objects LIBRARY_LD_OBJS to include
 #	in this library (may be for e.g. base/src/libCompat
 #	on some archs), don't define (and build) any library!
-SHRLIB_SUFFIX=.dll
+SHRLIB_SUFFIX_BASE = .dll
+SHRLIB_SUFFIX = $(SHRLIB_SUFFIX_BASE)
 SHRLIBNAME_YES = $(BUILD_LIBRARY:%=%$(SHRLIB_SUFFIX))
 LOADABLE_SHRLIBNAME = $(LOADABLE_BUILD_LIBRARY:%=%$(SHRLIB_SUFFIX))
 

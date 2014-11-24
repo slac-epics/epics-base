@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recStringin.c - Record Support Routines for Stringin records */
 /*
@@ -33,11 +33,12 @@
 #include "recSup.h"
 #include "recGbl.h"
 #include "menuYesNo.h"
+
 #define GEN_SIZE_OFFSET
 #include "stringinRecord.h"
 #undef  GEN_SIZE_OFFSET
 #include "epicsExport.h"
-
+
 /* Create RSET - Record Support Entry Table*/
 #define report NULL
 #define initialize NULL
@@ -156,20 +157,20 @@ static long process(stringinRecord *prec)
 
 static void monitor(stringinRecord *prec)
 {
-    unsigned short  monitor_mask;
+    int monitor_mask = recGblResetAlarms(prec);
 
-    monitor_mask = recGblResetAlarms(prec);
-    if(strcmp(prec->oval,prec->val)) {
-	monitor_mask |= DBE_VALUE|DBE_LOG;
-	strcpy(prec->oval,prec->val);
+    if (strncmp(prec->oval, prec->val, sizeof(prec->val))) {
+        monitor_mask |= DBE_VALUE | DBE_LOG;
+        strncpy(prec->oval, prec->val, sizeof(prec->val));
     }
+
     if (prec->mpst == stringinPOST_Always)
-	monitor_mask |= DBE_VALUE;
+        monitor_mask |= DBE_VALUE;
     if (prec->apst == stringinPOST_Always)
-	monitor_mask |= DBE_LOG;
-    if(monitor_mask)
-	db_post_events(prec,&(prec->val[0]),monitor_mask);
-    return;
+        monitor_mask |= DBE_LOG;
+
+    if (monitor_mask)
+        db_post_events(prec, prec->val, monitor_mask);
 }
 
 static long readValue(stringinRecord *prec)

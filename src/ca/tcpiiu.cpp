@@ -1135,7 +1135,7 @@ void tcpiiu::show ( unsigned level ) const
     }
 }
 
-bool tcpiiu::setEchoRequestPending ( epicsGuard < epicsMutex > & guard ) // X aCC 361
+bool tcpiiu::setEchoRequestPending ( epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1275,12 +1275,9 @@ bool tcpiiu::processIncoming (
         this->msgHeaderAvailable = false;
         this->curDataBytes = 0u;
     }
-#   if defined ( __HP_aCC ) && _HP_aCC <= 033300
-        return false; // to make hpux compiler happy...
-#   endif
 }
 
-void tcpiiu::hostNameSetRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 431
+void tcpiiu::hostNameSetRequest ( epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1310,7 +1307,7 @@ void tcpiiu::hostNameSetRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 4
 /*
  * tcpiiu::userNameSetRequest ()
  */
-void tcpiiu::userNameSetRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 431
+void tcpiiu::userNameSetRequest ( epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1338,7 +1335,7 @@ void tcpiiu::userNameSetRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 4
 }
 
 void tcpiiu::disableFlowControlRequest ( 
-    epicsGuard < epicsMutex > & guard ) // X aCC 431
+    epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1354,7 +1351,7 @@ void tcpiiu::disableFlowControlRequest (
 }
 
 void tcpiiu::enableFlowControlRequest ( 
-    epicsGuard < epicsMutex > & guard ) // X aCC 431
+    epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1369,7 +1366,7 @@ void tcpiiu::enableFlowControlRequest (
     minder.commit ();
 }
 
-void tcpiiu::versionMessage ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::versionMessage ( epicsGuard < epicsMutex > & guard,
                              const cacChannel::priLev & priority )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1389,7 +1386,7 @@ void tcpiiu::versionMessage ( epicsGuard < epicsMutex > & guard, // X aCC 431
     minder.commit ();
 }
 
-void tcpiiu::echoRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 431
+void tcpiiu::echoRequest ( epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
     
@@ -1410,7 +1407,7 @@ void tcpiiu::echoRequest ( epicsGuard < epicsMutex > & guard ) // X aCC 431
     minder.commit ();
 }
 
-void tcpiiu::writeRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::writeRequest ( epicsGuard < epicsMutex > & guard,
     nciu &chan, unsigned type, arrayElementCount nElem, const void *pValue )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1425,7 +1422,7 @@ void tcpiiu::writeRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
 }
 
 
-void tcpiiu::writeNotifyRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::writeNotifyRequest ( epicsGuard < epicsMutex > & guard,
                                  nciu &chan, netWriteNotifyIO &io, unsigned type,  
                                 arrayElementCount nElem, const void *pValue )
 {
@@ -1444,7 +1441,7 @@ void tcpiiu::writeNotifyRequest ( epicsGuard < epicsMutex > & guard, // X aCC 43
     minder.commit ();
 }
 
-void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard,
                                nciu & chan, netReadNotifyIO & io, 
                                unsigned dataType, arrayElementCount nElem )
 {
@@ -1477,7 +1474,7 @@ void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
 }
 
 void tcpiiu::createChannelRequest ( 
-    nciu & chan, epicsGuard < epicsMutex > & guard ) // X aCC 431
+    nciu & chan, epicsGuard < epicsMutex > & guard )
 {
     guard.assertIdenticalMutex ( this->mutex );
 
@@ -1525,7 +1522,7 @@ void tcpiiu::createChannelRequest (
     minder.commit ();
 }
 
-void tcpiiu::clearChannelRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::clearChannelRequest ( epicsGuard < epicsMutex > & guard,
                                   ca_uint32_t sid, ca_uint32_t cid )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1547,7 +1544,7 @@ void tcpiiu::clearChannelRequest ( epicsGuard < epicsMutex > & guard, // X aCC 4
 // is to try again the next time that we reconnect
 //
 void tcpiiu::subscriptionRequest ( 
-    epicsGuard < epicsMutex > & guard, // X aCC 431
+    epicsGuard < epicsMutex > & guard,
     nciu & chan, netSubscription & subscr )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1599,7 +1596,7 @@ void tcpiiu::subscriptionRequest (
 // is to try again the next time that we reconnect
 //
 void tcpiiu::subscriptionUpdateRequest ( 
-    epicsGuard < epicsMutex > & guard, // X aCC 431
+    epicsGuard < epicsMutex > & guard,
     nciu & chan, netSubscription & subscr )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1634,7 +1631,7 @@ void tcpiiu::subscriptionUpdateRequest (
     minder.commit ();
 }
 
-void tcpiiu::subscriptionCancelRequest ( epicsGuard < epicsMutex > & guard, // X aCC 431
+void tcpiiu::subscriptionCancelRequest ( epicsGuard < epicsMutex > & guard,
                              nciu & chan, netSubscription & subscr )
 {
     guard.assertIdenticalMutex ( this->mutex );
@@ -1866,10 +1863,14 @@ void tcpiiu::unlinkAllChannels (
     guard.assertIdenticalMutex ( this->mutex );
 
     while ( nciu * pChan = this->createReqPend.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         pChan->serviceShutdownNotify ( cbGuard, guard );
     }
 
     while ( nciu * pChan = this->createRespPend.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         // we dont yet know the server's id so we cant
         // send a channel delete request and will instead 
         // trust that the server can do the proper cleanup
@@ -1878,12 +1879,16 @@ void tcpiiu::unlinkAllChannels (
     }
     
     while ( nciu * pChan = this->v42ConnCallbackPend.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         this->clearChannelRequest ( guard, 
             pChan->getSID(guard), pChan->getCID(guard) );
         pChan->serviceShutdownNotify ( cbGuard, guard );
     }
 
     while ( nciu * pChan = this->subscripReqPend.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         pChan->disconnectAllIO ( cbGuard, guard );
         this->clearChannelRequest ( guard, 
             pChan->getSID(guard), pChan->getCID(guard) );
@@ -1891,6 +1896,8 @@ void tcpiiu::unlinkAllChannels (
     }
 
     while ( nciu * pChan = this->connectedList.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         pChan->disconnectAllIO ( cbGuard, guard );
         this->clearChannelRequest ( guard, 
             pChan->getSID(guard), pChan->getCID(guard) );
@@ -1898,6 +1905,8 @@ void tcpiiu::unlinkAllChannels (
     }
 
     while ( nciu * pChan = this->unrespCircuit.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         pChan->disconnectAllIO ( cbGuard, guard );
         // if we know that the circuit is unresponsive
         // then we dont send a channel delete request and 
@@ -1907,6 +1916,8 @@ void tcpiiu::unlinkAllChannels (
     }
     
      while ( nciu * pChan = this->subscripUpdateReqPend.get () ) {
+        pChan->channelNode::listMember = 
+            channelNode::cs_none;
         pChan->disconnectAllIO ( cbGuard, guard );
         this->clearChannelRequest ( guard, 
             pChan->getSID(guard), pChan->getCID(guard) );
@@ -2038,7 +2049,7 @@ bool tcpiiu::bytesArePendingInOS () const
     return false;
 #else
     osiSockIoctl_t bytesPending = 0; /* shut up purifys yapping */
-    int status = socket_ioctl ( this->sock, // X aCC 392
+    int status = socket_ioctl ( this->sock,
                             FIONREAD, & bytesPending );
     if ( status >= 0 ) {
         if ( bytesPending > 0 ) {

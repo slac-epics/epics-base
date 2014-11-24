@@ -50,12 +50,12 @@
 
 
 /* Task Control */
-enum ctl {ctlRun, ctlPause, ctlExit};
+enum ctl {ctlInit, ctlRun, ctlPause, ctlExit};
 
 /* Task Startup/Shutdown Synchronization */
 static epicsEventId startStopEvent;
 
-volatile enum ctl scanCtl;
+static volatile enum ctl scanCtl;
 
 /* SCAN ONCE */
 
@@ -82,9 +82,13 @@ typedef struct scan_element{
 
 /* PERIODIC */
 
+#define OVERRUN_REPORT_DELAY 10.0   /* Time between initial reports */
+#define OVERRUN_REPORT_MAX 3600.0   /* Maximum time between reports */
 typedef struct periodic_scan_list {
     scan_list           scan_list;
     double              period;
+    const char          *name;
+    unsigned long       overruns;
     volatile enum ctl   scanCtl;
     epicsEventId        loopEvent;
 } periodic_scan_list;
@@ -366,7 +370,8 @@ int scanppl(double period)      /* print periodic list */
         ppsl = papPeriodic[i];
         if (ppsl == NULL) continue;
         if (period > 0.0 && (fabs(period - ppsl->period) >.05)) continue;
-        sprintf(message, "Scan Period = %g seconds ", ppsl->period);
+        sprintf(message, "Records with SCAN = '%s' (%lu over-runs):",
+            ppsl->name, ppsl->overruns);
         printList(&ppsl->scan_list, message);
     }
     return 0;
@@ -541,19 +546,67 @@ static void initOnce(void)
 static void periodicTask(void *arg)
 {
     periodic_scan_list *ppsl = (periodic_scan_list *)arg;
-
-    epicsTimeStamp start_time, end_time;
-    double delay;
+    epicsTimeStamp next, reported;
+    unsigned int overruns = 0;
+    double report_delay = OVERRUN_REPORT_DELAY;
+    double overtime = 0.0;
+    double over_min = 0.0;
+    double over_max = 0.0;
+    const double penalty = (ppsl->period >= 2) ? 1 : (ppsl->period / 2);
 
     taskwdInsert(0, NULL, NULL);
     epicsEventSignal(startStopEvent);
 
+    epicsTimeGetCurrent(&next);
+    reported = next;
+
     while (ppsl->scanCtl != ctlExit) {
-        epicsTimeGetCurrent(&start_time);
-        if (ppsl->scanCtl == ctlRun) scanList(&ppsl->scan_list);
-        epicsTimeGetCurrent(&end_time);
-        delay = ppsl->period - epicsTimeDiffInSeconds(&end_time, &start_time);
-        if (delay <= 0.0) delay = 0.1;
+        double delay;
+        epicsTimeStamp now;
+
+        if (ppsl->scanCtl == ctlRun)
+            scanList(&ppsl->scan_list);
+
+        epicsTimeAddSeconds(&next, ppsl->period);
+        epicsTimeGetCurrent(&now);
+        delay = epicsTimeDiffInSeconds(&next, &now);
+        if (delay <= 0.0) {
+            if (overtime == 0.0) {
+                overtime = over_min = over_max = -delay;
+            }
+            else {
+                overtime -= delay;
+                if (over_min + delay > 0)
+                    over_min = -delay;
+                if (over_max + delay < 0)
+                    over_max = -delay;
+            }
+            delay = penalty;
+            ppsl->overruns++;
+            next = now;
+            epicsTimeAddSeconds(&next, delay);
+            if (++overruns >= 10 &&
+                epicsTimeDiffInSeconds(&now, &reported) > report_delay) {
+                errlogPrintf("\ndbScan warning from '%s' scan thread:\n"
+                    "\tScan processing averages %.2f seconds (%.2f .. %.2f).\n"
+                    "\tOver-runs have now happened %u times in a row.\n"
+                    "\tTo fix this, move some records to a slower scan rate.\n",
+                    ppsl->name, ppsl->period + overtime / overruns,
+                    ppsl->period + over_min, ppsl->period + over_max, overruns);
+
+                reported = now;
+                if (report_delay < (OVERRUN_REPORT_MAX / 2))
+                    report_delay *= 2;
+                else
+                    report_delay = OVERRUN_REPORT_MAX;
+            }
+        }
+        else {
+            overruns = 0;
+            report_delay = OVERRUN_REPORT_DELAY;
+            overtime = 0.0;
+        }
+
         epicsEventWaitWithTimeout(ppsl->loopEvent, delay);
     }
 
@@ -581,8 +634,8 @@ static void initPeriodic(void)
 
         ppsl->scan_list.lock = epicsMutexMustCreate();
         ellInit(&ppsl->scan_list.list);
-        epicsScanDouble(pmenu->papChoiceValue[i + SCAN_1ST_PERIODIC],
-                        &ppsl->period);
+        ppsl->name = pmenu->papChoiceValue[i + SCAN_1ST_PERIODIC];
+        epicsScanDouble(ppsl->name, &ppsl->period);
         ppsl->scanCtl = ctlPause;
         ppsl->loopEvent = epicsEventMustCreate(epicsEventEmpty);
 

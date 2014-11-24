@@ -1,5 +1,4 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # convertRelease.pl
+#!/usr/bin/env perl
 #*************************************************************************
 # Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
@@ -9,7 +8,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20101026142747-yfjkhakzmp4rnj0g
+# Revision-Id: anj@aps.anl.gov-20130710191331-94pikhnfm7gqxfy3
 #
 # Convert configure/RELEASE file(s) into something else.
 #
@@ -19,7 +18,7 @@ use strict;
 use FindBin qw($Bin);
 use lib ("$Bin/../../lib/perl", $Bin);
 
-use Cwd qw(cwd abs_path);
+use Cwd qw(cwd);
 use Getopt::Std;
 use EPICS::Path;
 use EPICS::Release;
@@ -53,9 +52,14 @@ if ($opt_T) {
 if ($opt_t) {
     $iocroot = $opt_t;
     $root = $top;
-    while (substr($iocroot, -1, 1) eq substr($root, -1, 1)) {
-        chop $iocroot;
-        chop $root;
+    if ($iocroot eq $root) {
+        # Identical paths, -t not needed
+        undef $opt_t;
+    } else {
+        while (substr($iocroot, -1, 1) eq substr($root, -1, 1)) {
+            chop $iocroot;
+            chop $root;
+        }
     }
 }
 
@@ -144,6 +148,7 @@ sub cdCommands {
     
     my $startup = $cwd;
     $startup =~ s/^$root/$iocroot/o if ($opt_t);
+    $startup =~ s/([\\"])/\\\1/g; # escape back-slashes and double-quotes
     
     print OUT "startup = \"$startup\"\n";
     
@@ -156,6 +161,7 @@ sub cdCommands {
     foreach my $app (@includes) {
         my $iocpath = my $path = $macros{$app};
         $iocpath =~ s/^$root/$iocroot/o if ($opt_t);
+        $iocpath =~ s/([\\"])/\\\1/g; # escape back-slashes and double-quotes
         my $app_lc = lc($app);
         print OUT "$app_lc = \"$iocpath\"\n"
             if (-d $path);
@@ -187,6 +193,7 @@ sub envPaths {
     foreach my $app (@includes) {
         my $iocpath = my $path = $macros{$app};
         $iocpath =~ s/^$root/$iocroot/o if ($opt_t);
+        $iocpath =~ s/([\\"])/\\\1/g; # escape back-slashes and double-quotes
         print OUT "epicsEnvSet(\"$app\",\"$iocpath\")\n" if (-d $path);
     }
     close OUT;
@@ -212,7 +219,7 @@ sub checkRelease {
         
         while (my ($parent, $ppath) = each %check) {
             if (exists $macros{$parent} &&
-                abs_path($macros{$parent}) ne abs_path($ppath)) {
+                AbsPath($macros{$parent}) ne AbsPath($ppath)) {
                 print "\n" unless ($status);
                 print "Definition of $parent conflicts with $app support.\n";
                 print "In this application a RELEASE file defines\n";

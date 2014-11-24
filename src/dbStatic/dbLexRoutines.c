@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131204233742-hk1dwvyb1032lx7k */
 
 /* Author:  Marty Kraimer Date:    13JUL95*/
 
@@ -31,7 +31,6 @@
 #include "epicsString.h"
 #include "epicsExport.h"
 
-#define epicsExportSharedSymbols
 #include "dbFldTypes.h"
 #include "link.h"
 #include "dbStaticLib.h"
@@ -113,8 +112,6 @@ static void yyerrorAbort(char *str)
 {
     yyerror(str);
     yyAbort = TRUE;
-    while (ellCount(&tempList))
-        popFirstTemp();
 }
 
 static void allocTemp(void *pvoid)
@@ -257,6 +254,11 @@ static long dbReadCOM(DBBASE **ppdbbase,const char *filename, FILE *fp,
     my_buffer_ptr = my_buffer;
     ellAdd(&inputFileList,&pinputFile->node);
     status = pvt_yy_parse();
+
+    if (yyAbort)
+        while (ellCount(&tempList))
+            popFirstTemp();
+
     dbFreePath(pdbbase);
     if(!status) { /*add RTYP and VERS as an attribute */
 	DBENTRY	dbEntry;
@@ -907,43 +909,52 @@ static void dbBreakBody(void)
     pgphentry->userPvt = pnewbrkTable;
 }
 
-static void dbRecordHead(char *recordType,char *name, int visible)
+static void dbRecordHead(char *recordType, char *name, int visible)
 {
-    DBENTRY		*pdbentry;
-    long		status;
+    char *badch;
+    DBENTRY *pdbentry;
+    long status;
 
+    badch = strpbrk(name, " \"'.$");
+    if (badch) {
+        epicsPrintf("Bad character '%c' in record name \"%s\"\n",
+            *badch, name);
+    }
     pdbentry = dbAllocEntry(pdbbase);
-    if(ellCount(&tempList))
-	yyerrorAbort("dbRecordHead: tempList not empty");
+    if (ellCount(&tempList))
+        yyerrorAbort("dbRecordHead: tempList not empty");
     allocTemp(pdbentry);
-    status = dbFindRecordType(pdbentry,recordType);
-    if(status) {
-	epicsPrintf("Record \"%s\" is of unknown type \"%s\" - ",
+    status = dbFindRecordType(pdbentry, recordType);
+    if (status) {
+        epicsPrintf("Record \"%s\" is of unknown type \"%s\"\n",
                     name, recordType);
-	yyerrorAbort(NULL);
-	return;
+        yyerrorAbort(NULL);
+        return;
     }
     /*Duplicate records ok if the same type */
     status = dbCreateRecord(pdbentry,name);
-    if(status==S_dbLib_recExists) {
-	if(strcmp(recordType,dbGetRecordTypeName(pdbentry))!=0) {
-	    epicsPrintf("Record %s already defined with different type %s\n",
-                        name, dbGetRecordTypeName(pdbentry));
+    if (status==S_dbLib_recExists) {
+        if (strcmp(recordType, dbGetRecordTypeName(pdbentry))!=0) {
+            epicsPrintf("Record \"%s\" of type \"%s\" redefined with new type "
+                "\"%s\"\n", name, dbGetRecordTypeName(pdbentry), recordType);
             yyerror(NULL);
-	    duplicate = TRUE;
-	    return;
-	} else if (dbRecordsOnceOnly) {
-	    epicsPrintf("Record \"%s\" already defined (dbRecordsOnceOnly is set)\n",
-                        name);
-	    yyerror(NULL);
-	    duplicate = TRUE;
-	}
-    } else if(status) {
-	epicsPrintf("Can't create record \"%s\" of type \"%s\"\n",
-                     name, recordType);
-	yyerrorAbort(NULL);
+            duplicate = TRUE;
+            return;
+        }
+        else if (dbRecordsOnceOnly) {
+            epicsPrintf("Record \"%s\" already defined (dbRecordsOnceOnly is "
+                "set)\n", name);
+            yyerror(NULL);
+            duplicate = TRUE;
+        }
     }
-    if(visible) dbVisibleRecord(pdbentry);
+    else if (status) {
+        epicsPrintf("Can't create record \"%s\" of type \"%s\"\n",
+                     name, recordType);
+        yyerrorAbort(NULL);
+    }
+    if (visible)
+        dbVisibleRecord(pdbentry);
 }
 
 static void dbRecordField(char *name,char *value)

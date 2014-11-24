@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* Revision-Id: anj@aps.anl.gov-20101007191624-sqws79ec9gxn7reb
+/* Revision-Id: anj@aps.anl.gov-20131119212622-758nq4pce6q9ahih
  *
  * Subroutines used to convert an infix expression to a postfix expression
  *
@@ -71,6 +71,7 @@ static const ELEMENT operands[] = {
 {"-",		7, 8,	0,	UNARY_OPERATOR,	UNARY_NEG},
 {".",		0, 0,	1,	LITERAL_OPERAND,LITERAL_DOUBLE},
 {"0",		0, 0,	1,	LITERAL_OPERAND,LITERAL_DOUBLE},
+{"0X",		0, 0,	1,	LITERAL_OPERAND,LITERAL_INT},
 {"1",		0, 0,	1,	LITERAL_OPERAND,LITERAL_DOUBLE},
 {"2",		0, 0,	1,	LITERAL_OPERAND,LITERAL_DOUBLE},
 {"3",		0, 0,	1,	LITERAL_OPERAND,LITERAL_DOUBLE},
@@ -204,7 +205,7 @@ static int
  * convert an infix expression to a postfix expression
  */
 epicsShareFunc long
-    postfix(const char *psrc, char * const ppostfix, short *perror)
+    postfix(const char *psrc, char *pout, short *perror)
 {
     ELEMENT stack[80];
     ELEMENT *pstacktop = stack;
@@ -212,7 +213,7 @@ epicsShareFunc long
     int operand_needed = TRUE;
     int runtime_depth = 0;
     int cond_count = 0;
-    char *pout = ppostfix;
+    char * const pdest = pout;
     char *pnext;
     double lit_d;
     int lit_i;
@@ -237,32 +238,45 @@ epicsShareFunc long
 	    operand_needed = FALSE;
 	    break;
 
-	case LITERAL_OPERAND:
-	    runtime_depth += pel->runtime_effect;
+        case LITERAL_OPERAND:
+            runtime_depth += pel->runtime_effect;
 
-	    psrc -= strlen(pel->name);
-	    lit_d = epicsStrtod(psrc, &pnext);
-	    if (pnext == psrc) {
-		*perror = CALC_ERR_BAD_LITERAL;
-		goto bad;
-	    }
-	    psrc = pnext;
-	    lit_i = lit_d;
-	    if (lit_d != (double) lit_i) {
-		*pout++ = pel->code;
-		memcpy(pout, (void *)&lit_d, sizeof(double));
-		pout += sizeof(double);
-	    } else {
-		*pout++ = LITERAL_INT;
-		memcpy(pout, (void *)&lit_i, sizeof(int));
-		pout += sizeof(int);
-	    }
+            psrc -= strlen(pel->name);
+            if (pel->code == LITERAL_DOUBLE) {
+                lit_d = epicsStrtod(psrc, &pnext);
+                if (pnext == psrc) {
+                    *perror = CALC_ERR_BAD_LITERAL;
+                    goto bad;
+                }
+                psrc = pnext;
+                lit_i = (int) lit_d;
+                if (lit_d != (double) lit_i) {
+                    *pout++ = pel->code;
+                    memcpy(pout, (void *)&lit_d, sizeof(double));
+                    pout += sizeof(double);
+                } else {
+                    *pout++ = LITERAL_INT;
+                    memcpy(pout, (void *)&lit_i, sizeof(int));
+                    pout += sizeof(int);
+                }
+            }
+            else {
+                lit_i = strtoul(psrc, &pnext, 0);
+                if (pnext == psrc) {
+                    *perror = CALC_ERR_BAD_LITERAL;
+                    goto bad;
+                }
+                psrc = pnext;
+                *pout++ = LITERAL_INT;
+                memcpy(pout, (void *)&lit_i, sizeof(int));
+                pout += sizeof(int);
+            }
 
-	    operand_needed = FALSE;
-	    break;
+            operand_needed = FALSE;
+            break;
 
 	case STORE_OPERATOR:
-	    if (pout == ppostfix || pstacktop > stack ||
+	    if (pout == pdest || pstacktop > stack ||
 		*--pout < FETCH_A || *pout > FETCH_L) {
 		*perror = CALC_ERR_BAD_ASSIGNMENT;
 		goto bad;
@@ -463,7 +477,7 @@ epicsShareFunc long
     return 0;
 
 bad:
-    *ppostfix = END_EXPRESSION;
+    *pdest = END_EXPRESSION;
     return -1;
 }
 

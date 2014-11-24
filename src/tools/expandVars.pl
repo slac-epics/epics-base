@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # Tool to expand @VAR@ variables while copying a file.
 # The file will *not* be copied if it already exists.
@@ -6,7 +6,7 @@
 # Author: Andrew Johnson <anj@aps.anl.gov>
 # Date: 10 February 2005
 #
-# Revision-Id: anj@aps.anl.gov-20101026142747-yfjkhakzmp4rnj0g
+# Revision-Id: anj@aps.anl.gov-20130123132907-fi34uue1k4b3kig8
 #
 
 use strict;
