@@ -223,6 +223,10 @@ static long process(mbboRecord *prec)
 	}
 	/* convert val to rval */
 	convert(prec);
+
+	/* Update the timestamp before writing output values so it
+	 * will be uptodate if any downstream records fetch it via TSEL */
+        recGblGetTimeStamp(prec);
     }
 
 CONTINUE:
@@ -261,7 +265,11 @@ CONTINUE:
     if ( !pact && prec->pact ) return(0);
     prec->pact = TRUE;
 
-    recGblGetTimeStamp(prec);
+    if ( pact ) {
+    	/* Update timestamp again for asynchronous devices */
+	recGblGetTimeStamp(prec);
+    }
+
     /* check event list */
     monitor(prec);
     /* process the forward scan link record */
