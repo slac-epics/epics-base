@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #*************************************************************************
 # Copyright (c) 2002 The University of Chicago, as Operator of Argonne
 #     National Laboratory.
@@ -9,7 +9,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# Revision-Id: anj@aps.anl.gov-20130123132907-fi34uue1k4b3kig8
 
 use File::Basename;
 

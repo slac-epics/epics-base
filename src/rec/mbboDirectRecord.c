@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recMbboDirect.c - Record Support for mbboDirect records */
 /*
@@ -32,12 +32,13 @@
 #include "recSup.h"
 #include "recGbl.h"
 #include "special.h"
-#define GEN_SIZE_OFFSET
-#include "mbboDirectRecord.h"
-#undef  GEN_SIZE_OFFSET
 #include "menuOmsl.h"
 #include "menuIvoa.h"
 #include "menuYesNo.h"
+
+#define GEN_SIZE_OFFSET
+#include "mbboDirectRecord.h"
+#undef  GEN_SIZE_OFFSET
 #include "epicsExport.h"
 
 /* Create RSET - Record Support Entry Table*/

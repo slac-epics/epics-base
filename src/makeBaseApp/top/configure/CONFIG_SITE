@@ -8,23 +8,28 @@
 #  CONFIG_SITE.Common.$(T_A)
 #  CONFIG_SITE.$(EPICS_HOST_ARCH).$(T_A)
 
+# CHECK_RELEASE controls the consistency checking of the support
+#   applications pointed to by the RELEASE* files.
+# Normally CHECK_RELEASE should be set to YES.
+# Set CHECK_RELEASE to NO to disable checking completely.
+# Set CHECK_RELEASE to WARN to perform consistency checking but
+#   continue building even if conflicts are found.
+CHECK_RELEASE = YES
+
 # Set this when you only want to compile this application
-# for a subset of the cross-compiled target architectures
-# that Base is built for.
+#   for a subset of the cross-compiled target architectures
+#   that Base is built for.
 # CROSS_COMPILER_TARGET_ARCHS = RTEMS-beatnik linux-x86 linux-x86_64
 
 # If you do NOT want to build for the host architecture,
 # clear BUILD_FOR_HOST_ARCH
 # BUILD_FOR_HOST_ARCH = 
 
-# Set this when your IOC and the host use different paths
-# to access the application. This will be needed to boot
-# from a Microsoft FTP server or with some NFS mounts.
-# You must rebuild in the iocBoot directory for this to
-# take effect.
-#IOCS_APPL_TOP = <path to application top as seen by IOC>
+# To install files into a location other than $(TOP) define
+#   INSTALL_LOCATION here.
+#INSTALL_LOCATION=</absolute/path/to/install/top>
 
-# If you don't want to install into $(TOP) then
-# define INSTALL_LOCATION here
-#INSTALL_LOCATION=<fullpathname>
-
+# Set this when the IOC and build host use different paths
+#   to the install location. This may be needed to boot from
+#   a Microsoft FTP server say, or on some NFS configurations.
+#IOCS_APPL_TOP = </IOC's/absolute/path/to/install/top>

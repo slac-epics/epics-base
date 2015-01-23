@@ -1,5 +1,5 @@
 #*************************************************************************
-# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2013 The University of Chicago, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
@@ -10,37 +10,34 @@
 #RULES.ioc-targets
 # This file contains targets needed in IOC instance directories
 
-$(ARCH): build
+$(ARCH): buildInstall
 
+##########################################
 ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
-build$(DIVIDER)$(ARCH) build: $(TARGETS)
-
-clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
-
-install$(DIVIDER)$(ARCH) install: $(TARGETS)
-
-else 
-build$(DIVIDER)$(ARCH) build:
-clean$(DIVIDER)$(ARCH) clean:
-install$(DIVIDER)$(ARCH) install:
+    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
+    clean$(DIVIDER)$(ARCH)               clean: ioc-targets_clean
+else
+    buildInstall$(DIVIDER)$(ARCH) buildInstall:
+    clean$(DIVIDER)$(ARCH)               clean:
 endif
+
+cdCommands envPaths dllPath.bat: $(wildcard $(TOP)/configure/RELEASE*) \
+    $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)
+ifeq ($(IOCS_APPL_TOP),)
+ifeq ($(IOC_APPL_TOP),)
+	$(CONVERTRELEASE) -a $(ARCH) $@
+else
+	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
+endif
+else
+	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
+endif
+
+realclean: ioc-targets_clean
 
 ioc-targets_clean:
 	$(RM) cdCommands envPaths dllPath.bat
 
-cdCommands envPaths dllPath.bat: $(wildcard $(TOP)/configure/RELEASE*) \
-	$(TOP)/configure/CONFIG $(INSTALL_LOCATION_BIN)/$(ARCH)
-ifeq ($(IOCS_APPL_TOP),)
-ifeq ($(IOC_APPL_TOP),)
-	$(PERL) $(TOOLS)/convertRelease.pl -a $(ARCH) $@
-else
-	$(PERL) $(TOOLS)/convertRelease.pl -a $(ARCH) -T $(IOC_APPL_TOP) $@
-endif
-else
-	$(PERL) $(TOOLS)/convertRelease.pl -a $(ARCH) -t $(IOCS_APPL_TOP) $@
-endif
-
-
-realclean: ioc-targets_clean
-
+##########################################
+##########################################
 

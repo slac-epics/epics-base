@@ -1,13 +1,13 @@
 #*************************************************************************
-# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2013 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
-# EPICS BASE Versions 3.13.7
-# and higher are distributed subject to a Software License Agreement found
-# in file LICENSE that is included with this distribution. 
+# EPICS BASE is distributed subject to a Software License Agreement found
+# in file LICENSE that is included with this distribution.
 #*************************************************************************
 #RULES.ioc
+
 include $(CONFIG)/RULES_DIRS
 include $(CONFIG)/RULES.ioc-targets
 
@@ -36,36 +36,3 @@ $(INSTALL_AUTOSAVE)/%.req: %.sub-req
 	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
 
-########################################################
-# NOTE: The following rules shouldn't be needed any more.
-# If you think you need them, please see Bruce Hill, bhill,
-# so we can discuss.
-
-## PCDS additions to install archive and autosave files
-#
-## Inflate the IOC archive file, if any
-#$(INSTALL_ARCHIVE)/%.archive: %.substitutions
-#	@echo "Inflating ioc archive file from $<"
-#	@$(RM) $@
-#	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-#
-#$(INSTALL_ARCHIVE)/%.archive: %.sub-archive
-#	@echo "Inflating ioc archive file from $<"
-#	@$(RM) $@
-#	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-#
-#$(INSTALL_ARCHIVE)/%.archive: %.sub-arch
-#	@echo "Inflating ioc archive file from $<"
-#	@$(RM) $@
-#	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-#
-## Inflate the IOC autosave file, if any
-#$(INSTALL_AUTOSAVE)/%.req: %.substitutions
-#	@echo "Inflating ioc autosave file from $<"
-#	@$(RM) $@
-#	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
-#	$(MV) msi.tmp $@
-#

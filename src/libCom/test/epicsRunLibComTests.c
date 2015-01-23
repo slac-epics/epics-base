@@ -20,6 +20,7 @@ int epicsThreadTest(void);
 int epicsTimerTest(void);
 int epicsAlgorithm(void);
 int epicsEllTest(void);
+int epicsEnvTest(void);
 int epicsErrlogTest(void);
 int epicsCalcTest(void);
 int epicsEventTest(void);
@@ -38,6 +39,7 @@ int macEnvExpandTest(void);
 int ringPointerTest(void);
 int ringBytesTest(void);
 int blockingSockTest(void);
+int epicsSockResolveTest(void);
 int taskwdTest(void);
 int epicsExitTest(void);
 
@@ -58,6 +60,8 @@ void epicsRunLibComTests(void)
     runTest(epicsAlgorithm);
 
     runTest(epicsEllTest);
+
+    runTest(epicsEnvTest);
 
     runTest(epicsErrlogTest);
 
@@ -94,6 +98,8 @@ void epicsRunLibComTests(void)
     runTest(ringBytesTest);
 
     runTest(blockingSockTest);
+    
+    runTest(epicsSockResolveTest);
 
     runTest(taskwdTest);
 

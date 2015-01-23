@@ -3,15 +3,203 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  <title>EPICS Base R3.14.12.3 Release Notes</title>
+  <title>EPICS Base R3.14.12.4 Release Notes</title>
 </head>
 
 <body lang="en">
-<h1 align="center">EPICS Base Release 3.14.12.3</h1>
+<h1 align="center">EPICS Base Release 3.14.12.4</h1>
 
-<h2 align="center">Changes between 3.14.12.2 and 3.14.12.3</h2>
+<h2 align="center">Changes between 3.14.12.3 and 3.14.12.4</h2>
 
 <!-- Insert new items immediately below here ... -->
+
+<h3>New test for environment variables</h3>
+
+<p>A new test program epicsEnvTest has been added to the libCom tests which
+checks environment variable APIs. It was written to confirm that threads see
+environment variable values that have been set in their parent thread. VxWorks
+6.x boot images must be configured with ENV_VAR_USE_HOOKS set to FALSE for the
+correct behaviour to occur (a test failure on VxWorks explains this).</p>
+
+<h3>Inclusion of &lt;top&gt;/cfg/* files refined</h3>
+
+<p>The way the build system includes files installed in the &lt;top&gt;/cfg/*
+directory has been cleaned up. Files whose names begin with CONFIG will now get
+included by the CONFIG step, and files whose names begin with RULES will get
+included in the RULES step. These files are only ever included when GNUMake is
+working in an application build (O.) directory and T_A is defined, so they
+cannot be used to create generic build targets at other levels.</p>
+
+<p>Files whose names don't start with either CONFIG or RULES are no longer
+included automatically, but such files can still be installed into
+&lt;top&gt;/cfg by naming them in the CFG variable.</p>
+
+<h3>Fixed iocsh stream redirection for several commands</h3>
+
+<p>A number of iocsh commands did not respond correctly to redirection of their
+output using the iocsh '>file' or '2>error-file' syntax, and redirecting an
+empty command could create files with garbage names. There may still be a few
+commands that do not properly redirect their output, please notify the core
+developers if you discover any. Thanks to Eric Norum for the iocsh changes.</p>
+
+<p>For externally developed commands, the simplest way to support redirection in
+your C/C++ code is to <tt>#include "epicsStdioRedirect.h"</tt> instead of
+<tt>stdio.h</tt>.</p>
+
+<h3>Fixed crash on loading record instance of unknown type</h3>
+
+<p>Fixed segfault when dbLoadRecords tried to load a record of a type that was
+not defined in its DBD files.</p>
+
+<h3>Hex literal support in epicStrtod()</h3>
+
+<p>Some OS implementations of the standard C library routine strtod() do not
+recognize hexadecimal integers, in particular the libraries provided on Windows
+and VxWorks. The internal implementation of epicsStrtod() that these targets use
+now recognizes the 0x prefix and will convert hex numbers correctly. Thanks to
+Dirk Zimoch for suggesting this change.</p>
+
+<h3>Added support for 64-bit Cygwin and MinGW targets</h3>
+
+<p>Both windows-x64-mingw and cygwin-x86_64 build targets are now provided.</p>
+
+<h3>Windows build issues</h3>
+
+<p>Thanks to Peter Heesterman for suggesting a number of small changes that
+clean up build issues on Windows, mostly related to symbol import and export
+to/from DLLs.</p>
+
+<h3>CAS: GDD Reference Count Underflow</h3>
+
+<p>Thanks to Bruce Hill a source of an underflow in a GDD reference count in the
+CAS code has been fixed.</p>
+
+<h3>Support for Apple Xcode 5.0</h3>
+
+<p>This adds the ability to build for iOS 7.0 and the ARMv8 64-bit CPU on the
+newest iPhone 5S device. Unfortunately the Xcode upgrade breaks the build of the
+ios-x86 simulator target, although the ios-arm target successfully builds code
+which runs fine on the real hardware.</p>
+
+<h3>Reading TSEL field</h3>
+
+<p>The TSEL link field has two complementary uses; it is read to fetch a
+time-stamp event number for the TSE field, or if pointed to the .TIME field of
+another record the record's timestamp is copied directly from the target record.
+However with the latter usage if the TSEL link is itself read back instead of
+pointing to the .TIME field the link appears to have changed to point to the VAL
+field. This is due to an internal detail, and makes it impossible to save the
+TSEL field's value using autosave. This has been fixed, and now the TSEL field
+should always read back the same PV that it was pointed to.</p>
+
+<h3>dbLoadTemplate variable limits adjustable</h3>
+
+<p>The <tt>dbLoadTemplate</tt> command used to allocate a fixed amount of memory
+for the template macro values that it used to 5000 bytes, and also limited the
+number of variables that could defined to 100. These limits can now be changed
+at runtime using the variable <tt>dbTemplateMaxVars</tt> which sets the maximum
+number of macro variables that can be used; the amount of memory allocated for
+value storage is 50 times this number. This variable is registered as an iocsh
+variable in the base.dbd file, and can be adjusted as necessary before each
+individual call to <tt>dbLoadTemplate</tt>.</p>
+
+<p>The code now checks for and prevents any attempt to define more than the set
+number of variables, but it does not check for overruns of the storage buffer.
+This means that template files which define many long macro value strings could
+still cause a buffer overflow and crash the IOC at startup, but increasing the
+variable is all that is needed to allow that template file to be loaded.</p>
+
+<h3>Improvements to dbpf</h3>
+
+<p>It is now possible to use the <tt>dbpf</tt> command to put a long string
+value into a UCHAR array field, previously only CHAR arrays were supported by
+this command even though through Channel Access could put a long string to
+either type. The error message printed by <tt>dbpf</tt> when a value conversion
+fails has also been significantly improved.</p>
+
+<h3>Support for VxWorks 6.9</h3>
+
+<p>Various changes have been made that were needed to allow Base to build and
+run properly on VxWorks 6.9.</p>
+
+<h3>Improvements to aToIPAddr()</h3>
+
+<p>The libCom routine aToIPAddr() and the vxWorks implementation of the
+associated hostToIPAddr() function have been modified to be able to look up
+hostnames that begin with one or more digits. The epicsSockResolveTest program
+was added to check this functionality.</p>
+
+<h4>Added osdFindSymbol for Windows</h4>
+
+<p>Dirk Zimoch implemented the epicsLoadLibrary(), epicsLoadError() and
+epicsFindSymbol() routines for Windows OS targets.</p>
+
+<h4>More dbStatic commands accept "" or "*" to mean 'all'</h4>
+
+<p>The IOC commands dbDumpRecordType, dbDumpMenu and dbDumpRecord will now
+accept either an empty string or any string beginning with an asterisk '*' to
+mean all record types or menus.  Previously the 'all' option for these commands
+required passing in a NULL value, which could be done from the vxWorks shell but
+was not possible from iocsh.</p>
+
+<h4>VxWorks sysAtReboot Registration</h4>
+
+<p>The increasing intelligence of the GNU compiler and linker broke the method
+that was being used by the VxWorks code to register a reboot hook that can close
+down TCP connections nicely before the network stack gets disabled. This has
+been fixed and no longer uses a C++ static contructor to execute that code.</p>
+
+<h4>IOCS_APPL_TOP and INSTALL_LOCATION</h4>
+
+<p>An IOC application that sets INSTALL_LOCATION in its configure/CONFIG_SITE
+file no longer has to set IOCS_APPL_TOP there as well, unless the IOC uses a
+different path than the build host to reach the application's top directory in
+its filesystem. The IOCS_APPL_TOP variable now defaults to the value of
+INSTALL_LOCATION, so setting the latter automatically sets the former. This
+change fixes <a href="https://bugs.launchpad.net/bugs/1165257">Launchpad bug
+1165257</a>.</p>
+
+<h4>devLibVME.h</h4>
+
+<p>Moved the declaration of bcopyLongs() from this header into RTEMS/osdVME.h.
+Its original location broke the build for vxWorks 6.9 (the int nlongs argument
+becomes size_t in 6.9, thus conflicting with this declaration). The only local
+implementation of this routine is found in RTEMS/devLibVMEOSD.c, but it is not
+used anywhere in Base.</p>
+
+<h4>Allow empty database files</h4>
+
+<p>The IOC used to report an error if dbLoadRecords or dbLoadDatabase was asked
+to load an empty file or one containing just whitespace and/or comments. Such
+files are now permitted, simplifying the task of automated database generation
+programs which might discover they have nothing to output.</p>
+
+<h4>High-Resolution Time Provider on MacOS</h4>
+
+<p>MacOS does not provide the clock_gettime() API with CLOCK_REALTIME that other
+Posix systems implement, so we previously used gettimeofday() to fetch the
+current date & time from the OS. That older routine only provides the time with
+a resolution of 1 microsecond though, whereas clock_gettime() gives results with
+a nanosecond resolution.  This release uses a new MachTime time provider on
+MacOS which uses the Mach Kernel's CALENDAR_CLOCK service to fetch the time, and
+provides nanosecond resolution.</p>
+
+<h4>Time drift in periodic scans</h4>
+
+<p>The implementation of the periodic scan code has been modified to remove
+long-term drift associated with OS thread sheduling. The new code keeps scan
+times much more closely tied to the system clock tick, only allowing the scan
+period to drift if the record processing time takes longer to execute than the
+interval between scans. If this happens the scan thread is made to wait for an
+additional half-period but at most 1 second before the records are scanned
+again, to allow lower priority threads some time to process on a preemptive
+priority scheduled OS. After 10 repeated over-runs a warning will be logged,
+with an increasing delay between messages up to hourly.</p>
+
+<p>This fixes <a href="https://bugs.launchpad.net/bugs/597054">launchpad bug
+597054</a>.</p>
+
+<h2 align="center">Changes between 3.14.12.2 and 3.14.12.3</h2>
 
 <h4>Hex literals in CALC expressions</h4>
 

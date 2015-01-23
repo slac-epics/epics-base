@@ -1,5 +1,4 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # convertRelease.pl
+#!/usr/bin/env perl
 #*************************************************************************
 # Copyright (c) 2008 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
@@ -9,7 +8,7 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20110713153813-utpd5swcmji6ce4l
+# Revision-Id: anj@aps.anl.gov-20130710191331-94pikhnfm7gqxfy3
 #
 # Convert configure/RELEASE file(s) into something else.
 #
@@ -53,9 +52,14 @@ if ($opt_T) {
 if ($opt_t) {
     $iocroot = $opt_t;
     $root = $top;
-    while (substr($iocroot, -1, 1) eq substr($root, -1, 1)) {
-        chop $iocroot;
-        chop $root;
+    if ($iocroot eq $root) {
+        # Identical paths, -t not needed
+        undef $opt_t;
+    } else {
+        while (substr($iocroot, -1, 1) eq substr($root, -1, 1)) {
+            chop $iocroot;
+            chop $root;
+        }
     }
 }
 
