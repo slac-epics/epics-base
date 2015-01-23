@@ -8,7 +8,7 @@
 * and higher are distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* Revision-Id: anj@aps.anl.gov-20101104192413-fxlfgfq0kuhsi23a */
+/* Revision-Id: anj@aps.anl.gov-20131120004103-rrs4qf6hlp20naol */
 /*
  *      Author:		Jeff Hill 
  */
@@ -21,8 +21,8 @@
 enum epicsSocketSystemCallInterruptMechanismQueryInfo 
         epicsSocketSystemCallInterruptMechanismQuery ()
 {
-#if (CYGWIN_VERSION_DLL_MAJOR >= 1007)
-    // Behaviour changed in Cygwin 1.7 release.
+#if 0
+    // Some broken versions of cygwin needed this:
     return esscimqi_socketCloseRequired;
 #else
     return esscimqi_socketBothShutdownRequired;

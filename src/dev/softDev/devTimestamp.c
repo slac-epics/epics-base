@@ -5,7 +5,7 @@
 * in the file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 /*
  * Device support for EPICS time stamps
  *
@@ -17,11 +17,10 @@
 #include "alarm.h"
 #include "devSup.h"
 #include "recGbl.h"
-#include "epicsExport.h"
 
 #include "aiRecord.h"
 #include "stringinRecord.h"
-
+#include "epicsExport.h"
 
 /* Extended device support to allow INP field changes */
 

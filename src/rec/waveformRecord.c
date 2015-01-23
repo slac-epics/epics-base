@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
 
 /* recWaveform.c - Record Support Routines for Waveform records */
 /*
@@ -23,6 +23,7 @@
 
 #include "dbDefs.h"
 #include "epicsPrint.h"
+#include "epicsString.h"
 #include "alarm.h"
 #include "dbAccess.h"
 #include "dbEvent.h"
@@ -34,11 +35,11 @@
 #include "recGbl.h"
 #include "cantProceed.h"
 #include "menuYesNo.h"
+
 #define GEN_SIZE_OFFSET
 #include "waveformRecord.h"
 #undef  GEN_SIZE_OFFSET
 #include "epicsExport.h"
-#include "epicsString.h"
 
 /* Create RSET - Record Support Entry Table*/
 #define report NULL
