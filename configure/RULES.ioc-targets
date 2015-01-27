@@ -1,5 +1,5 @@
 #*************************************************************************
-# Copyright (c) 2013 The University of Chicago, as Operator of Argonne
+# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
 #     National Laboratory.
 # Copyright (c) 2002 The Regents of the University of California, as
 #     Operator of Los Alamos National Laboratory.
@@ -10,19 +10,24 @@
 #RULES.ioc-targets
 # This file contains targets needed in IOC instance directories
 
-$(ARCH): buildInstall
+$(ARCH): build
 
 ##########################################
 ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
-    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
-    clean$(DIVIDER)$(ARCH)               clean: ioc-targets_clean
-else
-    buildInstall$(DIVIDER)$(ARCH) buildInstall:
-    clean$(DIVIDER)$(ARCH)               clean:
+build$(DIVIDER)$(ARCH) build: $(TARGETS)
+
+clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
+
+install$(DIVIDER)$(ARCH) install: $(TARGETS)
+
+else 
+build$(DIVIDER)$(ARCH) build:
+clean$(DIVIDER)$(ARCH) clean:
+install$(DIVIDER)$(ARCH) install:
 endif
 
 cdCommands envPaths dllPath.bat: $(wildcard $(TOP)/configure/RELEASE*) \
-    $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)
+	$(TOP)/configure/CONFIG $(INSTALL_LOCATION_BIN)/$(ARCH)
 ifeq ($(IOCS_APPL_TOP),)
 ifeq ($(IOC_APPL_TOP),)
 	$(CONVERTRELEASE) -a $(ARCH) $@
@@ -40,4 +45,3 @@ ioc-targets_clean:
 
 ##########################################
 ##########################################
-
