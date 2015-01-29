@@ -47,12 +47,14 @@ ARCHIVEDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMO
 # Build targets
 
 build:		$(INSTALL_ARCHIVES)
+install:$(COMMON_ARCHIVES) $(INSTALL_ARCHIVES)
 
 install:		$(INSTALL_ARCHIVES)
 
 rebuild:        clean install
 
 buildInstall:	build
+
 
 realclean: clean
 

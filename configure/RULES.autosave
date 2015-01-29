@@ -48,6 +48,7 @@ REQDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_RE
 # Build targets
 
 build:		$(INSTALL_REQS)
+install:$(COMMON_REQS) $(INSTALL_REQS)
 
 install:	$(INSTALL_REQS)
 
