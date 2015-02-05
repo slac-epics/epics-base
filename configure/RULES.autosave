@@ -21,6 +21,8 @@ vpath %.tpl-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DI
 
 INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
 
+include $(CONFIG)/CONFIG_APP_INCLUDE
+
 ####################################################
 # Autosave Flags (-I path)
 define  AUTOSAVE_DIRS_template

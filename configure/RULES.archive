@@ -20,6 +20,8 @@ vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMO
 
 INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
 
+include $(CONFIG)/CONFIG_APP_INCLUDE
+
 ####################################################
 # archive Flags (-I path)
 define  ARCHIVE_DIRS_template
