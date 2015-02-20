@@ -368,7 +368,7 @@ long dbCaPutLinkCallback(struct link *plink,short dbrType,
             plink->value.pv_link.pvlMask |= pvlOptOutNative;
  */
         }
-        if (nRequest == 1){
+        if (nRequest == 1 && pca->nelements==1){
             long (*fConvert)(const void *from, void *to, struct dbAddr *paddr);
 
             fConvert = dbFastPutConvertRoutine[dbrType][newType];
@@ -383,6 +383,10 @@ long dbCaPutLinkCallback(struct link *plink,short dbrType,
             /*Following only used for DBF_STRING*/
             dbAddr.field_size = MAX_STRING_SIZE;
             status = aConvert(&dbAddr, pbuffer, nRequest, pca->nelements, 0);
+            if(nRequest<pca->nelements) {
+                long elemsize = dbr_value_size[ca_field_type(pca->chid)];
+                memset(nRequest*elemsize+(char*)pca->pputNative, 0, (pca->nelements-nRequest)*elemsize);
+            }
         }
         link_action |= CA_WRITE_NATIVE;
         pca->gotOutNative = TRUE;
