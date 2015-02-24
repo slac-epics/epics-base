@@ -13,6 +13,49 @@
 
 <!-- Insert new items immediately below here ... -->
 
+<h3>MinGW Cross-builds from Linux</h3>
+
+<p>Build configuration files have been back-ported from the 3.15 branch that
+allows cross-building of the win32-x86-mingw target from either linux-x86 or
+linux-x86_64 hosts. Many Linux distributions now package the necessary MinGW
+cross-build tools and libraries to support this. Adjust the settings in
+configure/os/CONFIG_SITE.linux-x86.win32-x86-mingw and add win32-x86-mingw to
+the CROSS_COMPILER_TARGET_ARCHS variable in configure/CONFIG_SITE or in
+configure/os/CONFIG_SITE.linux-x86.Common.</p>
+
+<h3>Build rules for RTEMS GESYS modules</h3>
+
+<p>RTEMS target builds can now be configured to make GESYS modules by changing
+the <CODE>USE_GESYS=NO</code> setting in the file
+configure/os/CONFIG_SITE.Common.RTEMS to <code>YES</code>.</p>
+
+<h3>Added Make variables for command-line use</h3>
+
+<p>The following variables are now used during the build process, reserved for
+setting on the command-line only (Makefiles should continue to use the
+<code>USR_</code> equivalents):</p>
+
+<ul>
+<li>CMD_INCLUDES</li>
+<li>CMD_CPPFLAGS</li>
+<li>CMD_CFLAGS</li>
+<li>CMD_CXXFLAGS</li>
+<li>CMD_LDFLAGS</li>
+<li>CMD_DBFLAGS</li>
+<li>CMD_DBDFLAGS</li>
+<li>CMD_ARFLAGS</li>
+</ul>
+
+<p>For example:</p>
+
+<blockquote><pre>
+make CMD_INCLUDES=/opt/local/include CMD_LDFLAGS=-L/opt/local/lib
+</pre></blockquote>
+
+<h3>Back-ported dbLoadRecordsHook from the 3.15 branch</h3>
+
+<p>See the Release Notes from the Base 3.15.1 release for details.</p>
+
 <h3>Enhanced API for asTrapWrite listeners</h3>
 
 <p>External software such as the CA Put Logging module that registers a listener
