@@ -102,6 +102,7 @@
 #       RTEMS-pc386
 #       RTEMS-psim
 #       RTEMS-uC5282
+#       linuxRT_glibc-x86_64
 #
 
 # SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
@@ -117,6 +118,7 @@ endif
 CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS	+= vxWorks-68040
 CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
+CROSS_COMPILER_TARGET_ARCHS		+=	linuxRT_glibc-x86_64
 # Don't make linux-x86 be a cross compile if it's the host
 # A linux-x86_64 host can also cross compile to linux-x86
 ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
@@ -133,7 +135,8 @@ endif
 #  host:	linux-x86    targets: RTEMS-beatnik linux-x86
 #  host:	linux-x86_64 targets: RTEMS-beatnik linux-x86 linux-x86_64
 #  host:	rhel6-x86_64 targets: rhel6-x86_64
-CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64
+#CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64
+CROSS_COMPILER_HOST_ARCHS		=	rhel6-x86_64
 #CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
 BUILD_FOR_HOST_ARCH				=	1
 
