@@ -1,0 +1,4 @@
+#This files contains a list of patches that have been applied to this version of base.
+
+OSDThread.patch,03/08/2013,No,No,OSDThread.patch adds some code to the POSIX OSDThread once function to memlock all if the appropriate limits are set
+linuxRTToolchain.patch, 4/20/2015,No,No linuxRTToolchain.patch adds configure/os/CONFIG.Common.linuxRT_glibc-x86_64 and configure/os/CONFIG_SITE.Common.linuxRT_glibc-x86_64 for afs linuxRT cross compiler 
