@@ -227,3 +227,11 @@ GCC_PIPE = YES
 #  run at build-time, e.g. set the LD_LIBRARY_PATH environment variable.
 LINKER_USE_RPATH = YES
 
+# PCDS - Define PCRE lib and include directories if they exist
+# Not needed for base, but this allows all our streamdevice based IOC's
+# to share a common macro definition for PCRE_LIB and PCRE_INCLUDE
+ifneq ($(wildcard $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/lib),)
+PCRE_INCLUDE = $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/include
+PCRE_LIB     = $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/lib
+endif
+
