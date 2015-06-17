@@ -4,7 +4,12 @@
 
 # Where to find RTEMS
 #
-RTEMS_SITE_TOP=/reg/g/pcds/package/rtems/rtems-4.9.4-x86_64/
+ifndef PACKAGE_SITE_TOP
+PACKAGE_SITE_TOP=/reg/g/pcds/package
+#PACKAGE_SITE_TOP=/afs/slac/g/pcds/package
+endif
+RTEMS_VERSION=rtems-4.9.4-x86_64
+RTEMS_SITE_TOP=$(PACKAGE_SITE_TOP)/rtems/$(RTEMS_VERSION)
 RTEMS_PATCHLVL=rtems_p1
 SSRLAPPS_PATCHLVL=ssrlApps_p4
 RTEMS_BSP=$(subst RTEMS-,,$(T_A))

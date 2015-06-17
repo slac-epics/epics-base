@@ -12,6 +12,13 @@
 #  CONFIG_SITE  - Global site configuration file
 #
 
+# Include common directory macros for SLAC
+ifndef CONFIG_SITE_TOP
+CONFIG_SITE_TOP=/reg/g/pcds/config
+#CONFIG_SITE_TOP=/afs/slac/g/pcds/config
+endif
+-include $(CONFIG_SITE_TOP)/common_dirs.mak
+
 #  The host architecture performing the build, in the form
 #       <operating system>-<architecture>[-<toolset>]
 #

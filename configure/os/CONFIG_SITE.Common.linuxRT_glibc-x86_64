@@ -2,15 +2,17 @@
 VALID_BUILDS = Ioc
 
 # Location of linuxRT GNU ToolChain
-#LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
-#LINUX_RT_HOME=/afs/slac/package/linuxRT
-#LINUX_RT_HOME=/usr/local/common
-#LINUX_RT_HOME=/home/ernesto/packages
-LINUX_RT_HOME=/reg/g/pcds/package/linuxRT
+ifndef PACKAGE_SITE_TOP
+PACKAGE_SITE_TOP=/reg/g/pcds/package
+#PACKAGE_SITE_TOP=/afs/slac/g/pcds/package
+endif
+LINUXRT_HOME=$(PACKAGE_SITE_TOP)/linuxRT
 
-#GNU_DIR=$(LINUX_RT_HOME)/buildroot/buildroot-2012.02-x86/output/host/usr/
-#GNU_DIR=$(LINUX_RT_HOME)/buildroot-2014.08/host/$(EPICS_HOST_ARCH)/usr
-GNU_DIR=$(LINUX_RT_HOME)/buildroot-2014.11/host/$(EPICS_HOST_ARCH)/x86_64-glibc-linux/usr
+LINUXRT_ARCH=x86_64-glibc-linux
+LINUXRT_BUILDROOT=buildroot-2014.11
+#GNU_DIR=$(LINUXRT_HOME)/buildroot/buildroot-2012.02-x86/output/host/usr/
+#GNU_DIR=$(LINUXRT_HOME)/buildroot-2014.08/host/$(EPICS_HOST_ARCH)/usr
+GNU_DIR=$(LINUXRT_HOME)/$(LINUXRT_BUILDROOT)/host/$(EPICS_HOST_ARCH)/$(LINUXRT_ARCH)/usr
 
 # Cross Target Architecture
 GNU_TARGET=x86_64-linux
