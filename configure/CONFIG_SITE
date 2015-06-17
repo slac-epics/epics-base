@@ -124,20 +124,17 @@ endif
 #
 CROSS_COMPILER_TARGET_ARCHS=
 
-# Add RTEMS-beatnik if RTEMS_SITE_TOP exists
-ifneq (,$(wildcard $(RTEMS_SITE_TOP)))
+
+# RHEL6 currently supports linuxRT and RTEMS-beatnik cross compiles
+ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
+CROSS_COMPILER_TARGET_ARCHS		+=	linuxRT_glibc-x86_64
 CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
 endif
 
-# Only RHEL6 currently supports the linuxRT build
-ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
-CROSS_COMPILER_TARGET_ARCHS		+=	linuxRT_glibc-x86_64
-endif
-
-# Don't make linux-x86 be a cross compile if it's the host
-# A linux-x86_64 host can also cross compile to linux-x86
+# RHEL5 currently supports linux-x86 (RHEL5 32bit) and RTEMS-beatnik cross compiles
 ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
 CROSS_COMPILER_TARGET_ARCHS		+=  linux-x86
+CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
 endif
 
 #  If only a subset of the host architectures perform
