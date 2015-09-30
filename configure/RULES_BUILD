@@ -195,17 +195,23 @@ $(OBJLIBNAME):%$(OBJ):
 	@$(RM) $@
 	$(COMPILE.ctdt) $<
 
-%$(OBJ): %.c
+# Cancel GNUMake's built-in rules, which don't have our _INC
+# dependencies so could get used in some circumstances (gdd)
+%.o : %.c
+%.o : %.cc
+%.o : %.cpp
+
+%$(OBJ): %.c $(COMMON_INC) $(INSTALL_INC)
 	@$(HDEPENDS_CMD)
 	@$(RM) $@
 	$(COMPILE.c) $(call PATH_FILTER,$<) $(COMPILE_FILTER.c)
 
-%$(OBJ): %.cc
+%$(OBJ): %.cc $(COMMON_INC) $(INSTALL_INC)
 	@$(HDEPENDS_CMD)
 	@$(RM) $@
 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
 
-%$(OBJ): %.cpp
+%$(OBJ): %.cpp $(COMMON_INC) $(INSTALL_INC)
 	@$(HDEPENDS_CMD)
 	@$(RM) $@
 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)

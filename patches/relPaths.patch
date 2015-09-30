@@ -1,0 +1,111 @@
+=== modified file 'configure/RULES.ioc'
+--- configure/RULES.ioc	2013-07-10 19:13:31 +0000
++++ configure/RULES.ioc	2014-10-08 17:44:27 +0000
+@@ -18,16 +18,17 @@
+     buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
+ 
+     clean$(DIVIDER)$(ARCH) clean:
+-	$(RM) cdCommands envPaths dllPath.bat
++	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
+ else
+     buildInstall$(DIVIDER)$(ARCH) buildInstall:
+     clean$(DIVIDER)$(ARCH) clean:
+ endif
+ 
+-cdCommands envPaths dllPath.bat: $(wildcard $(TOP)/configure/RELEASE*) \
++cdCommands envPaths dllPath.bat relPaths.sh: \
++    $(wildcard $(TOP)/configure/RELEASE*) \
+     $(wildcard $(TOP)/configure/CONFIG_SITE*) $(INSTALL_BIN)
+ 	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
+ 
+ realclean:
+-	$(RM) cdCommands envPaths dllPath.bat
++	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
+ 
+
+=== modified file 'src/makeBaseApp/Makefile'
+--- src/makeBaseApp/Makefile	2008-10-08 22:42:49 +0000
++++ src/makeBaseApp/Makefile	2014-10-08 18:00:50 +0000
+@@ -53,6 +53,7 @@
+ TEMPLATES += top/exampleBoot/ioc/Makefile@Common
+ TEMPLATES += top/exampleBoot/ioc/Makefile@vxWorks
+ TEMPLATES += top/exampleBoot/ioc/Makefile@win32
++TEMPLATES += top/exampleBoot/ioc/Makefile@cygwin
+ TEMPLATES += top/exampleBoot/ioc/st.cmd@Common
+ TEMPLATES += top/exampleBoot/ioc/st.cmd@vxWorks
+ TEMPLATES += top/exampleBoot/ioc/st.cmd@RTEMS
+@@ -82,6 +83,7 @@
+ TEMPLATES += top/iocBoot/ioc/Makefile@Common
+ TEMPLATES += top/iocBoot/ioc/Makefile@vxWorks
+ TEMPLATES += top/iocBoot/ioc/Makefile@win32
++TEMPLATES += top/iocBoot/ioc/Makefile@cygwin
+ TEMPLATES += top/iocBoot/ioc/st.cmd@Common
+ TEMPLATES += top/iocBoot/ioc/st.cmd@Cross
+ TEMPLATES += top/iocBoot/ioc/st.cmd@vxWorks
+
+=== added file 'src/makeBaseApp/top/exampleBoot/ioc/Makefile@cygwin'
+--- src/makeBaseApp/top/exampleBoot/ioc/Makefile@cygwin	1970-01-01 00:00:00 +0000
++++ src/makeBaseApp/top/exampleBoot/ioc/Makefile@cygwin	2014-10-08 17:56:42 +0000
+@@ -0,0 +1,5 @@
++TOP = ../..
++include $(TOP)/configure/CONFIG
++ARCH = _ARCH_
++TARGETS = envPaths dllPath.bat relPaths.sh
++include $(TOP)/configure/RULES.ioc
+
+=== added file 'src/makeBaseApp/top/iocBoot/ioc/Makefile@cygwin'
+--- src/makeBaseApp/top/iocBoot/ioc/Makefile@cygwin	1970-01-01 00:00:00 +0000
++++ src/makeBaseApp/top/iocBoot/ioc/Makefile@cygwin	2014-10-08 17:48:31 +0000
+@@ -0,0 +1,5 @@
++TOP = ../..
++include $(TOP)/configure/CONFIG
++ARCH = _ARCH_
++TARGETS = envPaths dllPath.bat relPaths.sh
++include $(TOP)/configure/RULES.ioc
+
+=== modified file 'src/tools/convertRelease.pl'
+--- src/tools/convertRelease.pl	2013-07-10 19:13:31 +0000
++++ src/tools/convertRelease.pl	2014-10-08 17:44:13 +0000
+@@ -82,6 +82,7 @@
+ for ($outfile) {
+     m/releaseTops/       and do { &releaseTops;         last; };
+     m/dllPath\.bat/      and do { &dllPath;             last; };
++    m/relPaths\.sh/      and do { &relPaths;            last; };
+     m/cdCommands/        and do { &cdCommands;          last; };
+     m/envPaths/          and do { &envPaths;            last; };
+     m/checkRelease/      and do { &checkRelease;        last; };
+@@ -96,7 +97,8 @@
+ Usage: convertRelease.pl [-a arch] [-T top] [-t ioctop] outfile
+     where outfile is one of:
+         releaseTops - lists the module names defined in RELEASE*s
+-        dllPath.bat - path changes for cmd.exe to find WIN32 DLLs
++        dllPath.bat - path changes for cmd.exe to find Windows DLLs
++        relPaths.sh - path changes for bash to add RELEASE bin dir's
+         cdCommands - generate cd path strings for vxWorks IOCs
+         envPaths - generate epicsEnvSet commands for other IOCs
+         checkRelease - checks consistency with support modules
+@@ -113,13 +115,21 @@
+ }
+ 
+ #
+-# Generate Path files so Windows can find our DLLs
++# Generate Path files so Windows/Cygwin can find our DLLs
+ #
+ sub dllPath {
+     unlink $outfile;
+     open(OUT, ">$outfile") or die "$! creating $outfile";
+     print OUT "\@ECHO OFF\n";
+-    print OUT "PATH %PATH%;", join(';', binDirs()), "\n";
++    print OUT "PATH \%PATH\%;", join(';', binDirs()), "\n";
++    close OUT;
++}
++
++sub relPaths {
++    unlink $outfile;
++    open(OUT, ">$outfile") or die "$! creating $outfile";
++    print OUT "export PATH=\$PATH:",
++        join(':', map {m/\s/ ? "\"$_\"" : $_ } binDirs()), "\n";
+     close OUT;
+ }
+ 
+

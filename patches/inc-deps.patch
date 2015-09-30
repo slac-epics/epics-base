@@ -1,0 +1,48 @@
+=== modified file 'configure/RULES_BUILD'
+--- configure/RULES_BUILD       2012-12-05 20:34:18 +0000
++++ configure/RULES_BUILD       2014-04-10 17:35:47 +0000
+@@ -195,17 +195,23 @@
+	@$(RM) $@
+	$(COMPILE.ctdt) $<
+ 
+-%$(OBJ): %.c
++# Cancel GNUMake's built-in rules, which don't have our _INC
++# dependencies so could get used in some circumstances (gdd)
++%.o : %.c
++%.o : %.cc
++%.o : %.cpp
++
++%$(OBJ): %.c $(COMMON_INC) $(INSTALL_INC)
+	@$(HDEPENDS_CMD)
+	@$(RM) $@
+	$(COMPILE.c) $(call PATH_FILTER,$<) $(COMPILE_FILTER.c)
+ 
+-%$(OBJ): %.cc
++%$(OBJ): %.cc $(COMMON_INC) $(INSTALL_INC)
+	@$(HDEPENDS_CMD)
+	@$(RM) $@
+	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
+ 
+-%$(OBJ): %.cpp
++%$(OBJ): %.cpp $(COMMON_INC) $(INSTALL_INC)
+	@$(HDEPENDS_CMD)
+	@$(RM) $@
+	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
+
+=== modified file 'src/gdd/Makefile'
+--- src/gdd/Makefile    2013-02-11 23:49:05 +0000
++++ src/gdd/Makefile    2014-04-09 21:54:26 +0000
+@@ -30,9 +30,11 @@
+ INC += gddAppTable.h
+ INC += gddAppFuncTable.h
+ INC += smartGDDPointer.h
+-INC += gddApps.h
+ INC += gddEnumStringTable.h
+ 
++# Can't put this in INC, it causes a circular build dependency
++TARGETS += $(INSTALL_INCLUDE)/gddApps.h
++
+ HTMLS += gdd.html
+ HTMLS += gddref.html
+ HTMLS += gddref2.html
+
