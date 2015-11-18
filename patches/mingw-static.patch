@@ -1,0 +1,284 @@
+=== modified file 'src/catools/Makefile'
+--- src/catools/Makefile	2012-03-30 20:52:19 +0000
++++ src/catools/Makefile	2014-02-25 21:56:13 +0000
+@@ -12,22 +12,18 @@
+ 
+ include $(TOP)/configure/CONFIG
+ 
+-SHARED_LIBRARIES = NO
+-
+-# Build but don't install catools as a static library
+-LIBRARY += catools
+-INSTALL_LIBS =
+-
+-catools_SRCS += tool_lib.c
+-catools_LIBS += ca Com
+-
+-# Build and link programs against the catools library
+ PROD_DEFAULT += caget camonitor cainfo caput
+ PROD_vxWorks = -nil-
+ PROD_RTEMS = -nil-
+ PROD_iOS = -nil-
+ 
+-PROD_LIBS += catools ca Com
+-catools_DIR = .
++PROD_SRCS = tool_lib.c
++
++caget_SRCS = caget.c
++caput_SRCS = caput.c
++camonitor_SRCS = camonitor.c
++cainfo_SRCS = cainfo.c
++
++PROD_LIBS = ca Com
+ 
+ include $(TOP)/configure/RULES
+
+=== modified file 'src/libCom/misc/shareLib.h'
+--- src/libCom/misc/shareLib.h	2008-08-06 16:52:52 +0000
++++ src/libCom/misc/shareLib.h	2014-02-25 21:56:13 +0000
+@@ -126,7 +126,7 @@
+ #           define epicsShareFunc  __declspec(dllexport)
+ #       endif
+ #   else
+-#       if defined(_DLL) /* this indicates that we are being compiled to call DLLs */
++#       if !defined(EPICS_DLL_NO) /* this indicates that we are being compiled to call DLLs */
+ #           define epicsShareExtern __declspec(dllimport) extern 
+ #           define epicsShareClass  __declspec(dllimport) 
+ #           define epicsShareFunc  __declspec(dllimport)
+
+=== modified file 'src/libCom/test/blockingSockTest.cpp'
+--- src/libCom/test/blockingSockTest.cpp        2009-08-24 17:07:03 +0000
++++ src/libCom/test/blockingSockTest.cpp        2014-02-25 20:59:07 +0000
+@@ -8,7 +8,6 @@
+ \*************************************************************************/
+ 
+ #include <string.h>
+-#include <assert.h>
+ #include <stdio.h>
+ 
+ #include "osiSock.h"
+@@ -18,9 +17,6 @@
+ #include "epicsUnitTest.h"
+ #include "testMain.h"
+ 
+-#define verify(exp) ((exp) ? (void)0 : \
+-    epicsAssert(__FILE__, __LINE__, #exp, epicsAssertAuthor))
+-
+ union address {
+     struct sockaddr_in ia;
+     struct sockaddr sa;
+@@ -31,7 +27,6 @@
+     circuit ( SOCKET );
+     void recvTest ();
+     void shutdown ();
+-    void signal ();
+     void close ();
+     bool recvWakeupDetected () const;
+     bool sendWakeupDetected () const;
+@@ -64,6 +59,7 @@
+     server ( const address & );
+     void start ();
+     void daemon ();
++    void stop ();
+ protected:
+     SOCKET sock;
+     epicsThreadId id;
+@@ -76,7 +72,7 @@
+     recvWakeup ( false ), 
+     sendWakeup ( false )
+ {
+-    verify ( this->sock != INVALID_SOCKET );
++    testOk ( this->sock != INVALID_SOCKET, "Socket valid" );
+ }
+ 
+ bool circuit::recvWakeupDetected () const
+@@ -92,12 +88,7 @@
+ void circuit::shutdown ()
+ {
+     int status = ::shutdown ( this->sock, SHUT_RDWR );
+-    verify ( status == 0 );
+-}
+-
+-void circuit::signal ()
+-{
+-    epicsSignalRaiseSigAlarm ( this->id );
++    testOk ( status == 0, "Shutdown() returned Ok" );
+ }
+ 
+ void circuit::close ()
+@@ -107,7 +98,6 @@
+ 
+ void circuit::recvTest ()
+ {
+-    epicsSignalInstallSigAlarmIgnore ();
+     char buf [1];
+     while ( true ) {
+         int status = recv ( this->sock, 
+@@ -118,13 +108,13 @@
+             break;
+         }
+         else if ( status > 0 ) {
+-            testDiag ( "client received %i characters", status );
++            testDiag ( "%s received %i characters", this->pName (), status );
+         }
+         else {
+             char sockErrBuf[64];
+             epicsSocketConvertErrnoToString ( 
+                 sockErrBuf, sizeof ( sockErrBuf ) );
+-            testDiag ( "%s socket recv() error was \"%s\"\n",
++            testDiag ( "%s socket recv() error was \"%s\"",
+                 this->pName (), sockErrBuf );
+             this->recvWakeup = true;
+             break;
+@@ -144,14 +134,14 @@
+     address tmpAddr = addrIn;
+     int status = ::connect ( 
+         this->sock, & tmpAddr.sa, sizeof ( tmpAddr ) );
+-    verify ( status == 0 );
++    testOk ( status == 0, "Client end connected" );
+ 
+     circuit * pCir = this;
+     this->id = epicsThreadCreate ( 
+         "client circuit", epicsThreadPriorityMedium, 
+         epicsThreadGetStackSize(epicsThreadStackMedium), 
+         socketRecvTest, pCir );
+-    verify ( this->id );
++    testOk ( this->id != 0, "Client thread created" );
+ }
+ 
+ 
+@@ -169,7 +159,7 @@
+     sock ( epicsSocketCreate ( AF_INET, SOCK_STREAM, IPPROTO_TCP ) ),
+     id ( 0 ), exit ( false )
+ {
+-    verify ( this->sock != INVALID_SOCKET );
++    testOk ( this->sock != INVALID_SOCKET, "Server socket valid" );
+ 
+     // setup server side
+     address tmpAddr = addrIn;
+@@ -180,7 +170,7 @@
+         testAbort ( "Stop all CA servers before running this test." );
+     }
+     status = listen ( this->sock, 10 );
+-    verify ( status == 0 );
++    testOk ( status == 0, "Server socket listening" );
+ }
+ 
+ void server::start ()
+@@ -189,7 +179,7 @@
+         "server daemon", epicsThreadPriorityMedium, 
+         epicsThreadGetStackSize(epicsThreadStackMedium), 
+         serverDaemon, this );
+-    verify ( this->id );
++    testOk ( this->id != 0, "Server thread created" );
+ }
+ 
+ void server::daemon () 
+@@ -200,12 +190,20 @@
+         osiSocklen_t addressSize = sizeof ( addr );
+         SOCKET ns = accept ( this->sock, 
+             & addr.sa, & addressSize );
+-        verify ( ns != INVALID_SOCKET );
++        if ( this->exit )
++            break;
++        testOk ( ns != INVALID_SOCKET, "Accepted socket valid" );
+         circuit * pCir = new serverCircuit ( ns );
+-        verify ( pCir );
++        testOk ( pCir != 0, "Server circuit created" );
+     }
+ }
+ 
++void server::stop ()
++{
++    this->exit = true;
++    epicsSocketDestroy ( this->sock );
++}
++
+ serverCircuit::serverCircuit ( SOCKET sockIn ) :
+     circuit ( sockIn )
+ {
+@@ -214,7 +212,7 @@
+         "server circuit", epicsThreadPriorityMedium, 
+         epicsThreadGetStackSize(epicsThreadStackMedium), 
+         socketRecvTest, pCir );
+-    verify ( threadId );
++    testOk ( threadId != 0, "Server circuit thread created" );
+ }
+ 
+ const char * serverCircuit::pName ()
+@@ -243,7 +241,8 @@
+ 
+ MAIN(blockingSockTest)
+ {
+-    testPlan(1);
++    testPlan(13);
++    osiSockAttach();
+ 
+     address addr;
+     memset ( (char *) & addr, 0, sizeof ( addr ) );
+@@ -256,35 +255,36 @@
+     clientCircuit client ( addr );
+ 
+     epicsThreadSleep ( 1.0 );
+-    verify ( ! client.recvWakeupDetected () );
++    testOk ( ! client.recvWakeupDetected (), "Client is asleep" );
+ 
++    testDiag("Trying Shutdown mechanism");
+     client.shutdown ();
+     epicsThreadSleep ( 1.0 );
+     int mech = -1;
+     if ( client.recvWakeupDetected () ) {
+         mech = esscimqi_socketBothShutdownRequired;
++        testDiag("Shutdown succeeded");
+     }
+     else {
+-        client.signal ();
+-        epicsThreadSleep ( 1.0 );
+-        if ( client.recvWakeupDetected () ) {
+-            mech = esscimqi_socketSigAlarmRequired;
+-        }
+-        else {
++        testDiag("Trying Close mechanism");
+             client.close ();
+             epicsThreadSleep ( 1.0 );
+             if ( client.recvWakeupDetected () ) {
+                 mech = esscimqi_socketCloseRequired;
+-            }
++            testDiag("Close succeeded");
+         }
+     }
+     testDiag("This OS behaves like \"%s\".", mechName(mech));
+ 
+     int query = epicsSocketSystemCallInterruptMechanismQuery ();
+-    if (! testOk(mech == query, "Socket shutdown mechanism") )
++    if (! testOk(mech == query, "Declared mechanism works") )
+         testDiag("epicsSocketSystemCallInterruptMechanismQuery returned \"%s\"",
+             mechName(query));
+ 
++    srv.stop ();
++    epicsThreadSleep ( 1.0 );
++
++    osiSockRelease();
+     return testDone();
+ }
+ 
+
+=== modified file 'src/libCom/test/epicsSockResolveTest.c'
+--- src/libCom/test/epicsSockResolveTest.c	2013-06-07 22:03:55 +0000
++++ src/libCom/test/epicsSockResolveTest.c	2014-02-25 21:56:13 +0000
+@@ -47,6 +47,7 @@
+     int i;
+ 
+     testPlan(3*NELEMENTS(okdata) + NELEMENTS(baddata));
++    osiSockAttach();
+ 
+     {
+         struct in_addr addr;
+@@ -88,5 +89,6 @@
+         }
+     }
+ 
++    osiSockRelease();
+     return testDone();
+ }
+

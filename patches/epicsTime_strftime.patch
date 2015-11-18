@@ -1,0 +1,57 @@
+=== modified file 'src/libCom/osi/epicsTime.cpp'
+--- src/libCom/osi/epicsTime.cpp	2011-04-05 15:23:22 +0000
++++ src/libCom/osi/epicsTime.cpp	2014-01-29 22:20:13 +0000
+@@ -554,9 +554,11 @@
+                         static_cast < unsigned long > ( 1e1 ),
+                         static_cast < unsigned long > ( 1e0 )
+                     };
+-                    // round and convert nanosecs to integer of correct range
++                    // round without overflowing into whole seconds
+                     unsigned long frac = tmns.nSec + div[fracWid] / 2;
+-                    frac %= static_cast < unsigned long > ( 1e9 );
++                    if (frac >= nSecPerSec)
++                        frac = nSecPerSec - 1;
++                    // convert nanosecs to integer of correct range
+                     frac /= div[fracWid];
+                     char fracFormat[32];
+                     sprintf ( fracFormat, "%%0%lulu", fracWid );
+
+=== modified file 'src/libCom/test/epicsTimeTest.cpp'
+--- src/libCom/test/epicsTimeTest.cpp	2013-06-07 19:35:45 +0000
++++ src/libCom/test/epicsTimeTest.cpp	2014-01-29 22:06:58 +0000
+@@ -48,7 +48,7 @@
+     const int wasteTime = 100000;
+     const int nTimes = 10;
+ 
+-    testPlan(12 + nTimes * 18);
++    testPlan(15 + nTimes * 18);
+ 
+     try {
+         const epicsTimeStamp epochTS = {0, 0};
+@@ -96,6 +96,10 @@
+         et.strftime(buf, sizeof(buf), pFormat);
+         testOk(strcmp(buf, "1990-01-01 00.098765432") == 0, "'%s' => '%s'", pFormat, buf);
+ 
++        pFormat = "%S.%03f";
++        et.strftime(buf, sizeof(buf), pFormat);
++        testOk(strcmp(buf, "00.099") == 0, "'%s' => '%s'", pFormat, buf);
++
+         pFormat = "%S.%04f";
+         et.strftime(buf, sizeof(buf), pFormat);
+         testOk(strcmp(buf, "00.0988") == 0, "'%s' => '%s'", pFormat, buf);
+@@ -113,6 +117,14 @@
+         et.strftime(smbuf, sizeof(smbuf), pFormat);
+         testOk(strcmp(smbuf, "00.*") == 0, "'%s' => '%s'", pFormat, smbuf);
+ 
++        pFormat = "%S.%03f";
++        (et + 0.9).strftime(buf, sizeof(buf), pFormat);
++        testOk(strcmp(buf, "00.999") == 0, "0.998765 => '%s'", buf);
++
++        pFormat = "%S.%03f";
++        (et + 0.901).strftime(buf, sizeof(buf), pFormat);
++        testOk(strcmp(buf, "00.999") == 0, "0.999765 => '%s'", buf);
++
+         pFormat = "%%S.%%05f";
+         et.strftime(buf, sizeof(buf), pFormat);
+         testOk(strcmp(buf, "%S.%05f") == 0, "'%s' => '%s'", pFormat, buf);
+
