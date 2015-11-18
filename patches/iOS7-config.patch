@@ -1,0 +1,86 @@
+=== modified file 'configure/os/CONFIG.Common.ios-arm'
+--- configure/os/CONFIG.Common.ios-arm	2011-12-02 16:42:43 +0000
++++ configure/os/CONFIG.Common.ios-arm	2014-02-13 17:24:26 +0000
+@@ -11,6 +11,8 @@
+ IOS_PLATFORM = iPhoneOS
+ 
+ OP_SYS_CFLAGS += -fno-inline-functions
++OP_SYS_CFLAGS += -miphoneos-version-min=$(IOS_DEPLOYMENT_TARGET)
++OP_SYS_LDFLAGS += -miphoneos-version-min=$(IOS_DEPLOYMENT_TARGET)
+ 
+ # iOS optimization flags for arm architecture
+ OPT_CFLAGS_YES = -O2
+
+=== modified file 'configure/os/CONFIG.Common.ios-x86'
+--- configure/os/CONFIG.Common.ios-x86	2011-12-02 16:42:43 +0000
++++ configure/os/CONFIG.Common.ios-x86	2014-02-13 17:24:22 +0000
+@@ -10,6 +10,9 @@
+ 
+ IOS_PLATFORM = iPhoneSimulator
+ 
++OP_SYS_CFLAGS += -mios-simulator-version-min=$(IOS_DEPLOYMENT_TARGET)
++OP_SYS_LDFLAGS += -mios-simulator-version-min=$(IOS_DEPLOYMENT_TARGET)
++
+ #
+ # Architecture-specific information
+ #
+
+=== modified file 'configure/os/CONFIG.Common.iosCommon'
+--- configure/os/CONFIG.Common.iosCommon	2013-07-10 19:07:51 +0000
++++ configure/os/CONFIG.Common.iosCommon	2014-02-13 17:25:28 +0000
+@@ -40,7 +40,7 @@
+ 
+ #--------------------------------------------------
+ # Operating system flags
+-OP_SYS_CFLAGS += -isysroot $(SDK_DIR) -D__IPHONE_OS_VERSION_MIN_REQUIRED=30200
++OP_SYS_CFLAGS += -isysroot $(SDK_DIR)
+ OP_SYS_LDFLAGS += -isysroot $(SDK_DIR)
+ 
+ #--------------------------------------------------
+@@ -104,6 +104,9 @@
+ -include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).iosCommon
+ 
+ #--------------------------------------------------
+-# Find the Xcode compilers for the specified SDK just once
++# Find the Xcode programs for the selected SDK
+ CC := $(shell xcrun -sdk $(XCRUN_SDK_BASE) -find $(CC_$(COMPILER)))
+ CCC := $(shell xcrun -sdk $(XCRUN_SDK_BASE) -find $(CCC_$(COMPILER)))
++AR := $(shell xcrun -sdk $(XCRUN_SDK_BASE) -find ar) -rc
++LD := $(shell xcrun -sdk $(XCRUN_SDK_BASE) -find ld) -r
++RANLIB := $(shell xcrun -sdk $(XCRUN_SDK_BASE) -find ranlib)
+
+=== modified file 'configure/os/CONFIG_SITE.Common.iosCommon'
+--- configure/os/CONFIG_SITE.Common.iosCommon	2013-09-24 20:30:26 +0000
++++ configure/os/CONFIG_SITE.Common.iosCommon	2014-02-17 16:11:22 +0000
+@@ -5,18 +5,25 @@
+ # Site-specific settings for Apple iOS builds
+ #-------------------------------------------------------
+ 
+-# iOS Version number
++# iOS SDK Version number (not the XCode version).
++# We haven't tested our current build rules on the older
++# versions of either XCode or the iOS SDK, be warned!
+ 
+-#IOS_VERSION = 3.2
+-#IOS_VERSION = 4.1
+-#IOS_VERSION = 4.2
+-#IOS_VERSION = 4.3
+ #IOS_VERSION = 5.0
+ #IOS_VERSION = 5.1
+ #IOS_VERSION = 6.0
+ #IOS_VERSION = 6.1
+ IOS_VERSION = 7.0
+ 
++# Minimum version of iOS the executables must run on.
++# Earlier versions may work, if XCode supports them.
++
++#IOS_DEPLOYMENT_TARGET = 5.0
++#IOS_DEPLOYMENT_TARGET = 5.1
++#IOS_DEPLOYMENT_TARGET = 6.0
++#IOS_DEPLOYMENT_TARGET = 6.1
++IOS_DEPLOYMENT_TARGET = 7.0
++
+ 
+ # Which compiler to use:
+ #   CLANG is required for Xcode 5.0 and later
+

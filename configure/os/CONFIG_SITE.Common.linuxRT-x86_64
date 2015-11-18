@@ -10,10 +10,10 @@ LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
 
 #GNU_DIR=$(LINUX_RT_HOME)/buildroot/buildroot-2012.02-x86/output/host/usr/
 #GNU_DIR=$(LINUX_RT_HOME)/buildroot-2014.08/host/$(EPICS_HOST_ARCH)/usr
-GNU_DIR=$(LINUX_RT_HOME)/buildroot-2014.11/host/$(EPICS_HOST_ARCH)/i686-uclibc-linux/usr
+GNU_DIR=$(LINUX_RT_HOME)/buildroot-2014.11/host/$(EPICS_HOST_ARCH)/x86_64-uclibc-linux/usr
 
 # Cross Target Architecture
-GNU_TARGET=i686-linux
+GNU_TARGET=x86_64-linux
 
 # Could substitute prefix of rpath here
 #SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
