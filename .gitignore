@@ -18,4 +18,5 @@ O.vxWorks-ppc604_altivec/
 O.vxWorks-ppc604_long/
 O.linuxRT-x6/
 O.Common/
+O.linuxRT_glibc-i686/
 
