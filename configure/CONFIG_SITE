@@ -141,7 +141,7 @@ SHARED_LIBRARIES=YES
 #  Build client objects statically ?
 #        must be either YES or NO
 #
-STATIC_BUILD=NO
+STATIC_BUILD=YES
 
 #  Should header dependancy files be automatically generated
 #  for each C/C++ created object file?
