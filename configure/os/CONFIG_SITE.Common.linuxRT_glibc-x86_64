@@ -36,3 +36,8 @@ OPT_CXXFLAGS_YES = -O3 -g
 # EPICS IOC Shell for command line history, etc...
 #  ================================================
 COMMANDLINE_LIBRARY = READLINE
+
+# Support Package Architecture
+# (We're using rhel6 for now as it's compatible and we don't
+#  yet have a linuxRT build machine)
+PKG_ARCH=x86_64-rhel6-gcc44-opt
