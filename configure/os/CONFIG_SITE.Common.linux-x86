@@ -39,3 +39,7 @@ COMMANDLINE_LIBRARY = READLINE_NCURSES
 # loaded into RAM when the binary is loaded.
 OPT_CFLAGS_YES += -g
 OPT_CXXFLAGS_YES += -g
+
+# Support Package Architecture
+PKG_ARCH=x86-rhel5-gcc41-opt
+
