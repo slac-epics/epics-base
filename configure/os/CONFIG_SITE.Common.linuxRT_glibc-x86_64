@@ -7,7 +7,8 @@ VALID_BUILDS = Ioc
 #LINUX_RT_HOME=/home/ernesto/packages
 LINUX_RT_HOME=/afs/slac/package/linuxRT
 
-GNU_DIR=$(LINUX_RT_HOME)/buildroot-2015.02/host/linux-x86_64/x86_64/usr
+LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
+GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/x86_64/usr
 
 # Cross Target Architecture
 GNU_TARGET=x86_64-linux
