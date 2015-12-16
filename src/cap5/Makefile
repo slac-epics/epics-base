@@ -54,10 +54,12 @@ include $(TOP)/configure/RULES
 
 ifdef T_A
   EXTUTILS = $(shell $(PERL) ../perlConfig.pl privlib)/ExtUtils
+  PERLBIN = $(shell $(PERL) ../perlConfig.pl bin)
+  XSUBPP = $(firstword $(wildcard $(PERLBIN)/xsubpp $(EXTUTILS)/xsubpp))
 
   %.c: ../%.xs
 	$(RM) $@ $@_new
-	$(PERL) $(EXTUTILS)/xsubpp -typemap $(EXTUTILS)/typemap $< > $@_new && $(MV) $@_new $@
+	$(PERL) $(XSUBPP) -typemap $(EXTUTILS)/typemap $< > $@_new && $(MV) $@_new $@
 
   %.html: ../%.pm
 	$(RM) $@
