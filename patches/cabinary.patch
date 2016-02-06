@@ -1,0 +1,15 @@
+=== modified file 'src/catools/tool_lib.c'
+--- src/catools/tool_lib.c	2014-10-09 12:12:39 +0000
++++ src/catools/tool_lib.c	2015-02-05 16:58:35 +0000
+@@ -68,6 +68,10 @@
+     case hex: sprintf(ret, "0x%lX", val); break;
+     case oct: sprintf(ret, "0o%lo", val); break;
+     case bin:
++        if (val == 0) {
++            strcpy(ret, "0");
++            break;
++        }
+         for (i=31; i>=0 ; i--)
+         {
+             bit = (val>>i) & 0x1L;
+
