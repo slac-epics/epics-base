@@ -589,6 +589,8 @@ iocshBody (const char *pathname, const char *commandLine, const char *macros)
     wasOkToBlock = epicsThreadIsOkToBlock();
     epicsThreadSetOkToBlock(1);
     for (;;) {
+        bool echo = true;
+        
         /*
          * Read a line
          */
@@ -610,14 +612,23 @@ iocshBody (const char *pathname, const char *commandLine, const char *macros)
         while ((c = raw[icin]) && isspace(c)) {
             icin++;
         }
-
+        
+        /*
+         * @ stops the echoing of a line
+         */
+        if (c == '@') {
+            echo = false;
+            icin++;
+            c = raw[icin];
+        }
+        
         /*
          * Ignore comment lines other than to echo
          * them if they came from a script.  This
          * avoids macLib errors from comments.
          */
         if (c == '#') {
-            if ((prompt == NULL) && (commandLine == NULL))
+            if ((prompt == NULL) && (commandLine == NULL) && echo)
                 puts(raw);
             continue;
         }
@@ -635,11 +646,20 @@ iocshBody (const char *pathname, const char *commandLine, const char *macros)
         while ((c = line[icin]) && isspace(c)) {
             icin++;
         }
-
+        
+        /*
+         * @ stops the echoing of a line
+         */
+        if (c == '@') {
+            echo = false;
+            icin++;
+            c = raw[icin];
+        }
+        
         /*
          * Echo non-empty lines read from a script
          */
-        if ((prompt == NULL) && *line && (commandLine == NULL))
+        if ((prompt == NULL) && *line && (commandLine == NULL) && echo)
             puts(line);
 
         /*
