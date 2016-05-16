@@ -47,6 +47,7 @@ sub GetEpicsHostArch { # no args
 				elsif ($release =~ m/2.6.35.13-rt/)  { return "linux-x86_64"; }
 				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
 				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
+				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
 			}
             else							{ return "unsupported"; }
     } elsif ($arch =~ m/MSWin32-x86/)   { return "win32-x86";
