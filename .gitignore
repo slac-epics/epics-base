@@ -1,10 +1,10 @@
-bin/
-lib/
-db/
-dbd/
-html/
-include/
-templates/
+/bin/
+/lib/
+/db/
+/dbd/
+/html/
+/include/
+/templates/
 O.RTEMS-beatnik/
 O.RTEMS-mvme3100/
 O.RTEMS-uC5282/
