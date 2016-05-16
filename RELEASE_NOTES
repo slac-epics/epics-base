@@ -1,3 +1,13 @@
+Release Notes for base-R3-14-12-3_1-1
+
+Patches:
+db_get_field_and_count.patch:
+    Bug fix for Race condition in db_get_field_and_count() Dehong/Andrew
+    From https://bugs.launchpad.net/epics-base/+bug/1581212
+    Andrew will probably move some of the includes around in the official patch for compiles on other platforms.
+
+
+
 Release Notes for base-R3-14-12-3_1-0
 -----------------------------------
 base-R3-14-12-3_1-0: Shankar/Ernest/Strauman (Mar/28/2012)
