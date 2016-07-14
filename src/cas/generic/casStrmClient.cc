@@ -2614,10 +2614,16 @@ caStatus casStrmClient::read ()
 {
     const caHdrLargeArray * pHdr = this->ctx.getMsg();
 
+    ca_uint32_t count   = pHdr->m_count;
+    if ( count == 0 ) {
+        if ( this->ctx.getChannel() ) {
+            count = this->ctx.getChannel()->getPVI().nativeCount();
+        }
+    }
+
     {
         gdd * pDD = 0;
-        caStatus status = createDBRDD ( pHdr->m_dataType, 
-            pHdr->m_count, pDD );
+        caStatus status = createDBRDD ( pHdr->m_dataType, count, pDD );
         if ( status != S_cas_success ) {
             return status;
         }
