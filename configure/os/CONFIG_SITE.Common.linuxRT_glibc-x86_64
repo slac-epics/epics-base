@@ -23,6 +23,9 @@ GNU_TARGET=x86_64-linux
 SHARED_LIBRARIES=NO
 STATIC_BUILD=YES
 
+# Suppress _SVID_SOURCE deprecated, use _DEFAULT_SOURCE build warnings
+OP_SYS_CPPFLAGS += -D_DEFAULT_SOURCE
+
 # =====================================================================
 # Recommended by Till Strauman:
 # For linuxRT-x86 Builds.
