@@ -8,7 +8,7 @@ VALID_BUILDS = Ioc
 #LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
 LINUX_RT_HOME=/afs/slac/package/linuxRT
 
-GNU_DIR=$(LINUX_RT_HOME)/buildroot-2015.02/host/$(EPICS_HOST_ARCH)/i686/usr
+GNU_DIR=$(LINUX_RT_HOME)/buildroot-2015.02/host/linux-x86_64/i686/usr
 
 # Cross Target Architecture
 GNU_TARGET=i686-linux
