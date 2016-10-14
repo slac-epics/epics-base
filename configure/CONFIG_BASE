@@ -111,7 +111,7 @@ DBST = dbst
 endif
 
 ifndef MSI
-MSI = msi
+MSI = $(TOOLS)/msi
 endif
 
 
