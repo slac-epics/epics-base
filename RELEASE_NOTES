@@ -1,16 +1,35 @@
-Release Notes for base-R3-14-12-3_1-1
+Release Notes for R3.14.12.4-1.2: bhill Oct 17, 2016
+	Reworked git remotes to pull github-3.14 branch and tags from github.com
+	Added msi 1.6 to base so we can build w/o extensions
+	Modified startup/epicsHostArch to make EPICS_HOST_ARCH rhel6-x86_64 on RedHat6,
+		and rhel7-x86_64 on RedHat7 hosts.
+	Added build support for rhel6-x86_64 and rhel7-x86_64 build targets
+
+Release Notes for base-R3-14-12-4_1-1: mshankar May 16, 2016
+	Bug fix for Race condition in db_get_field_and_count() Dehong/Andrew
+	Added patch from the collaboration fixing caget for waveforms when displaying in binary mode.
+	Various linuxRT BuildRoot related path updates
 
 Patches:
 db_get_field_and_count.patch:
     Bug fix for Race condition in db_get_field_and_count() Dehong/Andrew
     From https://bugs.launchpad.net/epics-base/+bug/1581212
     Andrew will probably move some of the includes around in the official patch for compiles on other platforms.
+FLNKmsg.patch:
+epicsTime_strftime.patch
+iOS7-config.patch
+inc-deps.patch
+mingw-static.patch
+mkmf-includes.patch
+relPaths.patch
+xsubpp.patch
 
+Release Notes for base-R3-14-12-4_1-0: mshankar Nov 24, 2014
+	Merged changes from collaboration R3.14.12.4
+	Restores SLAC makeBaseApp templates
 
-
-Release Notes for base-R3-14-12-3_1-0
 -----------------------------------
-base-R3-14-12-3_1-0: Shankar/Ernest/Strauman (Mar/28/2012)
+base-R3-14-12-3_1-0: Shankar/Ernest/Strauman (Mar/28/2012, Last updated Sept/16/2013)
     This is an import of EPICS baseR3.14.12.3.tar.gz from the collaboration into LCLS base-R3-14-12 with some additional patches.
     For the sequence and location of the patches please see SLAC_Patches.txt
 -----------------------------------
@@ -19,6 +38,8 @@ TSEL.patch - EPICS collaboration - Applied Sep/16/2013
     Reading back a .TSEL field that is pointed to another record's .TIME field was exposing internal details
     (that the link target field gets changed internally to point the .VAL field) which don't need to be made visible. 
     This patch hides the change, and should allow a .TSEL field to be saved and restored properly using autosave.
+
+Release Notes for base-R3-14-12-3_1-0
 OSDThread.patch - Strauman/Shankar
     Realtime (RT) scheduling is a feature of all Linux operating systems (not just those with an 'RT Kernel') that enables an application to meet timing deadlines more reliably.
     A feature that contributes significantly to the application's ability to meet timing deadlines is the ability to lock  part  or  all  of  the process's virtual address space into RAM, preventing that memory from being paged to the swap area. 
