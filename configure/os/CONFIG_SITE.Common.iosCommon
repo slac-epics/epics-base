@@ -20,6 +20,15 @@ IOS_DEPLOYMENT_TARGET = 8.0
 # Older versions of Xcode may require this SDK_DIR definition
 #SDK_DIR = $(PLATFORM_DIR)/Developer/SDKs/$(IOS_PLATFORM)$(IOS_DEPLOYMENT_TARGET).sdk
 
+# Minimum version of iOS the executables must run on.
+# Earlier versions may work, if XCode supports them.
+
+#IOS_DEPLOYMENT_TARGET = 5.0
+#IOS_DEPLOYMENT_TARGET = 5.1
+#IOS_DEPLOYMENT_TARGET = 6.0
+#IOS_DEPLOYMENT_TARGET = 6.1
+IOS_DEPLOYMENT_TARGET = 7.0
+
 
 # Which compiler to use:
 #   CLANG is required for Xcode 5.0 and later

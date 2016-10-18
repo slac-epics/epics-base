@@ -80,6 +80,9 @@
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-microblaze
 #       linux-xscale_be
+#       linuxRT-x86             (linux-rt with uClibc; buildroot; created by Till Strauman)
+#       linuxRT-x86_64          (linux-rt with uClibc; buildroot; created by Till Strauman)
+#       linuxRT-ppcP2020        (linux-rt with uClibc; buildroot; created by Till Strauman)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -113,8 +116,15 @@
 # configure/os/CONFIG_SITE.<host>.Common files will
 # override 
 #
-CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
+#CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
+#CROSS_COMPILER_TARGET_ARCHS=rt-linux
+
+#CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86 linuxRT-x86_64
+
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec linuxRT_glibc-x86_64 linuxRT_glibc-i686 
+
+
 
 #  If only a subset of the host architectures perform
 #  the build for the CROSS_COMPILER_TARGET_ARCHS
@@ -136,7 +146,7 @@ SHARED_LIBRARIES=YES
 #  Build client objects statically ?
 #        must be either YES or NO
 #
-STATIC_BUILD=NO
+STATIC_BUILD=YES
 
 #  Should header dependancy files be automatically generated
 #  for each C/C++ created object file?
@@ -185,7 +195,8 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-EPICS_SITE_VERSION =
+# Optimized Build
+EPICS_SITE_VERSION = 1.2
 
 # For GNU compiler, use pipes rather than temporary files for communication 
 # between the various stages of compilation.

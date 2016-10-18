@@ -1,7 +1,7 @@
 #
 # This file contains definitions for RTEMS builds
 #
-# $Revision-Id$
+# CONFIG.Common.RTEMS,v 1.44.2.8 2004/11/30 19:41:55 norume Exp
 # Author: W. Eric Norum
 #         University of Saskatchewan
 #         eric.norum@usask.ca
@@ -14,35 +14,64 @@
 #
 
 #-------------------------------------------------------
+# Where to find RTEMS
+#RTEMS_BASE=/opt/rtems-4.7
+#RTEMS_VERSION=4.7
+# T.S. 8/7/2002: cannot override this from CONFIG_SITE because of
+# the includes :-(
+# RTEMS_BASE=/afs/slac/package/rtems/4.6.2/host/@sys/
+#
+# NOTE RTEMS_BASE is now defined by the site specific
+#      RTEMS makefile 'rtems-version.cfg'
+
+#-------------------------------------------------------
 # RTEMS tools are similar to UNIX tools
 -include $(CONFIG)/os/CONFIG.Common.UnixCommon
 
-GNU_TARGET_INCLUDE_DIR =
-unexport GCC_EXEC_PREFIX
+ifeq ($(T_A),RTEMS-mvme5500)
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
+else
+#RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
+# Also, change afs hard-coded path to the new path after relocating RTEMS
+# to NFS
+#
+# could use
+#
+# ifeq ($(wildcard /afs/slac/package/rtems)xx,xx)
+# RTEMS_SITE_TOP=<NFS-path>
+# else
+# RTEMS_SITE_TOP=<afs-path>
+# endif
+#
+# but I'm not sure if that causes problems with checkRelease
+# since checkRelease is pretty dumb...
+#
 
-#--------------------------------------------------
-# Get RTEMS_BASE definition
--include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
-
-ifneq ($(CONFIG),$(TOP)/configure)
--include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
+#RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
+RTEMS_PATCHLVL=rtems_p0
+SSRLAPPS_PATCHLVL=ssrlApps_p3
 endif
 
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
+RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 #-------------------------------------------------------
 # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
+#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
+RTEMS_BSP=$(subst RTEMS-,,$(T_A))
+include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
 
 #-------------------------------------------------------
 # RTEMS cross-development tools
-CC = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
-CCC = $(RTEMS_TOOLS)/bin/$(CXX)
-CPP = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) -x c -E
-AR = $(RTEMS_TOOLS)/bin/$(AR_FOR_TARGET)
-LD = $(RTEMS_TOOLS)/bin/$(LD_FOR_TARGET) -r
+CC = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
+CCC = $(RTEMS_BASE)/bin/$(CXX)
+CPP = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) -x c -E
+AR = $(RTEMS_BASE)/bin/$(AR_FOR_TARGET)
+LD = $(RTEMS_BASE)/bin/$(LD_FOR_TARGET) -r
 
-RANLIB := $(RTEMS_TOOLS)/bin/$(RANLIB)
+RANLIB := $(RTEMS_BASE)/bin/$(RANLIB)
 
 #-------------------------------------------------------
 # Build types
@@ -51,12 +80,14 @@ VALID_BUILDS = Ioc
 #--------------------------------------------------
 # The RTEMS Makefiles redefine several macros, so we have to
 # reset them to the proper EPICS values, from CONFIG_COMMON
-CFLAGS = $($(BUILD_CLASS)_CFLAGS) $(POSIX_CFLAGS) $(OPT_CFLAGS)\
+CFLAGS = $(CONFORM_CFLAGS)\
+ $($(BUILD_CLASS)_CFLAGS) $(POSIX_CFLAGS) $(OPT_CFLAGS)\
  $(DEBUG_CFLAGS) $(PIPE_CFLAGS) $(WARN_CFLAGS) $(TARGET_CFLAGS)\
  $(USR_CFLAGS) $(CMD_CFLAGS) $(ARCH_DEP_CFLAGS) $(CODE_CFLAGS)\
  $(STATIC_CFLAGS) $(OP_SYS_CFLAGS) $(LIBRARY_SRC_CFLAGS) $(HDEPENDS_CFLAGS)
 
-CXXFLAGS = $($(BUILD_CLASS)_CXXFLAGS) $(POSIX_CXXFLAGS) $(OPT_CXXFLAGS)\
+CXXFLAGS = $(CONFORM_CXXFLAGS)\
+ $($(BUILD_CLASS)_CXXFLAGS) $(POSIX_CXXFLAGS) $(OPT_CXXFLAGS)\
  $(DEBUG_CXXFLAGS) $(PIPE_CFLAGS) $(WARN_CXXFLAGS) $(TARGET_CXXFLAGS)\
  $(USR_CXXFLAGS) $(CMD_CXXFLAGS) $(ARCH_DEP_CXXFLAGS) $(CODE_CXXFLAGS)\
  $(STATIC_CXXCFLAGS) $(OP_SYS_CXXFLAGS) $(LIBRARY_SRC_CFLAGS) $(HDEPENDS_CFLAGS)
@@ -65,10 +96,12 @@ LDFLAGS = $(OPT_LDFLAGS) $(TARGET_LDFLAGS) $(USR_LDFLAGS) $(CMD_LDFLAGS)\
  $(POSIX_LDFLAGS) $(ARCH_DEP_LDFLAGS) $(DEBUG_LDFLAGS) $(OP_SYS_LDFLAGS)\
  $($(BUILD_CLASS)_LDFLAGS) $(RUNTIME_LDFLAGS) $(CODE_LDFLAGS)
 
-LDLIBS = $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
+LDLIBS = $(STATIC_LDLIBS)\
+ $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
  $(GNU_LDLIBS_$(GNU))
 
-CPPFLAGS += $($(BUILD_CLASS)_CPPFLAGS) $(POSIX_CPPFLAGS) $(OPT_CPPFLAGS)\
+CPPFLAGS += $(CONFORM_CPPFLAGS)\
+ $($(BUILD_CLASS)_CPPFLAGS) $(POSIX_CPPFLAGS) $(OPT_CPPFLAGS)\
  $(DEBUG_CPPFLAGS) $(WARN_CPPFLAGS) $(BASE_CPPFLAGS) $(TARGET_CPPFLAGS)\
  $(USR_CPPFLAGS) $(CMD_CPPFLAGS) $(ARCH_DEP_CPPFLAGS) $(OP_SYS_CPPFLAGS)\
  $(OP_SYS_INCLUDE_CPPFLAGS) $(CODE_CPPFLAGS)
@@ -82,8 +115,8 @@ CROSS_LDFLAGS =
 SHRLIB_CFLAGS =
 OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
 OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
-OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
-OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V)
+OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V) -g
+OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V) -g
 
 MODEXT=.obj
 
@@ -93,7 +126,8 @@ OS_CLASS = RTEMS
 
 #--------------------------------------------------
 # Operating system flags
-OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lnfs -lm
+#OP_SYS_LDLIBS += -lrtemsCom -lrtemscpu -lCom -lrtemsNfs -lm
+OP_SYS_LDLIBS=
 OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
                  $(PROJECT_RELEASE)/lib/no-dpmem.rel \
                  $(PROJECT_RELEASE)/lib/no-mp.rel \
@@ -145,8 +179,11 @@ CODE_CFLAGS =
 CODE_CXXFLAGS =
 
 #--------------------------------------------------
-# Override the usual RTEMS verbosity from ar
-ARFLAGS = rc
+# RTEMS uses the inline keyword so -pedantic causes too many problems.
+
+CONFORM_CFLAGS_STRICT = -ansi
+
+CONFORM_CXXFLAGS_STRICT = -ansi
 
 #--------------------------------------------------
 # Command-line input support
@@ -155,4 +192,4 @@ LDLIBS_READLINE = -lreadline -lncurses
 
 #--------------------------------------------------
 # Allow site overrides
--include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
+-include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
