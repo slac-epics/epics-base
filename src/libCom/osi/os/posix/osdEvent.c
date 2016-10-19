@@ -27,8 +27,14 @@
 #include "epicsAssert.h"
 
 /* Until these can be demonstrated to work leave them undefined*/
+/* We need this for linux; so we will try them now.
 #undef _POSIX_THREAD_PROCESS_SHARED
 #undef _POSIX_THREAD_PRIO_INHERIT
+*/
+#define _POSIX_THREAD_PROCESS_SHARED
+#define _POSIX_THREAD_PRIO_INHERIT
+
+
 
 typedef struct epicsEventOSD {
     pthread_mutex_t     mutex;
