@@ -160,10 +160,18 @@ static void dbpfCallFunc(const iocshArgBuf *args)
 /* dbpr */
 static const iocshArg dbprArg0 = { "record name",iocshArgString};
 static const iocshArg dbprArg1 = { "interest level",iocshArgInt};
-static const iocshArg * const dbprArgs[2] = {&dbprArg0,&dbprArg1};
-static const iocshFuncDef dbprFuncDef = {"dbpr",2,dbprArgs};
+static const iocshArg dbprArg2 = { "tab_size",iocshArgInt};
+static const iocshArg * const dbprArgs[3] = {&dbprArg0,&dbprArg1,&dbprArg2};
+static const iocshFuncDef dbprFuncDef = {"dbpr",3,dbprArgs};
 static void dbprCallFunc(const iocshArgBuf *args)
-{ dbpr(args[0].sval,args[1].ival);}
+{ dbpr(args[0].sval,args[1].ival,20);}
+
+/* dbdump */
+static const iocshArg dbdumpArg0 = { "interest level",iocshArgInt};
+static const iocshArg * const dbdumpArgs[1] = {&dbprArg0};
+static const iocshFuncDef dbdumpFuncDef = {"dbdump",1,dbdumpArgs};
+static void dbdumpCallFunc(const iocshArgBuf *args)
+{ dbdump(args[0].ival);}
 
 /* dbtr */
 static const iocshArg dbtrArg0 = { "record name",iocshArgString};
@@ -309,6 +317,7 @@ void epicsShareAPI dbIocRegister(void)
     iocshRegister(&dbnrFuncDef,dbnrCallFunc);
     iocshRegister(&dblaFuncDef,dblaCallFunc);
     iocshRegister(&dbgrepFuncDef,dbgrepCallFunc);
+    iocshRegister(&dbdumpFuncDef,dbdumpCallFunc);
     iocshRegister(&dbgfFuncDef,dbgfCallFunc);
     iocshRegister(&dbpfFuncDef,dbpfCallFunc);
     iocshRegister(&dbprFuncDef,dbprCallFunc);
