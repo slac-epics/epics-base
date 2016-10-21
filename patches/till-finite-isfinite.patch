@@ -1,0 +1,32 @@
+diff --git a/src/libCom/test/epicsCalcTest.cpp b/src/libCom/test/epicsCalcTest.cpp
+index 3fee492..a273b82 100644
+--- a/src/libCom/test/epicsCalcTest.cpp
++++ b/src/libCom/test/epicsCalcTest.cpp
+@@ -13,6 +13,11 @@
+ #include "postfix.h"
+ #include "testMain.h"
+ 
++/* Suggested by Till Strauman to support linuxRT from SLAC */
++#ifdef isfinite
++#define finite(x) isfinite(x)
++#endif
++
+ /* Infrastructure for running tests */
+ 
+ double doCalc(const char *expr) {
+diff --git a/src/libCom/timer/epicsTimer.cpp b/src/libCom/timer/epicsTimer.cpp
+index 7cdc30b..81eb35d 100644
+--- a/src/libCom/timer/epicsTimer.cpp
++++ b/src/libCom/timer/epicsTimer.cpp
+@@ -34,6 +34,11 @@
+ #   pragma warning ( pop )
+ #endif
+ 
++/* Suggested by Till Strauman to support linuxRT from SLAC */
++#ifdef isfinite
++#define finite(x) isfinite(x)
++#endif
++
+ template class tsFreeList < epicsTimerForC, 0x20 >;
+ 
+ epicsTimer::~epicsTimer () {}
