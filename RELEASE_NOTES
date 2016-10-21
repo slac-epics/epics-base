@@ -1,0 +1,144 @@
+Release Notes for R3.14.12.5-1.0: bhill Oct 20, 2016
+	Built from R3.14.12.5-1.branch which was derived from tag R3.14.12.5 on the github-3.14 branch.
+	Primary changes from R3.14.12.4 to R3.14.12.5
+		aoRecord raw converion overflow fix
+		Back-ported dbLoadRecordsHook from the 3.15 branch
+		Fix buffer overflow in epicsStrnRawFromEscaped()
+		epicsString.h comparison functions fixed
+		gdd: Fix crash issue when copying array q/ zero elements
+		For more details on collaboration fixes in R3.14.12.5, see documentation/RELEASE_NOTES.html
+
+	Includes the following patches in addition to R3.14.12.5:
+		DbDump.patch
+			From 344fe15, mshankar 3/7/2013
+    		DBDump additions from Mike Z, original changes Dec 2012
+		OSDThread.patch
+			From b1dd73d, mdewart, 5/23/2015
+			Adds some code to the POSIX OSDThread once function to memlock all if the appropriate limits are set.
+		RTEMS-HiRes-Nanoclock.patch
+    		From 2f17278, ernesto 6/2/2011
+    		Patch from Steph/Till to use high resolution timers in RTEMS: ntpNanoclockTime
+		add-msi1.6-to-base.patch
+			From 069a82e, bhill 10/18/2016, adds msi 1.6 src to base so it can build w/o any extensions.
+		db_get_field_and_count.patch
+			Bug fix for Race condition in db_get_field_and_count() from Dehong/Andrew
+			From https://bugs.launchpad.net/epics-base/+bug/1581212
+		enable-posix-thread-prioIherit-procShared.patch
+    		From a48b261, ernesto 8/14/2012, to enable posix thread priority inheritance and
+			process shared features.
+		rhel6-rhel7-build-support.patch
+		rhel6-rhel7-linuxRT-EpicsHostArch.patch
+			Modify EpicsHostArch scripts to support additional SLAC target arches:
+			linuxRT_glibc-x86_64, rhel6-x86_64, rhel7-x86_64
+		vxWorks-RTEMS-SLAC-targets.patch
+    		Adds SLAC target arch support for vxWorks and RTEMS targets
+
+	Note: Does not include these patches from lcls-trunk:
+		till-finite-isfinite.patch
+			This redefine's finite() using infinite(), but Andrew made the
+			equivalent change in libCom/osi/os/*/epicsMath.h in 2011.
+
+	No other significant differences remained from the lcls-trunk merge other than the patches listed here.
+
+Release Notes for R3.14.12.4-1.2: bhill Oct 17, 2016
+	Reworked git remotes to pull github-3.14 branch and tags from github.com
+	Built from R3.14.12.4-1.branch which was derived from lcls-trunk plus the following fixes:
+		Added msi 1.6 to base so we can build w/o extensions
+		Modified startup/epicsHostArch to make EPICS_HOST_ARCH rhel6-x86_64 on RedHat6,
+			and rhel7-x86_64 on RedHat7 hosts.
+		Added build support for linuxRT_glibc-x86_64, rhel6-x86_64 and rhel7-x86_64 build targets
+
+Release Notes for base-R3-14-12-4_1-1: mshankar May 16, 2016
+	Bug fix for Race condition in db_get_field_and_count() Dehong/Andrew
+	Added patch from the collaboration fixing caget for waveforms when displaying in binary mode.
+	Various linuxRT BuildRoot related path updates
+
+Patches:
+db_get_field_and_count.patch:
+    Bug fix for Race condition in db_get_field_and_count() Dehong/Andrew
+    From https://bugs.launchpad.net/epics-base/+bug/1581212
+    Andrew will probably move some of the includes around in the official patch for compiles on other platforms.
+FLNKmsg.patch:
+epicsTime_strftime.patch
+iOS7-config.patch
+inc-deps.patch
+mingw-static.patch
+mkmf-includes.patch
+relPaths.patch
+xsubpp.patch
+
+Release Notes for base-R3-14-12-4_1-0: mshankar Nov 24, 2014
+	Merged changes from collaboration R3.14.12.4
+	Restores SLAC makeBaseApp templates
+
+-----------------------------------
+base-R3-14-12-3_1-0: Shankar/Ernest/Strauman (Mar/28/2012, Last updated Sept/16/2013)
+    This is an import of EPICS baseR3.14.12.3.tar.gz from the collaboration into LCLS base-R3-14-12 with some additional patches.
+    For the sequence and location of the patches please see SLAC_Patches.txt
+-----------------------------------
+Patches:
+TSEL.patch - EPICS collaboration - Applied Sep/16/2013
+    Reading back a .TSEL field that is pointed to another record's .TIME field was exposing internal details
+    (that the link target field gets changed internally to point the .VAL field) which don't need to be made visible. 
+    This patch hides the change, and should allow a .TSEL field to be saved and restored properly using autosave.
+
+Release Notes for base-R3-14-12-3_1-0
+OSDThread.patch - Strauman/Shankar
+    Realtime (RT) scheduling is a feature of all Linux operating systems (not just those with an 'RT Kernel') that enables an application to meet timing deadlines more reliably.
+    A feature that contributes significantly to the application's ability to meet timing deadlines is the ability to lock  part  or  all  of  the process's virtual address space into RAM, preventing that memory from being paged to the swap area. 
+    This patch will attempt to lock the process's virtual address space into RAM if the process has the ability to run threads with different priorities. 
+    If unsuccessful, it prints an message to stderr. 
+    In Linux, one can grant a process the ability to run threads with different priorities by using a command like ulimit -r unlimited. 
+    In Linux, one can grant a process the ability to lock memory by using a command like ulimit -l unlimited. 
+    Alternatively, these limits can be configured on a per user/per group basis by using /etc/security/limits.conf or its equivalent.
+DBDump.patch - Zelazny/Rock
+    The IRMIS PV crawler script parses every ioc's st.cmd file to collect PV and configured field lists to store in the RDB.
+    The crawler is a complicated perl script developed at APS over 8 years ago.
+    Over the years new st.cmd syntax elements have been introduced.
+    Many of these changes affect elements parsed by the IRMIS crawler, and therefore the script must be constantly modified to keep up with syntax and usage changes.  
+    dbdump creates a file containing a formatted list of PV and field names.  
+    Instead of parsing complex and changeable st.cmd syntax, the crawler (or any other software for that matter) can simply read and parse the dbdump file to obtain PV and field lists.
+envPerl.patch - EPICS collaboration
+    If you need to use a version of Perl which is not found at /usr/bin/perl some of the scripts that come with Base will run the wrong perl. 
+    This patch changes all of the Perl preamble lines to #!/usr/bin/env perl which should be correct on all modern Unix-like systems. 
+    This line is not used on Windows systems.
+dbScan.patch - EPICS collaboration
+    A fix for bug 597054 is available for sites that want their period scan tasks to not drift on workstaion OSs. 
+    Apply this patch which prints warning messages when repeated over-run errors occur.
+1091401.patch - EPICS collaboration
+    A race condition can occur when reloading the access security file from a subroutine record that is processed using "caput" rather than a longer-running CA client such as MEDM or "caput -c". 
+    This patch fixes the problem.
+-----------------------------------
+Notes: Migration for IOC Application Engineers:
+Some additional notes for those that start new applications and want to use the slac style templates.
+You will be able to do the same as before:
+
+makeBaseApp.pl  -t slac  <yourAppName>
+
+The templates have been moved outside of EPICS BASE and now live in the modules area.
+EPICS_MBA_TEMPLATE_TOP=${EPICS_MODULES_TOP}/icdTemplates/MAIN_TRUNK
+
+When logging into the DEV system sourcing: "$EPICS_SETUP/go_epics_3-14-12-3_1-0.bash"
+will setup the EPICS environment as well the ENV Var mentioned above.
+
+If you have an existing application and would like to migrate, please use the sample slac template as your guide/reference.
+
+When checking out modules from CVS including IOC application modules please use the "eco" utility.
+
+Note: For engineers that had applications for linuxRT targets, it is now easier.
+To migrate your existing linuxRT application follow the "slac" template for sure.
+If you try to use the new EPICS BASE as is, your App will not build.
+
+Note: For engineers that would like to try and build 
+softIOCs for linux-x86 as a static based executable; we now support this in the new EPICS BASE.
+Here, I am referring only to softIOCs on linux hosts since they are all currently dynamically built.
+All of our cross targets namely, RTEMS and linuxRT-x86 create static binaries already.
+
+So, to have your softIOC build statically you just need to do the following:
+Add two variables below in your "<TOP>"/configure/CONFIG_SITE" file:
+===============================================
+SHARED_LIBRARIES=NO
+STATIC_BUILD=YES
+===============================================
+Do not touch the "CHECK_RELEASE = YES"  variable
+
