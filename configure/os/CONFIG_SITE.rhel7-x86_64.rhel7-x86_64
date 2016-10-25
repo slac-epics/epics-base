@@ -1,6 +1,6 @@
 # CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
 #
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# $Revision-Id$
 #
 # Site specific definitions for rhel7-x86_64 host - rhel7-x86_64 target builds
 #-------------------------------------------------------

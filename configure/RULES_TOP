@@ -7,7 +7,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-#  Revision-Id: anj@aps.anl.gov-20130401150338-vrfmimau4wu1h6xr
+#  $Revision-Id$
 #
 
 include $(CONFIG)/RULES_DIRS

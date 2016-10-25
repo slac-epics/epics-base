@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbEvent.c */
-/* Revision-Id: johill@lanl.gov-20111019180700-7u25j7zwo2w1894n */
+/* $Revision-Id$ */
 /* routines for scheduling events to lower priority tasks via the RT kernel */
 /*
  *  Author:     Jeffrey O. Hill 

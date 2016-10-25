@@ -1,6 +1,6 @@
 # CONFIG.Common.UnixCommon
 #
-# Revision-Id: anj@aps.anl.gov-20130710190751-ogbyoj47fych51ep
+# $Revision-Id$
 #
 #  Contains definitions common to all Unix target archs
 #

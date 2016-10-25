@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # Authors: Ralph Lange, Marty Kraimer, Andrew Johnson and Janet Anderson
-# Revision-Id: anj@aps.anl.gov-20130819204651-8fvycjecojsfsnwl
+# $Revision-Id$
 
 use Cwd;
 use Getopt::Std;

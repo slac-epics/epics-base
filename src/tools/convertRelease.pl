@@ -8,7 +8,7 @@
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20130710191331-94pikhnfm7gqxfy3
+# $Revision-Id$
 #
 # Convert configure/RELEASE file(s) into something else.
 #

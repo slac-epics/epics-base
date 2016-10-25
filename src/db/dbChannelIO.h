@@ -9,7 +9,7 @@
 \*************************************************************************/
 
 /*
- *  Revision-Id: johill@lanl.gov-20130516183331-ccgep7u4xccqzaw3
+ *  $Revision-Id$
  *
  *
  *                    L O S  A L A M O S

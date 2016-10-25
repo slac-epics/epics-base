@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20120504183859-1ye6uv4hf0pxrlp7
+/* $Revision-Id$
  *
  *    Original Authors: Bob Dalesio and Marty Kraimer
  *    Date:             26MAR96

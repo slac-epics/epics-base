@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* dbAccess.c */
-/* Revision-Id: anj@aps.anl.gov-20121017230839-u6ohpi6wehm44tqh */
+/* $Revision-Id$ */
 /*
  *      Original Author: Bob Dalesio
  *      Current Author:  Marty Kraimer

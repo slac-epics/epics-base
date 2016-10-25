@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* recGbl.c */
-/* Revision-Id: anj@aps.anl.gov-20130913165718-nz75kavfqj9pv93v */
+/* $Revision-Id$ */
 
 /*
  *      Author:          Marty Kraimer

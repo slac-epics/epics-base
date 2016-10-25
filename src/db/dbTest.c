@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20130801231018-kb01bi3no4ej5ily */
+/* $Revision-Id$ */
 /* database access test subroutines */
 
 #include <stddef.h>

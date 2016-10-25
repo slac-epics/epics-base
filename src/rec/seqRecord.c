@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 /*
- * Revision-Id: anj@aps.anl.gov-20120308154738-i28sjadeiwewua4d
+ * $Revision-Id$
  *
  *      Author:	John Winans
  *      Date:	09-21-92

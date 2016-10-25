@@ -6,7 +6,7 @@
 * in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20131120004245-drexj41vy3vynah9 */
+/* $Revision-Id$ */
 
 #include <stdlib.h>
 

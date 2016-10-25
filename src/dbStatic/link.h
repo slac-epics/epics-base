@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* link.h */
-/* base/include Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* base/include $Revision-Id$ */
 
 /*
  *      Original Author: Bob Dalesio

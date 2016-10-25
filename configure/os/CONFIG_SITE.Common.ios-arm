@@ -1,6 +1,6 @@
 # CONFIG_SITE.Common.ios-arm
 #
-# Revision-Id: anj@aps.anl.gov-20130924203026-ds44hcsnrh82licl
+# $Revision-Id$
 #
 # Site-specific settings for ios-arm target builds
 #-------------------------------------------------------

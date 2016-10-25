@@ -7,7 +7,7 @@
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
 #
-# Revision-Id: anj@aps.anl.gov-20101012153723-0ft6f95pnz93ivxw
+# $Revision-Id$
 #
 
 TOP = ..

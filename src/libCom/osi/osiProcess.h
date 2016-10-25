@@ -11,7 +11,7 @@
 #define INC_osiProcess_H
 
 /* 
- * Revision-Id: anj@aps.anl.gov-20130411175656-dor1h3zt7zo46epw
+ * $Revision-Id$
  * 
  * Operating System Independent Interface to Process Environment
  *

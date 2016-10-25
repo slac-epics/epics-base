@@ -7,7 +7,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 
-/* Revision-Id: anj@aps.anl.gov-20131120222110-3o0wgh76u652ad4e */
+/* $Revision-Id$ */
 
 /* recEvent.c - Record Support Routines for Event records */
 /*

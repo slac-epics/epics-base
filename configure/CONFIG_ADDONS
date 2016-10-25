@@ -6,7 +6,7 @@
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution. 
 #*************************************************************************
-# Revision-Id: anj@aps.anl.gov-20111114183307-7ziopjkjj2k97la3
+# $Revision-Id$
 #
 #	check for add-on CFLAGS and CXXFLAGS
 #

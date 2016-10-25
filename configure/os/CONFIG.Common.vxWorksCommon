@@ -1,6 +1,6 @@
 # CONFIG.Common.vxWorksCommon
 #
-# Revision-Id: anj@aps.anl.gov-20130329161709-tpe2r5nie1xw5k9f
+# $Revision-Id$
 # This file is maintained by the build community.
 #
 # Definitions for vxWorks target archs

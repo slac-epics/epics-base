@@ -1,6 +1,6 @@
 # CONFIG_SITE.rhel7-x86_64.Common
 #
-# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+# $Revision-Id$
 # This file is maintained by the build community.
 #
 # Site override definitions for rhel7-x86_64 host builds

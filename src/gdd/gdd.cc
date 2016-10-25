@@ -10,7 +10,7 @@
 // Author: Jim Kowalkowski
 // Date: 2/96
 // 
-// Revision-Id: anj@aps.anl.gov-20131120004245-drexj41vy3vynah9
+// $Revision-Id$
 // 
 
 #include <stdio.h>

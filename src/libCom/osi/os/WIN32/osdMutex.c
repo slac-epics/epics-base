@@ -9,7 +9,7 @@
 \*************************************************************************/
 /* osdMutex.c */
 /*
- *      Revision-Id: anj@aps.anl.gov-20131120004245-drexj41vy3vynah9
+ *      $Revision-Id$
  *      WIN32 version
  *
  *      Author  Jeffrey O. Hill

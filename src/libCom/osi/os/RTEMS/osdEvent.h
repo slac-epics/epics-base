@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdEvent.h
- *	Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+ *	$Revision-Id$
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055

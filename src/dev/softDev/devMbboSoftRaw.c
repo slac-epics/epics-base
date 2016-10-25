@@ -8,7 +8,7 @@
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
 /* devMbboSoftRaw.c */
-/* base/src/dev Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd */
+/* base/src/dev $Revision-Id$ */
 /*
  *      Author:		Janet Anderson
  *      Date:		3-28-92

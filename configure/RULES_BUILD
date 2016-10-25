@@ -6,7 +6,7 @@
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in the file LICENSE that is included with this distribution. 
 #*************************************************************************
-# Revision-Id: jba@aps.anl.gov-20121205203418-15wux5bxnojrv6pn
+# $Revision-Id$
 #
 #	Rules for making things specified in Makefile
 #

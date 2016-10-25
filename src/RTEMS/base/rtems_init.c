@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS startup task for EPICS
- *  Revision-Id: anj@aps.anl.gov-20120516172527-v19sgxr84hn9mecd
+ *  $Revision-Id$
  *      Author: W. Eric Norum
  *              eric.norum@usask.ca
  *              (306) 966-5394

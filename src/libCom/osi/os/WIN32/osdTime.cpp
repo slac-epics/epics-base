@@ -8,7 +8,7 @@
 \*************************************************************************/
 
 //
-// Revision-Id: anj@aps.anl.gov-20111129200729-1bx6zsmjnog13sf0
+// $Revision-Id$
 //
 // Author: Jeff Hill
 //

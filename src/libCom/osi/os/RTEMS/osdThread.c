@@ -6,7 +6,7 @@
 \*************************************************************************/
 /*
  * RTEMS osdThread.c
- *      Revision-Id: anj@aps.anl.gov-20120618195203-fn89v5ir0faou35v
+ *      $Revision-Id$
  *      Author: W. Eric Norum
  *              eric@cls.usask.ca
  *              (306) 966-6055

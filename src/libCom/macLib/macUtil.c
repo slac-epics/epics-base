@@ -6,7 +6,7 @@
 * EPICS BASE is distributed subject to a Software License Agreement found
 * in file LICENSE that is included with this distribution. 
 \*************************************************************************/
-/* Revision-Id: anj@aps.anl.gov-20131119212622-758nq4pce6q9ahih
+/* $Revision-Id$
  *
  * Implementation of utility macro substitution library (macLib)
  *
