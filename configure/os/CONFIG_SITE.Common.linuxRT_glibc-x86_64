@@ -1,0 +1,46 @@
+# Build types
+VALID_BUILDS = Ioc
+
+# Location of linuxRT GNU ToolChain
+ifndef PACKAGE_SITE_TOP
+PACKAGE_SITE_TOP=/reg/g/pcds/package
+#PACKAGE_SITE_TOP=/afs/slac/g/pcds/package
+endif
+LINUXRT_HOME=$(PACKAGE_SITE_TOP)/linuxRT
+
+LINUXRT_ARCH=x86_64-glibc-linux
+LINUXRT_BUILDROOT=buildroot-2014.11
+#GNU_DIR=$(LINUXRT_HOME)/buildroot/buildroot-2012.02-x86/output/host/usr/
+#GNU_DIR=$(LINUXRT_HOME)/buildroot-2014.08/host/$(EPICS_HOST_ARCH)/usr
+GNU_DIR=$(LINUXRT_HOME)/$(LINUXRT_BUILDROOT)/host/$(EPICS_HOST_ARCH)/$(LINUXRT_ARCH)/usr
+
+# Cross Target Architecture
+GNU_TARGET=x86_64-linux
+
+# Could substitute prefix of rpath here
+#SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
+# Only static build is supported at this time.
+SHARED_LIBRARIES=NO
+STATIC_BUILD=YES
+
+# Suppress _SVID_SOURCE deprecated, use _DEFAULT_SOURCE build warnings
+OP_SYS_CPPFLAGS += -D_DEFAULT_SOURCE
+
+# =====================================================================
+# Recommended by Till Strauman:
+# For linuxRT-x86 Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES = -O3 -g
+OPT_CXXFLAGS_YES = -O3 -g
+
+# =================================================
+# Add support for readline: used by
+# EPICS IOC Shell for command line history, etc...
+#  ================================================
+COMMANDLINE_LIBRARY = READLINE
+
+# Support Package Architecture
+# (We're using rhel6 for now as it's compatible and we don't
+#  yet have a linuxRT build machine)
+PKG_ARCH=x86_64-rhel6-gcc44-opt
