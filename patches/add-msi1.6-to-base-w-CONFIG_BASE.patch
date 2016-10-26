@@ -1,0 +1,1424 @@
+diff --git a/configure/CONFIG_BASE b/configure/CONFIG_BASE
+index 373b831..965c4fa 100644
+--- a/configure/CONFIG_BASE
++++ b/configure/CONFIG_BASE
+@@ -112,7 +112,7 @@ DBST = dbst
+ endif
+ 
+ ifndef MSI
+-MSI = msi
++MSI = $(TOOLS)/msi
+ endif
+ 
+ 
+diff --git a/src/msi/LICENSE b/src/msi/LICENSE
+new file mode 100644
+index 0000000..9f03a0c
+--- /dev/null
++++ b/src/msi/LICENSE
+@@ -0,0 +1,64 @@
++Copyright (c) 2002 University of Chicago. All rights reserved.
++
++msi is distributed subject to the following license conditions:
++
++ SOFTWARE LICENSE AGREEMENT
++ Software: Macro Substitution and Include Tool (msi)
++
++ 1. The "Software", below, refers to msi (in either source code, or
++    binary form and accompanying documentation). Each licensee is
++    addressed as "you" or "Licensee."
++
++ 2. The copyright holders shown above and their third-party licensors
++    hereby grant Licensee a royalty-free nonexclusive license, subject to
++    the limitations stated herein and U.S. Government license rights.
++
++ 3. You may modify and make a copy or copies of the Software for use
++    within your organization, if you meet the following conditions:
++      a. Copies in source code must include the copyright notice and this
++         Software License Agreement.
++      b. Copies in binary form must include the copyright notice and this
++         Software License Agreement in the documentation and/or other
++         materials provided with the copy.
++
++ 4. You may modify a copy or copies of the Software or any portion of it,
++    thus forming a work based on the Software, and distribute copies of
++    such work outside your organization, if you meet all of the following
++    conditions:
++      a. Copies in source code must include the copyright notice and this
++         Software License Agreement;
++      b. Copies in binary form must include the copyright notice and this
++         Software License Agreement in the documentation and/or other
++         materials provided with the copy;
++      c. Modified copies and works based on the Software must carry
++         prominent notices stating that you changed specified portions of
++         the Software.
++
++ 5. Portions of the Software resulted from work developed under a U.S.
++    Government contract and are subject to the following license: the
++    Government is granted for itself and others acting on its behalf a
++    paid-up, nonexclusive, irrevocable worldwide license in this computer
++    software to reproduce, prepare derivative works, and perform publicly
++    and display publicly.
++
++ 6. WARRANTY DISCLAIMER. THE SOFTWARE IS SUPPLIED "AS IS" WITHOUT WARRANTY
++    OF ANY KIND. THE COPYRIGHT HOLDERS, THEIR THIRD PARTY LICENSORS, THE
++    UNITED STATES, THE UNITED STATES DEPARTMENT OF ENERGY, AND THEIR
++    EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
++    BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
++    FOR A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, (2) DO NOT ASSUME
++    ANY LEGAL LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS,
++    OR USEFULNESS OF THE SOFTWARE, (3) DO NOT REPRESENT THAT USE OF THE
++    SOFTWARE WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS, (4) DO NOT WARRANT
++    THAT THE SOFTWARE WILL FUNCTION UNINTERRUPTED, THAT IT IS ERROR-FREE
++    OR THAT ANY ERRORS WILL BE CORRECTED.
++
++ 7. LIMITATION OF LIABILITY. IN NO EVENT WILL THE COPYRIGHT HOLDERS, THEIR
++    THIRD PARTY LICENSORS, THE UNITED STATES, THE UNITED STATES DEPARTMENT
++    OF ENERGY, OR THEIR EMPLOYEES: BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
++    CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND OR NATURE,
++    INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA, FOR ANY
++    REASON WHATSOEVER, WHETHER SUCH LIABILITY IS ASSERTED ON THE BASIS OF
++    CONTRACT, TORT (INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR
++    OTHERWISE, EVEN IF ANY OF SAID PARTIES HAS BEEN WARNED OF THE
++    POSSIBILITY OF SUCH LOSS OR DAMAGES.
+diff --git a/src/msi/Makefile b/src/msi/Makefile
+new file mode 100644
+index 0000000..5222d87
+--- /dev/null
++++ b/src/msi/Makefile
+@@ -0,0 +1,22 @@
++#*************************************************************************
++# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
++# National Laboratory.
++# Copyright (c) 2002 The Regents of the University of California, as
++# Operator of Los Alamos National Laboratory.
++# This file is distributed subject to a Software License Agreement found
++# in the file LICENSE that is included with this distribution. 
++#*************************************************************************
++#
++# Makefile,v 1.6 2007/05/18 16:16:49 jba Exp
++#
++TOP = ../..
++
++include $(TOP)/configure/CONFIG
++
++PROD_HOST = msi
++HTMLS = msi.html
++
++msi_SRCS = msi.c
++PROD_LIBS += Com
++
++include $(TOP)/configure/RULES
+diff --git a/src/msi/README.1st b/src/msi/README.1st
+new file mode 100644
+index 0000000..60ebbdd
+--- /dev/null
++++ b/src/msi/README.1st
+@@ -0,0 +1,2 @@
++The extension distribution file should be unziped and untared
++in the extensions/src directory.
+diff --git a/src/msi/msi.c b/src/msi/msi.c
+new file mode 100644
+index 0000000..3d9460c
+--- /dev/null
++++ b/src/msi/msi.c
+@@ -0,0 +1,795 @@
++/*************************************************************************\
++* Copyright (c) 2002 The University of Chicago, as Operator of Argonne
++* National Laboratory.
++* Copyright (c) 2002 The Regents of the University of California, as
++* Operator of Los Alamos National Laboratory.
++* This file is distributed subject to a Software License Agreement found
++* in the file LICENSE that is included with this distribution. 
++\*************************************************************************/
++/*msi - macro sunstitutions and include */
++ 
++/*
++ * Modification Log:
++ * -----------------
++ * .01  08DEC97       mrk     Original version
++ */
++
++#include <stdlib.h>
++#include <stddef.h>
++#include <stdio.h>
++#include <string.h>
++#include <ctype.h>
++#include <errno.h>
++
++#include <epicsVersion.h>
++#include <dbDefs.h>
++#include <macLib.h>
++#include <ellLib.h>
++#include <errlog.h>
++
++#define MAX_BUFFER_SIZE 4096
++
++#if ((EPICS_VERSION <= 3) && (EPICS_REVISION <= 13))
++#define macEnvExpand(x) strdup(x)
++#endif
++
++/*Forward references to local routines*/
++static void usageExit(void);
++static void addMacroReplacements(MAC_HANDLE *macPvt,char *pval);
++static void makeSubstitutions(void *inputPvt,void *macPvt,char *templateName);
++
++/*Routines that read the template files */
++static void inputConstruct(void **inputPvt);
++static void inputDestruct(void *inputPvt);
++static void inputAddPath(void *inputPvt, char *pval);
++static void inputBegin(void *inputPvt,char *fileName);
++static char *inputNextLine(void *inputPvt);
++static void inputNewIncludeFile(void *inputPvt,char *name);
++static void inputErrPrint(void *inputPvt);
++
++/*Routines that read the substitution file */
++static void substituteDestruct(void *substitutePvt);
++static void substituteOpen(void **substitutePvt,char *substitutionName);
++static int substituteGetNextSet(void *substitutePvt,char **filename);
++static char *substituteGetReplacements(void *substitutePvt);
++
++/*Exit status*/
++static int exitStatus = 0;
++
++int opt_V = 0;
++
++
++int main(int argc,char **argv)
++{
++    void *inputPvt;
++    MAC_HANDLE *macPvt;
++    char *pval;
++    int  narg;
++    char *substitutionName=0;
++    char *templateName=0;
++    int  i;
++
++    inputConstruct(&inputPvt);
++    macCreateHandle(&macPvt,0);
++    macSuppressWarning(macPvt,1);
++    while((argc>1) && (argv[1][0] == '-')) {
++	narg = (strlen(argv[1])==2) ? 2 : 1;
++	pval = (narg==1) ? (argv[1]+2) : argv[2];
++	if(strncmp(argv[1],"-I",2)==0) {
++	    inputAddPath(inputPvt,pval);
++	} else if(strncmp(argv[1],"-o",2)==0) {
++	    if(freopen(pval,"w",stdout)==NULL) {
++            fprintf(stderr,"Can't open %s for writing: %s\n", pval, strerror(errno));
++            exit(1);
++        }
++	} else if(strncmp(argv[1],"-M",2)==0) {
++	    addMacroReplacements(macPvt,pval);
++	} else if(strncmp(argv[1],"-S",2)==0) {
++	    substitutionName = calloc(strlen(pval)+1,sizeof(char));
++	    strcpy(substitutionName,pval);
++	} else if(strncmp(argv[1],"-V",2)==0) {
++	    macSuppressWarning(macPvt,0);
++	    opt_V = 1;
++	    narg = 1; /* no argument for this option */
++	} else {
++	    usageExit();
++	}
++	argc -= narg;
++	for(i=1; i<argc; i++) argv[i] = argv[i + narg];
++    }
++    if(argc>2) {
++	fprintf(stderr,"too many filename arguments\n");
++	usageExit();
++    }
++    if(argc==2) {
++        templateName = calloc(strlen(argv[1])+1,sizeof(char));
++        strcpy(templateName,argv[1]);
++    }
++    if(!substitutionName) {
++	makeSubstitutions(inputPvt,macPvt,templateName);
++    } else {
++	void *substitutePvt;
++        char *filename = 0;
++
++	substituteOpen(&substitutePvt,substitutionName);
++        while(substituteGetNextSet(substitutePvt,&filename)) {
++            if(templateName) filename = templateName;
++            if(!filename) {
++	        fprintf(stderr,"no template file\n");
++	        usageExit();
++            }
++            macPushScope(macPvt);
++	    while((pval = substituteGetReplacements(substitutePvt))){
++	        addMacroReplacements(macPvt,pval);
++	        makeSubstitutions(inputPvt,macPvt,filename);
++	    }
++            macPopScope(macPvt);
++        }
++        substituteDestruct(substitutePvt);
++    }
++    errlogFlush();
++    inputDestruct(inputPvt);
++    free((void *)templateName);
++    free((void *)substitutionName);
++    return(exitStatus);
++}
++
++void usageExit(void)
++{
++    fprintf(stderr,"usage: msi -V -opath -Ipath ... -Msub ... -Ssubfile  template\n");
++    fprintf(stderr,"    Specifying path will replace the default '.'\n");
++    fprintf(stderr,"    stdin is used if template is not given\n");
++    exit(1);
++}
++
++static void addMacroReplacements(MAC_HANDLE *macPvt,char *pval)
++{
++    char **pairs;
++    long status;
++
++    status = macParseDefns(macPvt,pval,&pairs);
++    if(!status) {
++        fprintf(stderr,"Error macParseDefns error\n");
++        usageExit();
++    }
++    status = macInstallMacros(macPvt,pairs);
++    if(!status) {
++        fprintf(stderr,"Error macInstallMacros error\n");
++        usageExit();
++    }
++    free((void *)pairs);
++}
++
++typedef enum {cmdInclude,cmdSubstitute} cmdType;
++static const char *cmdNames[] = {"include","substitute"};
++static void makeSubstitutions(void *inputPvt,void *macPvt,char *templateName)
++{
++    char *input;
++    static char buffer[MAX_BUFFER_SIZE];
++    int  n;
++    static int unexpWarned = 0;
++
++    inputBegin(inputPvt,templateName);
++    while((input = inputNextLine(inputPvt))) {
++	int	expand=1;
++	char	*p;
++	char	*command = 0;
++
++	p = input; 
++	/*skip whitespace at beginning of line*/
++	while(*p && (isspace(*p))) ++p;
++	/*Look for i or s */
++	if(*p && (*p=='i' || *p=='s')) command = p;
++	if(command) {
++	    char *pstart;
++	    char *pend;
++	    char *copy;
++	    int  cmdind=-1;
++	    int  i;
++	    
++	    for(i=0; i< NELEMENTS(cmdNames); i++) {
++		if(strstr(command,cmdNames[i])) {
++		    cmdind = i;
++		}
++	    }
++	    if(cmdind<0) goto endif;
++	    p = command + strlen(cmdNames[cmdind]);
++	    /*skip whitespace after command*/
++	    while(*p && (isspace(*p))) ++p;
++	    /*Next character must be quote*/
++	    if((*p==0) || (*p!='"')) goto endif;
++	    pstart = ++p;
++	    /*Look for end quote*/
++	    while(*p && (*p!='"')) {
++		/*allow escape for imbeded quote*/
++		if((*p=='\\') && *(p+1)=='"') {
++		    p += 2; continue;
++		} else {
++		    if(*p=='"') break;
++		}
++		++p;
++	    }
++	    pend = p;
++	    if(*p==0) goto endif;
++            /*skip quote and any trailing blanks*/
++            while(*++p==' ') ;
++            if(*p != '\n' && *p !=0) goto endif;
++	    copy = calloc(pend-pstart+1,sizeof(char));
++	    strncpy(copy,pstart,pend-pstart);
++	    switch(cmdind) {
++	    case cmdInclude:
++	        inputNewIncludeFile(inputPvt,copy);
++		break;
++	    case cmdSubstitute:
++		addMacroReplacements(macPvt,copy);
++		break;
++	    default:
++		fprintf(stderr,"Logic Error: makeSubstitutions\n");
++	        inputErrPrint(inputPvt);
++		exit(1);
++	    }
++	    free(copy);
++	    expand = 0;
++	}
++endif:
++	if (expand) {
++	    n = macExpandString(macPvt,input,buffer,MAX_BUFFER_SIZE-1);
++	    fputs(buffer,stdout);
++	    if ( !unexpWarned && n<0 && opt_V ) {
++	    	const char * pErrMsg = "Error: Undefined macros present\n";
++		exitStatus = 2;
++		fprintf( stderr, pErrMsg );
++		unexpWarned++;
++	    }
++	}
++    }
++}
++
++typedef struct inputFile{
++    ELLNODE	node;
++    char	*filename;
++    FILE	*fp;
++    int		lineNum;
++}inputFile;
++
++typedef struct pathNode {
++    ELLNODE	node;
++    char	*directory;
++} pathNode;
++
++typedef struct inputData {
++    ELLLIST 	inputFileList;
++    ELLLIST 	pathList;
++    char	inputBuffer[MAX_BUFFER_SIZE];
++}inputData;
++
++static void inputOpenFile(inputData *pinputData,char *filename);
++static void inputCloseFile(inputData *pinputData);
++static void inputCloseAllFiles(inputData *pinputData);
++
++static void inputConstruct(void **ppvt)
++{
++    inputData	*pinputData;
++
++    pinputData = calloc(1,sizeof(inputData));
++    ellInit(&pinputData->inputFileList);
++    ellInit(&pinputData->pathList);
++    *ppvt = pinputData;
++}
++
++static void inputDestruct(void *pvt)
++{
++    inputData	*pinputData = (inputData *)pvt;
++    pathNode	*ppathNode;
++
++    inputCloseAllFiles(pinputData);
++    while((ppathNode = (pathNode *)ellFirst(&pinputData->pathList))) {
++	ellDelete(&pinputData->pathList,&ppathNode->node);
++	free((void *)ppathNode->directory);
++	free((void *)ppathNode);
++    }
++    free(pvt);
++}
++
++static void inputAddPath(void *pvt, char *path)
++{
++    inputData	*pinputData = (inputData *)pvt;
++    ELLLIST	*ppathList = &pinputData->pathList;
++    pathNode	*ppathNode;
++    const char	*pcolon;
++    const char	*pdir;
++    int		len;
++    int		emptyName;
++
++    pdir = path;
++    /*an empty name at beginning, middle, or end means current directory*/
++    while(pdir && *pdir) {
++	emptyName = ((*pdir == ':') ? 1 : 0);
++	if(emptyName) ++pdir;
++	ppathNode = (pathNode *)calloc(1,sizeof(pathNode));
++	ellAdd(ppathList,&ppathNode->node);
++	if(!emptyName) {
++	    pcolon = strchr(pdir,':');
++	    len = (pcolon ? (pcolon - pdir) : strlen(pdir));
++	    if(len>0)  {
++	        ppathNode->directory = (char *)calloc(len+1,sizeof(char));
++	        strncpy(ppathNode->directory,pdir,len);
++		pdir = pcolon;
++		/*unless at end skip past first colon*/
++		if(pdir && *(pdir+1)!=0) ++pdir;
++	    } else { /*must have been trailing : */
++		emptyName=1;
++	    }
++	}
++	if(emptyName) {
++	    ppathNode->directory = (char *)calloc(2,sizeof(char));
++	    strcpy(ppathNode->directory,".");
++	}
++    }
++    return;
++}
++
++static void inputBegin(void *pvt,char *fileName)
++{
++    inputData	*pinputData = (inputData *)pvt;
++
++    inputCloseAllFiles(pinputData);
++    inputOpenFile(pinputData,fileName);
++}
++
++static char *inputNextLine(void *pvt)
++{
++    inputData	*pinputData = (inputData *)pvt;
++    inputFile	*pinputFile;
++    char	*pline;
++
++    while((pinputFile = (inputFile *)ellFirst(&pinputData->inputFileList))) {
++        pline = fgets(pinputData->inputBuffer,MAX_BUFFER_SIZE,pinputFile->fp);
++	if(pline) {
++	    ++pinputFile->lineNum;
++	    return(pline);
++	}
++	inputCloseFile(pinputData);
++    }
++    return(0);
++}
++
++static void inputNewIncludeFile(void *pvt,char *name)
++{
++    inputData	*pinputData = (inputData *)pvt;
++
++    inputOpenFile(pinputData,name);
++}
++
++static void inputErrPrint(void *pvt)
++{
++    inputData	*pinputData = (inputData *)pvt;
++    inputFile	*pinputFile;
++
++    fprintf(stderr,"input: %s  which is ",pinputData->inputBuffer);
++    pinputFile = (inputFile *)ellFirst(&pinputData->inputFileList);
++    while(pinputFile) {
++	fprintf(stderr,"line %d of ",pinputFile->lineNum);
++	if(pinputFile->filename) {
++	    fprintf(stderr," file %s\n",pinputFile->filename);
++	} else {
++	    fprintf(stderr,"stdin:\n");
++	}
++	pinputFile = (inputFile *)ellNext(&pinputFile->node);
++	if(pinputFile) {
++	    fprintf(stderr,"  which is included from ");
++	} else {
++	    fprintf(stderr,"\n");
++	}
++    }
++    fprintf(stderr,"\n");
++}
++
++static void inputOpenFile(inputData *pinputData,char *filename)
++{
++    ELLLIST	*ppathList = &pinputData->pathList;
++    pathNode	*ppathNode = 0;
++    inputFile	*pinputFile;
++    char	*fullname = 0;
++    FILE	*fp = 0;
++
++    if(!filename) {
++	fp = stdin;
++    } else if((ellCount(ppathList)==0) || strchr(filename,'/')){
++	fp = fopen(filename,"r");
++    } else {
++        ppathNode = (pathNode *)ellFirst(ppathList);
++        while(ppathNode) {
++	    fullname = calloc(strlen(filename)+strlen(ppathNode->directory) +2,
++		sizeof(char));
++	    strcpy(fullname,ppathNode->directory);
++	    strcat(fullname,"/");
++	    strcat(fullname,filename);
++	    fp = fopen(fullname,"r");
++	    if(fp) break;
++	    free((void *)fullname);
++	    ppathNode = (pathNode *)ellNext(&ppathNode->node);
++	}
++    }
++    if(!fp) {
++	fprintf(stderr,"Could not open %s\n",filename);
++        inputErrPrint((void *)pinputData);
++        exit(1);
++    }
++    pinputFile = calloc(1,sizeof(inputFile));
++    if(ppathNode) {
++	pinputFile->filename = calloc(1,strlen(fullname)+1);
++	strcpy(pinputFile->filename,fullname);
++	free((void *)fullname);
++    } else if(filename) {
++        pinputFile->filename = calloc(1,strlen(filename)+1);
++        strcpy(pinputFile->filename,filename);
++    } else {
++	pinputFile->filename = calloc(1,strlen("stdin")+1);
++	strcpy(pinputFile->filename,"stdin");
++    }
++    pinputFile->fp = fp;
++    ellInsert(&pinputData->inputFileList,0,&pinputFile->node);
++}
++
++static void inputCloseFile(inputData *pinputData)
++{
++    inputFile *pinputFile;
++
++    pinputFile = (inputFile *)ellFirst(&pinputData->inputFileList);
++    if(!pinputFile) return;
++    ellDelete(&pinputData->inputFileList,&pinputFile->node);
++    if(fclose(pinputFile->fp)) 
++	fprintf(stderr,"fclose failed: file %s\n",pinputFile->filename);
++    free(pinputFile->filename);
++    free(pinputFile);
++}
++
++static void inputCloseAllFiles(inputData *pinputData)
++{
++    inputFile	*pinputFile;
++
++    while((pinputFile=(inputFile *)ellFirst(&pinputData->inputFileList))){
++	inputCloseFile(pinputData);
++    }
++}
++
++/*start of code that handles substitution file*/
++typedef enum {
++    tokenLBrace,tokenRBrace,tokenSeparater,tokenString,tokenEOF
++}tokenType;
++
++typedef struct subFile {
++    char	*substitutionName;
++    FILE	*fp;
++    int		lineNum;
++    char	inputBuffer[MAX_BUFFER_SIZE];
++    char	*pnextChar;
++    tokenType	token;
++    char	string[MAX_BUFFER_SIZE];
++} subFile;
++
++typedef struct patternNode {
++    ELLNODE	node;
++    char	*var;
++}patternNode;
++
++typedef struct subInfo {
++    subFile	*psubFile;
++    int		isFile;
++    char	*filename;
++    int		isPattern;
++    ELLLIST	patternList;
++    size_t	size;
++    size_t	curLength;
++    char	*macroReplacements;
++}subInfo;
++
++static char *subGetNextLine(subFile *psubFile);
++static tokenType subGetNextToken(subFile *psubFile);
++static void subFileErrPrint(subFile *psubFile,char * message);
++static void freeSubFile(subInfo *psubInfo);
++static void freePattern(subInfo *psubInfo);
++static void catMacroReplacements(subInfo *psubInfo,const char *value);
++
++void freeSubFile(subInfo *psubInfo)
++{
++    subFile	*psubFile = psubInfo->psubFile;
++    if(psubFile->fp) {
++        if(fclose(psubFile->fp))
++            fprintf(stderr,"fclose failed on substitution file\n");
++    }
++    free((void *)psubFile);
++    free((void *)psubInfo->filename);
++    psubInfo->psubFile = 0;
++}
++
++void freePattern(subInfo *psubInfo)
++{
++    patternNode	*ppatternNode;
++    while((ppatternNode = (patternNode *)ellFirst(&psubInfo->patternList))) {
++	ellDelete(&psubInfo->patternList,&ppatternNode->node);
++	free(ppatternNode->var);
++	free(ppatternNode);
++    }
++    psubInfo->isPattern = 0;
++}
++
++static void substituteDestruct(void *pvt)
++{
++    subInfo	*psubInfo = (subInfo *)pvt;
++
++    freeSubFile(psubInfo);
++    freePattern(psubInfo);
++    free((void *)psubInfo);
++    return;
++}
++
++static void substituteOpen(void **ppvt,char *substitutionName)
++{
++    subInfo	*psubInfo;
++    subFile	*psubFile;
++    FILE	*fp;
++
++    psubInfo = calloc(1,sizeof(subInfo));
++    *ppvt = (void *)psubInfo;
++    psubFile = calloc(1,sizeof(subFile));
++    psubInfo->psubFile = psubFile;
++    ellInit(&psubInfo->patternList);
++    fp = fopen(substitutionName,"r");
++    if(!fp) {
++	fprintf(stderr,"Could not open %s\n",substitutionName);
++        exit(1);
++    }
++    psubFile->substitutionName = substitutionName;
++    psubFile->fp = fp;
++    psubFile->lineNum = 0;
++    psubFile->inputBuffer[0] = 0;
++    psubFile->pnextChar = &psubFile->inputBuffer[0];
++    subGetNextToken(psubFile);
++    return;
++}
++
++static int substituteGetNextSet(void *pvt,char **filename)
++{
++    subInfo	*psubInfo = (subInfo *)pvt;
++    subFile	*psubFile = psubInfo->psubFile;
++    patternNode	*ppatternNode;
++
++    *filename = 0;
++    while(psubFile->token==tokenSeparater) subGetNextToken(psubFile);
++    if(psubFile->token==tokenEOF) return(0);
++    if(psubFile->token==tokenString && strcmp(psubFile->string,"file")==0) {
++        psubInfo->isFile = 1;
++        if(subGetNextToken(psubFile)!=tokenString) {
++            subFileErrPrint(psubFile,"Expecting filename");
++            exit(1);
++        }
++        freePattern(psubInfo);
++        free((void *)psubInfo->filename);
++        if(psubFile->string[0]=='"'&&psubFile->string[strlen(psubFile->string)-1]=='"') {
++            psubFile->string[strlen(psubFile->string)-1]='\0';
++            psubInfo->filename = macEnvExpand(psubFile->string+1);
++        }
++        else {
++            psubInfo->filename = macEnvExpand(psubFile->string);
++        }
++        while(subGetNextToken(psubFile)==tokenSeparater);
++        if(psubFile->token!=tokenLBrace) {
++            subFileErrPrint(psubFile,"Expecting {");
++            exit(1);
++        }
++        subGetNextToken(psubFile);
++    }
++    *filename = psubInfo->filename;
++    while(psubFile->token==tokenSeparater) subGetNextToken(psubFile);
++    if(psubFile->token==tokenLBrace) return(1);
++    if(psubFile->token==tokenRBrace) return(0);
++    if(psubFile->token!=tokenString
++    || strcmp(psubFile->string,"pattern")!=0) {
++        subFileErrPrint(psubFile,"Expecting pattern");
++        exit(1);
++    }
++    freePattern(psubInfo);
++    psubInfo->isPattern = 1;
++    while(subGetNextToken(psubFile)==tokenSeparater);
++    if(psubFile->token!=tokenLBrace) {
++	subFileErrPrint(psubFile,"Expecting {");
++	exit(1);
++    }
++    while(1) {
++        while(subGetNextToken(psubFile)==tokenSeparater);
++	if(psubFile->token!=tokenString) break;
++	ppatternNode = calloc(1,sizeof(patternNode));
++	ellAdd(&psubInfo->patternList,&ppatternNode->node);
++	ppatternNode->var = calloc(strlen(psubFile->string)+1,sizeof(char));
++	strcpy(ppatternNode->var,psubFile->string);
++    }
++    if(psubFile->token!=tokenRBrace) {
++	subFileErrPrint(psubFile,"Expecting }");
++	exit(1);
++    }
++    subGetNextToken(psubFile);
++    return(1);
++}
++
++static char *substituteGetReplacements(void *pvt)
++{
++    subInfo	*psubInfo = (subInfo *)pvt;
++    subFile	*psubFile = psubInfo->psubFile;
++    patternNode *ppatternNode;
++
++    if(psubInfo->macroReplacements) psubInfo->macroReplacements[0] = 0;
++    psubInfo->curLength = 0;
++    while(psubFile->token==tokenSeparater) subGetNextToken(psubFile);
++    if(psubFile->token==tokenRBrace && psubInfo->isFile) {
++        psubInfo->isFile = 0;
++        free((void *)psubInfo->filename);
++        psubInfo->filename = 0;
++        freePattern(psubInfo);
++        subGetNextToken(psubFile);
++        return(0);
++    }
++    if(psubFile->token==tokenEOF) return(0);
++    if(psubFile->token!=tokenLBrace) return(0);
++    if(psubInfo->isPattern) {
++	int gotFirstPattern = 0;
++
++        while(subGetNextToken(psubFile)==tokenSeparater);
++	ppatternNode = (patternNode *)ellFirst(&psubInfo->patternList);
++	while(1) {
++            if(psubFile->token==tokenRBrace) {
++                if(ppatternNode) 
++                    subFileErrPrint(psubFile,"less values than patterns");
++                subGetNextToken(psubFile);
++                return(psubInfo->macroReplacements);
++            }
++            if(psubFile->token!=tokenString) {
++                subFileErrPrint(psubFile,"Illegal token");
++                exit(-1);
++            }
++	    if(gotFirstPattern) catMacroReplacements(psubInfo,",");
++	    gotFirstPattern = 1;
++            if(ppatternNode) {
++	        catMacroReplacements(psubInfo,ppatternNode->var);
++	        catMacroReplacements(psubInfo,"=");
++	        catMacroReplacements(psubInfo,psubFile->string);
++                ppatternNode = (patternNode *)ellNext(&ppatternNode->node);
++            } else {
++                subFileErrPrint(psubFile,"more values than patterns");
++            }
++            while(subGetNextToken(psubFile)==tokenSeparater);
++	}
++    } else while(1) {
++        switch(subGetNextToken(psubFile)) {
++	    case tokenRBrace:
++                subGetNextToken(psubFile);
++                return(psubInfo->macroReplacements);
++	    case tokenSeparater:
++		catMacroReplacements(psubInfo,",");
++		break;
++	    case tokenString:
++		catMacroReplacements(psubInfo,psubFile->string);
++		break;
++	    default:
++		subFileErrPrint(psubFile,"Illegal token");
++		exit(1);
++	}
++    }
++}
++
++static char *subGetNextLine(subFile *psubFile)
++{
++    char *pline;
++
++    pline = fgets(psubFile->inputBuffer,MAX_BUFFER_SIZE,psubFile->fp);
++    ++psubFile->lineNum;
++    while(pline && psubFile->inputBuffer[0]=='#') {
++	pline = fgets(psubFile->inputBuffer,MAX_BUFFER_SIZE,psubFile->fp);
++        ++psubFile->lineNum;
++    }
++    if(!pline) {
++	psubFile->token = tokenEOF;
++	psubFile->inputBuffer[0] = 0;
++	psubFile->pnextChar = 0;
++	return(0);
++    }
++    psubFile->pnextChar = &psubFile->inputBuffer[0];
++    return(&psubFile->inputBuffer[0]);
++}
++
++static void subFileErrPrint(subFile *psubFile,char * message)
++{
++    fprintf(stderr,"substitution file %s line %d: %s",
++	psubFile->substitutionName,
++	psubFile->lineNum,psubFile->inputBuffer);
++    fprintf(stderr,"%s\n",message);
++}
++
++
++static tokenType subGetNextToken(subFile *psubFile)
++{
++    char	*p;
++    char	*pto;
++
++    p = psubFile->pnextChar;
++    if(!p) { psubFile->token = tokenEOF; return(tokenEOF);}
++    if(*p==0 || *p=='\n' || *p=='#') {
++	p = subGetNextLine(psubFile);
++	if(!p) { psubFile->token = tokenEOF; return(tokenEOF);}
++        else { psubFile->token = tokenSeparater; return(tokenSeparater);}
++    }
++    while(isspace(*p)) p++;
++    if(*p=='{') {
++	psubFile->token = tokenLBrace;
++	psubFile->pnextChar = ++p;
++	return(tokenLBrace);
++    }
++    if(*p=='}') {
++	psubFile->token = tokenRBrace;
++	psubFile->pnextChar = ++p;
++	return(tokenRBrace);
++    }
++    if(*p==0 || isspace(*p) || *p==',') {
++	while(isspace(*p) || *p==',') p++;
++	psubFile->token = tokenSeparater;
++	psubFile->pnextChar = p;
++	return(tokenSeparater);
++    }
++    /*now handle quoted strings*/
++    if(*p=='"') {
++	pto = &psubFile->string[0];
++	*pto++ = *p++;
++	while(*p!='"') {
++	    if(*p==0 || *p=='\n') {
++		subFileErrPrint(psubFile,"Strings must be on single line\n");
++		exit(1);
++	    }
++	    /*allow  escape for imbeded quote*/
++	    if((*p=='\\') && *(p+1)=='"') {
++		*pto++ = *p++;
++		*pto++ = *p++;
++		continue;
++	    }
++	    *pto++ = *p++;
++	}
++	*pto++ = *p++;
++	psubFile->pnextChar = p;
++	*pto = 0;
++	psubFile->token = tokenString;
++	return(tokenString);
++    }
++    /*Now take anything up to next non String token and not space*/
++    pto = &psubFile->string[0];
++    while(!isspace(*p) && (strspn(p,"\",{}")==0)) *pto++ = *p++; 
++    *pto = 0;
++    psubFile->pnextChar = p;
++    psubFile->token = tokenString;
++    return(tokenString);
++}
++
++static void catMacroReplacements(subInfo *psubInfo,const char *value)
++{
++    size_t	len = strlen(value);
++
++    if(psubInfo->size <= (psubInfo->curLength + len)) {
++        size_t newsize = psubInfo->size + MAX_BUFFER_SIZE;
++        char *newbuf;
++
++        if(newsize <= psubInfo->curLength + len)
++            newsize = psubInfo->curLength + len + 1;
++        newbuf = calloc(1,newsize);
++        if(!newbuf) {
++            fprintf(stderr,"calloc failed for size %Zu\n",newsize);
++            exit(1);
++        }
++        if(psubInfo->macroReplacements) {
++            memcpy(newbuf,psubInfo->macroReplacements,psubInfo->curLength);
++            free(psubInfo->macroReplacements);
++        }
++        psubInfo->size = newsize;
++        psubInfo->macroReplacements = newbuf;
++    }
++    strcat(psubInfo->macroReplacements,value);
++    psubInfo->curLength += len;
++}
+diff --git a/src/msi/msi.html b/src/msi/msi.html
+new file mode 100644
+index 0000000..73498df
+--- /dev/null
++++ b/src/msi/msi.html
+@@ -0,0 +1,433 @@
++<!DOCTYPE html public "-//w3c//dtd html 4.0 transitional//en">
++<html>
++<head>
++  <title></title>
++  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
++</head>
++
++<body>
++
++<h1>msi: Macro Substitution and Include Tool</h1>
++
++<blockquote>
++<p>Version 1.6, 9th January, 2013</p>
++</blockquote>
++
++<h2>Introduction</h2>
++
++<p>msi is a general purpose macro substitution/include tool. It accepts as input
++an ascii template file. It looks for lines containing two reserved command
++names: <tt>include</tt> and <tt>substitute</tt>. It also looks for and performs
++substitutions on macros of the form $(var) and ${var}. It uses the macLib
++routines from EPICS Base to perform the substitutions, so it also accepts the
++default value and value definition syntax that macLib implements.</p>
++
++<p>msi also allows substitutions to be specified via a separate substitution
++file. This substitution file allows the same format as the substitution files
++accepted by the EPICS IOC's dbLoadTemplate command.</p>
++
++<h2>Command Syntax:</h2>
++
++<pre>msi -V -o<i>outfile</i> -I<i>dir</i> -M<i>subs</i> -S<i>subfile</i> <i>template</i></pre>
++
++<p>All parameters are optional. The -o, -I, -M, and -S switches may be
++separated from their associated value string by spaces if desired. Output will
++be written to stdout unless the -o option is given.</p>
++
++<p>Switches have the following meanings:</p>
++
++<dl>
++  <dt><tt>-V</tt></dt>
++    <dd>If this parameter is specified then any undefined macro discovered in
++    the template file which does not have an associated default value is
++    considered an error. An error message is generated and when msi terminates
++    it will do so with an exit status of 2.</dd>
++
++  <dt><tt>-o</tt> <i>file</i></dt>
++    <dd>Output will be written to the specifed file rather than to the standard
++    output.</dd>
++
++  <dt><tt>-I</tt> <i>dir</i></dt>
++    <dd>This parameter, which may be repeated, specifies a search path for
++    include commands. For example:
++
++    <blockquote>
++    <pre>msi -I /home/mrk/examples:. -I.. template</pre>
++    </blockquote>
++
++    specifies that all named files should be searched for in the following
++    locations in the order given:
++
++    <ol>
++      <li><tt>/home/mrk/examples</tt></li>
++      <li><tt>.</tt> (the current directory)</li>
++      <li><tt>..</tt> (the parent of the current directory)</li>
++    </ol>
++  </dd>
++
++  <dt><tt>-M</tt> <i>substitutions</i></dt>
++    <dd>This parameter specifies macro values for the template instance.
++    Multiple macro values can be specified in one substitution parameter, or in
++    multiple <tt>-M</tt> parameters. For example:
++
++    <blockquote>
++    <pre>msi -M "a=aval,b=bval" -Mc=cval template</pre>
++    </blockquote>
++
++    specifies that in the template file each occurrence of:
++
++    <dl>
++      <dd><tt>$(a)</tt> or <tt>${a}</tt> is replaced by <tt>aval</tt></dd>
++      <dd><tt>$(b)</tt> or <tt>${b}</tt> is replaced by <tt>bval</tt></dd>
++      <dd><tt>$(c)</tt> or <tt>${c}</tt> is replaced by <tt>cval</tt></dd>
++    </dl>
++  </dd>
++
++  <dt><tt>-S</tt> <i>subfile</i></dt>
++    <dd>The substitution file. See below for format.</dd>
++
++  <dt><i>template</i></dt>
++    <dd> The input file. If no file is specified then input is taken from
++    stdin, i.e. msi can be used as a filter. See below for a description of
++    commands that can be embedded in the template file.</dd>
++</dl>
++
++<p>It is not possible to display usage by just typing <tt>msi</tt> since
++executing the command with no arguments is a valid command. To show usage
++specify an illegal switch, e.g.</p>
++
++<blockquote>
++<pre>msi -help</pre>
++</blockquote>
++
++<h2>Exit Status</h2>
++
++<dl>
++  <dt>0<dd>Success.
++  <dt>1<dd>Can't open/create file, or other I/O error.
++  <dt>2<dd>Undefined macros encountered with the <tt>-V</tt> option specified.
++</dl>
++
++<h2>Template File Format</h2>
++
++<p>This file contains the text to be read and written to the output after macro
++substitution is performed. If no file is given then input is read from stdin.
++Variable instances to be substituted by macro values are expressed in the
++template using the syntax <tt>$(</tt><i>name</i><tt>)</tt> or
++<tt>${</tt><i>name</i><tt>}</tt>. If msi has been built with EPICS Base version
++3.14.7 or later, the template can also provide default values to be used when a
++macro has not been given a value, using the syntax
++<tt>$(</tt><i>name</i><tt>=</tt><i>default</i><tt>)</tt> or
++<tt>${</tt><i>name</i><tt>=</tt><i>default</i><tt>}</tt>.</p>
++
++<p>For example, using the command</p>
++
++<blockquote>
++<pre>msi -M name=Marty template</pre>
++</blockquote>
++
++<p>where the file template contains</p>
++
++<blockquote>
++<pre>My name is $(name)
++My age is $(age=none of your business)</pre>
++</blockquote>
++
++<p>results in this output:</p>
++
++<blockquote>
++<pre>My name is Marty
++My age is none of your business</pre>
++</blockquote>
++
++<p>Macro variables and their default values can be expressed in terms of other
++macros if necessary, to almost any level of complexity. Recursive definitions
++will generate warning messages on stderr and result in undefined output.</p>
++
++<p>The template file is read and processed one line at a time, where the
++maximum length of a line before and/or after macro expansion is 1023 characters
++&mdash; longer input or output lines will cause msi to fail. Within the context
++of a single line, macro expansion does not occur when the variable instance
++appears inside a single-quoted string, or where the dollar sign <tt>$</tt> is
++preceded by a back-slash character <tt>\</tt>, but as with the standard Unix
++shells, variables inside double quoted strings are expanded properly.</p>
++
++<p>However neither back-slash characters nor quotes of either variety are
++removed when generating the output file, so depending on what is being output
++the single quote behaviour may not be useful and may even be a hinderance. It
++cannot be disabled in the current version of msi.</p>
++
++<h3>Template file commands</h3>
++
++<p>In addition to the regular text and variable instances described above, the
++template file may also contain commands which allow the insertion of other
++template files and the ability to set macro values inside the template file
++itself. These commands are:</p>
++
++<blockquote>
++<pre>include "file"
++substitute "var=value,var=value,..."</pre>
++</blockquote>
++
++<p>Lines containing commands must be in one of these forms:</p>
++
++<ul>
++  <li><tt>include "</tt><i>filename</i><tt>"</tt></li>
++  <li><tt>substitute "</tt><i>name1=value1, name2=value2, ...</i><tt>"</tt></li>
++</ul>
++
++<p>White space is allowed before and after the command verb, and after the
++quoted string. If embedded quotes are needed, the backslash character
++<tt>\</tt> can be used as an escape character. For example</p>
++
++<blockquote>
++<pre>substitute "a=\"val\""</pre>
++</blockquote>
++
++<p>specifies that (unless <tt>a</tt> is subsequently redefined) wherever a
++<tt>$(a)</tt> macro appears in the template below this point, the text
++<tt>"val"</tt> (including the double quote characters) will appear in the
++output instead.</p>
++
++<p>If a line does match either syntax above it is just passed to macLib for
++processing without any notification. Thus the input line:</p>
++
++<blockquote>
++<pre>include "myfile" #include file</pre>
++</blockquote>
++
++<p>would just be passed to macLib, i.e. it would <em>not</em> be considered an
++include command.</p>
++
++<p>As an example of these commands, let the Unix command be:</p>
++
++<blockquote>
++<pre>msi template</pre>
++</blockquote>
++
++<p>and file includeFile contain:</p>
++
++<blockquote>
++<pre>first name is ${first}
++family name is ${family}</pre>
++</blockquote>
++
++<p>and template is</p>
++
++<blockquote>
++<pre>substitute "first=Marty,family=Kraimer"
++include "includeFile"
++substitute "first=Irma,family=Kraimer"
++include "includeFile"</pre>
++</blockquote>
++
++<p>then the following is written to the output.</p>
++
++<blockquote>
++<pre>first name is Marty
++family name is Kraimer
++first name is Irma
++family name is Kraimer</pre>
++</blockquote>
++
++<p>Note that on an IOC when using the <tt>dbLoadTemplate</tt> command, the
++template file does not support the <tt>substitute</tt> command, although
++<tt>include</tt> is supported.</p>
++
++<h2>Substitution File Format</h2>
++
++<p>The optional substitution file has three formats: regular, pattern, and
++dbTemplate format. We will discuss each separately.</p>
++
++<h3>Regular format</h3>
++
++<blockquote>
++<pre>{var1=set1_val1, var2=set1_val2, ...}
++{var2=set2_val2, var1=set2_val1, ...}
++{var1=set3_val1, var2=set3_val2, ...}
++{var2=set4_val2, var1=set4_val1, ...}</pre>
++</blockquote>
++
++<p>The template file is output with macro substitutions performed once for each
++set of braces containing macro replacement values.</p> 
++
++<h3>Pattern format</h3>
++
++<blockquote>
++<pre>pattern {var1, var2, ...}
++{set1_val1, set1_val2, ...}
++{set2_val1, set2_val2, ...}
++pattern {var2, var1, ...}
++{set3_val2, set3_val1, ...}
++{set4_val2, set4_val2, ...}</pre>
++</blockquote>
++
++<p>This produces the same result as the regular format example above.</p>
++
++<h3>dbTemplate Format</h3>
++
++<p>This format is an extension of the format accepted by the EPICS IOC command
++<tt>dbLoadTemplate</tt>, and allows templates to be expanded on the host rather
++by using dbLoadTemplate at IOC boot time.</p>
++
++<blockquote>
++<pre>file template {
++    <i>pattern format or regular format</i>
++}
++file "${WHERE}/template2" {
++    <i>pattern format or regular format</i>
++}</pre>
++</blockquote>
++
++<p>For the dbTemplate format, the template filename does not have to be given
++on the command line, and is usually specified in the substitutions file
++instead. If a template filename is given on the command line it will override
++the filenames listed in the substitutions files.</p>
++
++<h3>Syntax for all formats</h3>
++
++<p>A comment line may appear anywhere in a substitution file, and will be
++ignored. A comment line is any line beginning with the character <tt>#</tt>,
++which must be the very first character on the line.</p>
++
++<p>For definitions within braces given in any of the file formats, a separator
++must be given between items. A separator is either a comma, or one or more of
++the standard white space characters (space, formfeed, newline, carriage return,
++tab or vertical tab).</p>
++
++<p>Each item within braces can be an alphanumeric token, or a double-quoted
++string. A back-slash character <tt>\</tt> can be used to escape a quote
++character needed inside a quoted string. These three sets of substitutions are
++all equivalent:</p>
++
++<blockquote>
++<pre>{a=aa b=bb c="\"cc\""}
++{b="bb",a=aa,c="\"cc\""}
++{
++    c="\"cc\""
++    b=bb
++    a="aa"
++}</pre>
++</blockquote>
++
++<p>Within a substitutions file, the file name may appear inside double
++quotation marks; these are only required if the name contains environment
++variable macros of the form ${ENV_VAR} or $(ENV_VAR), which will be expanded
++before the file is opened. Environment variable macro expansion is only
++available when msi has been built using EPICS base R3.14.3 or newer.</p>
++
++<h3>Regular substitution example</h3>
++
++<p>Let the command be:</p>
++
++<blockquote>
++<pre>msi -S substitute template</pre>
++</blockquote>
++
++<p>The file <tt>template</tt> contains</p>
++
++<blockquote>
++<pre>first name is ${first}
++family name is ${family}</pre>
++</blockquote>
++
++<p> and the file <tt>substitute</tt> is</p>
++
++<blockquote>
++<pre>{first=Marty,family=Kraimer}
++{first=Irma,family=Kraimer}</pre>
++</blockquote>
++
++<p>The following is the output produced:</p>
++
++<blockquote>
++<pre>first name is Marty
++family name is Kraimer
++first name is Irma
++family name is Kraimer</pre>
++</blockquote>
++
++<h3>Pattern substitution example</h3>
++
++<p>Let the command be:</p>
++
++<blockquote>
++<pre>msi -S pattern template</pre>
++</blockquote>
++
++<p>The file <tt>pattern</tt> contains</p>
++
++<blockquote>
++<pre>pattern {first,last}
++{Marty,Kraimer}
++{Irma,Kraimer}</pre>
++</blockquote>
++
++<p>and <tt>template</tt> is the same as the previous example:</p>
++
++<blockquote>
++<pre>first name is ${first}
++family name is ${family}</pre>
++</blockquote>
++
++<p>This is the output:</p>
++
++<blockquote>
++<pre>first name is Marty
++family name is Kraimer
++first name is Irma
++family name is Kraimer</pre>
++</blockquote>
++
++<h3>dbTemplate example</h3>
++Let the command be
++
++<blockquote>
++<pre>msi -S xxx.substitutions</pre>
++</blockquote>
++
++<tt>xxx.substitutions</tt> is
++
++<blockquote>
++<pre>file template {
++pattern {first,last}
++{Marty,Kraimer}
++{Irma,Kraimer}
++pattern {last,first}
++{Smith,Bill}
++{Smith,Mary}
++}
++file template {
++{first=Marty,last=Kraimer}
++{first=Irma,last=Kraimer}
++}</pre>
++</blockquote>
++<tt>template</tt> is the same as in the previous example..
++
++<p>The following is written to the output</p>
++
++<blockquote>
++<pre>first name is Marty
++family name is Kraimer
++first name is Irma
++family name is Kraimer
++first name is Bill
++last name is Smith
++first name is Mary
++last name is Smith
++first name is Marty
++family name is Kraimer
++first name is Irma
++family name is Kraimer</pre>
++</blockquote>
++
++<h2>Building msi</h2>
++
++<p>msi is built as a normal extensions product, and can be built with any
++version of EPICS Base from 3.13.0beta11 onwards. Base version 3.14.3 or later
++is required if the ability to expand environment variables in filenames is
++needed. Base version 3.14.7 or later is required to allow the use of default
++macro values in template files.</p>
++
++</body>
++</html>
+diff --git a/src/msi/pattern b/src/msi/pattern
+new file mode 100644
+index 0000000..e847f7d
+--- /dev/null
++++ b/src/msi/pattern
+@@ -0,0 +1,9 @@
++#test of a pattern
++   pattern {a,b}
++{xxx,"yyy"}
++   {zzz   ,   ttt}
++
++{
++    vvv
++    zzz
++}
+diff --git a/src/msi/substitute b/src/msi/substitute
+new file mode 100644
+index 0000000..22c98bb
+--- /dev/null
++++ b/src/msi/substitute
+@@ -0,0 +1,5 @@
++{a=111,b="222"}
++{ 	a 	= 	aaa   ,   b=bbb}
++{a=	aaa
++b=	bbb
++}
+diff --git a/src/msi/template b/src/msi/template
+new file mode 100644
+index 0000000..38ced3c
+--- /dev/null
++++ b/src/msi/template
+@@ -0,0 +1,4 @@
++# comment line
++$(a)
++this is a test $(b)
++$(d)
+diff --git a/src/msi/testfile b/src/msi/testfile
+new file mode 100644
+index 0000000..8456483
+--- /dev/null
++++ b/src/msi/testfile
+@@ -0,0 +1,13 @@
++This is a test file
++This is second line
++include "testfile1"
++a=${a}
++b=$(b)
++substitute "a=aaa,b=bbb"
++a=${a}
++b=$(b)
++substitute "a=\"aa\""
++${a}
++$(a)
++This is last line
++%report
+diff --git a/src/msi/testfile1 b/src/msi/testfile1
+new file mode 100644
+index 0000000..3a61424
+--- /dev/null
++++ b/src/msi/testfile1
+@@ -0,0 +1,4 @@
++This is testfile1
++in testfile1 $(a)=a
++in testfile1 $(b)=b
++end of testfile1
