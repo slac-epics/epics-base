@@ -12,21 +12,6 @@
 #
 
 TOP = .
-
-### SLAC PCDS
-# If EPICS_BASE is not set, use TOP
-ifndef EPICS_BASE
-EPICS_BASE=$(TOP)
-export EPICS_BASE
-endif
-
-# If EPICS_HOST_ARCH is not set, derive it
-ifndef EPICS_HOST_ARCH
-EPICS_HOST_ARCH=$(shell $(TOP)/startup/EpicsHostArch.pl)
-export EPICS_HOST_ARCH
-endif
-### END SLAC PCDS
-
 include $(TOP)/configure/CONFIG
 
 # Bootstrap resolution: tools not installed yet

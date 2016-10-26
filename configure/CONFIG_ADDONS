@@ -26,7 +26,6 @@
 #    USR_CFLAGS    C flags
 #    USR_CXXFLAGS  C++ flags
 #    USR_CPPFLAGS  c preprocesser flags
-#    INC           include-files to install
 #    SRCS          source files for building libraries and prods
 #    USR_SRCS      source files for building libraries and prods
 #    PROD_SRCS     source files for building prods
@@ -373,17 +372,6 @@ USR_LIBS += $(subst -nil-,,$(USR_LIBS_$(OS_CLASS)))
 else
 ifdef USR_LIBS_DEFAULT
 USR_LIBS += $(USR_LIBS_DEFAULT)
-endif
-endif
-
-#
-#	concat specific include files
-#
-ifneq ($(strip $(INC_$(OS_CLASS))),)
-INC += $(subst -nil-,,$(INC_$(OS_CLASS)))
-else
-ifdef INC_DEFAULT
-INC+=$(INC_DEFAULT)
 endif
 endif
 
