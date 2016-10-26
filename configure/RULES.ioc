@@ -9,17 +9,21 @@
 #RULES.ioc
 
 include $(CONFIG)/RULES_DIRS
+
+## PCDS moves the buildInstall, envPaths and other targets from
+## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
+## be configured w/ or w/o RULES_DIRS
 include $(CONFIG)/RULES.ioc-targets
 
-## PCDS additions to install archive and autosave files
-## These rules are needed to build autosave and archive files
+## PCDS rules for building archive and autosave files in ioc directories.
+## These rules are needed to install autosave and archive files
 ## from IOC directories whose Makefile's end like this:
 ## include $(CONFIG)/RULES.ioc
 ## -include $(CONFIG)/RULES.archive
 ## -include $(CONFIG)/RULES.autosave
 ##
-## However, this style of Makefile works better as it builds
-## and checks dependencies
+## However, the following style of Makefile works better as it creates
+## O.Common and other O.* directories as needed for proper dependency checking
 ## include $(CONFIG)/RULES
 ## include $(CONFIG)/RULES.ioc-targets
 ## 
