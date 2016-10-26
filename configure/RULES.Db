@@ -318,11 +318,14 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 # Note:
 # MSI expansion command was
 #	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
-# This is wrong for our msi usage as all our substitution
-# files specify their template(s), and specifying one on
-# the command line overrides the ones specified in the
-# substitutions file.
-#
+# This is wrong for msi when both foo.template and foo.substitutions
+# are used as in many of the PCDS IOc's.
+# Specifying foo.template in the command line as above
+# overrides the templates specified in the substitutions file.
+# 
+# PCDS changes it to
+#   $(MSI) $(DBFLAGS) -S$< > $*.tmp
+# to allow both foo.template and foo.subsitutions to coexist.
 $(COMMON_DIR)/%.db$(RAW): %.substitutions
 	@$(RM) $(notdir $@)$(DEP)
 	$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
@@ -349,7 +352,7 @@ $(COMMON_DIR)/%.db$(RAW): %.template
 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
-	$(MSI) $(DBFLAGS) -S$< > $*.tmp
+	$(MSI) $(DBFLAGS) $< > $*.tmp
 	$(MV) $*.tmp $@
 
 $(COMMON_DIR)/%.acf: %.acs
