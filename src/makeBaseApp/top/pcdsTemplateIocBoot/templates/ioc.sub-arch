@@ -1,0 +1,21 @@
+#
+# unixCam IOC archive substitutions file
+#
+
+# Generate generic portion of unixCam archive request 
+file archive_unixCam.archive
+{
+	{
+		IOC		=	$$IOC_PV,
+		EVR		=	$$EVRNAME0
+	}
+}
+
+# Generate one set per camera
+file archive_edt_unix.archive
+{
+$$LOOP(CAMERA)
+	{	CAM     =    $$NAME }
+$$ENDLOOP(CAMERA)
+}
+

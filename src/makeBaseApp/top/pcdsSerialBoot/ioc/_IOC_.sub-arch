@@ -1,0 +1,15 @@
+# _APPNAME_ IOC instance archive file
+
+# Generate archive PV list for IOC
+file _APPNAME_-ioc.archive
+{
+	{ IOC = "_IOCPVROOT_" }
+}
+
+
+# Generate archive PV list for each serial device
+file exampleDevice.tpl-arch
+{
+	{ P = "TST:EXP:XXX:01" }
+#	{ P = "TST:EXP:XXX:02" }
+}

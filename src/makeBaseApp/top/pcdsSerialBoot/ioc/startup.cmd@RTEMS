@@ -1,0 +1,15 @@
+# Run the setup script
+# TODO: Change tst as needed for your hutch
+< /home/All/pre_rtems_tst.cmd
+
+# For development
+chdir( "/home3/my_user_id/devel/ioc/tst/_APPNAME_/current/iocBoot/_IOC_" )
+
+# For release
+#chdir( "/iocs/tst/_APPNAME_/R0.1.0/iocBoot/_IOC_" )
+
+# Run the start script
+< st.cmd
+
+< /home/All/post_rtems.cmd
+
