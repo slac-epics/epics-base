@@ -47,45 +47,44 @@ sub ReplaceLineHook { return $_[0]; }
 # Returning an empty string means don't copy this file.
 sub ReplaceFilename { # (filename)
     my($file) = $_[0];
-    $file =~ s|.*/CVS/?.*||;    # Ignore CVS files and Replace.pl scripts
+    $file =~ s|.*/CVS/?.*||;	# Ignore CVS files and Replace.pl scripts
     $file =~ s|.*/$apptypename/Replace\.pl$||;
     
     if($opt_i) {
 	# Handle name@arch stuff, copy only the closest matching file
 	# NB: Won't work with directories, don't use '@' in a directory name!
 	my($base,$filearch) = split /@/, $file;
-	if ($base ne $file) {           # This file is arch-specific
+	if ($base ne $file) {		# This file is arch-specific
 	    my($os,$cpu,$toolset) = split /-/, $arch, 3;
-	    if (-r "$base\@$arch") {        # A version exists for this arch
+	    if (-r "$base\@$arch") {	# A version exists for this arch
 		$base = '' unless ($filearch eq $arch && -s $file);
-	    } elsif (-r "$base\@$os") {     # A version exists for this os
+	    } elsif (-r "$base\@$os") {	# A version exists for this os
 		$base = '' unless ($filearch eq $os && -s $file);
 	    } elsif (  $ENV{EPICS_HOST_ARCH} !~ "$os-$cpu" && 
-		      -r "$base\@Cross" ) { # Cross version exists
+                  -r "$base\@Cross" ) {	# Cross version exists
 		$base = '' unless ($filearch eq "Cross" && -s $file);
-	    } elsif (-r "$base\@Common") {  # Default version exists
+	    } elsif (-r "$base\@Common") {	# Default version exists
 		$base = '' unless ($filearch eq "Common" && -s $file);
-	    } else {                        # No default version
+	    } else {			# No default version
 		$base = '';
 	    }
-	    $file = $base;  # Strip the @... part from the target name
+	    $file = $base;	# Strip the @... part from the target name
 	}
-	$file =~ s|/$apptypename|/iocBoot|;     # templateBoot => iocBoot
+	$file =~ s|/$apptypename|/iocBoot|;	# templateBoot => iocBoot
     }
-
     if ($ioc) {
-        $file =~ s|/iocBoot/ioc|/iocBoot/$ioc|; # name the ioc subdirectory
-        $file =~ s|_IOC_|$ioc|;
+	$file =~ s|/iocBoot/ioc|/iocBoot/$ioc|;	# name the ioc subdirectory
+	$file =~ s|_IOC_|$ioc|;
     } else {
-        $file =~ s|.*/iocBoot/ioc/?.*||;        # Not doing IOCs here
-        $file =~ s|.*_IOC_.*||; # Ignore files with unexpanded _IOC_
+	$file =~ s|.*/iocBoot/ioc/?.*||;	# Not doing IOCs here
     }
     if ($app) {
-        $file =~ s|/$apptypename|/$appdir|;     # templateApp => namedApp
-#       $file =~ s|/$appdir/configure|/configure/$apptype|;
-        $file =~ s|/$appdir/configure|/configure|;
-        $file =~ s|/$appdir/_APPNAME_Screens|/_APPNAME_Screens|;
+	$file =~ s|/$apptypename|/$appdir|;	# templateApp => namedApp
+#	$file =~ s|/$appdir/configure|/configure/$apptype|;
+	$file =~ s|/$appdir/configure|/configure|;
+	$file =~ s|/$appdir/_APPNAME_Screens|/_APPNAME_Screens|;
     }
+
     $file =~ s|_APPNAME_|$appname|g;
     $file =~ s|_APPTYPE_|$apptype|g;
     $file =~ s|_IOCPVROOT_|$pvroot|g if ($pvroot);
@@ -167,7 +166,7 @@ if ($opt_i) {
 	# any common directories or files, such as top/archive/_IOC_.req
 	CopyTop();
     }
-    exit 0;                     # finished here for -i (no xxxApps)
+    exit 0;			# finished here for -i (no xxxApps)
 }
 
 #
@@ -192,7 +191,7 @@ foreach $app ( @names ) {
     CopyTop();
 }
 
-exit 0;                         # END OF SCRIPT
+exit 0;				# END OF SCRIPT
 
 #
 # Get commandline options and check for validity
@@ -206,8 +205,8 @@ sub get_commandline_opts { #no args
 
     # Locate epics_base
     my ($command) = UnixPath($0);
-    if ($opt_b) {               # first choice is -b base
-        $epics_base = UnixPath($opt_b);
+    if ($opt_b) {		# first choice is -b base
+	$epics_base = UnixPath($opt_b);
     } elsif ($release{"EPICS_BASE"}) { # second choice is configure/RELEASE
 	$epics_base = UnixPath($release{"EPICS_BASE"});
 	$epics_base =~s|^\$\(TOP\)/||;
@@ -216,11 +215,11 @@ sub get_commandline_opts { #no args
     }
 
     if ( !$epics_base or !-d "$epics_base" ) {
-        # Only try the command line path if neither of the above work
-        if ($command =~ m|/bin/|) { # assume script was run with full path to base
-            $epics_base = $command;
-            $epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
-        }
+	# Only try the command line path if neither of the above work
+	if ($command =~ m|/bin/|) { # assume script was run with full path to base
+	    $epics_base = $command;
+	    $epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
+	}
     }
     print "EPICS_BASE = $epics_base\n" if $opt_d; 
 
@@ -229,12 +228,12 @@ sub get_commandline_opts { #no args
     $app_epics_base =~ s|^\.\.|\$(TOP)/..|;
 
     # Locate template top directory
-    if ($opt_T) {               # first choice is -T templ-top
-        $top = UnixPath($opt_T);
+    if ($opt_T) {		# first choice is -T templ-top
+	$top = UnixPath($opt_T);
     } elsif ($release{"TEMPLATE_TOP"}) { # second choice is configure/RELEASE
-        $top = UnixPath($release{"TEMPLATE_TOP"});
-        $top =~s|^\$\(EPICS_BASE\)|$epics_base|;
-        $top =~s|^\$\(TOP\)/||;
+	$top = UnixPath($release{"TEMPLATE_TOP"});
+	$top =~s|^\$\(EPICS_BASE\)|$epics_base|;
+	$top =~s|^\$\(TOP\)/||;
     }
     $top = $ENV{EPICS_MBA_TEMPLATE_TOP} unless $top && -d $top; # third choice is env var
     $top = $epics_base . "/templates/makeBaseApp/top" unless $top && -d $top; # final
@@ -246,167 +245,116 @@ sub get_commandline_opts { #no args
 
     # Print application type list?
     if ($opt_l) {
-        &ListAppTypes;
-        exit 0;                 # finished for -l command
+	&ListAppTypes;
+	exit 0;			# finished for -l command
     }
     
     if (!@ARGV){
-        if ($opt_t) {
-            if ($opt_i) {
-                my @iocs = map {s/iocBoot\///; $_} glob 'iocBoot/ioc*';
-                if (@iocs) {
-                    print "The following IOCs already exist here:\n",
-                          map {"    $_\n"} @iocs;
-                }
-                print "Name the IOC(s) to be created.\n",
-                      "Names given will have \"ioc-\" prepended to them.\n",
-                      "IOC names? ";
-            } else {
-                print "Name the application(s) to be created.\n",
-                      "Names given will have \"App\" appended to them.\n",
-                      "Application names? ";
-            }
-            $namelist = <STDIN>;
-            chomp($namelist);
-            @names = split /[\s,]/, $namelist;
-        } else {
-            Cleanup(1);
-        } 
+	if ($opt_t) {
+	    if ($opt_i) {
+		my @iocs = map {s/iocBoot\///; $_} glob 'iocBoot/ioc*';
+		if (@iocs) {
+		    print "The following IOCs already exist here:\n",
+			  map {"    $_\n"} @iocs;
+		}
+		print "Name the IOC(s) to be created.\n",
+		      "Names given will have \"ioc-\" prepended to them.\n",
+		      "IOC names? ";
+	    } else {
+		print "Name the application(s) to be created.\n",
+		      "Names given will have \"App\" appended to them.\n",
+		      "Application names? ";
+	    }
+	    $namelist = <STDIN>;
+	    chomp($namelist);
+	    @names = split /[\s,]/, $namelist;
+	} else {
+	    Cleanup(1);
+	} 
     } else {
-        @names = @ARGV;
-    }
+	@names = @ARGV;
+    } 
 
     # ioc architecture and application name
     if ($opt_i && @names) {
 
-        # ioc architecture
-        opendir BINDIR, "$epics_base/bin" or die "Can't open $epics_base/bin: $!";
-        my @archs = grep !/^\./, readdir BINDIR;        # exclude .files
-        closedir BINDIR;
-        if ($opt_a) {
-            $arch = $opt_a;
-        } elsif (@archs == 1) {
-            $arch = $archs[0];
-            print "Using target architecture $arch (only one available)\n";
-        } else {
-            print "The following target architectures are available in base:\n";
-            foreach $arch (@archs) {
-                print "    $arch\n";
-            }
-            print "What architecture do you want to use? ";
-            $arch = <STDIN>;
-            chomp($arch);
-        }
-        grep /^$arch$/, @archs or Cleanup(1, "Target architecture $arch not available");
+	# ioc architecture
+	opendir BINDIR, "$epics_base/bin" or die "Can't open $epics_base/bin: $!";
+	my @archs = grep !/^\./, readdir BINDIR;	# exclude .files
+	closedir BINDIR;
+	if ($opt_a) {
+	    $arch = $opt_a;
+	} elsif (@archs == 1) {
+	    $arch = $archs[0];
+	    print "Using target architecture $arch (only one available)\n";
+	} else {
+	    print "The following target architectures are available in base:\n";
+	    foreach $arch (@archs) {
+		print "    $arch\n";
+	    }
+	    print "What architecture do you want to use? ";
+	    $arch = <STDIN>;
+	    chomp($arch);
+	}
+	grep /^$arch$/, @archs or Cleanup(1, "Target architecture $arch not available");
 
         # Application name
-        if ($opt_p){
-            $appnameIn = $opt_p if ($opt_p);
-        } else {
-            my @apps = glob '*App';
-            if (@apps) {
-                print "The following applications are available:\n",
-                      map {s/App$//; "    $_\n"} @apps;
-            }
-            print "What application should the IOC(s) boot?\n",
-                  "The default uses the IOC's name, even if not listed above.\n",
-                  "Application name? ";
-            $appnameIn = <STDIN>;
-            chomp($appnameIn);
-        }
+	if ($opt_p){
+	    $appnameIn = $opt_p if ($opt_p);
+	} else {
+	    my @apps = glob '*App';
+	    if (@apps) {
+		print "The following applications are available:\n",
+		      map {s/App$//; "    $_\n"} @apps;
+	    }
+	    print "What application should the IOC(s) boot?\n",
+		  "The default uses the IOC's name, even if not listed above.\n",
+		  "Application name? ";
+	    $appnameIn = <STDIN>;
+	    chomp($appnameIn);
+	}
 
-        # IOC PV Root name
-        if ( $opt_i and ! $opt_r ) {
-            print "Enter the root PV name for this IOC (Ex. TST:R12:IOC:12):\n",
-                  "Root PV name? ";
-            $opt_r = <STDIN>;
-            chomp($opt_r);
-            if ( length "$opt_r" <= 0 ) {
-                $opt_r  = undef;
-            }
-        }
+	# IOC PV Root name
+	if ( $opt_i and ! $opt_r ) {
+	    print "Enter the root PV name for this IOC (Ex. TST:R12:IOC:12):\n",
+		  "Root PV name? ";
+	    $opt_r = <STDIN>;
+	    chomp($opt_r);
+	    if ( length "$opt_r" <= 0 ) {
+		$opt_r  = undef;
+	    }
+	}
     }
 
     # Application type
     $appext = $opt_i ? "Boot" : "App";
     if ($opt_t) { # first choice is -t type
-        $apptype = $opt_t;
-        if ( -r "$top/$apptype" . "Lib" ) {
-            $appext     = "Lib";
-        }
-        $apptype =~ s/$appext$//;
+	$apptype = $opt_t; 
+	if ( -r "$top/$apptype" . "Lib" ) {
+	    $appext     = "Lib";
+	}
+	$apptype =~ s/$appext$//;
     } elsif ($ENV{EPICS_MBA_DEF_APP_TYPE}) { # second choice is environment var
-        $apptype = $ENV{EPICS_MBA_DEF_APP_TYPE};
-        $apptype =~ s/(App)|(Boot)$//;
+	$apptype = $ENV{EPICS_MBA_DEF_APP_TYPE};
+	$apptype =~ s/(App)|(Boot)$//;
     } elsif (-d "$top/default$appext") { # third choice is default
-        $apptype = "default";
+	$apptype = "default";
     } elsif (-d "$top/example$appext") { # fourth choice is example
-        $apptype = "example";
+	$apptype = "example";
     }
     $apptype or Cleanup(1, "No application type set");
     $apptypename = $apptype . $appext;
     (-r "$top/$apptypename") or
-        Cleanup(1, "Can't access template directory '$top/$apptypename'.\n");
+	Cleanup(1, "Can't access template directory '$top/$apptypename'.\n");
     $pvroot = $opt_r ? $opt_r : undef;
 
     print "\nCommand line / environment options validated:\n"
-        . " Templ-Top: $top\n"
-        . "Templ-Type: $apptype\n"
-        . "Templ-Name: $apptypename\n"
-        . "     opt_i: $opt_i\n"
-        . "      arch: $arch\n"
-        . "EPICS-Base: $epics_base\n\n" if $opt_d;
-}
-
-#
-# Parse a configure/RELEASE file.
-#
-# NB: This subroutine also appears in base/configure/tools/convertRelease.pl
-# If you make changes here, they will be needed there as well.
-#
-sub readRelease {
-    my ($file, $Rmacros, $Rapps) = @_;
-    # $Rmacros is a reference to a hash, $Rapps a ref to an array
-    my ($pre, $var, $post, $macro, $path);
-    local *IN;
-    open(IN, $file) or die "Can't open $file: $!\n";
-    while (<IN>) {
-        chomp;
-        s/\r$//;                # Shouldn't need this, but sometimes...
-        s/\s*#.*$//;            # Remove trailing comments
-        next if /^\s*$/;        # Skip blank lines
-        
-        # Expand all already-defined macros in the line:
-        while (($pre,$var,$post) = /(.*)\$\((\w+)\)(.*)/) {
-            last unless (exists $Rmacros->{$var});
-            $_ = $pre . $Rmacros->{$var} . $post;
-        }
-        
-        # Handle "<macro> = <path>"
-        ($macro, $path) = /^\s*(\w+)\s*=\s*(.*)/;
-        if ($macro ne "") {
-            $Rmacros->{$macro} = $path;
-            push @$Rapps, $macro;
-            next;
-        }
-        # Handle "include <path>" syntax
-        ($path) = /^\s*include\s+(.*)/;
-        &readRelease($path, $Rmacros, $Rapps) if (-r $path);
-    }
-    close IN;
-}
-
-sub expandRelease {
-    my ($Rmacros, $Rapps) = @_;
-    # $Rmacros is a reference to a hash, $Rapps a ref to an array
-    
-    # Expand any (possibly nested) macros that were defined after use
-    while (($macro, $path) = each %$Rmacros) {
-        while (($pre,$var,$post) = $path =~ /(.*)\$\((\w+)\)(.*)/) {
-            $path = $pre . $Rmacros->{$var} . $post;
-            $Rmacros->{$macro} = $path;
-        }
-    }
+	. " Templ-Top: $top\n"
+	. "Templ-Type: $apptype\n"
+	. "Templ-Name: $apptypename\n"
+	. "     opt_i: $opt_i\n"
+	. "      arch: $arch\n"
+	. "EPICS-Base: $epics_base\n\n" if $opt_d;
 }
 
 #
@@ -421,18 +369,18 @@ sub ListAppTypes { # no args
     my @mods = grep /.*Lib$/, @allfiles;
     print "Valid application types are:\n";
     foreach $name (sort @apps) {
-        $name =~ s|App||;
-        printf "\t$name\n" if ($name && -r "$top/$name" . "App");
+	$name =~ s|App||;
+	printf "\t$name\n" if ($name && -r "$top/$name" . "App");
     }
     print "Valid iocBoot types are:\n";
     foreach $name (sort @boots) {
-        $name =~ s|Boot||;
-        printf "\t$name\n" if ($name && -r "$top/$name" . "Boot");;
+	$name =~ s|Boot||;
+	printf "\t$name\n" if ($name && -r "$top/$name" . "Boot");;
     }
     print "Valid module types are:\n";
     foreach $name (sort @mods) {
-        $name =~ s|Lib||;
-        printf "\t$name\n" if ($name && -r "$top/$name" . "Lib");
+	$name =~ s|Lib||;
+	printf "\t$name\n" if ($name && -r "$top/$name" . "Lib");
     }
 }
 
@@ -446,7 +394,7 @@ sub CopyFile { # (source)
 
     if ($target and !-e $target) {
 	open(INP, "<$source") and open(OUT, ">$target")
-		or die "$! Copying $source -> $target";
+	    or die "$! Copying $source -> $target";
 
 	print "Copying file $source -> $target\n" if $opt_d;
 	while (<INP>) {
@@ -459,14 +407,14 @@ sub CopyFile { # (source)
 	}
     }
 }
-
+	
 #
 # Find() callback for file or structure copy
 #
 sub FCopyTree {
-    chdir $app_top;             # Sigh
-    if (    -d "$File::Find::name"
-	  and  ($dir = &ReplaceFilename($File::Find::name))) {
+    chdir $app_top;		# Sigh
+    if (-d "$File::Find::name"
+	and ($dir = &ReplaceFilename($File::Find::name))) {
 	print "Creating directory $dir\n" if $opt_d and !(-d "$dir");
 	&mkpath($dir) unless (-d "$dir");
     } else {
@@ -482,9 +430,9 @@ sub Cleanup { # (return-code [ messsage-line1, line 2, ... ])
     my ($rtncode, @message) = @_;
 
     if (@message) {
-        print join("\n", @message), "\n";
+	print join("\n", @message), "\n";
     } else {
-        &Usage;
+	&Usage;
     }
     exit $rtncode;
 }
@@ -544,37 +492,11 @@ sub GetUser {
     $user = $opt_u || $ENV{USER} || $ENV{USERNAME} || Win32::LoginName();
 
     unless ($user) {
-        print "Strange, I cannot figure out your user name!\n";
-        print "What should you be called ? ";
-        $user = <STDIN>;
-        chomp $user;
+	print "Strange, I cannot figure out your user name!\n";
+	print "What should you be called ? ";
+	$user = <STDIN>;
+	chomp $user;
     }
     $user =~ tr/-a-zA-Z0-9_:;[]<>//cd;  # Sanitize; these are the legal chars
     die "No user name" unless $user;
-}
-
-# Path rewriting rules for various OSs
-# These functions are duplicated in configure/convertRelease.pl
-sub UnixPath {
-    my ($newpath) = @_;
-    if ($^O eq 'cygwin') {
-        $newpath =~ s{\\}{/}go;
-        $newpath =~ s{^([a-zA-Z]):/}{/cygdrive/$1/};
-    } elsif ($^O eq 'MSWin32') {
-        $newpath =~ s{\\}{/}go;
-    } elsif ($^O eq 'sunos') {
-        $newpath =~ s{^/tmp_mnt/}{/};
-    }
-    return $newpath;
-}
-
-sub LocalPath {
-    my ($newpath) = @_;
-    if ($^O eq "cygwin") {
-        $newpath =~ s{^/cygdrive/([a-zA-Z])/}{$1:/};
-    } elsif ($^O eq "darwin") {
-        # These rules are likely to be site-specific
-        $newpath =~ s{^/private/var/auto\.home/}{/home/};    # APS
-    }
-    return $newpath;
 }
