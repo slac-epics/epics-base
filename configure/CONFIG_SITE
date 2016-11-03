@@ -12,13 +12,6 @@
 #  CONFIG_SITE  - Global site configuration file
 #
 
-# Include common directory macros for SLAC
-ifndef CONFIG_SITE_TOP
-CONFIG_SITE_TOP=/reg/g/pcds/config
-#CONFIG_SITE_TOP=/afs/slac/g/pcds/config
-endif
--include $(CONFIG_SITE_TOP)/common_dirs.mak
-
 #  The host architecture performing the build, in the form
 #       <operating system>-<architecture>[-<toolset>]
 #
@@ -32,6 +25,7 @@ endif
 #	darwin-x86             (Intel based Apple running OSX)
 #	freebsd-x86            (GNU compiler used for host builds)
 #	freebsd-x86_64         (GNU compiler used for host builds)
+#	linux-arm              (GNU compiler used for host builds)
 #	linux-ppc              (GNU compiler used for host builds)
 #	linux-ppc64            (GNU compiler used for host builds)
 #	linux-x86              (GNU compiler used for host builds)
@@ -48,10 +42,13 @@ endif
 #	win32-x86              (MS Visual C++ compiler used for host builds)
 #	win32-x86-cygwin       (WIN32 API with cygwin GNU compiler used for host builds)
 #	win32-x86-mingw        (MinGW compiler used for host builds)
+#	win32-x86-static       (MS Visual C++ compiler used for host builds)
 #	windows-x64            (MS Visual C++ compiler used for host builds)
 #	windows-x64-mingw      (MinGW compiler used for host builds)
+#	windows-x64-static     (MS Visual C++ compiler used for host builds)
 
-#  Debugging builds 
+#  Debugging builds:
+#	linux-arm-debug        (GNU compiler used for host builds)
 #	linux-x86-debug        (GNU compiler with -g option for host builds)
 #	linux-x86_64-debug     (GNU compiler with -g option for host builds)
 #	solaris-sparc-debug    (sun compiler no optimization,-g for debugging info)
@@ -68,13 +65,13 @@ endif
 #
 #  Currently Supporting:
 
-#       ios-arm
-#       ios-386
+#       ios-arm                 (darwin-x86 host)
+#       ios-386                 (darwin-x86 host)
 #       linux-386               (linux-x86 host)
 #       linux-486               (linux-x86 host)
 #       linux-586               (linux-x86 host)
 #       linux-686               (linux-x86 host)
-#       linux-arm               (linux-x86 host)
+#       linux-arm               (linux-x86 or -x86_64 host)
 #       linux-arm_eb            (linux-x86 host)
 #       linux-arm_el            (linux-x86 host)
 #       linux-athlon            (linux-x86 host)
@@ -110,11 +107,12 @@ endif
 #       RTEMS-psim
 #       RTEMS-uC5282
 #       linuxRT_glibc-x86_64
+#       win32-x86-mingw         (linux-x86 or -x86_64 host)
 #
 
 # SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
 ifndef EPICS_HOST_ARCH
-EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
+EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch)
 export EPICS_HOST_ARCH
 endif
 
@@ -146,9 +144,8 @@ endif
 # PCDS build targets:
 #  host:	linux-x86    targets: RTEMS-beatnik linux-x86
 #  host:	linux-x86_64 targets: RTEMS-beatnik linux-x86 linux-x86_64
-#  host:	rhel6-x86_64 targets: rhel6-x86_64
+#  host:	rhel6-x86_64 targets: RTEMS-beatnik rhel6-x86_64 linuxRT_glibc-x86_64
 CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
-BUILD_FOR_HOST_ARCH				=	1
 
 #  Build shared libraries?
 #        must be either YES or NO
@@ -160,12 +157,10 @@ BUILD_FOR_HOST_ARCH				=	1
 #        SHARED_LIBRARIES=NO   and  STATIC_BUILD=YES
 #
 SHARED_LIBRARIES=YES
-#SHARED_LIBRARIES=NO
 
 #  Build client objects statically ?
 #        must be either YES or NO
 #
-#STATIC_BUILD=NO
 STATIC_BUILD=YES
 
 #  Should header dependancy files be automatically generated
@@ -215,7 +210,7 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 #  Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools
-EPICS_SITE_VERSION = 0.4.0
+EPICS_SITE_VERSION = 2.0
 
 # For GNU compiler, use pipes rather than temporary files for communication 
 # between the various stages of compilation.
@@ -226,12 +221,4 @@ GCC_PIPE = YES
 #  way for Base executables to find their shared libraries when they are
 #  run at build-time, e.g. set the LD_LIBRARY_PATH environment variable.
 LINKER_USE_RPATH = YES
-
-# PCDS - Define PCRE lib and include directories if they exist
-# Not needed for base, but this allows all our streamdevice based IOC's
-# to share a common macro definition for PCRE_LIB and PCRE_INCLUDE
-ifneq ($(wildcard $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/lib),)
-PCRE_INCLUDE = $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/include
-PCRE_LIB     = $(PACKAGE_SITE_TOP)/pcre/8.37/$(T_A)/lib
-endif
 

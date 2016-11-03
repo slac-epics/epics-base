@@ -27,8 +27,8 @@ vpath %.acs           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
 DBD_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DBD) $(RELEASE_DBD_DIRS)
 DB_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DB) $(RELEASE_DB_DIRS)
 
-DBDFLAGS = $(USR_DBDFLAGS) $(addprefix -I,$(DBD_SEARCH_DIRS))
-DBFLAGS = $($*_DBFLAGS) $(USR_DBFLAGS) $(addprefix -I,$(DB_SEARCH_DIRS))
+DBDFLAGS = $(USR_DBDFLAGS) $(CMD_DBDFLAGS) $(addprefix -I,$(DBD_SEARCH_DIRS))
+DBFLAGS = $($*_DBFLAGS) $(USR_DBFLAGS) $(CMD_DBFLAGS) $(addprefix -I,$(DB_SEARCH_DIRS))
 
 #####################################################
 # To allow os specific dbd files AND have the -j option work properly,
@@ -71,8 +71,8 @@ SOURCE_DB_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_DB_aaa)  )
 SOURCE_DB_aaa = $(addsuffix /$(file), $(dir) )
 
 COMMONS = $(COMMON_DIR)/*.dbd $(COMMON_DIR)/*.db $(COMMON_DIR)/*.h \
-          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template \
-          $(COMMON_DIR)/*.sub-db        $(COMMON_DIR)/*.tpl-db
+          $(COMMON_DIR)/*.sub-db        $(COMMON_DIR)/*.tpl-db \
+          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template
 
 # Remove trailing numbers (to 99) on stem
 TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
@@ -124,6 +124,9 @@ DBDDEPENDS_CMD = -$(MKMF) -m $(notdir $@)$(DEP) $(DBDDEPENDS_FLAGS) $@ $<
 
 ifndef T_A
 
+DEP = .d
+TEMPLATE3+=$(addsuffix .template, $(TEMPLATE2))
+
 COMMON_DIR = .
 INSTALL_DBDS =
 INSTALL_DBS =
@@ -136,7 +139,7 @@ ACTIONS += build
 ACTIONS += install
 ACTIONS += buildInstall
 ACTIONS += browse
-ACTIONS += runtests
+ACTIONS += runtests tapfiles
 
 actionArchTargets = $(foreach x, $(ACTIONS),\ $(foreach arch,$(BUILD_ARCHS), $(x)$(DIVIDER)$(arch)))
 
@@ -341,7 +344,6 @@ $(COMMON_DIR)/%.db$(RAW): %.sub-db
 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
 	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
 	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $@ $*.tmp
 	$(MSI) $(DBFLAGS) -S$< > $*.tmp
