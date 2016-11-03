@@ -19,8 +19,8 @@ use POSIX;
 use Config qw( config_sh myconfig );
 #print config_sh();
 #print myconfig();
-#print "Config{'archname']=".$Config{'archname'}."\n";
-#print "Config{'archname64']=".$Config{'archname64'}."\n";
+#print "Config{'archname'}=".$Config{'archname'}."\n";
+#print "Config{'archname64'}=".$Config{'archname64'}."\n";
 
 $suffix="";
 $suffix="-".$ARGV[0] if ($ARGV[0] ne "");
@@ -30,7 +30,7 @@ print "$EpicsHostArch$suffix";
 
 sub GetEpicsHostArch { # no args
     $arch=$Config{'archname'};
-    #print "Config['archname'}=".$arch."\n";
+    #print "Config{'archname'}=".$arch."\n";
     if ($arch =~ /sun4-solaris/)        { return "solaris-sparc";
     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
     } elsif ($arch =~ m/arm-linux/)     { return "linux-arm";
