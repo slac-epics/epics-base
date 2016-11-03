@@ -24,6 +24,17 @@ case $sysname in
     Linux )
         os=linux
         cpu=`uname -m`
+        release=`uname -r`
+		case $release in
+			*el6* )
+				os=rhel6 ;;
+			*el7* )
+				os=rhel7 ;;
+			2.6.35.13-rt )
+				os=linux ;;
+			3.14.12-rt9 | 3.18.11-rt7 )
+				os=linuxRT_glibc ;;
+        esac
         case $cpu in
             i386 | i486 | i586 | i686 )
                 cpu=x86 ;;
