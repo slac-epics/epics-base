@@ -1,8 +1,13 @@
+# CONFIG_SITE.Common.RTEMS
 #
-# SLAC LCLS information for all RTEMS targets
+# $Revision-Id$
 #
+# Site-specific information for all RTEMS targets
+#-------------------------------------------------------
 
 # Where to find RTEMS
+#
+# SLAC PCDS
 #
 ifndef PACKAGE_SITE_TOP
 PACKAGE_SITE_TOP=/reg/g/pcds/package
@@ -13,13 +18,20 @@ RTEMS_SITE_TOP=$(PACKAGE_SITE_TOP)/rtems/$(RTEMS_VERSION)
 RTEMS_PATCHLVL=rtems_p1
 SSRLAPPS_PATCHLVL=ssrlApps_p4
 RTEMS_BSP=$(subst RTEMS-,,$(T_A))
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 
 # Cross-compile toolchain in $(RTEMS_TOOLS)/bin
 #
 RTEMS_TOOLS = $(RTEMS_BASE)
 
+# Link Generic System loadable objects instead of full executable.
+#
+# A GeSys object is similar to a shared library.  It can be (un)loaded
+# at runtime by the Generic System loader which is available as a
+# patch against RTEMS.
+USE_GESYS = NO
 
 # If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
 # network configuration you must uncomment and specify your Internet
