@@ -112,7 +112,7 @@
 
 # SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
 ifndef EPICS_HOST_ARCH
-EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
+EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch)
 export EPICS_HOST_ARCH
 endif
 
