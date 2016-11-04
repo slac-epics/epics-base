@@ -1,0 +1,18 @@
+# _APPNAME_ IOC instance autosave file
+
+# Generate autosave PV list for IOC specific PV's
+file _APPNAME_-ioc.req
+{
+	{ IOC = "_IOCPVROOT_" }
+}
+
+# Generate motor settings PV list for each motor
+# Note: use ims_motor_settings.template for IMS motors
+# Note: use autosave_motor_settings.template for other motors
+#file autosave_motor_settings.template
+file ims_motor_settings.template
+{
+	{ MOTOR = "TST:XXX:MMS:01" }
+#	{ MOTOR = "TST:XXX:MMS:02" }
+}
+

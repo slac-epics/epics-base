@@ -1,0 +1,10 @@
+# IOC autosave file
+## Replace _IOCPVROOT_ with the PV prefix used for
+## iocAdmin PV's on this IOC
+
+# Generate IOC autosave request 
+file _APPNAME_-ioc.req
+{
+	{ IOC = "_IOCPVROOT_", EVR = "_EVRPVROOT_" }
+}
+

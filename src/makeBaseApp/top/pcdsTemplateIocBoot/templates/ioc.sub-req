@@ -1,0 +1,63 @@
+#
+# unixCam IOC substitutions file
+#
+
+# Generate iocAdmin autosave request 
+file autosave_iocAdmin.req
+{
+	{
+		IOC		=	$$IOC_PV
+	}
+}
+
+# Generate EVR autosave request 
+file autosave_evr.req
+{
+	{
+		IOC		=	$$IOC_PV,
+		EVR		=	$$EVRNAME0
+	}
+}
+
+# Generate one set per camera
+file autosave_edt_unix.req
+{
+$$LOOP(CAMERA)
+	{	CAM     =    $$NAME }
+$$ENDLOOP(CAMERA)
+}
+
+
+file cameras.req
+{
+$$LOOP(CAMERA)
+	{	CAM     =    $$NAME }
+$$ENDLOOP(CAMERA)
+}
+
+$$LOOP(CAMERA)
+$$IF(TRIG)
+file camdelay.req
+{
+	{	CAM     =    $$NAME }
+}
+$$ENDIF(TRIG)
+$$IF(DROPLET)
+file autosave_droplet.req
+{
+	{
+		CAM		=	$$NAME,
+		N		=	$$DROPLET,
+	}
+}
+$$ENDIF(DROPLET)
+$$IF(DOPRJ)
+file autosave_doprj.req
+{
+	{
+		CAM		=	$$NAME,
+	}
+}
+$$ENDIF(DOPRJ)
+$$ENDLOOP(CAMERA)
+

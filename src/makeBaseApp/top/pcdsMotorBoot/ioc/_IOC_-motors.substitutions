@@ -1,0 +1,55 @@
+# P and M combine to make the instance's name.
+# P EPICS PV Prefix
+# M Motor number (please use leading 0, i.e. 01, 02, ...)
+# DTYP is the motor driver name for our motors.
+# C is controller; this links to the ASYN port
+#   ASYN gives digi port a name
+#   MDrivePlusConfig maps digi name to controller #.
+# ACCL is the time to accelerate from the base speed to full speed.
+# DIR is the direction of rotation, "Pos" or "Neg"
+
+# SREV (not shown) is the number of steps per revolution is 200 by default
+#
+# There are three pivot points to which the six motors are attached.
+#   Three provide vertical motion: M0Y, M1Y, and M2Y.
+#   M2Z provides horizontal motion in the Z direction (along beamline)
+#   M0X and M2X provide horiz motion in the X direction (perpendicular to beamline):
+#
+
+# 
+# For SREV:
+#    2048 = internal encoder (EQ)
+#     250 = external encoder, NUMERIK-JENA
+#     200 = external encoder, Renishaw
+#   51200 = no encoder
+
+# NOTE: Soft limits (DHLM & DLLM) may be better off using HLM & LLM and
+# relying on autosave to keep those than loading them into the database everytime.
+# If the motor is reversed in DIR, then the DHLM and HLM are reveresed
+# which makes it difficult to accurately set the soft limits.
+# (Dial) DHLM 140, DLLM 2 is equivalent to (User) HLM -2, LLM -140
+
+file pcds_motor_ims.template
+{
+    pattern
+    {  P,            M, C,  DESC,              EGU, DIR, SREV,  UREV,    SP,  SBAS, SMAX, ACCL,  RDBD, DLY, DHLM,  DLLM, UEvent, UEIP, DVER  }
+    { TST:XXX:MMS:, 01, 0,  "Manipulator 1 X",  mm, Neg,  200,   0.200,   2,   0.5,  1,    1.0,  0.01, 0,   200.0, -200.0,    1,  Yes,    2  }
+#   { TST:XXX:MMS:, 02, 1,  "Y Stepper 1 vert", mm, Pos,   79,   3.794,   1,   0.1,  1,    0.1,  0.01, 0,   47.0,  -47.0,     1,  Yes,    2  }
+}
+
+file motor-status.template
+{
+    pattern
+    { MOT,             FW_MEANS,    REV_MEANS    }
+    { "TST:XXX:MMS:01", "X+",       "X-"        }
+#   { "TST:XXX:MMS:02", "Y+",       "Y-"        }
+}
+
+file mcode.template
+{
+    pattern
+    { cont,               M,    addr   }
+    { "TST:XXX:MMS:$(M)", "01", 1      }
+#   { "TST:XXX:MMS:$(M)", "02", 1      }
+}
+

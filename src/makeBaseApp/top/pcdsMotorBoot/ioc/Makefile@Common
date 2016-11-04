@@ -1,0 +1,30 @@
+# IOC instance Makefile
+# Generates envPaths and expands the instance
+# specific substitution files.
+
+TOP = ../..
+include $(TOP)/configure/CONFIG
+ARCH = _ARCH_
+TARGETS = envPaths
+
+# Make sure these archive files are fully expanded
+USR_ARCHIVEFLAGS += -V
+
+#----------------------------------------------------
+# Create and install IOC motors db file
+#
+DB += _IOC_-motors.db
+
+#----------------------------------------------------
+# Create and install IOC archive file
+#
+ARCHIVE += _IOC_.archive
+
+#----------------------------------------------------
+# Create and install IOC autosave file
+#
+REQ += _IOC_.req
+REQ += _IOC_-positions.req
+
+include $(TOP)/configure/RULES
+include $(TOP)/configure/RULES.ioc-targets

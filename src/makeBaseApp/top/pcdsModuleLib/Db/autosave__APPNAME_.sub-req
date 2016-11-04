@@ -1,0 +1,16 @@
+#
+# _APPNAME_ autosave substitutions file
+#
+
+# Generate _APPNAME_ autosave file 
+#	Macros:
+#		TODO:	List here any macros used in the template
+#				Note which ones have defaults.
+file autosave__APPNAME_.template
+{
+	{
+		# Hack till msi supports empty substitutions
+		IOC		=	$(IOC),
+	}
+}
+
