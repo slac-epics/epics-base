@@ -3,15 +3,48 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  <title>EPICS Base R3.14.12.4 Release Notes</title>
+  <title>EPICS Base R3.14.12.5 Release Notes</title>
 </head>
 
 <body lang="en">
-<h1 align="center">EPICS Base Release 3.14.12.4</h1>
+<h1 align="center">EPICS Base Release 3.14.12.5</h1>
 
-<h2 align="center">Changes between 3.14.12.3 and 3.14.12.4</h2>
+<h2 align="center">Changes between 3.14.12.4 and 3.14.12.5</h2>
 
 <!-- Insert new items immediately below here ... -->
+
+<h3>aoRecord raw conversion overflows</h3>
+
+<p>The ao record type now checks converted raw values and limits them to the
+32-bit integer range before writing them to the RVAL field. Previously value
+overflows relied on Undefined Behaviour which could give different results on
+different platforms. The ROFF fields of the ao and ai record types are now
+DBF_ULONG to allow an ROFF setting of 0x80000000 to work properly.</p>
+
+<h3>Changes to &lt;top&gt;/cfg/* files</h3>
+
+<p>The order in which cfg/CONFIG* and cfg/RULES* files are included from support
+applications listed in the configure/RELEASE* files has been changed. Previously
+these files were included in the order in which the top areas are listed in the
+RELEASE file, but it makes more sense to load them in reverse order since later
+entries override earlier ones in Makefiles but the release file order is
+supposed to allow earlier entries to take precedence over later ones. The same
+change has been made to the inclusion of the &lt;top&gt;/configure/RULES_BUILD
+files.</p>
+
+<p>Two new file types can also be provided in a module's cfg directory. Files
+named TOP_RULES* will be included by the top-level Makefile of other modules
+that refer to this module; files name DIR_RULES* will be included by all
+Makefiles that merely descend into lower-level directories. The cfg/RULES* files
+are only included when make is building code inside the O.&lt;arch&gt;
+directories.</p>
+
+<p>The new cfg/DIR_RULES* file inclusion was designed to permit new recursive
+make actions to be implemented by appending the name of the new action to the
+ACTIONS variable. There must be a matching rule in one of the cfg/RULES* files
+when doing this. Similar rules may also be defined in the cfg/TOP_RULES* and/or
+cfg/DIR_RULES* files, but these should only state prerequisites and not directly
+provide commands to be executed.</p>
 
 <h3>MinGW Cross-builds from Linux</h3>
 
