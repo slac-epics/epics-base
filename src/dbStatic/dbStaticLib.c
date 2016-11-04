@@ -2186,7 +2186,7 @@ long epicsShareAPI dbPutString(DBENTRY *pdbentry,const char *pstring)
 	if(!pfield) return(S_dbLib_fieldNotFound);
 	if(strlen(pstring) >= (size_t)pflddes->size) return S_dbLib_strLen;
 	strncpy((char *)pfield, pstring, pflddes->size-1);
-	((char *)pfield)[pflddes->size-1] = 0;
+        ((char *)pfield)[pflddes->size-1] = 0;
 
 	if((pflddes->special == SPC_CALC) && !stringHasMacro) {
 	    char  rpcl[RPCL_LEN];
