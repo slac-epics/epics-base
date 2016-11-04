@@ -23,9 +23,6 @@
 #include <signal.h>
 #include <sched.h>
 #include <unistd.h>
-#ifdef SHOW_LINUX_PIDS
-#include <sys/syscall.h>
-#endif
 
 #define epicsExportSharedSymbols
 #include "epicsStdio.h"
@@ -83,9 +80,6 @@ typedef struct epicsThreadOSD {
     int                isFifoScheduled;
     int                isOnThreadList;
     unsigned int       osiPriority;
-#ifdef SHOW_LINUX_PIDS
-    pid_t              pid;
-#endif
     char              *name;
 } epicsThreadOSD;
 
@@ -385,9 +379,6 @@ static void once(void)
     if(errVerbose) fprintf(stderr,"task priorities are not implemented\n");
 #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
     pthreadInfo = init_threadInfo("_main_",0,epicsThreadGetStackSize(epicsThreadStackSmall),0,0);
-#ifdef SHOW_LINUX_PIDS
-    pthreadInfo->pid=syscall(SYS_gettid);
-#endif
     status = pthread_setspecific(getpthreadInfo,(void *)pthreadInfo);
     checkStatusOnceQuit(status,"pthread_setspecific","epicsThreadInit");
     status = mutexLock(&listLock);
@@ -417,9 +408,6 @@ static void * start_routine(void *arg)
     pthreadInfo->isOnThreadList = 1;
     status = pthread_mutex_unlock(&listLock);
     checkStatusQuit(status,"pthread_mutex_unlock","start_routine");
-#ifdef SHOW_LINUX_PIDS
-    pthreadInfo->pid = syscall(SYS_gettid);
-#endif
 
     (*pthreadInfo->createFunc)(pthreadInfo->createArg);
 
@@ -795,14 +783,9 @@ static void showThreadInfo(epicsThreadOSD *pthreadInfo,unsigned int level)
             status = pthread_getschedparam(pthreadInfo->tid,&policy,&param);
             if(!status) priority = param.sched_priority;
         }
-
         fprintf(epicsGetStdout(),"%16.16s %12p %12lu    %3d%8d %8.8s\n",
-             pthreadInfo->name,(void *) pthreadInfo,
-#ifdef SHOW_LINUX_PIDS
-             (unsigned long)pthreadInfo->pid,
-#else
-             (unsigned long)pthreadInfo->tid,
-#endif
+             pthreadInfo->name,(void *)
+             pthreadInfo,(unsigned long)pthreadInfo->tid,
              pthreadInfo->osiPriority,priority,
              pthreadInfo->isSuspended?"SUSPEND":"OK");
     }
