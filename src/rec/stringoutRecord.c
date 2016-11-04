@@ -138,17 +138,22 @@ static long process(stringoutRecord *prec)
 		recGblRecordError(S_dev_missingSup,(void *)prec,"write_stringout");
 		return(S_dev_missingSup);
 	}
-        if (!prec->pact
-        && (prec->dol.type != CONSTANT)
-        && (prec->omsl == menuOmslclosed_loop)) {
-		status = dbGetLink(&(prec->dol),
-			DBR_STRING,prec->val,0,0);
-		if(prec->dol.type!=CONSTANT && RTN_SUCCESS(status)) prec->udf=FALSE;
-	}
+        if ( !prec->pact ) {
+		if ( (prec->dol.type != CONSTANT)
+		&&   (prec->omsl == menuOmslclosed_loop)) {
+			status = dbGetLink(&(prec->dol), DBR_STRING,prec->val,0,0);
+			if ( RTN_SUCCESS(status) )
+				prec->udf=FALSE;
+		}
 
-        if(prec->udf == TRUE ){
-                recGblSetSevr(prec,UDF_ALARM,INVALID_ALARM);
-        }
+		if(prec->udf == TRUE ){
+			recGblSetSevr(prec,UDF_ALARM,INVALID_ALARM);
+		}
+
+		/* Update the timestamp before writing output values so it
+		* will be uptodate if any downstream records fetch it via TSEL */
+		recGblGetTimeStamp(prec);
+	}
 
         if (prec->nsev < INVALID_ALARM )
                 status=writeValue(prec); /* write the new value */
@@ -174,9 +179,13 @@ static long process(stringoutRecord *prec)
 
 	/* check if device support set pact */
 	if ( !pact && prec->pact ) return(0);
-
 	prec->pact = TRUE;
-	recGblGetTimeStamp(prec);
+
+	if ( pact ) {
+		/* Update timestamp again for asynchronous devices */
+		recGblGetTimeStamp(prec);
+	}
+
 	monitor(prec);
 	recGblFwdLink(prec);
 	prec->pact=FALSE;
