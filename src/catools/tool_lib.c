@@ -77,8 +77,8 @@ static void sprint_long (char *ret, dbr_long_t val, IntFormatT outType)
             if (skip >= 0) {
                 ret[31-i-skip] = '0' + bit;
             }
-            }
         }
+    }
     else {
         const char *fmt[4] = { /* Order must match the enum IntFormatT */
             "%ld"   /* dec */,
