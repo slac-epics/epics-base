@@ -43,23 +43,23 @@ MAIN(epicsStringTest)
     const char * const empty = "";
     const char * const space = " ";
     const char * const A     = "A";
-    const char * const ABC   = "ABC";
     const char * const ABCD  = "ABCD";
     const char * const ABCDE = "ABCDE";
     const char * const a     = "a";
     const char * const abcd  = "abcd";
     const char * const abcde = "abcde";
-    char result[20];
+    char result[8];
     char *s;
+    int status;
 
-    testPlan(285);
+    testPlan(299);
 
     testChars();
 
     testOk1(epicsStrnCaseCmp(empty, "", 0) == 0);
     testOk1(epicsStrnCaseCmp(empty, "", 1) == 0);
-    testOk1(epicsStrnCaseCmp(space, empty, 1) < 0);
-    testOk1(epicsStrnCaseCmp(empty, space, 1) > 0);
+    testOk1(epicsStrnCaseCmp(space, empty, 1) > 0);
+    testOk1(epicsStrnCaseCmp(empty, space, 1) < 0);
     testOk1(epicsStrnCaseCmp(a, A, 1) == 0);
     testOk1(epicsStrnCaseCmp(a, A, 2) == 0);
     testOk1(epicsStrnCaseCmp(abcd, ABCD, 2) == 0);
@@ -67,17 +67,17 @@ MAIN(epicsStringTest)
     testOk1(epicsStrnCaseCmp(abcd, ABCD, 1000) == 0);
     testOk1(epicsStrnCaseCmp(abcd, ABCDE, 2) == 0);
     testOk1(epicsStrnCaseCmp(abcd, ABCDE, 4) == 0);
-    testOk1(epicsStrnCaseCmp(abcd, ABCDE, 1000)> 0);
+    testOk1(epicsStrnCaseCmp(abcd, ABCDE, 1000) < 0);
     testOk1(epicsStrnCaseCmp(abcde, ABCD, 2) == 0);
     testOk1(epicsStrnCaseCmp(abcde, ABCD, 4) == 0);
-    testOk1(epicsStrnCaseCmp(abcde, ABCD, 1000) < 0);
+    testOk1(epicsStrnCaseCmp(abcde, ABCD, 1000) > 0);
 
     testOk1(epicsStrCaseCmp(empty, "") == 0);
     testOk1(epicsStrCaseCmp(a, A) == 0);
     testOk1(epicsStrCaseCmp(abcd, ABCD) == 0);
-    testOk1(epicsStrCaseCmp(abcd, ABCDE) != 0);
-    testOk1(epicsStrCaseCmp(abcde, ABCD) != 0);
-    testOk1(epicsStrCaseCmp(abcde, "ABCDF") != 0);
+    testOk1(epicsStrCaseCmp(abcd, ABCDE) < 0);
+    testOk1(epicsStrCaseCmp(abcde, ABCD) > 0);
+    testOk1(epicsStrCaseCmp(abcde, "ABCDF") < 0);
 
     s = epicsStrDup(abcd);
     testOk(strcmp(s, abcd) == 0 && s != abcd, "epicsStrDup");
@@ -87,17 +87,41 @@ MAIN(epicsStringTest)
     testOk1(epicsStrHash(abcd, 0) == epicsMemHash(abcde, 4, 0));
     testOk1(epicsStrHash(abcd, 0) != epicsMemHash("abcd\0", 5, 0));
 
-	/* Test for buffer overflow and NULL termination on epicsStrnEscapedFromRaw */
-    epicsStrnEscapedFromRaw( result, sizeof(result), ABCDE, strlen(ABCDE) );
-    epicsStrnEscapedFromRaw( result, strlen(ABCD),   ABCD,  strlen(ABCD) );
-    testOk( result[strlen(ABCDE)-1] == 'E', "epicsStrnEscapedFromRaw buffer overflow");
-    testOk( strcmp(result, ABC) == 0,		"epicsStrnEscapedFromRaw NULL termination");
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnEscapedFromRaw(result, 4, ABCD, 3);
+    testOk(status == 3, "epicsStrnEscapedFromRaw returned %d (exp. 3)", status);
+    testOk(result[4] == 'x', "epicsStrnEscapedFromRaw no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnEscapedFromRaw 0-terminated");
 
-	/* Test for buffer overflow and NULL termination on epicsStrnRawFromEscaped */
-    epicsStrnRawFromEscaped( result, sizeof(result), ABCDE, strlen(ABCDE) );
-    epicsStrnRawFromEscaped( result, strlen(ABCD),   ABCD,  strlen(ABCD) );
-    testOk( result[strlen(ABCDE)-1] == 'E', "epicsStrnRawFromEscaped buffer overflow");
-    testOk( strcmp(result, ABC) == 0,		"epicsStrnRawFromEscaped NULL termination");
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnEscapedFromRaw(result, 4, ABCD, 4);
+    testOk(status == 4, "epicsStrnEscapedFromRaw returned %d (exp. 4)", status);
+    testOk(result[4] == 'x', "epicsStrnEscapedFromRaw no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnEscapedFromRaw 0-terminated");
+
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnEscapedFromRaw(result, 4, ABCDE, 5);
+    testOk(status == 5, "epicsStrnEscapedFromRaw returned %d (exp. 5)", status);
+    testOk(result[4] == 'x', "epicsStrnEscapedFromRaw no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnEscapedFromRaw 0-terminated");
+
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnRawFromEscaped(result, 4, ABCD, 3);
+    testOk(status == 3, "epicsStrnRawFromEscaped returned %d (exp. 3)", status);
+    testOk(result[4] == 'x', "epicsStrnRawFromEscaped no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnRawFromEscaped 0-terminated");
+
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnRawFromEscaped(result, 4, ABCD, 4);
+    testOk(status == 4, "epicsStrnRawFromEscaped returned %d (exp. 4)", status);
+    testOk(result[4] == 'x', "epicsStrnRawFromEscaped no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnRawFromEscaped 0-terminated");
+
+    memset(result, 'x', sizeof(result));
+    status = epicsStrnRawFromEscaped(result, 4, ABCDE, 5);
+    testOk(status == 4, "epicsStrnRawFromEscaped returned %d (exp. 4)", status);
+    testOk(result[4] == 'x', "epicsStrnRawFromEscaped no buffer overrun");
+    testOk(result[3] == 0, "epicsStrnRawFromEscaped 0-terminated");
 
     return testDone();
 }
