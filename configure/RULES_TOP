@@ -45,11 +45,6 @@ uninstall$(DIVIDER)%:
 	$(RMDIR) $(INSTALL_LOCATION_BIN)/$(archPart)
 	$(RMDIR) $(INSTALL_LOCATION_LIB)/$(archPart)
 
-archPart = $(word 2, $(subst $(DIVIDER), ,$@))
-uninstall$(DIVIDER)%:
-	$(RMDIR) $(INSTALL_LOCATION_BIN)/$(archPart)
-	$(RMDIR) $(INSTALL_LOCATION_LIB)/$(archPart)
-
 cleandirs:
 	@$(NOP)
 ifeq ($(wildcard $(INSTALL_LOCATION_BIN)/*),)
