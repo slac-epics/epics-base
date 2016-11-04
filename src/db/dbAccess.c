@@ -583,6 +583,7 @@ long epicsShareAPI dbProcess(dbCommon *precord)
 		if (precord->stat==SCAN_ALARM) goto all_done;
 		if (precord->lcnt++ !=MAX_LOCK) goto all_done;
 		if (precord->sevr>=INVALID_ALARM) goto all_done;
+		recGblRecordError(status, precord, "Active scan count exceeded!");
 		recGblSetSevr(precord, SCAN_ALARM, INVALID_ALARM);
 		monitor_mask = recGblResetAlarms(precord);
 		monitor_mask |= DBE_VALUE|DBE_LOG;
