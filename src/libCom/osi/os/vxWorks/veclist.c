@@ -42,7 +42,7 @@
 #include "sysSymTbl.h"
 
 static const char sccsID[] = 
-	"@(#) $Revision-Id$
+	"@(#) $Revision-Id$";
 
 /*
  *
