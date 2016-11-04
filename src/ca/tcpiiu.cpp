@@ -1456,10 +1456,10 @@ void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard,
     else {
         maxBytes = MAX_TCP;
     }
-	arrayElementCount elemSize	= dbr_value_size[dataType];
-    arrayElementCount maxElem	= ( maxBytes - dbr_size[dataType] ) / elemSize;
+    arrayElementCount elemSize  = dbr_value_size[dataType];
+    arrayElementCount maxElem   = ( maxBytes - dbr_size[dataType] ) / elemSize;
     if ( nElem > maxElem ) {
-		errlogPrintf( "CA Read Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
+        errlogPrintf( "CA Read Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
         throw cacChannel::msgBodyCacheTooSmall ();
     }
     if (nElem == 0 && !CA_V413(this->minorProtocolVersion))
@@ -1570,10 +1570,10 @@ void tcpiiu::subscriptionRequest (
     }
     unsigned dataType = subscr.getType ( guard );
     // data type bounds checked when sunscription created
-	arrayElementCount elemSize	= dbr_value_size[dataType];
-    arrayElementCount maxElem	= ( maxBytes - dbr_size[dataType] ) / elemSize;
+    arrayElementCount elemSize  = dbr_value_size[dataType];
+    arrayElementCount maxElem   = ( maxBytes - dbr_size[dataType] ) / elemSize;
     if ( nElem > maxElem ) {
-		errlogPrintf( "CA Subscribe Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
+        errlogPrintf( "CA Subscribe Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
         throw cacChannel::msgBodyCacheTooSmall ();
     }
     comQueSendMsgMinder minder ( this->sendQue, guard );
@@ -1619,10 +1619,10 @@ void tcpiiu::subscriptionUpdateRequest (
     }
     unsigned dataType = subscr.getType ( guard );
     // data type bounds checked when subscription constructed
-	arrayElementCount elemSize	= dbr_value_size[dataType];
-    arrayElementCount maxElem	= ( maxBytes - dbr_size[dataType] ) / elemSize;
+    arrayElementCount elemSize  = dbr_value_size[dataType];
+    arrayElementCount maxElem   = ( maxBytes - dbr_size[dataType] ) / elemSize;
     if ( nElem > maxElem ) {
-		errlogPrintf( "CA Subscription Update Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
+        errlogPrintf( "CA Subscription Update Error: data size=%lu, max=%lu\n", nElem * elemSize, maxElem * elemSize );
         throw cacChannel::msgBodyCacheTooSmall ();
     }
     comQueSendMsgMinder minder ( this->sendQue, guard );
