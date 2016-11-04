@@ -224,6 +224,11 @@ static long process(calcoutRecord *prec)
                 prec->udf = isnan(prec->val);
             }
         }
+
+	if ( prec->tpro >= 2 )
+		printf( "%s: Process %s, val %f\n",
+			epicsThreadGetNameSelf(), prec->name, prec->val );
+
         checkAlarms(prec);
         /* check for output link execution */
         switch (prec->oopt) {

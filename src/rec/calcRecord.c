@@ -119,6 +119,11 @@ static long process(calcRecord *prec)
 	} else prec->udf = isnan(prec->val);
     }
     recGblGetTimeStamp(prec);
+    
+    if ( prec->tpro >= 2 )
+	printf( "%s: Process %s, val %f\n",
+		epicsThreadGetNameSelf(), prec->name, prec->val );
+
     /* check for alarms */
     checkAlarms(prec);
     /* check event list */

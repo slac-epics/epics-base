@@ -219,6 +219,11 @@ static long process(boRecord *prec)
 		} else prec->rval = (epicsUInt32)prec->val;
 	}
 
+	if ( prec->tpro >= 2 )
+		printf( "%s: Process %s, val %s\n",
+			epicsThreadGetNameSelf(), prec->name,
+			( prec->val ? prec->onam : prec->znam ) );
+
 	/* check for alarms */
 	checkAlarms(prec);
 
