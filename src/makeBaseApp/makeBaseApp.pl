@@ -80,10 +80,15 @@ sub ReplaceFilename { # (filename)
     }
     if ($app) {
 	$file =~ s|/$apptypename|/$appdir|;	# templateApp => namedApp
-	$file =~ s|/$appdir/configure|/configure/$apptype|;
+#	$file =~ s|/$appdir/configure|/configure/$apptype|;
+	$file =~ s|/$appdir/configure|/configure|;
+	$file =~ s|/$appdir/_APPNAME_Screens|/_APPNAME_Screens|;
     }
-    $file =~ s|_APPNAME_|$appname|;
-    $file =~ s|_APPTYPE_|$apptype|;
+
+    $file =~ s|_APPNAME_|$appname|g;
+    $file =~ s|_APPTYPE_|$apptype|g;
+    $file =~ s|_IOCPVROOT_|$pvroot|g if ($pvroot);
+
     my $qmtop = quotemeta($top);
     $file =~ s|$qmtop/||;   # Change to the target location
     $file = &ReplaceFilenameHook($file); # Call the apptype's hook
@@ -103,10 +108,28 @@ sub ReplaceLine { # (line)
     $line =~ s/_APPNAME_/$appname/g;
     $line =~ s/_CSAFEAPPNAME_/$csafeappname/g;
     $line =~ s/_APPTYPE_/$apptype/go;
+    $line =~ s/_IOCPVROOT_/$pvroot/go if ($pvroot);
     $line =~ s/_ARCH_/$arch/go if ($opt_i);
     $line = &ReplaceLineHook($line); # Call the apptype's hook
     return $line;
 }
+
+
+#
+# CopyTop
+# Copy files and dirs from <top> (other than App & Boot & Lib) if not present
+#
+# We do this after app expansion so _APPNAME_ substitution works for
+# any common directories or files, such as top/_APPNAME_Screens
+#
+sub CopyTop {
+    opendir TOPDIR, "$top" or die "Can't open $top: $!";
+    foreach $f ( grep !/^\.\.?$|^[^\/]*(App|Boot|Lib)/, readdir TOPDIR ) {
+       find({wanted => \&FCopyTree, follow => 1}, "$top/$f");
+    }
+    closedir TOPDIR;
+}
+
 
 # Source replace overrides for file copy
 if (-r "$top/$apptypename/Replace.pl") {
@@ -116,11 +139,7 @@ if (-r "$top/$apptypename/Replace.pl") {
 #
 # Copy files and dirs from <top> (other than App & Boot) if not present
 #
-opendir TOPDIR, "$top" or die "Can't open $top: $!";
-foreach $f ( grep !/^\.\.?$|^[^\/]*(App|Boot)/, readdir TOPDIR ) {
-   find({wanted => \&FCopyTree, follow => 1}, "$top/$f") unless (-e "$f");
-}
-closedir TOPDIR;
+#CopyTop();
 
 #
 # Create ioc directories
@@ -132,12 +151,20 @@ if ($opt_i) {
     foreach $ioc ( @names ) {
 	($appname = $ioc) =~ s/App$// if !$appnameIn;
 	($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
-	$ioc = "ioc" . $ioc unless ($ioc =~ m/ioc/);
-	if (-d "iocBoot/$ioc") {
-	    print "iocBoot/$ioc exists, not modified.\n";
-	    next;
-	}
+	$ioc = "ioc-" . $ioc unless ($ioc =~ m/ioc/);
+	# This test commented out because we want to go ahead
+	# and process the ioc directory to fill in missing pieces
+	#if (-d "iocBoot/$ioc") {
+	#       print "iocBoot/$ioc exists, not modified.\n";
+	#       next;
+	#}
 	find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/ioc");
+
+	#
+	# Copy files and dirs from <top> with $ioc substituted for _IOC_
+	# We do this so _IOC_ substitution works for
+	# any common directories or files, such as top/archive/_IOC_.req
+	CopyTop();
     }
     exit 0;			# finished here for -i (no xxxApps)
 }
@@ -147,14 +174,21 @@ if ($opt_i) {
 #
 foreach $app ( @names ) {
     ($appname = $app) =~ s/App$//;
-    ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
-    $appdir  = $appname . "App";
-    if (-d "$appdir") {
-	print "$appname exists, not modified.\n";
-	next;
+    $appname =~ s/Lib$//;
+    if ( $appname =~ /^-/ ) {
+        print "Invalid application name: $appname\n";
+        next;
     }
+    ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
+    $appdir  = $appname . $appext;
     print "Creating $appname from template type $apptypename\n" if $opt_d; 
     find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/");
+
+    #
+    # Copy files and dirs from <top> with $appname substituted for _APPNAME_
+    # We do this so _APPNAME_ substitution works for
+    # any common directories or files, such as top/_APPNAME_Screens
+    CopyTop();
 }
 
 exit 0;				# END OF SCRIPT
@@ -163,8 +197,9 @@ exit 0;				# END OF SCRIPT
 # Get commandline options and check for validity
 #
 sub get_commandline_opts { #no args
-    getopts("a:b:dhilp:T:t:u:") or Cleanup(1);
-    
+    # Options followed by ':' take an argument
+    getopts("a:b:dhilp:r:T:t:u:") or Cleanup(1);
+ 
     # Options help
     Cleanup(0) if $opt_h;
 
@@ -177,10 +212,17 @@ sub get_commandline_opts { #no args
 	$epics_base =~s|^\$\(TOP\)/||;
     } elsif ($ENV{EPICS_MBA_BASE}) { # third choice is env var EPICS_MBA_BASE
         $epics_base = UnixPath($ENV{EPICS_MBA_BASE});
-    } elsif ($command =~ m|/bin/|) { # assume script was run with full path to base
-	$epics_base = $command;
-	$epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
     }
+
+    if ( !$epics_base or !-d "$epics_base" ) {
+	# Only try the command line path if neither of the above work
+	if ($command =~ m|/bin/|) { # assume script was run with full path to base
+	    $epics_base = $command;
+	    $epics_base =~ s|^(.*)/bin/.*makeBaseApp.*|$1|;
+	}
+    }
+    print "EPICS_BASE = $epics_base\n" if $opt_d; 
+
     $epics_base and -d "$epics_base" or Cleanup(1, "Can't find EPICS base");
     $app_epics_base = LocalPath($epics_base);
     $app_epics_base =~ s|^\.\.|\$(TOP)/..|;
@@ -195,6 +237,7 @@ sub get_commandline_opts { #no args
     }
     $top = $ENV{EPICS_MBA_TEMPLATE_TOP} unless $top && -d $top; # third choice is env var
     $top = $epics_base . "/templates/makeBaseApp/top" unless $top && -d $top; # final
+    print "template top = $top\n" if $opt_d; 
     $top and -d "$top" or Cleanup(1, "Can't find template top directory");
     $app_template_top = LocalPath($top);
     $app_template_top =~s|^\.\.|\$(TOP)/..|;
@@ -215,7 +258,7 @@ sub get_commandline_opts { #no args
 			  map {"    $_\n"} @iocs;
 		}
 		print "Name the IOC(s) to be created.\n",
-		      "Names given will have \"ioc\" prepended to them.\n",
+		      "Names given will have \"ioc-\" prepended to them.\n",
 		      "IOC names? ";
 	    } else {
 		print "Name the application(s) to be created.\n",
@@ -270,12 +313,26 @@ sub get_commandline_opts { #no args
 	    $appnameIn = <STDIN>;
 	    chomp($appnameIn);
 	}
+
+	# IOC PV Root name
+	if ( $opt_i and ! $opt_r ) {
+	    print "Enter the root PV name for this IOC (Ex. TST:R12:IOC:12):\n",
+		  "Root PV name? ";
+	    $opt_r = <STDIN>;
+	    chomp($opt_r);
+	    if ( length "$opt_r" <= 0 ) {
+		$opt_r  = undef;
+	    }
+	}
     }
 
     # Application type
     $appext = $opt_i ? "Boot" : "App";
     if ($opt_t) { # first choice is -t type
 	$apptype = $opt_t; 
+	if ( -r "$top/$apptype" . "Lib" ) {
+	    $appext     = "Lib";
+	}
 	$apptype =~ s/$appext$//;
     } elsif ($ENV{EPICS_MBA_DEF_APP_TYPE}) { # second choice is environment var
 	$apptype = $ENV{EPICS_MBA_DEF_APP_TYPE};
@@ -289,6 +346,7 @@ sub get_commandline_opts { #no args
     $apptypename = $apptype . $appext;
     (-r "$top/$apptypename") or
 	Cleanup(1, "Can't access template directory '$top/$apptypename'.\n");
+    $pvroot = $opt_r ? $opt_r : undef;
 
     print "\nCommand line / environment options validated:\n"
 	. " Templ-Top: $top\n"
@@ -308,15 +366,21 @@ sub ListAppTypes { # no args
     closedir TYPES;
     my @apps = grep /.*App$/, @allfiles;
     my @boots = grep /.*Boot$/, @allfiles;
+    my @mods = grep /.*Lib$/, @allfiles;
     print "Valid application types are:\n";
-    foreach $name (@apps) {
+    foreach $name (sort @apps) {
 	$name =~ s|App||;
 	printf "\t$name\n" if ($name && -r "$top/$name" . "App");
     }
     print "Valid iocBoot types are:\n";
-    foreach $name (@boots) {
+    foreach $name (sort @boots) {
 	$name =~ s|Boot||;
 	printf "\t$name\n" if ($name && -r "$top/$name" . "Boot");;
+    }
+    print "Valid module types are:\n";
+    foreach $name (sort @mods) {
+	$name =~ s|Lib||;
+	printf "\t$name\n" if ($name && -r "$top/$name" . "Lib");
     }
 }
 
@@ -325,6 +389,7 @@ sub ListAppTypes { # no args
 #
 sub CopyFile { # (source)
     $source = $_[0];
+    print "CopyFile: Checking source $source\n" if $opt_d; 
     $target = &ReplaceFilename($source);
 
     if ($target and !-e $target) {
@@ -336,6 +401,10 @@ sub CopyFile { # (source)
 	    print OUT &ReplaceLine($_);
 	}
 	close INP; close OUT;
+	# Make startup cmd scripts executable
+	if ( $target =~ /.*\.cmd/ and !-x $target ) {
+	    chmod 0775, $target;
+	}
     }
 }
 	
@@ -346,7 +415,7 @@ sub FCopyTree {
     chdir $app_top;		# Sigh
     if (-d "$File::Find::name"
 	and ($dir = &ReplaceFilename($File::Find::name))) {
-	print "Creating directory $dir\n" if $opt_d;
+	print "Creating directory $dir\n" if $opt_d and !(-d "$dir");
 	&mkpath($dir) unless (-d "$dir");
     } else {
 	&CopyFile($File::Find::name);
@@ -392,6 +461,7 @@ EOF
           If configure does not exist, from environment
           If not found in environment, from makeBaseApp.pl location
  -d       Enable debug messages
+ -r root  Specifies the root name for the IOC's iocAdmin PV's, Ex AMO:R23:IOC:17
  -i       Specifies that ioc boot directories will be generated
  -l       List valid application types for this installation
           If this is specified the other options are not used
