@@ -141,8 +141,7 @@ static long process(stringoutRecord *prec)
         if ( !prec->pact ) {
 		if ( (prec->dol.type != CONSTANT)
 		&&   (prec->omsl == menuOmslclosed_loop)) {
-			status = dbGetLink(&(prec->dol),
-			    DBR_STRING,prec->val,0,0);
+			status = dbGetLink(&(prec->dol), DBR_STRING,prec->val,0,0);
 			if ( RTN_SUCCESS(status) )
 				prec->udf=FALSE;
 		}
