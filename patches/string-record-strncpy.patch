@@ -1,0 +1,26 @@
+diff --git a/src/rec/stringinRecord.c b/src/rec/stringinRecord.c
+index 02f4547..fce8c81 100644
+--- a/src/rec/stringinRecord.c
++++ b/src/rec/stringinRecord.c
+@@ -121,7 +121,7 @@ static long init_record(stringinRecord *prec, int pass)
+     if( pdset->init_record ) {
+ 	if((status=(*pdset->init_record)(prec))) return(status);
+     }
+-    strcpy(prec->oval,prec->val);
++    strncpy(prec->oval,prec->val,sizeof(prec->oval));
+     return(0);
+ }
+ 
+diff --git a/src/rec/stringoutRecord.c b/src/rec/stringoutRecord.c
+index 6e7a858..12176ab 100644
+--- a/src/rec/stringoutRecord.c
++++ b/src/rec/stringoutRecord.c
+@@ -123,7 +123,7 @@ static long init_record(stringoutRecord *prec, int pass)
+     if( pdset->init_record ) {
+ 	if((status=(*pdset->init_record)(prec))) return(status);
+     }
+-    strcpy(prec->oval,prec->val);
++    strncpy(prec->oval,prec->val,sizeof(prec->oval));
+     return(0);
+ }
+ 
