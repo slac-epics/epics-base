@@ -15,6 +15,7 @@ VALID_BUILDS = Host Ioc
 ARCH_CLASS = x86_64
 ARCH_DEP_CPPFLAGS += -D_X86_64_
 
-# Silence annoying warnigs re _BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE
+OS_CLASS = Linux
+
 OP_SYS_CPPFLAGS += -D_DEFAULT_SOURCE
 
