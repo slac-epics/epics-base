@@ -1,0 +1,114 @@
+####################################################
+# RULES for building and installing archive files
+
+# Display how this makefile was called
+$(info RULES.archive: '$(MAKECMDGOALS)')
+
+########################################################
+# NOTE: The rules for generating archive files from
+# %.substitutions files shouldn't be needed any more.
+# If you think you need them, please see Bruce Hill, bhill,
+# so we can discuss.
+
+####################################################
+# Where to find and install files for archive
+
+vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
+vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+
+INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
+
+include $(CONFIG)/CONFIG_APP_INCLUDE
+
+####################################################
+# archive Flags (-I path)
+define  ARCHIVE_DIRS_template
+  RELEASE_ARCHIVE_DIRS += $$(wildcard $$(strip $$($(1)))/archive)
+endef
+$(foreach top, $(RELEASE_TOPS), $(eval $(call ARCHIVE_DIRS_template,$(top)) ))
+ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(TOP)/archive $(RELEASE_ARCHIVE_DIRS)
+ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
+ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
+
+####################################################
+# Generate COMMON_ARCHIVES list
+COMMON_ARCHIVES  += $(filter $(COMMON_DIR)/%, $(foreach file, $(ARCHIVE), \
+	$(firstword $(SOURCE_ARCHIVE) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_ARCHIVE = $(wildcard $(file) $(SOURCE_ARCHIVE_bbb) )
+SOURCE_ARCHIVE_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ARCHIVE_aaa)  )
+SOURCE_ARCHIVE_aaa = $(addsuffix /$(file), $(dir) )
+INSTALL_ARCHIVES += $(addprefix $(INSTALL_ARCHIVE)/, $(notdir $(ARCHIVE)))
+
+####################################################
+# Generate ARCHIVE_DEPENDS_FILES list
+ARCHIVEDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_ARCHIVES)))
+
+####################################################
+# Build targets
+
+build:		$(INSTALL_ARCHIVES)
+
+install:		$(INSTALL_ARCHIVES)
+
+rebuild:        clean install
+
+buildInstall:	build
+
+realclean:: clean
+
+clean:: archive_clean
+
+archive_clean:
+	@$(RM) $(COMMONS)
+	@$(RM) $(TARGETS)
+	@echo "Cleaning"
+
+####################################################
+# Build and install Rules
+
+$(COMMON_DIR)/%.archive: %.sub-arch
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m$(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
+	$(ECHO) "Inflating archive file from $<"
+	@$(RM) $@ msi.tmp
+	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
+	$(MV) msi.tmp $@
+
+INSTALL = $(PERL) $(TOOLS)/installEpics.pl
+
+$(INSTALL_ARCHIVE)/%: $(COMMON_DIR)/%
+	@echo "Installing common archive file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(INSTALL_ARCHIVE)/%.archive:	%.archive  
+	@echo "Installing archive file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+#.PRECIOUS: $(COMMON_DIR)/%.archive
+
+#$(INSTALL_ARCHIVE)/%.substitutions: %.substitutions
+#	@echo "Installing archive substitutions file $@"
+#	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(INSTALL_ARCHIVE)/%.sub-arch: %.sub-arch
+	$(ECHO) "Installing archive substitutions file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+# This rule is obsolete
+# Please rename any archive template files <basename>.tpl-arch
+#$(INSTALL_ARCHIVE)/%.template: %.template
+#	@echo "Installing archive template file $@"
+#	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
+	@echo "Installing archive tpl-arch file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+#####################################################
+# Include archive dependency files
+ifneq (,$(strip $(ARCHIVEDEPENDS_FILES)))
+-include $(ARCHIVEDEPENDS_FILES)
+endif
+

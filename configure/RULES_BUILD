@@ -71,6 +71,10 @@ all:	install
 
 -include $(CONFIG)/RULES.Db
 
+-include $(CONFIG)/RULES.autosave
+
+-include $(CONFIG)/RULES.archive
+
 -include $(CONFIG)/RULES_JAVA
 
 ifneq (,$(strip $(HDEPENDS_FILES)))
