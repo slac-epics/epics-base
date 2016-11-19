@@ -93,6 +93,7 @@ excas_DEPEND_DIRS = cas as registry
 DIRS += cap5
 cap5_DEPEND_DIRS = ca dbStatic
 
+DIRS += msi
 
 include $(TOP)/configure/RULES_DIRS
 
