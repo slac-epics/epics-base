@@ -14,7 +14,7 @@ index 839c942..fe6796e 100644
  INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
  
 diff --git a/configure/RULES.Db b/configure/RULES.Db
-index 11e4d40..e898efc 100644
+index 11e4d40..fdc886c 100644
 --- a/configure/RULES.Db
 +++ b/configure/RULES.Db
 @@ -10,17 +10,20 @@
@@ -65,24 +65,7 @@ index 11e4d40..e898efc 100644
  
  # dbst based database optimization
  ifeq '$(DB_OPT)' 'YES'
-@@ -173,12 +178,14 @@ build : $(COMMON_DBDS) $(COMMON_DBS) \
- 	$(DBDDEPENDS_FILES) $(TARGETS) \
- 	$(INSTALL_DB_INSTALLS) $(INSTALL_DBD_INSTALLS)
- 
--clean:: 
-+clean: db_clean
-+
-+db_clean:
- 	@$(RM) $(COMMONS) $(DBDDEPENDS_FILES)
- 	@$(RM) *_registerRecordDeviceDriver.cpp
- 	@$(RM) $(TARGETS)
- 
--realclean:: clean
-+realclean: clean
- 
- ##################################################### CapFast filter
- 
-@@ -199,7 +206,11 @@ $(COMMON_DIR)/%.substitutions:
+@@ -199,7 +204,11 @@ $(COMMON_DIR)/%.substitutions:
  endif
  
  $(INSTALL_DB)/%.substitutions: %.substitutions
@@ -95,7 +78,7 @@ index 11e4d40..e898efc 100644
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
  
  .PRECIOUS: $(COMMON_DIR)/%.substitutions
-@@ -213,7 +224,7 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
+@@ -213,7 +222,7 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
  	@$(RM) $@.VAR
  
  $(INSTALL_DB)/%.template: %.template
@@ -104,7 +87,7 @@ index 11e4d40..e898efc 100644
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
  
  .PRECIOUS: $(COMMON_DIR)/%.template
-@@ -293,7 +304,7 @@ $(INSTALL_DBD)/%: %
+@@ -293,7 +302,7 @@ $(INSTALL_DBD)/%: %
  
  define  DBD_INSTALLS_template
  $$(INSTALL_DBD)/$$(notdir $(1)) : $(1)
@@ -113,7 +96,7 @@ index 11e4d40..e898efc 100644
  	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DBD)
  endef
  $(foreach file, $(DBD_INSTALLS), $(eval $(call DBD_INSTALLS_template, $(file))))
-@@ -307,14 +318,35 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
+@@ -307,14 +316,35 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
  	@$(REPLACEVAR) < $*.VAR > $@
  	@$(RM) $*.VAR
  
@@ -151,7 +134,7 @@ index 11e4d40..e898efc 100644
  	$(MV) $*.tmp $@
  
  $(COMMON_DIR)/%.db$(RAW): %.template
-@@ -351,7 +383,7 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.db$(RAW)
+@@ -351,7 +381,7 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.db$(RAW)
  else
  
  $(INSTALL_DB)/%: %
@@ -160,7 +143,7 @@ index 11e4d40..e898efc 100644
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
  endif
  
-@@ -361,7 +393,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
+@@ -361,7 +391,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
  
  define  DB_INSTALLS_template
  $$(INSTALL_DB)/$$(notdir $(1)) : $(1)
@@ -171,7 +154,7 @@ index 11e4d40..e898efc 100644
  $(foreach file, $(DB_INSTALLS), $(eval $(call DB_INSTALLS_template, $(file))))
 diff --git a/configure/RULES.archive b/configure/RULES.archive
 new file mode 100644
-index 0000000..a1648cd
+index 0000000..b65d7e9
 --- /dev/null
 +++ b/configure/RULES.archive
 @@ -0,0 +1,114 @@
@@ -233,9 +216,9 @@ index 0000000..a1648cd
 +
 +buildInstall:	build
 +
-+realclean: clean
++realclean:: clean
 +
-+clean: archive_clean
++clean:: archive_clean
 +
 +archive_clean:
 +	@$(RM) $(COMMONS)
@@ -291,7 +274,7 @@ index 0000000..a1648cd
 +
 diff --git a/configure/RULES.autosave b/configure/RULES.autosave
 new file mode 100644
-index 0000000..f5c277c
+index 0000000..bc78e4c
 --- /dev/null
 +++ b/configure/RULES.autosave
 @@ -0,0 +1,122 @@
@@ -354,9 +337,9 @@ index 0000000..f5c277c
 +
 +buildInstall:	build
 +
-+realclean: clean
++realclean:: clean
 +
-+clean: autosave_clean
++clean:: autosave_clean
 +
 +autosave_clean:
 +	@$(RM) $(COMMONS)
@@ -524,7 +507,7 @@ index 0000000..17ea02b
 +    $(wildcard $(TOP)/configure/RELEASE*) \
 +    $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)\
 +    $(wildcard $(TOP)/RELEASE_SITE) \
-+    $(wildcard $(TOP)/RELEASE.local) \
++    $(wildcard $(TOP)/RELEASE.local)
 +ifeq ($(IOC_APPL_TOP),)
 +ifeq ($(IOCS_APPL_TOP),)
 +	$(CONVERTRELEASE) -a $(ARCH) $@
@@ -541,7 +524,7 @@ index 0000000..17ea02b
 +	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
 +
 diff --git a/configure/RULES_BUILD b/configure/RULES_BUILD
-index c0e1ffb..9af64f8 100644
+index c0e1ffb..ad0b663 100644
 --- a/configure/RULES_BUILD
 +++ b/configure/RULES_BUILD
 @@ -71,6 +71,10 @@ all:	install
@@ -555,17 +538,6 @@ index c0e1ffb..9af64f8 100644
  -include $(CONFIG)/RULES_JAVA
  
  ifneq (,$(strip $(HDEPENDS_FILES)))
-@@ -139,7 +143,9 @@ buildInstall : \
- 	$(INSTALL_TEMPLATE) \
- 	$(INSTALL_BIN_INSTALLS)
- 
--clean::
-+clean : build_clean
-+
-+build_clean :
- 	$(ECHO) "Cleaning"
- 	@$(RM) *.i *$(OBJ) *.a $(TESTPRODNAME) $(LIBNAME) $(SHRLIBNAME) \
- 	$(INC) $(TARGETS) $(DLL_LINK_LIBNAME) $(TDS) \
 diff --git a/configure/RULES_TOP b/configure/RULES_TOP
 index 1898f59..a23f28c 100644
 --- a/configure/RULES_TOP

@@ -11,6 +11,18 @@ index 373b831..965c4fa 100644
  endif
  
  
+diff --git a/src/Makefile b/src/Makefile
+index 5e2c660..8ef574d 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -93,6 +93,7 @@ excas_DEPEND_DIRS = cas as registry
+ DIRS += cap5
+ cap5_DEPEND_DIRS = ca dbStatic
+ 
++DIRS += msi
+ 
+ include $(TOP)/configure/RULES_DIRS
+ 
 diff --git a/src/msi/LICENSE b/src/msi/LICENSE
 new file mode 100644
 index 0000000..9f03a0c
