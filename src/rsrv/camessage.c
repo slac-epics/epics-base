@@ -274,7 +274,7 @@ static void log_header (
     pciu = MPTOPCIU(mp);
 
     if (pContext) {
-        epicsPrintf ("CAS: request from %s => \"%s\"\n",
+        epicsPrintf ("CAS: request from %s => %s\n",
             hostName, pContext);
     }
 

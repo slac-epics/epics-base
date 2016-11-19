@@ -109,7 +109,7 @@ void cas_send_bs_msg ( struct client *pclient, int lock_needed )
                 char sockErrBuf[64];
                 epicsSocketConvertErrnoToString ( 
                     sockErrBuf, sizeof ( sockErrBuf ) );
-                errlogPrintf ( "CAS: TCP send to \"%s\" failed because \"%s\"\n",
+                errlogPrintf ( "CAS: TCP send to %s failed - %s\n",
                     buf, sockErrBuf);
             }
             pclient->disconnect = TRUE;
@@ -213,7 +213,7 @@ void cas_send_dg_msg ( struct client * pclient )
         epicsSocketConvertErrnoToString ( 
             sockErrBuf, sizeof ( sockErrBuf ) );
         ipAddrToDottedIP ( &pclient->addr, buf, sizeof(buf) );
-        errlogPrintf( "CAS: UDP send to \"%s\" failed because \"%s\"\n",
+        errlogPrintf( "CAS: UDP send to %s failed - %s\n",
             buf, sockErrBuf);
     }
 
