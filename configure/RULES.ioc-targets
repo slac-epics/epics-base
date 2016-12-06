@@ -42,7 +42,7 @@ cdCommands envPaths dllPath.bat relPaths.sh: \
     $(wildcard $(TOP)/configure/RELEASE*) \
     $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)\
     $(wildcard $(TOP)/RELEASE_SITE) \
-    $(wildcard $(TOP)/RELEASE.local) \
+    $(wildcard $(TOP)/RELEASE.local)
 ifeq ($(IOC_APPL_TOP),)
 ifeq ($(IOCS_APPL_TOP),)
 	$(CONVERTRELEASE) -a $(ARCH) $@

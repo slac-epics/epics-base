@@ -80,8 +80,7 @@ $(buildDirs):
 O.Common:
 	$(MKDIR) O.Common
 
-#
-# special clean rule
+# Clean rules
 #
 clean : archs_common_clean
 
