@@ -1,7 +1,7 @@
 #
 # This file contains definitions for RTEMS builds
 #
-# CONFIG.Common.RTEMS,v 1.44.2.8 2004/11/30 19:41:55 norume Exp
+# $Revision-Id$
 # Author: W. Eric Norum
 #         University of Saskatchewan
 #         eric.norum@usask.ca
@@ -28,20 +28,22 @@ ifneq ($(CONFIG),$(TOP)/configure)
 -include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
 endif
 
-
+#-------------------------------------------------------
+# Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
+# RTEMS_MAKEFILE_PATH defined in TOP/configure/CONFIG_SITE.Common.RTEMS
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
 
 #-------------------------------------------------------
 # RTEMS cross-development tools
-CC = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
-CCC = $(RTEMS_BASE)/bin/$(CXX)
-CPP = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) -x c -E
-AR = $(RTEMS_BASE)/bin/$(AR_FOR_TARGET)
-LD = $(RTEMS_BASE)/bin/$(LD_FOR_TARGET) -r
+CC = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
+CCC = $(RTEMS_TOOLS)/bin/$(CXX)
+CPP = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) -x c -E
+AR = $(RTEMS_TOOLS)/bin/$(AR_FOR_TARGET)
+LD = $(RTEMS_TOOLS)/bin/$(LD_FOR_TARGET) -r
 
-RANLIB := $(RTEMS_BASE)/bin/$(RANLIB)
+RANLIB := $(RTEMS_TOOLS)/bin/$(RANLIB)
 
 #-------------------------------------------------------
 # Build types
@@ -51,28 +53,23 @@ VALID_BUILDS = Ioc
 # The RTEMS Makefiles redefine several macros, so we have to
 # reset them to the proper EPICS values, from CONFIG_COMMON
 CFLAGS = $($(BUILD_CLASS)_CFLAGS) $(POSIX_CFLAGS) $(OPT_CFLAGS)\
- $(CONFORM_CFLAGS) $(CROSS_CFLAGS) \
  $(DEBUG_CFLAGS) $(PIPE_CFLAGS) $(WARN_CFLAGS) $(TARGET_CFLAGS)\
  $(USR_CFLAGS) $(CMD_CFLAGS) $(ARCH_DEP_CFLAGS) $(CODE_CFLAGS)\
  $(STATIC_CFLAGS) $(OP_SYS_CFLAGS) $(LIBRARY_SRC_CFLAGS) $(HDEPENDS_CFLAGS)
 
 CXXFLAGS = $($(BUILD_CLASS)_CXXFLAGS) $(POSIX_CXXFLAGS) $(OPT_CXXFLAGS)\
- $(CONFORM_CXXFLAGS) $(CROSS_CXXFLAGS)\
  $(DEBUG_CXXFLAGS) $(PIPE_CFLAGS) $(WARN_CXXFLAGS) $(TARGET_CXXFLAGS)\
  $(USR_CXXFLAGS) $(CMD_CXXFLAGS) $(ARCH_DEP_CXXFLAGS) $(CODE_CXXFLAGS)\
  $(STATIC_CXXCFLAGS) $(OP_SYS_CXXFLAGS) $(LIBRARY_SRC_CFLAGS) $(HDEPENDS_CFLAGS)
 
 LDFLAGS = $(OPT_LDFLAGS) $(TARGET_LDFLAGS) $(USR_LDFLAGS) $(CMD_LDFLAGS)\
  $(POSIX_LDFLAGS) $(ARCH_DEP_LDFLAGS) $(DEBUG_LDFLAGS) $(OP_SYS_LDFLAGS)\
- $(CROSS_LDFLAGS)\
  $($(BUILD_CLASS)_LDFLAGS) $(RUNTIME_LDFLAGS) $(CODE_LDFLAGS)
 
-LDLIBS = $(STATIC_LDLIBS)\
- $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
+LDLIBS = $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
  $(GNU_LDLIBS_$(GNU))
 
 CPPFLAGS += $($(BUILD_CLASS)_CPPFLAGS) $(POSIX_CPPFLAGS) $(OPT_CPPFLAGS)\
- $(CONFORM_CPPFLAGS) $(CROSS_CPPFLAGS)\
  $(DEBUG_CPPFLAGS) $(WARN_CPPFLAGS) $(BASE_CPPFLAGS) $(TARGET_CPPFLAGS)\
  $(USR_CPPFLAGS) $(CMD_CPPFLAGS) $(ARCH_DEP_CPPFLAGS) $(OP_SYS_CPPFLAGS)\
  $(OP_SYS_INCLUDE_CPPFLAGS) $(CODE_CPPFLAGS)
@@ -97,9 +94,14 @@ OS_CLASS = RTEMS
 
 #--------------------------------------------------
 # Operating system flags
-#OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lrtemsNfs -lm
+# SLAC OP_SYS_LDLIBS defined in TOP/configure/CONFIG.Common.RTEMS-*
 OP_SYS_LDLIBS=
-OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init
+OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
+                 $(PROJECT_RELEASE)/lib/no-dpmem.rel \
+                 $(PROJECT_RELEASE)/lib/no-mp.rel \
+                 $(PROJECT_RELEASE)/lib/no-part.rel \
+                 $(PROJECT_RELEASE)/lib/no-signal.rel \
+                 $(PROJECT_RELEASE)/lib/no-rtmon.rel
 
 MOD_SYS_LDFLAGS += $(CPU_CFLAGS) -Wl,-r -nostdlib
 
@@ -148,12 +150,11 @@ CODE_CXXFLAGS =
 # Override the usual RTEMS verbosity from ar
 ARFLAGS = rc
 
-#--------------------------------------------------
 # RTEMS uses the inline keyword so -pedantic causes too many problems.
 # -ansi also causes problems, as it defines __STRICT_ANSI__  which ifdef's
 # out needed functions like tzset().
-CONFORM_CFLAGS_STRICT = -std=gnu89
-CONFORM_CXXFLAGS_STRICT = -std=gnu++98
+# WHY??? CONFORM_CFLAGS_STRICT = -std=gnu89
+# WHY??? CONFORM_CXXFLAGS_STRICT = -std=gnu++98
 
 #--------------------------------------------------
 # Command-line input support
@@ -162,5 +163,4 @@ LDLIBS_READLINE = -lreadline -lncurses
 
 #--------------------------------------------------
 # Allow site overrides
--include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 -include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
