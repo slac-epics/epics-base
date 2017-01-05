@@ -1,0 +1,524 @@
+diff --git a/configure/os/CONFIG.Common.rhel6-x86_64 b/configure/os/CONFIG.Common.rhel6-x86_64
+new file mode 100644
+index 0000000..da05e46
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel6-x86_64
+@@ -0,0 +1,22 @@
++# CONFIG.Common.rhel6-x86_64
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.Common.rhel6-x86_64
++#-------------------------------------------------------
++
++# Include definitions common to all linux targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++
++ARCH_CLASS = x86_64
++
++ARCH_DEP_CPPFLAGS += -D_X86_64_
++ARCH_DEP_CFLAGS += -m64
++ARCH_DEP_LDFLAGS += -m64
++
++# If your crosscompiler name has a GNU target prefix like <gnutarget>-gcc,
++# e.g. x86_64-redhat-linux-gcc, put a GNU_TARGET definition in
++# CONFIG_SITE.<host>.rhel6-x86_64 file, e.g. GNU_TARGET=x86_64-redhat-linux
++
+diff --git a/configure/os/CONFIG.Common.rhel6-x86_64-debug b/configure/os/CONFIG.Common.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..8955e1d
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel6-x86_64-debug
+@@ -0,0 +1,13 @@
++# CONFIG.Common.rhel6-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.Common.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++# Include definitions common to all rhel6-x86_64  target archs
++include $(CONFIG)/os/CONFIG.Common.rhel6-x86_64
++
++HOST_OPT=NO
+diff --git a/configure/os/CONFIG.Common.rhel7-x86_64 b/configure/os/CONFIG.Common.rhel7-x86_64
+new file mode 100644
+index 0000000..c36a989
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel7-x86_64
+@@ -0,0 +1,22 @@
++# CONFIG.Common.rhel7-x86_64
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.Common.rhel7-x86_64
++#-------------------------------------------------------
++
++# Include definitions common to all linux targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++
++ARCH_CLASS = x86_64
++
++ARCH_DEP_CPPFLAGS += -D_X86_64_
++ARCH_DEP_CFLAGS += -m64
++ARCH_DEP_LDFLAGS += -m64
++
++# If your crosscompiler name has a GNU target prefix like <gnutarget>-gcc,
++# e.g. x86_64-redhat-linux-gcc, put a GNU_TARGET definition in
++# CONFIG_SITE.<host>.rhel7-x86_64 file, e.g. GNU_TARGET=x86_64-redhat-linux
++
+diff --git a/configure/os/CONFIG.Common.rhel7-x86_64-debug b/configure/os/CONFIG.Common.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..afad143
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel7-x86_64-debug
+@@ -0,0 +1,13 @@
++# CONFIG.Common.rhel7-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.Common.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++# Include definitions common to all rhel7-x86_64  target archs
++include $(CONFIG)/os/CONFIG.Common.rhel7-x86_64
++
++HOST_OPT=NO
+diff --git a/configure/os/CONFIG.rhel6-x86_64-debug.Common b/configure/os/CONFIG.rhel6-x86_64-debug.Common
+new file mode 100644
+index 0000000..678830d
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64-debug.Common
+@@ -0,0 +1,15 @@
++# CONFIG.rhel6-x86_64-debug.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 debug with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64-debug.Common
++#-------------------------------------------------------
++
++#Include definitions common to rhel6-x86_64 hosts
++include $(CONFIG)/os/CONFIG.rhel6-x86_64.Common
++
++# Make all crosscompiler builds debug builds
++#CROSS_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug b/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..acffe96
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+@@ -0,0 +1,14 @@
++# CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64 target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++include $(CONFIG)/os/CONFIG.rhel6-x86_64.rhel6-x86_64
++
++# Removes -O optimization and adds -g compile option
++HOST_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel6-x86_64.Common b/configure/os/CONFIG.rhel6-x86_64.Common
+new file mode 100644
+index 0000000..67c3066
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.Common
+@@ -0,0 +1,13 @@
++# CONFIG.rhel6-x86_64.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host builds
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.Common
++#-------------------------------------------------------
++
++#Include definitions common to unix hosts
++include $(CONFIG)/os/CONFIG.UnixCommon.Common
++
++WIND_HOST_TYPE = x86-linux
+diff --git a/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64 b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64
+new file mode 100644
+index 0000000..589f5db
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64
+@@ -0,0 +1,12 @@
++#  CONFIG.rhel6-x86_64.rhel6-x86_64
++#
++# $Revision-Id$
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++#-------------------------------------------------------
++
++# Include common gnu compiler definitions
++include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
++
++GNU_LIB = $(GNU_DIR)/lib64
+diff --git a/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..736e200
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG.rhel6-x86_64.rhel6-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64-debug target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++-include $(CONFIG)/os/CONFIG.rhel6-x86_64.rhel6-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.Common.rhel6-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++
++BUILD_CLASS=HOST
++HOST_OPT = NO
+diff --git a/configure/os/CONFIG.rhel7-x86_64-debug.Common b/configure/os/CONFIG.rhel7-x86_64-debug.Common
+new file mode 100644
+index 0000000..a5d5870
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64-debug.Common
+@@ -0,0 +1,15 @@
++# CONFIG.rhel7-x86_64-debug.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 debug with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64-debug.Common
++#-------------------------------------------------------
++
++#Include definitions common to rhel7-x86_64 hosts
++include $(CONFIG)/os/CONFIG.rhel7-x86_64.Common
++
++# Make all crosscompiler builds debug builds
++#CROSS_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug b/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..d50fc40
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
+@@ -0,0 +1,14 @@
++# CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64 target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++include $(CONFIG)/os/CONFIG.rhel7-x86_64.rhel7-x86_64
++
++# Removes -O optimization and adds -g compile option
++HOST_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel7-x86_64.Common b/configure/os/CONFIG.rhel7-x86_64.Common
+new file mode 100644
+index 0000000..b492d0a
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.Common
+@@ -0,0 +1,13 @@
++# CONFIG.rhel7-x86_64.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host builds
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.Common
++#-------------------------------------------------------
++
++#Include definitions common to unix hosts
++include $(CONFIG)/os/CONFIG.UnixCommon.Common
++
++WIND_HOST_TYPE = x86-linux
+diff --git a/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64 b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64
+new file mode 100644
+index 0000000..ab5e8a3
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64
+@@ -0,0 +1,12 @@
++#  CONFIG.rhel7-x86_64.rhel7-x86_64
++#
++# $Revision-Id$
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++#-------------------------------------------------------
++
++# Include common gnu compiler definitions
++include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
++
++GNU_LIB = $(GNU_DIR)/lib64
+diff --git a/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..3ac14a3
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG.rhel7-x86_64.rhel7-x86_64-debug
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64-debug target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++-include $(CONFIG)/os/CONFIG.rhel7-x86_64.rhel7-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.Common.rhel7-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++
++BUILD_CLASS=HOST
++HOST_OPT = NO
+diff --git a/configure/os/CONFIG_SITE.Common.rhel6-x86_64 b/configure/os/CONFIG_SITE.Common.rhel6-x86_64
+new file mode 100644
+index 0000000..302e91c
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.rhel6-x86_64
+@@ -0,0 +1,44 @@
++# CONFIG_SITE.Common.rhel6-x86_64
++#
++# $Revision-Id$
++#
++# Site Specific definitions for rhel6-x86_64 target
++# Only the local epics system manager should modify this file
++
++# NOTE for SHARED_LIBRARIES: In most cases if this is set to YES the
++# shared libraries will be found automatically.  However if the .so
++# files are installed at a different path to their compile-time path
++# then in order to be found at runtime do one of these:
++# a) LD_LIBRARY_PATH must include the full absolute pathname to
++#    $(INSTALL_LOCATION)/lib/$(EPICS_HOST_ARCH) when invoking base
++#    executables.
++# b) Add the runtime path to SHRLIB_DEPLIB_DIRS and PROD_DEPLIB_DIRS, which
++#    will add the named directory to the list contained in the executables.
++# c) Add the runtime path to /etc/ld.so.conf and run ldconfig
++#    to inform the system of the shared library location.
++
++# Depending on your version of Linux you'll want one of the following
++# lines to enable command-line editing and history in iocsh.  If you're
++# not sure which, start with the top one and work downwards until the
++# build doesn't fail to link the readline library.  If none of them work,
++# comment them all out to build without readline support.
++
++# No other libraries needed (recent Fedora, Ubuntu etc.):
++#COMMANDLINE_LIBRARY = READLINE
++
++# Needs -lncurses (RHEL 5 etc.):
++COMMANDLINE_LIBRARY = READLINE_NCURSES
++
++# Needs -lcurses (older versions)
++#COMMANDLINE_LIBRARY = READLINE_CURSES
++
++
++# It makes sense to include debugging symbols even in optimized builds
++# in case you want to attach gdb to the process or examine a core-dump.
++# This does cost disk space, but not memory as debug symbols are not
++# loaded into RAM when the binary is loaded.
++OPT_CFLAGS_YES += -g
++OPT_CXXFLAGS_YES += -g
++
++# Support Package Architecture
++PKG_ARCH=x86_64-rhel6-gcc44-opt
+diff --git a/configure/os/CONFIG_SITE.Common.rhel7-x86_64 b/configure/os/CONFIG_SITE.Common.rhel7-x86_64
+new file mode 100644
+index 0000000..51268c8
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.rhel7-x86_64
+@@ -0,0 +1,44 @@
++# CONFIG_SITE.Common.rhel7-x86_64
++#
++# $Revision-Id$
++#
++# Site Specific definitions for rhel7-x86_64 target
++# Only the local epics system manager should modify this file
++
++# NOTE for SHARED_LIBRARIES: In most cases if this is set to YES the
++# shared libraries will be found automatically.  However if the .so
++# files are installed at a different path to their compile-time path
++# then in order to be found at runtime do one of these:
++# a) LD_LIBRARY_PATH must include the full absolute pathname to
++#    $(INSTALL_LOCATION)/lib/$(EPICS_HOST_ARCH) when invoking base
++#    executables.
++# b) Add the runtime path to SHRLIB_DEPLIB_DIRS and PROD_DEPLIB_DIRS, which
++#    will add the named directory to the list contained in the executables.
++# c) Add the runtime path to /etc/ld.so.conf and run ldconfig
++#    to inform the system of the shared library location.
++
++# Depending on your version of Linux you'll want one of the following
++# lines to enable command-line editing and history in iocsh.  If you're
++# not sure which, start with the top one and work downwards until the
++# build doesn't fail to link the readline library.  If none of them work,
++# comment them all out to build without readline support.
++
++# No other libraries needed (recent Fedora, Ubuntu etc.):
++#COMMANDLINE_LIBRARY = READLINE
++
++# Needs -lncurses (RHEL 5 etc.):
++COMMANDLINE_LIBRARY = READLINE_NCURSES
++
++# Needs -lcurses (older versions)
++#COMMANDLINE_LIBRARY = READLINE_CURSES
++
++
++# It makes sense to include debugging symbols even in optimized builds
++# in case you want to attach gdb to the process or examine a core-dump.
++# This does cost disk space, but not memory as debug symbols are not
++# loaded into RAM when the binary is loaded.
++OPT_CFLAGS_YES += -g
++OPT_CXXFLAGS_YES += -g
++
++# Support Package Architecture
++PKG_ARCH=x86_64-rhel7-gcc44-opt
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug b/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..5933948
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
++#
++# $Revision-Id$
++#
++# Site specific override definitions for solaris-sparc host builds
++# Only the local epics system manager should modify this file
++
++
++
++#Prepares the object code to collect data for profiling with prof. 
++#PROFILE=YES
++
++#Compiles for profiling with the gprof profiler.
++#GPROF=YES
++
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.Common b/configure/os/CONFIG_SITE.rhel6-x86_64.Common
+new file mode 100644
+index 0000000..958cdbb
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.Common
+@@ -0,0 +1,12 @@
++# CONFIG_SITE.rhel6-x86_64.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Site override definitions for rhel6-x86_64 host builds
++#-------------------------------------------------------
++
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
++#CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100
++
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon b/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon
+new file mode 100644
+index 0000000..bdbabe0
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon
+@@ -0,0 +1,7 @@
++# CONFIG_SITE.rhel6-x86_64.UnixCommon
++$
++# $Revision-Id$
++#
++# Site Specific configure override definitions
++# Only the local epics system manager should modify this file
++ 
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64 b/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+new file mode 100644
+index 0000000..6f7e367
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++#
++# $Revision-Id$
++#
++# Site specific definitions for rhel6-x86_64 host - rhel6-x86_64 target builds
++#-------------------------------------------------------
++
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug b/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..86e0977
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
++#
++# $Revision-Id$
++#
++# Site specific override definitions for solaris-sparc host builds
++# Only the local epics system manager should modify this file
++
++
++
++#Prepares the object code to collect data for profiling with prof. 
++#PROFILE=YES
++
++#Compiles for profiling with the gprof profiler.
++#GPROF=YES
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.Common b/configure/os/CONFIG_SITE.rhel7-x86_64.Common
+new file mode 100644
+index 0000000..0b00bfc
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.Common
+@@ -0,0 +1,12 @@
++# CONFIG_SITE.rhel7-x86_64.Common
++#
++# $Revision-Id$
++# This file is maintained by the build community.
++#
++# Site override definitions for rhel7-x86_64 host builds
++#-------------------------------------------------------
++
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
++#CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon b/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon
+new file mode 100644
+index 0000000..42ead71
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon
+@@ -0,0 +1,7 @@
++# CONFIG_SITE.rhel7-x86_64.UnixCommon
++$
++# $Revision-Id$
++#
++# Site Specific configure override definitions
++# Only the local epics system manager should modify this file
++ 
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64 b/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
+new file mode 100644
+index 0000000..a8dfaef
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++#
++# $Revision-Id$
++#
++# Site specific definitions for rhel7-x86_64 host - rhel7-x86_64 target builds
++#-------------------------------------------------------
++
++

@@ -1,0 +1,39 @@
+--- src/libCom/osi/os/posix/osdThread.c.orig	2015-04-22 09:09:37.394558538 -0700
++++ src/libCom/osi/os/posix/osdThread.c	2015-04-22 09:20:17.509951065 -0700
+@@ -39,6 +39,13 @@
+ #include "epicsAssert.h"
+ #include "epicsExit.h"
+ 
++#if defined(linux) 
++#include <unistd.h>
++#if _POSIX_MEMLOCK > 0
++#include <sys/mman.h>
++#endif
++#endif
++
+ static int mutexLock(pthread_mutex_t *id)
+ {
+     int status;
+@@ -351,6 +358,22 @@
+         fprintf(stderr,"sched_get_priority_min failed set to %d\n",
+             pcommonAttr->maxPriority);
+     }
++
++#if _POSIX_MEMLOCK > 0
++    if(errVerbose)  { 
++        fprintf(stderr, "LRT: min priority: %d max priority %d\n", 
++            pcommonAttr->minPriority, pcommonAttr->maxPriority);
++    }
++    if (pcommonAttr->maxPriority > pcommonAttr->minPriority) {
++        status = mlockall(MCL_CURRENT | MCL_FUTURE);
++        if(status) { 
++            fprintf(stderr, "Unable to lock the virtual address space using mlockall\n");
++        } else { 
++            fprintf(stderr,"Successfully locked memory using mlockAll\n");
++        }
++    }
++#endif
++
+ #else
+     if(errVerbose) fprintf(stderr,"task priorities are not implemented\n");
+ #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */

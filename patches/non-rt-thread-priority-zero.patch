@@ -1,0 +1,14 @@
+diff --git a/src/libCom/osi/os/posix/osdThread.c b/src/libCom/osi/os/posix/osdThread.c
+index 9b552f0..d0090ed 100644
+--- a/src/libCom/osi/os/posix/osdThread.c
++++ b/src/libCom/osi/os/posix/osdThread.c
+@@ -560,7 +560,8 @@ static epicsThreadOSD *createImplicit(void)
+     struct sched_param param;
+     int policy;
+     if(pthread_getschedparam(tid,&policy,&param) == 0)
+-        pthreadInfo->osiPriority =
++        if (param.sched_priority >= pcommonAttr->minPriority)
++            pthreadInfo->osiPriority =
+                  (param.sched_priority - pcommonAttr->minPriority) * 100.0 /
+                     (pcommonAttr->maxPriority - pcommonAttr->minPriority + 1);
+     }
