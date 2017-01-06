@@ -1,6 +1,8 @@
---- src/libCom/osi/os/posix/osdThread.c.orig	2015-04-22 09:09:37.394558538 -0700
-+++ src/libCom/osi/os/posix/osdThread.c	2015-04-22 09:20:17.509951065 -0700
-@@ -39,6 +39,13 @@
+diff --git a/src/libCom/osi/os/posix/osdThread.c b/src/libCom/osi/os/posix/osdThread.c
+index 2dc4eda..9b552f0 100644
+--- a/src/libCom/osi/os/posix/osdThread.c
++++ b/src/libCom/osi/os/posix/osdThread.c
+@@ -36,6 +36,13 @@
  #include "epicsAssert.h"
  #include "epicsExit.h"
  
@@ -14,7 +16,7 @@
  static int mutexLock(pthread_mutex_t *id)
  {
      int status;
-@@ -351,6 +358,22 @@
+@@ -352,6 +359,22 @@ static void once(void)
          fprintf(stderr,"sched_get_priority_min failed set to %d\n",
              pcommonAttr->maxPriority);
      }

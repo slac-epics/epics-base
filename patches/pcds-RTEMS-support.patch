@@ -1,0 +1,103 @@
+diff --git a/configure/os/CONFIG.Common.RTEMS b/configure/os/CONFIG.Common.RTEMS
+index 9e6a1ad..7ace335 100644
+--- a/configure/os/CONFIG.Common.RTEMS
++++ b/configure/os/CONFIG.Common.RTEMS
+@@ -1,7 +1,7 @@
+ #
+ # This file contains definitions for RTEMS builds
+ #
+-# $Revision-Id$
++# CONFIG.Common.RTEMS,v 1.44.2.8 2004/11/30 19:41:55 norume Exp
+ # Author: W. Eric Norum
+ #         University of Saskatchewan
+ #         eric.norum@usask.ca
+@@ -28,21 +28,20 @@ ifneq ($(CONFIG),$(TOP)/configure)
+ -include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
+ endif
+ 
+-#-------------------------------------------------------
+-# Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
+-include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
++
++include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
+ include $(RTEMS_CUSTOM)
+ include $(CONFIG.CC)
+ 
+ #-------------------------------------------------------
+ # RTEMS cross-development tools
+-CC = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
+-CCC = $(RTEMS_TOOLS)/bin/$(CXX)
+-CPP = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) -x c -E
+-AR = $(RTEMS_TOOLS)/bin/$(AR_FOR_TARGET)
+-LD = $(RTEMS_TOOLS)/bin/$(LD_FOR_TARGET) -r
++CC = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
++CCC = $(RTEMS_BASE)/bin/$(CXX)
++CPP = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) -x c -E
++AR = $(RTEMS_BASE)/bin/$(AR_FOR_TARGET)
++LD = $(RTEMS_BASE)/bin/$(LD_FOR_TARGET) -r
+ 
+-RANLIB := $(RTEMS_TOOLS)/bin/$(RANLIB)
++RANLIB := $(RTEMS_BASE)/bin/$(RANLIB)
+ 
+ #-------------------------------------------------------
+ # Build types
+@@ -93,13 +92,9 @@ OS_CLASS = RTEMS
+ 
+ #--------------------------------------------------
+ # Operating system flags
+-OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lnfs -lm
+-OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
+-                 $(PROJECT_RELEASE)/lib/no-dpmem.rel \
+-                 $(PROJECT_RELEASE)/lib/no-mp.rel \
+-                 $(PROJECT_RELEASE)/lib/no-part.rel \
+-                 $(PROJECT_RELEASE)/lib/no-signal.rel \
+-                 $(PROJECT_RELEASE)/lib/no-rtmon.rel
++#OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lrtemsNfs -lm
++OP_SYS_LDLIBS=
++OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init
+ 
+ MOD_SYS_LDFLAGS += $(CPU_CFLAGS) -Wl,-r -nostdlib
+ 
+@@ -149,10 +144,17 @@ CODE_CXXFLAGS =
+ ARFLAGS = rc
+ 
+ #--------------------------------------------------
++# RTEMS uses the inline keyword so -pedantic causes too many problems.
++# -ansi also causes problems, as it defines __STRICT_ANSI__  which ifdef's
++# out needed functions like tzset().
++CONFORM_CFLAGS_STRICT = -std=gnu89
++CONFORM_CXXFLAGS_STRICT = -std=gnu++98
++
++#--------------------------------------------------
+ # Command-line input support
+ LDLIBS_LIBTECLA = -ltecla_r -lncurses
+ LDLIBS_READLINE = -lreadline -lncurses
+ 
+ #--------------------------------------------------
+ # Allow site overrides
+--include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
++-include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
+diff --git a/configure/os/CONFIG.Common.RTEMS-beatnik b/configure/os/CONFIG.Common.RTEMS-beatnik
+index 714bb37..2ba1f86 100644
+--- a/configure/os/CONFIG.Common.RTEMS-beatnik
++++ b/configure/os/CONFIG.Common.RTEMS-beatnik
+@@ -18,11 +18,12 @@ OP_SYS_LDLIBS += -lbspExt
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+ endef
+ 
+ include $(CONFIG)/os/CONFIG.Common.RTEMS
+ 
++
+ RTEMSSYMS=$(PRODNAME:%$(EXE)=%.sym)
+ RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
+ INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
+@@ -35,3 +36,5 @@ INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
+ 	$(OBJCOPY) -Obinary $^ $@
+ 
+ #PRODTARGETS+=$(INSTALL_RTEMSSYMS) $(INSTALL_RTEMSIMGS)
++
++
