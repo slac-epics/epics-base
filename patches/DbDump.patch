@@ -1,0 +1,152 @@
+diff --git a/src/db/dbBkpt.c b/src/db/dbBkpt.c
+index f865ba8..6915bcc 100644
+--- a/src/db/dbBkpt.c
++++ b/src/db/dbBkpt.c
+@@ -809,7 +809,7 @@ void epicsShareAPI dbPrint(dbCommon *precord )
+      return;
+ 
+   printf("\n");
+-  dbpr(precord->name, 2);
++  dbpr(precord->name, 2, 20);
+   printf("-> ");
+ }
+ 
+@@ -830,7 +830,7 @@ long epicsShareAPI dbp(const char *record_name, int interest_level)
+   }
+ 
+  /* print out record's fields */
+-  dbpr(precord->name, (interest_level == 0) ? 2 : interest_level);
++  dbpr(precord->name, (interest_level == 0) ? 2 : interest_level, 20);
+ 
+   epicsMutexUnlock(bkpt_stack_sem);
+   return(0);
+diff --git a/src/db/dbIocRegister.c b/src/db/dbIocRegister.c
+index a82337f..9350522 100644
+--- a/src/db/dbIocRegister.c
++++ b/src/db/dbIocRegister.c
+@@ -160,10 +160,18 @@ static void dbpfCallFunc(const iocshArgBuf *args)
+ /* dbpr */
+ static const iocshArg dbprArg0 = { "record name",iocshArgString};
+ static const iocshArg dbprArg1 = { "interest level",iocshArgInt};
+-static const iocshArg * const dbprArgs[2] = {&dbprArg0,&dbprArg1};
+-static const iocshFuncDef dbprFuncDef = {"dbpr",2,dbprArgs};
++static const iocshArg dbprArg2 = { "tab_size",iocshArgInt};
++static const iocshArg * const dbprArgs[3] = {&dbprArg0,&dbprArg1,&dbprArg2};
++static const iocshFuncDef dbprFuncDef = {"dbpr",3,dbprArgs};
+ static void dbprCallFunc(const iocshArgBuf *args)
+-{ dbpr(args[0].sval,args[1].ival);}
++{ dbpr(args[0].sval,args[1].ival,20);}
++
++/* dbdump */
++static const iocshArg dbdumpArg0 = { "interest level",iocshArgInt};
++static const iocshArg * const dbdumpArgs[1] = {&dbprArg0};
++static const iocshFuncDef dbdumpFuncDef = {"dbdump",1,dbdumpArgs};
++static void dbdumpCallFunc(const iocshArgBuf *args)
++{ dbdump(args[0].ival);}
+ 
+ /* dbtr */
+ static const iocshArg dbtrArg0 = { "record name",iocshArgString};
+@@ -309,6 +317,7 @@ void epicsShareAPI dbIocRegister(void)
+     iocshRegister(&dbnrFuncDef,dbnrCallFunc);
+     iocshRegister(&dblaFuncDef,dblaCallFunc);
+     iocshRegister(&dbgrepFuncDef,dbgrepCallFunc);
++    iocshRegister(&dbdumpFuncDef,dbdumpCallFunc);
+     iocshRegister(&dbgfFuncDef,dbgfCallFunc);
+     iocshRegister(&dbpfFuncDef,dbpfCallFunc);
+     iocshRegister(&dbprFuncDef,dbprCallFunc);
+diff --git a/src/db/dbTest.c b/src/db/dbTest.c
+index 2c9350d..b346014 100644
+--- a/src/db/dbTest.c
++++ b/src/db/dbTest.c
+@@ -293,6 +293,34 @@ long epicsShareAPI dbgrep(const char *pmask)
+     return 0;
+ }
+ 
++long epicsShareAPI dbdump(int interest_level)
++{
++    DBENTRY dbentry;
++    DBENTRY *pdbentry = &dbentry;
++    long status;
++
++    if (!pdbbase) {
++        printf("No database loaded\n");
++        return 0;
++    }
++    dbInitEntry(pdbbase, pdbentry);
++    status = dbFirstRecordType(pdbentry);
++    while (!status) {
++        status = dbFirstRecord(pdbentry);
++        while (!status) {
++            char *pname = dbGetRecordName(pdbentry);
++            puts("----------");
++            puts(pname);
++            dbpr(pname, interest_level, 0);
++            status = dbNextRecord(pdbentry);
++        }
++        status = dbNextRecordType(pdbentry);
++    }
++    dbFinishEntry(pdbentry);
++    return 0;
++}
++
++
+ long epicsShareAPI dbgf(const char *pname)
+ {
+     /* declare buffer long just to ensure correct alignment */
+@@ -379,13 +407,12 @@ long epicsShareAPI dbpf(const char *pname,const char *pvalue)
+     return dbgf(pname);
+ }
+ 
+-long epicsShareAPI dbpr(const char *pname,int interest_level)
++long epicsShareAPI dbpr(const char *pname,int interest_level, int tab_size)
+ {
+     static TAB_BUFFER msg_Buff;
+     TAB_BUFFER *pMsgBuff = &msg_Buff;
+     DBADDR addr;
+     char *pmsg;
+-    int tab_size = 20;
+ 
+     if (!pname || !*pname) {
+         printf("Usage: dbpr \"pv name\", level\n");
+@@ -432,7 +459,7 @@ long epicsShareAPI dbtr(const char *pname)
+     if (status)
+         recGblRecordError(status, precord, "dbtr(dbProcess)");
+ 
+-    dbpr(pname, 3);
++    dbpr(pname, 3, 20);
+     return 0;
+ }
+ 
+@@ -1258,9 +1285,9 @@ static void dbpr_msgOut(TAB_BUFFER *pMsgBuff,int tab_size)
+     char       *pmsg = pMsgBuff->message;
+     static int last_tabsize;
+ 
+-    if (!((tab_size == 10) || (tab_size == 20))) {
+-        printf("tab_size not 10 or 20 - dbpr_msgOut()\n");
+-        return;
++    if (!((tab_size == 0) || (tab_size == 10) || (tab_size == 20))) {
++       printf("tab_size not 10 or 20 - dbpr_msgOut()\n"); /* Why does tab_size matter? */
++       return;
+     }
+     /* init if first time */
+     if (!(pMsgBuff->pNext))
+diff --git a/src/db/dbTest.h b/src/db/dbTest.h
+index 231403a..b0f4b9d 100644
+--- a/src/db/dbTest.h
++++ b/src/db/dbTest.h
+@@ -27,12 +27,14 @@ epicsShareFunc long epicsShareAPI dbnr(int verbose);
+ epicsShareFunc long epicsShareAPI dbla(const char *pmask);
+ /*list records with mask*/
+ epicsShareFunc long epicsShareAPI dbgrep(const char *pmask);
++/*dump database fields*/
++long epicsShareAPI dbdump(const int interest_level);
+ /*get field value*/
+ epicsShareFunc long epicsShareAPI dbgf(const char *pname);
+ /*put field value*/
+ epicsShareFunc long epicsShareAPI dbpf(const char *pname,const char *pvalue);
+ /*print record*/
+-epicsShareFunc long epicsShareAPI dbpr(const char *pname,int interest_level);
++epicsShareFunc long epicsShareAPI dbpr(const char *pname,int interest_level,int tab_size);
+ /*test record*/
+ epicsShareFunc long epicsShareAPI dbtr(const char *pname);
+ /*test get field*/

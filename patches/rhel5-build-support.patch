@@ -1,0 +1,44 @@
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86 b/configure/os/CONFIG_SITE.Common.linux-x86
+index 9e7262c..f5d0f54 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86
++++ b/configure/os/CONFIG_SITE.Common.linux-x86
+@@ -24,10 +24,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
+@@ -39,3 +39,4 @@ COMMANDLINE_LIBRARY = READLINE
+ # loaded into RAM when the binary is loaded.
+ OPT_CFLAGS_YES += -g
+ OPT_CXXFLAGS_YES += -g
++
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86_64 b/configure/os/CONFIG_SITE.Common.linux-x86_64
+index ddc90d5..64b3a88 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86_64
++++ b/configure/os/CONFIG_SITE.Common.linux-x86_64
+@@ -24,10 +24,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
+@@ -39,3 +39,4 @@ COMMANDLINE_LIBRARY = READLINE
+ # loaded into RAM when the binary is loaded.
+ OPT_CFLAGS_YES += -g
+ OPT_CXXFLAGS_YES += -g
++
