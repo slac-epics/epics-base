@@ -1,4 +1,4 @@
-Release Notes for R3.14.12.5-2.0: bhill Oct 20, 2016
+Release Notes for R3.14.12.5-2.1: bhill Jan 5, 2017
 	Built from R3.14.12.5-2.branch which was derived from tag R3.14.12.5 on the github-3.14 branch.
 	Primary changes from R3.14.12.4 to R3.14.12.5
 		aoRecord raw converion overflow fix
@@ -27,6 +27,9 @@ Release Notes for R3.14.12.5-2.0: bhill Oct 20, 2016
 		aSubTimeStamp.patch
 			Makes aSub record's update their timestamp before processing their output links.
 			Needed for proper timestamp propagation in areaDetector templates and plugins.
+		timestamp-before-writing-output.patch
+			Update timestamps in ao, aao, bo, calcout, longout, mbboDirect, mbbo, and stringout records before writing output values.
+			Fixes timing errors when downstream records inherit timestamps via TSEL
 		gdd-free-list-race.patch
 			Fixes race condition in gdd when returning a DD object to the free list.
 		OSDThread.patch
@@ -35,11 +38,74 @@ Release Notes for R3.14.12.5-2.0: bhill Oct 20, 2016
 			Fixes Launchpad bug 1581212, race condition in db_get_field_and_count().
 		perl-makeBaseApp-features.patch
 			PCDS enhancements to makeBaseApp:
-				-r flag to specify IOCROOT Support for top directory files
-				Uses ioc- instead of ioc as prefix for ioc instance dirs
-				Supports Lib vs App for module templates
-				Allows template macros to appear more than once per line.
-				Makes startup scripts executable Misc diagnostics
+				-d option for diagnostic output
+				-r to specify _IOCPVROOT_ PV prefix
+			Add support for _APPNAME_Screens to create custom screens directories
+			Do global substitution for _APPNAME_, _APPTYPE_, ... so they can appear more than once per line
+			Add support for install files in TOP
+			Force iocBoot/ioc-name directories to begin w/ ioc-
+			Allow _APPNAME_Lib directory for modules in contrast to _APPNAME_App for ioc apps
+			Makes startup scripts executable Misc diagnostics
 		pcds-makeBaseApp-templates.patch
-			Adds PCDS templates
+			Install PCDS makeBaseApp templates
+		readline_ncurses.patch
+			Use READLINE_NCURSES for linux redhat targets.
+		convertRelease-diag.patch
+			Adds a debug option, -d, to convertRelease.pl
+			Was quite usefull when debugging our templated ioc builds which build w/ a local TOP and a parent IOC_TOP.
+		rules-ioc-archive-autosave-templated.patch
+			Adds support for building archive and autosave request files
+			New file suffixes and INSTALL locations:		*.tpl-arch:	
+			Templates for archive request files:			*.sub-arch:
+			Substitution files for archive request files:	*.archive:
+			Archive request files TOP/archive
+			Default install location
+		caget-dynamic-array.patch
+			Made asynchronous ca_array_get_callback the default for caget, thus supporting dynamic array sizing.
+			Added -G option to force synchronous fetch w/o dynamic arrays.
+		active-scan-count-exceeded-error-msg.patch
+			Show more helpful msgs for active scan count exceeded.
+		assert-abort-not-suspend.patch
+			An unhandled exception will abort the process instead of suspending the thread.
+			Thus, procServ restarts the ioc instead of leaving it crippled.
+		epics-thread-show-linux-pids.patch
+			Show linux PID instead of pthreads in epicsThreadShowAll
+		non-rt-thread-priority-zero.patch
+			Fix bug Mike found w/ default 0 priority when thread is non-RT and can't be set less than 1.
+		string-record-strncpy.patch
+			Protect against buffer overruns
+		db-tpro-show-values.patch
+			to show record VAL fields for tpro >= 2
+		ca-sizes-in-error-msgs.patch
+			to show data size vs max size in CA error msgs
+		new-host-arch-names.patch
+			to update startup/EpicsHostArch scripts
+		pv-name-in-ca-error-msgs.patch
+			Modified CA error msgs for invalid pv types to include the PV name.
+		mkmf-db-dep-for-sub-arch.patch
+			Extended the new db dependency fixes using mkmf.pl to also work for our *.sub-{db,tpl,arch} files.
+		readRelease-diags.patch
+			Improved user diagnostics for readRelease perl module
+		convertRelease-typo.patch
+			Fixed typo in rule for convertRelease envPaths
+		pcds-gitignore.patch
+			Adding a .gitignore file from pcds-trunk branch.
+		tsel-implementation-comments.patch
+			Improved comments re how TSEL links are implemented.
+		only-one-ca-no-write-access-error-msg.patch2
+			Added another ck to suppress error msg spewing
+		only-one-ca-no-write-access-error-msg.patch
+			Add tests for sevr already INVALID before issuing recGbl link errors to avoid spewing msgs endlessly to the console
+		dbCaHasWriteAccess.patch
+			Added new methods dbCaHasReadAccess() and dbCaHasWriteAccess() to 
+			dbCa.c and dbCa.h following the pattern of the current dbCaIsConnected().
+			Modified error messages in db/dbAccess.c to check for CA read and
+			write access in order to set the record status to READ_ACCESS_ALARM
+			or WRITE_ACCESS_ALARM as appropriate.
+		dst2016.patch
+			Fix 2016 DST dates
+		startup-EpicsHostArch.patch
+			Use startup/EpicsHostArch instead of startup/EpicsHostArch.pl to determine EPICS_HOST_ARCH.
 
+Release Notes for R3.14.12.5-2.0: bhill Oct 20, 2016
+		This release is deprecated as it only has some of the patches listed above.

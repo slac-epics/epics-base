@@ -1,0 +1,15 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..689fa30
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,9 @@
++/bin/
++/lib/
++/db/
++/dbd/
++/html/
++/include/
++/templates/
++O.*
++*.log

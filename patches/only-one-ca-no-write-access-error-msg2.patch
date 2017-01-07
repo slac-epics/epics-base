@@ -1,0 +1,14 @@
+diff --git a/src/db/dbAccess.c b/src/db/dbAccess.c
+index d5f798a..6fbb7ca 100644
+--- a/src/db/dbAccess.c
++++ b/src/db/dbAccess.c
+@@ -958,7 +958,8 @@ long epicsShareAPI dbPutLinkValue(struct link *plink, short dbrType,
+ 					recGblRecordError(status, psource, "dbCaPutLink error, no read access!");
+ 				recGblSetSevr(psource, READ_ACCESS_ALARM, INVALID_ALARM);
+ 			} if ( !dbCaHasWriteAccess( plink ) ) {
+-				recGblRecordError(status, psource, "dbCaPutLink error, no write access!");
++				if ( psource->sevr < INVALID_ALARM )
++					recGblRecordError(status, psource, "dbCaPutLink error, no write access!");
+ 				recGblSetSevr(psource, WRITE_ACCESS_ALARM, INVALID_ALARM);
+ 			}
+ 		}
