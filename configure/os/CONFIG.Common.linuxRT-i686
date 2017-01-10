@@ -14,7 +14,3 @@ include $(CONFIG)/os/CONFIG.Common.linuxCommon
 VALID_BUILDS = Host Ioc
 ARCH_CLASS = x86
 ARCH_DEP_CPPFLAGS += -D_X86_
-
-# Silence annoying warnigs re _BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE
-OP_SYS_CPPFLAGS += -D_DEFAULT_SOURCE
-

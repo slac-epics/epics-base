@@ -31,7 +31,7 @@ case $sysname in
 			*el7* )
 				os=rhel7 ;;
 			*-rt* )
-				os=linuxRT_glibc ;;
+				os=linuxRT ;;
         esac
         case $cpu in
             i386 | i486 | i586 | i686 )
