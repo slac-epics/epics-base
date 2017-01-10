@@ -1,0 +1,44 @@
+# Build types
+VALID_BUILDS = Ioc
+
+# Location of linuxRT GNU ToolChain
+#LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
+#LINUX_RT_HOME=/usr/local/common
+#LINUX_RT_HOME=/home/ernesto/packages
+#LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
+LINUX_RT_HOME=/afs/slac/package/linuxRT
+
+GNU_DIR=$(LINUX_RT_HOME)/buildroot-2015.02/host/linux-x86_64/i686/usr
+
+# Cross Target Architecture
+GNU_TARGET=i686-linux
+
+# Could substitute prefix of rpath here
+#SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
+# Only static build is supported at this time.
+SHARED_LIBRARIES=NO
+STATIC_BUILD=YES
+
+# =====================================================================
+# Recommended by Till Strauman:
+# For linuxRT-x86 Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES = -O3 -g
+OPT_CXXFLAGS_YES = -O3 -g
+
+
+# =================================================
+# # Add support for readline: used by
+# # EPICS IOC Shell for command line history, etc...
+# #  ================================================
+COMMANDLINE_LIBRARY = READLINE
+
+
+# =========================================================================
+# Valgrind support
+# =========================================================================
+VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
+VALGRIND_INCLUDE=$(VALGRIND_TOP)/buildroot_2015.2/install/linuxRT_glibc-i686/include
+VALGRIND_LIB=$(VALGRIND_TOP)/buildroot_2015.2/install/linuxRT_glibc-i686/lib
+

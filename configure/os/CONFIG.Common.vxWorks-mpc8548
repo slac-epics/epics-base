@@ -1,6 +1,6 @@
 # CONFIG.Common.vxWorks-mpc8548
 #
-# Definitions for vxWorks-mpc8548 target archs
+# Definitions for vxWorks-mpc8548 targets: MPC8548 CPU with >32MB RAM.
 # Sites may override these definitions in CONFIG_SITE.Common.vxWorks-mpc8548
 #-------------------------------------------------------
 
