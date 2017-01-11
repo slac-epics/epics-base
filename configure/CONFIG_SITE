@@ -83,6 +83,9 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-microblaze
 #       linux-xscale_be
+#       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+#       linuxRT-i686            (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+#       linuxRT-arm_zynq        (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -116,7 +119,10 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
 CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
+ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
+CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
+CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
+endif
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
