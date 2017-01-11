@@ -27,6 +27,7 @@
 #	linux-ppc64            (GNU compiler used for host builds)
 #	linux-x86              (GNU compiler used for host builds)
 #	linux-x86_64           (GNU compiler used for host builds)
+#	rhel6-x86_64           (GNU compiler used for host builds)
 #	solaris-sparc          (Sun compiler used for host builds)
 #	solaris-sparc-gnu      (GNU compiler used for host builds)
 #	solaris-sparc64        (Sun compiler used for host builds)
@@ -75,9 +76,9 @@
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-microblaze
 #       linux-xscale_be
-#       linuxRT-x86             (linux-rt with uClibc; buildroot; created by Till Strauman)
-#       linuxRT-x86_64          (linux-rt with uClibc; buildroot; created by Till Strauman)
-#       linuxRT-ppcP2020        (linux-rt with uClibc; buildroot; created by Till Strauman)
+#       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+#       linuxRT-i686            (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+#       linuxRT-arm_zynq        (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -111,12 +112,8 @@
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
 #CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
 #CROSS_COMPILER_TARGET_ARCHS=rt-linux
-
-#CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86 linuxRT-x86_64
-
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec linuxRT_glibc-x86_64 linuxRT_glibc-i686
+CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
@@ -171,7 +168,7 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 # Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools.
 #  Optimized Build
-EPICS_SITE_VERSION = 0.0
+EPICS_SITE_VERSION = 0.1.0
 
 # For GNU compiler, use pipes rather than temporary files for
 #  communication between the various stages of compilation.
