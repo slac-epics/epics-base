@@ -1,0 +1,14 @@
+diff --git a/src/libCom/osi/os/posix/osdThread.c b/src/libCom/osi/os/posix/osdThread.c
+index 755390e..888fa13 100644
+--- a/src/libCom/osi/os/posix/osdThread.c
++++ b/src/libCom/osi/os/posix/osdThread.c
+@@ -426,6 +426,9 @@ void epicsThreadRealtimeLock(void)
+                 "Warning: Unable to lock the virtual address space.\n"
+                 "VM page faults may harm real-time performance.\n");
+         }
++		else {
++			printf( "epicsThreadRealtimeLock: Successfull mlockall for current and future memory pages.\n" );
++		}
+     }
+ #endif
+ }
