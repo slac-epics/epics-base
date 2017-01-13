@@ -4,7 +4,7 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
-base-R3.15.5-0.1.0:  Initial Release
+R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
                Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
                Add comment for HOST Build:
                # rhel6-x86_64           (GNU compiler used for host builds)
