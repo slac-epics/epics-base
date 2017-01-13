@@ -426,9 +426,6 @@ void epicsThreadRealtimeLock(void)
                 "Warning: Unable to lock the virtual address space.\n"
                 "VM page faults may harm real-time performance.\n");
         }
-		else {
-			printf( "epicsThreadRealtimeLock: Successfull mlockall for current and future memory pages.\n" );
-		}
     }
 #endif
 }
