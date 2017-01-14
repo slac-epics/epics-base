@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-0.2:	New linuxRT buildroot version?
+				Replaced 3 prior patches w/ new lcls-build-support.patch based on final set of changes.
+				?, 1/?/2017
+
 R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
                Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
                Add comment for HOST Build:
