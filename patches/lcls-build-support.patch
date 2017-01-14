@@ -1,0 +1,1843 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..96fcb47
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,10 @@
++/bin/
++/lib/
++/db/
++/dbd/
++/html/
++/include/
++/templates/
++O.*
++*.log
++*.swp
+diff --git a/configure/CONFIG_SITE b/configure/CONFIG_SITE
+index d4edb94..9af80a9 100644
+--- a/configure/CONFIG_SITE
++++ b/configure/CONFIG_SITE
+@@ -27,6 +27,7 @@
+ #	linux-ppc64            (GNU compiler used for host builds)
+ #	linux-x86              (GNU compiler used for host builds)
+ #	linux-x86_64           (GNU compiler used for host builds)
++#	rhel6-x86_64           (GNU compiler used for host builds)
+ #	solaris-sparc          (Sun compiler used for host builds)
+ #	solaris-sparc-gnu      (GNU compiler used for host builds)
+ #	solaris-sparc64        (Sun compiler used for host builds)
+@@ -75,6 +76,9 @@
+ #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
+ #       linux-microblaze
+ #       linux-xscale_be
++#       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
++#       linuxRT-i686            (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
++#       linuxRT-arm_zynq        (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+ #       vxWorks-486
+ #       vxWorks-68040
+ #       vxWorks-68040lc
+@@ -107,8 +111,9 @@
+ # Which target architectures to cross-compile for.
+ #  Definitions in configure/os/CONFIG_SITE.<host>.Common
+ #  may override this setting.
+-CROSS_COMPILER_TARGET_ARCHS=
+-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
++#CROSS_COMPILER_TARGET_ARCHS=
++#CROSS_COMPILER_TARGET_ARCHS=rt-linux
++CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
+ 
+ # If only some of your host architectures can compile the
+ #  above CROSS_COMPILER_TARGET_ARCHS specify those host
+@@ -134,7 +139,7 @@ SHARED_LIBRARIES=YES
+ 
+ # Build client objects statically.
+ #  Must be either YES or NO.
+-STATIC_BUILD=NO
++STATIC_BUILD=YES
+ 
+ # Host build optimization.
+ #  Must be either YES or NO.
+@@ -162,7 +167,8 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
+ 
+ # Site version number, if set will append '-' and this string to the
+ #  EPICS version number string that is reported by many tools.
+-EPICS_SITE_VERSION =
++#  Optimized Build
++EPICS_SITE_VERSION = 0.1
+ 
+ # For GNU compiler, use pipes rather than temporary files for
+ #  communication between the various stages of compilation.
+diff --git a/configure/CONFIG_SITE_ENV b/configure/CONFIG_SITE_ENV
+index 2c56ff2..e0659d2 100644
+--- a/configure/CONFIG_SITE_ENV
++++ b/configure/CONFIG_SITE_ENV
+@@ -46,7 +46,8 @@
+ #	(see: http://www.timeanddate.com/time/dst/2016.html etc. )
+ #
+ # These values are for 2016:
+-EPICS_TIMEZONE=CST/CDT::360:031302:110602
++#EPICS_TIMEZONE=CST/CDT::360:031302:110602
++EPICS_TIMEZONE=PUS::480:031302:110602
+ #EPICS_TIMEZONE=CET/CEST::-60:032702:103002
+ 
+ # EPICS_TS_NTP_INET
+diff --git a/configure/os/CONFIG.Common.RTEMS b/configure/os/CONFIG.Common.RTEMS
+index 9650ae2..5331c9b 100644
+--- a/configure/os/CONFIG.Common.RTEMS
++++ b/configure/os/CONFIG.Common.RTEMS
+@@ -11,37 +11,67 @@
+ #  Sites may override definitions in os/CONFIG_SITE.Common.RTEMS
+ #-------------------------------------------------------
+ #
+-
++# Where to find RTEMS
++#RTEMS_BASE=/opt/rtems-4.7
++#RTEMS_VERSION=4.7
++# T.S. 8/7/2002: cannot override this from CONFIG_SITE because of
++# the includes :-(
++# RTEMS_BASE=/afs/slac/package/rtems/4.6.2/host/@sys/
++#
++# NOTE RTEMS_BASE is now defined by the site specific
++#      RTEMS makefile 'rtems-version.cfg'
++                     
+ #-------------------------------------------------------
+ # RTEMS tools are similar to UNIX tools
+ -include $(CONFIG)/os/CONFIG.Common.UnixCommon
+ 
+-GNU_TARGET_INCLUDE_DIR =
+-unexport GCC_EXEC_PREFIX
+-
+ #--------------------------------------------------
+ # Get RTEMS_BASE definition
+ -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
+ 
+-ifneq ($(CONFIG),$(TOP)/configure)
+--include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
++ifeq ($(T_A),RTEMS-mvme5500)
++RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
++else
++#RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
++# Also, change afs hard-coded path to the new path after relocating RTEMS
++# to NFS
++#
++# could use
++#
++# ifeq ($(wildcard /afs/slac/package/rtems)xx,xx)
++# RTEMS_SITE_TOP=<NFS-path>
++# else
++# RTEMS_SITE_TOP=<afs-path>
++# endif
++#
++# but I'm not sure if that causes problems with checkRelease
++# since checkRelease is pretty dumb...
++#
++RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
++#RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
++RTEMS_PATCHLVL=rtems_p0
++SSRLAPPS_PATCHLVL=ssrlApps_p3
+ endif
+ 
++RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
++RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+ #-------------------------------------------------------
+ # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
+-include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
++#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
++RTEMS_BSP=$(subst RTEMS-,,$(T_A))
++include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
+ include $(RTEMS_CUSTOM)
+ include $(CONFIG.CC)
+ 
+ #-------------------------------------------------------
+ # RTEMS cross-development tools
+-CC = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
+-CCC = $(RTEMS_TOOLS)/bin/$(CXX)
+-CPP = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) -x c -E
+-AR = $(RTEMS_TOOLS)/bin/$(AR_FOR_TARGET)
+-LD = $(RTEMS_TOOLS)/bin/$(LD_FOR_TARGET) -r
++CC = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
++CCC = $(RTEMS_BASE)/bin/$(CXX)
++CPP = $(RTEMS_BASE)/bin/$(CC_FOR_TARGET) -x c -E
++AR = $(RTEMS_BASE)/bin/$(AR_FOR_TARGET)
++LD = $(RTEMS_BASE)/bin/$(LD_FOR_TARGET) -r
+ 
+-RANLIB := $(RTEMS_TOOLS)/bin/$(RANLIB)
++RANLIB := $(RTEMS_BASE)/bin/$(RANLIB)
+ 
+ #-------------------------------------------------------
+ # Build types
+@@ -50,12 +80,14 @@ VALID_BUILDS = Ioc
+ #--------------------------------------------------
+ # The RTEMS Makefiles redefine several macros, so we have to
+ # reset them to the proper EPICS values, from CONFIG_COMMON
+-CFLAGS = $($(BUILD_CLASS)_CFLAGS) $(POSIX_CFLAGS) $(OPT_CFLAGS)\
++CFLAGS = $(CONFORM_CFLAGS)\
++ $($(BUILD_CLASS)_CFLAGS) $(POSIX_CFLAGS) $(OPT_CFLAGS)\
+  $(DEBUG_CFLAGS) $(PIPE_CFLAGS) $(WARN_CFLAGS) $(TARGET_CFLAGS)\
+  $(USR_CFLAGS) $(CMD_CFLAGS) $(ARCH_DEP_CFLAGS) $(CODE_CFLAGS)\
+  $(STATIC_CFLAGS) $(OP_SYS_CFLAGS) $(LIBRARY_SRC_CFLAGS)
+ 
+-CXXFLAGS = $($(BUILD_CLASS)_CXXFLAGS) $(POSIX_CXXFLAGS) $(OPT_CXXFLAGS)\
++CXXFLAGS = $(CONFORM_CXXFLAGS)\
++ $($(BUILD_CLASS)_CXXFLAGS) $(POSIX_CXXFLAGS) $(OPT_CXXFLAGS)\
+  $(DEBUG_CXXFLAGS) $(PIPE_CFLAGS) $(WARN_CXXFLAGS) $(TARGET_CXXFLAGS)\
+  $(USR_CXXFLAGS) $(CMD_CXXFLAGS) $(ARCH_DEP_CXXFLAGS) $(CODE_CXXFLAGS)\
+  $(STATIC_CXXCFLAGS) $(OP_SYS_CXXFLAGS) $(LIBRARY_SRC_CFLAGS)
+@@ -64,10 +96,12 @@ LDFLAGS = $(OPT_LDFLAGS) $(TARGET_LDFLAGS) $(USR_LDFLAGS) $(CMD_LDFLAGS)\
+  $(POSIX_LDFLAGS) $(ARCH_DEP_LDFLAGS) $(DEBUG_LDFLAGS) $(OP_SYS_LDFLAGS)\
+  $($(BUILD_CLASS)_LDFLAGS) $(RUNTIME_LDFLAGS) $(CODE_LDFLAGS)
+ 
+-LDLIBS = $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
++LDLIBS = $(STATIC_LDLIBS)\
++ $(POSIX_LDLIBS) $(ARCH_DEP_LDLIBS) $(DEBUG_LDLIBS) $(OP_SYS_LDLIBS)\
+  $(GNU_LDLIBS_$(GNU))
+ 
+-CPPFLAGS += $($(BUILD_CLASS)_CPPFLAGS) $(POSIX_CPPFLAGS) $(OPT_CPPFLAGS)\
++CPPFLAGS += $(CONFORM_CPPFLAGS)\
++ $($(BUILD_CLASS)_CPPFLAGS) $(POSIX_CPPFLAGS) $(OPT_CPPFLAGS)\
+  $(DEBUG_CPPFLAGS) $(WARN_CPPFLAGS) $(BASE_CPPFLAGS) $(TARGET_CPPFLAGS)\
+  $(USR_CPPFLAGS) $(CMD_CPPFLAGS) $(ARCH_DEP_CPPFLAGS) $(OP_SYS_CPPFLAGS)\
+  $(OP_SYS_INCLUDE_CPPFLAGS) $(CODE_CPPFLAGS)
+@@ -81,8 +115,8 @@ CROSS_LDFLAGS =
+ SHRLIB_CFLAGS =
+ OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V)
+ OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V)
+-OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V)
+-OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V)
++OPT_CFLAGS_NO    = $(CFLAGS_DEBUG_V) -g
++OPT_CXXFLAGS_NO  = $(CFLAGS_DEBUG_V) -g
+ 
+ MODEXT=.obj
+ 
+@@ -92,7 +126,8 @@ OS_CLASS = RTEMS
+ 
+ #--------------------------------------------------
+ # Operating system flags
+-OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lnfs -lm
++#OP_SYS_LDLIBS += -lrtemsCom -lc -lrtemscpu -lCom -lnfs -lm
++OP_SYS_LDLIBS=
+ OP_SYS_LDFLAGS += $(CPU_CFLAGS) -u Init \
+                  $(PROJECT_RELEASE)/lib/no-dpmem.rel \
+                  $(PROJECT_RELEASE)/lib/no-mp.rel \
+@@ -144,8 +179,11 @@ CODE_CFLAGS =
+ CODE_CXXFLAGS =
+ 
+ #--------------------------------------------------
+-# Override the usual RTEMS verbosity from ar
+-ARFLAGS = rc
++# RTEMS uses the inline keyword so -pedantic causes too many problems.
++
++CONFORM_CFLAGS_STRICT = -ansi
++
++CONFORM_CXXFLAGS_STRICT = -ansi
+ 
+ #--------------------------------------------------
+ # Command-line input support
+@@ -154,4 +192,6 @@ LDLIBS_READLINE = -lreadline -lncurses
+ 
+ #--------------------------------------------------
+ # Allow site overrides
+--include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).RTEMS
++-include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
++
++
+diff --git a/configure/os/CONFIG.Common.RTEMS-beatnik b/configure/os/CONFIG.Common.RTEMS-beatnik
+index 00080e7..5257790 100644
+--- a/configure/os/CONFIG.Common.RTEMS-beatnik
++++ b/configure/os/CONFIG.Common.RTEMS-beatnik
+@@ -17,7 +17,7 @@ OP_SYS_LDLIBS += -lbspExt
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+ endef
+ 
+ include $(CONFIG)/os/CONFIG.Common.RTEMS
+@@ -34,3 +34,5 @@ INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
+ 	$(OBJCOPY) -Obinary $^ $@
+ 
+ #PRODTARGETS+=$(INSTALL_RTEMSSYMS) $(INSTALL_RTEMSIMGS)
++
++
+diff --git a/configure/os/CONFIG.Common.RTEMS-mvme2100 b/configure/os/CONFIG.Common.RTEMS-mvme2100
+index 687af23..f52122d 100644
+--- a/configure/os/CONFIG.Common.RTEMS-mvme2100
++++ b/configure/os/CONFIG.Common.RTEMS-mvme2100
+@@ -15,9 +15,9 @@ OP_SYS_LDLIBS += -lbspExt
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< rtems
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< rtems
+ 	gzip -f9 rtems
+-	$(RTEMS_TOOLS)/bin/$(LD_FOR_TARGET) -o $@ \
++	$(RTEMS_BASE)/bin/$(LD_FOR_TARGET) -o $@ \
+ 		 $(PROJECT_RELEASE)/lib/bootloader.o \
+ 		--just-symbols=$< \
+ 		-b binary rtems.gz \
+diff --git a/configure/os/CONFIG.Common.RTEMS-mvme3100 b/configure/os/CONFIG.Common.RTEMS-mvme3100
+index cd9416c..f3f5866 100644
+--- a/configure/os/CONFIG.Common.RTEMS-mvme3100
++++ b/configure/os/CONFIG.Common.RTEMS-mvme3100
+@@ -4,29 +4,28 @@
+ #
+ # All RTEMS targets use the same Makefile fragment
+ #
+-EXE = .elf
++override EXE = .elf
+ RTEMS_TARGET_CPU = powerpc
+-GNU_TARGET = powerpc-rtems
++GNU_TARGET=powerpc-rtems
+ ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
+ ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
+-ARCH_DEP_CFLAGS += -DRTEMS_NETWORK_CONFIG_MBUF_SPACE=2048
+-ARCH_DEP_CFLAGS += -DRTEMS_NETWORK_CONFIG_CLUSTER_SPACE=5120
+-
+-OP_SYS_LDLIBS += -lbspExt
+ 
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+ endef
+ 
+-include $(CONFIG)/os/CONFIG.Common.RTEMS
++CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik
+ 
++include $(CONFIG)/os/CONFIG.Common.RTEMS
+ RTEMSSYMS=$(PRODNAME:%$(EXE)=%.sym)
+ RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
+ INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
+ INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
+ 
++#OP_SYS_LDLIBS += -lbspExt
++
+ %.sym: %$(EXE)
+ 	$(XSYMS) $^ $@
+ 
+diff --git a/configure/os/CONFIG.Common.RTEMS-mvme5500 b/configure/os/CONFIG.Common.RTEMS-mvme5500
+index 0c05b76..36d0b59 100644
+--- a/configure/os/CONFIG.Common.RTEMS-mvme5500
++++ b/configure/os/CONFIG.Common.RTEMS-mvme5500
+@@ -4,21 +4,14 @@
+ #
+ # All RTEMS targets use the same Makefile fragment
+ #
+-EXE = .elf
+ RTEMS_TARGET_CPU = powerpc
+-GNU_TARGET = powerpc-rtems
+ ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
+ ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
+-ARCH_DEP_CFLAGS += -DRTEMS_NETWORK_CONFIG_MBUF_SPACE=2048
+-ARCH_DEP_CFLAGS += -DRTEMS_NETWORK_CONFIG_CLUSTER_SPACE=5120
+-ARCH_DEP_CFLAGS += -DBSP_NVRAM_BASE_ADDR=0xf1110000
+-
+-OP_SYS_LDLIBS += -lbspExt
+ 
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+ endef
+ 
+ OP_SYS_LDLIBS += -lbspExt
+diff --git a/configure/os/CONFIG.Common.RTEMS-pc386 b/configure/os/CONFIG.Common.RTEMS-pc386
+index b3150cc..9fa78a1 100644
+--- a/configure/os/CONFIG.Common.RTEMS-pc386
++++ b/configure/os/CONFIG.Common.RTEMS-pc386
+@@ -10,7 +10,7 @@ RTEMS_TARGET_CPU=i386
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< temp.bin
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< temp.bin
+ 	$(BIN2BOOT) $@ 0x00097E00 \
+ 		$(PROJECT_RELEASE)/lib/start16.bin 0x00097C00 0 temp.bin 0x00100000 0
+ 	rm -f temp.bin
+@@ -21,4 +21,7 @@ include $(CONFIG)/os/CONFIG.Common.RTEMS
+ #
+ # Put text segment where it will work with etherboot
+ #
+-OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
++# Suggested by Till Strauman
++# Must be removed for CEXP/run-time loading:
++#OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
++
+diff --git a/configure/os/CONFIG.Common.RTEMS-pc586 b/configure/os/CONFIG.Common.RTEMS-pc586
+new file mode 100644
+index 0000000..e8226a0
+--- /dev/null
++++ b/configure/os/CONFIG.Common.RTEMS-pc586
+@@ -0,0 +1,35 @@
++#
++# $Revision-Id$
++# Author: W. Eric Norum
++#         Canadian Light Source
++#         eric@cls.usask.ca
++#
++# All RTEMS targets use the same Makefile fragment
++#
++
++RTEMS_TARGET_CPU=i386
++
++MUNCH_SUFFIX = .boot
++
++MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
++
++define MUNCH_CMD
++
++   $(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< temp.bin
++
++   $(PROJECT_RELEASE)/build-tools/bin2boot $@ 0x00097E00 \
++
++       $(PROJECT_RELEASE)/lib/start16.bin 0x00097C00 0 temp.bin 0x00100000 0
++
++   rm -f temp.bin
++
++endef
++ 
++include $(CONFIG)/os/CONFIG.Common.RTEMS
++
++#
++# Put text segment where it will work with etherboot
++#
++# Must be removed for CEXP/run-time loading:
++#OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
++
+diff --git a/configure/os/CONFIG.Common.RTEMS-uC5282 b/configure/os/CONFIG.Common.RTEMS-uC5282
+index 9c6a58d..19f8ac2 100644
+--- a/configure/os/CONFIG.Common.RTEMS-uC5282
++++ b/configure/os/CONFIG.Common.RTEMS-uC5282
+@@ -5,13 +5,35 @@
+ #
+ # All RTEMS targets use the same Makefile fragment
+ #
++override EXE=.elf
+ RTEMS_TARGET_CPU = m68k
++GNU_TARGET=m68k-rtems
+ ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
++#ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
+ 
+ MUNCH_SUFFIX = .boot
+ MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+ define MUNCH_CMD
+-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< $@
++	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< $@
+ endef
+ 
++CROSS_COMPILER_TARGET_ARCHS=RTEMS-uC5282
++
+ include $(CONFIG)/os/CONFIG.Common.RTEMS
++
++RTEMSSYMS=$(PRODNAME:%$(EXE)=%.sym)
++RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
++INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
++INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
++
++%.sym: %$(EXE)
++	$(XSYMS) $^ $@
++
++%.bin: %$(EXE)
++	$(OBJCOPY) -Obinary $^ $@
++
++#
++# Must put this one so it shows up after the -m528x
++#
++OP_SYS_LDFLAGS += -m5200
++
+diff --git a/configure/os/CONFIG.Common.linuxRT-arm_zynq b/configure/os/CONFIG.Common.linuxRT-arm_zynq
+new file mode 100644
+index 0000000..88f4833
+--- /dev/null
++++ b/configure/os/CONFIG.Common.linuxRT-arm_zynq
+@@ -0,0 +1,15 @@
++# CONFIG.Common.linuxRT-arm_zynq
++#
++# This file is maintained by the build community.
++#
++# Definitions for linuxRT-arm_zync target builds
++# linuxRT is really linux-rt with glibc produced by Till Strauman of
++# SLAC National Laboratories
++# Sites may override these definitions and add other definitions
++# in CONFIG_SITE.Common.linuxRT-arm_zynq
++#-------------------------------------------------------
++
++# Include definitions common to all linux-arm targets
++include $(CONFIG)/os/CONFIG.Common.linux-arm
++VALID_BUILDS = Ioc
++
+diff --git a/configure/os/CONFIG.Common.linuxRT-i686 b/configure/os/CONFIG.Common.linuxRT-i686
+new file mode 100644
+index 0000000..5456ae4
+--- /dev/null
++++ b/configure/os/CONFIG.Common.linuxRT-i686
+@@ -0,0 +1,17 @@
++# CONFIG.Common.linuxRT-x86
++#
++# This file is maintained by the build community.
++#
++# Definitions for linuxRT-x86 target builds
++# linuxRT is really linux-rt with glibc produced by Till Strauman of
++# SLAC National Laboratories
++# Sites may override these definitions and add other definitions
++# in CONFIG_SITE.Common.linuxRT-x86
++#-------------------------------------------------------
++
++# Include definitions common to all Unix targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++VALID_BUILDS = Ioc
++ARCH_CLASS = x86
++ARCH_DEP_CPPFLAGS += -D_X86_
++
+diff --git a/configure/os/CONFIG.Common.linuxRT-x86_64 b/configure/os/CONFIG.Common.linuxRT-x86_64
+new file mode 100644
+index 0000000..ceac5b5
+--- /dev/null
++++ b/configure/os/CONFIG.Common.linuxRT-x86_64
+@@ -0,0 +1,17 @@
++# CONFIG.Common.linuxRT-x86_64
++#
++# This file is maintained by the build community.
++#
++# Definitions for linuxRT-x86_64 target builds
++# linuxRT is really linux-rt with glibc produced by Till Strauman of
++# SLAC National Laboratories
++# Sites may override these definitions and add other definitions
++# in CONFIG_SITE.Common.linuxRT-x86_64
++#-------------------------------------------------------
++
++# Include definitions common to all Unix targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++VALID_BUILDS = Ioc
++ARCH_CLASS = x86_64
++ARCH_DEP_CPPFLAGS += -D_X86_64_
++
+diff --git a/configure/os/CONFIG.Common.rhel6-x86_64 b/configure/os/CONFIG.Common.rhel6-x86_64
+new file mode 100644
+index 0000000..7dd4453
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel6-x86_64
+@@ -0,0 +1,24 @@
++# CONFIG.Common.rhel6-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.Common.rhel6-x86_64
++#-------------------------------------------------------
++
++# Include definitions common to all linux targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++
++ARCH_CLASS = x86_64
++
++ARCH_DEP_CPPFLAGS += -D_X86_64_
++ARCH_DEP_CFLAGS += -m64
++ARCH_DEP_LDFLAGS += -m64
++
++OS_CLASS = Linux
++
++# If your crosscompiler name has a GNU target prefix like <gnutarget>-gcc,
++# e.g. x86_64-redhat-linux-gcc, put a GNU_TARGET definition in
++# CONFIG_SITE.<host>.rhel6-x86_64 file, e.g. GNU_TARGET=x86_64-redhat-linux
++
+diff --git a/configure/os/CONFIG.Common.rhel6-x86_64-debug b/configure/os/CONFIG.Common.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..1aff2c9
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel6-x86_64-debug
+@@ -0,0 +1,13 @@
++# CONFIG.Common.rhel6-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.Common.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++# Include definitions common to all rhel6-x86_64  target archs
++include $(CONFIG)/os/CONFIG.Common.rhel6-x86_64
++
++HOST_OPT=NO
+diff --git a/configure/os/CONFIG.Common.rhel7-x86_64 b/configure/os/CONFIG.Common.rhel7-x86_64
+new file mode 100644
+index 0000000..bca002b
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel7-x86_64
+@@ -0,0 +1,24 @@
++# CONFIG.Common.rhel7-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.Common.rhel7-x86_64
++#-------------------------------------------------------
++
++# Include definitions common to all linux targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++
++ARCH_CLASS = x86_64
++
++ARCH_DEP_CPPFLAGS += -D_X86_64_
++ARCH_DEP_CFLAGS += -m64
++ARCH_DEP_LDFLAGS += -m64
++
++OS_CLASS = Linux
++
++# If your crosscompiler name has a GNU target prefix like <gnutarget>-gcc,
++# e.g. x86_64-redhat-linux-gcc, put a GNU_TARGET definition in
++# CONFIG_SITE.<host>.rhel7-x86_64 file, e.g. GNU_TARGET=x86_64-redhat-linux
++
+diff --git a/configure/os/CONFIG.Common.rhel7-x86_64-debug b/configure/os/CONFIG.Common.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..d1f8f4e
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rhel7-x86_64-debug
+@@ -0,0 +1,13 @@
++# CONFIG.Common.rhel7-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.Common.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++# Include definitions common to all rhel7-x86_64  target archs
++include $(CONFIG)/os/CONFIG.Common.rhel7-x86_64
++
++HOST_OPT=NO
+diff --git a/configure/os/CONFIG.Common.rt-linux b/configure/os/CONFIG.Common.rt-linux
+new file mode 100644
+index 0000000..1dcbd8d
+--- /dev/null
++++ b/configure/os/CONFIG.Common.rt-linux
+@@ -0,0 +1,36 @@
++# CONFIG.Common.linux-x86
++#
++# CONFIG.Common.linux-x86,v 1.16.2.9 2005/02/25 16:00:40 jba Exp
++# This file is maintained by the build community.
++#
++# Definitions for linux-x86 target builds
++# Sites may override these definitions in CONFIG_SITE.Common.linux-x86
++#-------------------------------------------------------
++
++# Include definitions common to all linux targets
++include $(CONFIG)/os/CONFIG.Common.linuxCommon
++
++ARCH_CLASS = x86
++
++ARCH_DEP_CPPFLAGS += -D_X86_
++
++#
++## The vendor's tool chain needs to be located here
++#
++ifeq ($(BUILD_CLASS),CROSS)
++    RT_LINUX_USR_DIR = /afs/slac/g/cd/swe/rhel6/package/rtLinux/toolchain/xtools/i686-nptl-linux-gnu/i686-nptl-linux-gnu/sys-root/usr
++    VALID_BUILDS = Ioc
++    GNU_DIR=/afs/slac/g/cd/swe/rhel6/package/rtLinux/toolchain/xtools/i686-nptl-linux-gnu/
++    #GNU_TARGET =
++    LDLIBS_READLINE=-lreadline -lncurses
++    #CMPLR_PREFIX = $(addsuffix -,$(GNU_TARGET))
++    CMPLR_PREFIX=rt-linux-
++    CROSS_INCLUDES= -I$(RT_LINUX_USR_DIR)/local/include
++    CROSS_LDFLAGS=
++    SHRLIB_SEARCH_FULLPATHDIRS += /afs/slac/g/cd/swe/rhel6/package/rtLinux/toolchain/xtools/i686-nptl-linux-gnu/lib/gcc/i686-nptl-linux-gnu/4.4.5
++    unexport GCC_EXEC_PREFIX
++endif
++
++
++
++
+diff --git a/configure/os/CONFIG.Common.vxWorks-mpc8548 b/configure/os/CONFIG.Common.vxWorks-mpc8548
+index d7a7591..f3e59fb 100644
+--- a/configure/os/CONFIG.Common.vxWorks-mpc8548
++++ b/configure/os/CONFIG.Common.vxWorks-mpc8548
+@@ -1,6 +1,6 @@
+ # CONFIG.Common.vxWorks-mpc8548
+ #
+-# Definitions for vxWorks-mpc8548 target archs
++# Definitions for vxWorks-mpc8548 targets: MPC8548 CPU with >32MB RAM.
+ # Sites may override these definitions in CONFIG_SITE.Common.vxWorks-mpc8548
+ #-------------------------------------------------------
+ 
+diff --git a/configure/os/CONFIG.Common.vxWorks-pentium4 b/configure/os/CONFIG.Common.vxWorks-pentium4
+new file mode 100644
+index 0000000..e8f933c
+--- /dev/null
++++ b/configure/os/CONFIG.Common.vxWorks-pentium4
+@@ -0,0 +1,29 @@
++# CONFIG.Common.vxWorks-pentium4
++#
++# Revision-Id:
++# This file is maintained by the build community.
++#
++# Definitions for vxWorks-pentium4 target archs
++# Sites may override these definitions in CONFIG_SITE.Common.vxWorks-pentium4
++#-------------------------------------------------------
++
++# Include definitions common to all vxWorks target archs
++include $(CONFIG)/os/CONFIG.Common.vxWorksCommon
++
++# ======================================================================================
++# Define "VSB_DIR" and "VXB_CONFIG_FILE" to get rid of warning message in vxWorks 6.8
++# ======================================================================================
++VSB_DIR=$(WIND_BASE)/vxworks-6.8/target/lib
++# =====================================================================================
++
++# Vx GNU cross compiler suffix
++CMPLR_SUFFIX = pentium
++ 
++ARCH_CLASS = pentium
++
++ARCH_DEP_CPPFLAGS = -DCPU=PENTIUM4 -D_X86_ -D_WRS_KERNEL -MD -MP
++ARCH_DEP_CPPFLAGS += -D_VSB_CONFIG_FILE=\"$(VSB_DIR)/h/config/vsbConfig.h\"
++ARCH_DEP_CFLAGS += -mtune=pentium4 -march=pentium4
++ARCH_DEP_CXXFLAGS += -x 'c++' 
++ARCH_DEP_CFLAGS += -fno-defer-pop -nostdlib
++
+diff --git a/configure/os/CONFIG.Common.vxWorks-pentium4-debug b/configure/os/CONFIG.Common.vxWorks-pentium4-debug
+new file mode 100644
+index 0000000..104841a
+--- /dev/null
++++ b/configure/os/CONFIG.Common.vxWorks-pentium4-debug
+@@ -0,0 +1,14 @@
++# CONFIG.Common.vxWorks-pentium4-debug
++#
++# Revision-Id:
++# This file is maintained by the build community.
++#
++# Definitions for vxWorks-pentium-debug target archs
++# Sites may override these definitions in CONFIG_SITE.Common.vxWorks-pentium4-debug
++#-------------------------------------------------------
++
++# Include definitions common to all vxWorks archs
++include $(CONFIG)/os/CONFIG.Common.vxWorks-pentium4
++
++CROSS_OPT = NO
++
+diff --git a/configure/os/CONFIG.Common.vxWorks-pentium4-smp b/configure/os/CONFIG.Common.vxWorks-pentium4-smp
+new file mode 100644
+index 0000000..862a5f3
+--- /dev/null
++++ b/configure/os/CONFIG.Common.vxWorks-pentium4-smp
+@@ -0,0 +1,30 @@
++# CONFIG.Common.vxWorks-pentium4-smp
++#
++# Revision-Id:
++# This file is maintained by the build community.
++#
++# Definitions for vxWorks-pentium4-smp target archs
++# Sites may override these definitions in CONFIG_SITE.Common.vxWorks-pentium4
++#-------------------------------------------------------
++
++# Include definitions common to all vxWorks target archs
++include $(CONFIG)/os/CONFIG.Common.vxWorksCommon
++
++# ======================================================================================
++# Define "VSB_DIR" and "VXB_CONFIG_FILE" to get rid of warning message in vxWorks 6.8
++# ======================================================================================
++VSB_DIR=$(WIND_BASE)/vxworks-6.8/target/lib_smp
++
++# =====================================================================================
++
++# Vx GNU cross compiler suffix
++CMPLR_SUFFIX = pentium
++ 
++ARCH_CLASS = pentium
++
++ARCH_DEP_CPPFLAGS = -DCPU=PENTIUM4 -D_X86_ -D_WRS_KERNEL -D_WRS_VX_SMP -MD -MP 
++ARCH_DEP_CPPFLAGS += -D_VSB_CONFIG_FILE=\"$(VSB_DIR)/h/config/vsbConfig.h\"
++ARCH_DEP_CFLAGS += -mtune=pentium4 -march=pentium4
++ARCH_DEP_CXXFLAGS += -x 'c++' 
++ARCH_DEP_CFLAGS += -fno-defer-pop -nostdlib
++
+diff --git a/configure/os/CONFIG.Common.vxWorks-pentium4-smp-debug b/configure/os/CONFIG.Common.vxWorks-pentium4-smp-debug
+new file mode 100644
+index 0000000..dd1409a
+--- /dev/null
++++ b/configure/os/CONFIG.Common.vxWorks-pentium4-smp-debug
+@@ -0,0 +1,14 @@
++# CONFIG.Common.vxWorks-pentium4-debug
++#
++# Revision-Id:
++# This file is maintained by the build community.
++#
++# Definitions for vxWorks-pentium-debug target archs
++# Sites may override these definitions in CONFIG_SITE.Common.vxWorks-pentium4-debug
++#-------------------------------------------------------
++
++# Include definitions common to all vxWorks archs
++include $(CONFIG)/os/CONFIG.Common.vxWorks-pentium4-smp
++
++CROSS_OPT = NO
++
+diff --git a/configure/os/CONFIG.Common.vxWorksCommon b/configure/os/CONFIG.Common.vxWorksCommon
+index 3952fa9..9c18cc3 100644
+--- a/configure/os/CONFIG.Common.vxWorksCommon
++++ b/configure/os/CONFIG.Common.vxWorksCommon
+@@ -74,7 +74,6 @@ VX_GNU_VERSION_6.5 = 3.4.4
+ VX_GNU_VERSION_6.6 = 4.1.2
+ VX_GNU_VERSION_6.7 = 4.1.2
+ VX_GNU_VERSION_6.8 = 4.1.2
+-VX_GNU_VERSION_6.9 = 4.3.3
+ VX_GNU_VERSION = $(VX_GNU_VERSION_$(VXWORKS_VERSION))
+ 
+ VX_GNU_MAJOR_VERSION = $(basename $(basename $(VX_GNU_VERSION)))
+@@ -116,7 +115,6 @@ NM_DIR_6.5 = $(WORKBENCH_BIN)
+ NM_DIR_6.6 = $(WORKBENCH_BIN)
+ NM_DIR_6.7 = $(GNU_BIN)
+ NM_DIR_6.8 = $(UTILITIES_BIN)
+-NM_DIR_6.9 = $(UTILITIES_BIN)
+ NM_DIR = $(firstword $(NM_DIR_$(VXWORKS_VERSION)) $(GNU_BIN))
+ 
+ NM = $(NM_DIR)/$(CMPLR_PREFIX)nm$(CMPLR_SUFFIX)$(HOSTEXE)
+diff --git a/configure/os/CONFIG.rhel6-x86_64-debug.Common b/configure/os/CONFIG.rhel6-x86_64-debug.Common
+new file mode 100644
+index 0000000..7b90f32
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64-debug.Common
+@@ -0,0 +1,15 @@
++# CONFIG.rhel6-x86_64-debug.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 debug with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64-debug.Common
++#-------------------------------------------------------
++
++#Include definitions common to rhel6-x86_64 hosts
++include $(CONFIG)/os/CONFIG.rhel6-x86_64.Common
++
++# Make all crosscompiler builds debug builds
++#CROSS_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug b/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..a7747cd
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+@@ -0,0 +1,14 @@
++# CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64 target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++include $(CONFIG)/os/CONFIG.rhel6-x86_64.rhel6-x86_64
++
++# Removes -O optimization and adds -g compile option
++HOST_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel6-x86_64.Common b/configure/os/CONFIG.rhel6-x86_64.Common
+new file mode 100644
+index 0000000..eb335ac
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.Common
+@@ -0,0 +1,13 @@
++# CONFIG.rhel6-x86_64.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host builds
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.Common
++#-------------------------------------------------------
++
++#Include definitions common to unix hosts
++include $(CONFIG)/os/CONFIG.UnixCommon.Common
++
++WIND_HOST_TYPE = x86-linux
+diff --git a/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64 b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64
+new file mode 100644
+index 0000000..7d8ae01
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64
+@@ -0,0 +1,12 @@
++#  CONFIG.rhel6-x86_64.rhel6-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++#-------------------------------------------------------
++
++# Include common gnu compiler definitions
++include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
++
++GNU_LIB = $(GNU_DIR)/lib64
+diff --git a/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..f5a4614
+--- /dev/null
++++ b/configure/os/CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG.rhel6-x86_64.rhel6-x86_64-debug
++#
++# Revision-Id: jba@aps.anl.gov-20101115163116-3xboj0bh17bood7s
++# This file is maintained by the build community.
++#
++# Definitions for rhel6-x86_64 host - rhel6-x86_64-debug target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel6-x86_64.rhel6-x86_64-debug
++#-------------------------------------------------------
++
++-include $(CONFIG)/os/CONFIG.rhel6-x86_64.rhel6-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.Common.rhel6-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++
++BUILD_CLASS=HOST
++HOST_OPT = NO
+diff --git a/configure/os/CONFIG.rhel7-x86_64-debug.Common b/configure/os/CONFIG.rhel7-x86_64-debug.Common
+new file mode 100644
+index 0000000..bbe7981
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64-debug.Common
+@@ -0,0 +1,15 @@
++# CONFIG.rhel7-x86_64-debug.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 debug with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64-debug.Common
++#-------------------------------------------------------
++
++#Include definitions common to rhel7-x86_64 hosts
++include $(CONFIG)/os/CONFIG.rhel7-x86_64.Common
++
++# Make all crosscompiler builds debug builds
++#CROSS_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug b/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..fef75ae
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
+@@ -0,0 +1,14 @@
++# CONFIG.rhel7-x86_64-debug.rhel7-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64 target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++include $(CONFIG)/os/CONFIG.rhel7-x86_64.rhel7-x86_64
++
++# Removes -O optimization and adds -g compile option
++HOST_OPT=NO
++
+diff --git a/configure/os/CONFIG.rhel7-x86_64.Common b/configure/os/CONFIG.rhel7-x86_64.Common
+new file mode 100644
+index 0000000..66dcbd9
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.Common
+@@ -0,0 +1,13 @@
++# CONFIG.rhel7-x86_64.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host builds
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.Common
++#-------------------------------------------------------
++
++#Include definitions common to unix hosts
++include $(CONFIG)/os/CONFIG.UnixCommon.Common
++
++WIND_HOST_TYPE = x86-linux
+diff --git a/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64 b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64
+new file mode 100644
+index 0000000..ea56c5a
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64
+@@ -0,0 +1,12 @@
++#  CONFIG.rhel7-x86_64.rhel7-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64 target builds
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++#-------------------------------------------------------
++
++# Include common gnu compiler definitions
++include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
++
++GNU_LIB = $(GNU_DIR)/lib64
+diff --git a/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..3a9be63
+--- /dev/null
++++ b/configure/os/CONFIG.rhel7-x86_64.rhel7-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG.rhel7-x86_64.rhel7-x86_64-debug
++#
++# Revision-Id: jba@aps.anl.gov-20101115163116-3xboj0bh17bood7s
++# This file is maintained by the build community.
++#
++# Definitions for rhel7-x86_64 host - rhel7-x86_64-debug target build with debug compiler flags
++# Sites may override these definitions in CONFIG_SITE.rhel7-x86_64.rhel7-x86_64-debug
++#-------------------------------------------------------
++
++-include $(CONFIG)/os/CONFIG.rhel7-x86_64.rhel7-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.Common.rhel7-x86_64
++-include $(CONFIG)/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++
++BUILD_CLASS=HOST
++HOST_OPT = NO
+diff --git a/configure/os/CONFIG_SITE.Common.RTEMS b/configure/os/CONFIG_SITE.Common.RTEMS
+index 0b5d227..e333a0f 100644
+--- a/configure/os/CONFIG_SITE.Common.RTEMS
++++ b/configure/os/CONFIG_SITE.Common.RTEMS
+@@ -3,15 +3,58 @@
+ # Site-specific information for all RTEMS targets
+ #-------------------------------------------------------
+ 
+-# Where to find RTEMS
++# Don't use the default after relocating RTEMS tool-chain and OS
++# things necessary were not being found properly.  Also, had to
++# to modify the Makefile.in for each BSP to change path for 
++# "prefix" and "exec_prefix"
++unexport GCC_EXEC_PREFIX
++
++#
++# If you're not using BOOTP/DHCP to pick up your IOC network configuration
++# you may need to specify your Internet Domain Name here
+ #
+ # APS:
+-RTEMS_VERSION = 4.10.2
+-RTEMS_BASE = /usr/local/vw/rtems/rtems-$(RTEMS_VERSION)
++#RTEMS_VERSION = 4.10.2
++#RTEMS_BASE = /usr/local/vw/rtems/rtems-$(RTEMS_VERSION)
+ 
+-# Cross-compile toolchain in $(RTEMS_TOOLS)/bin
+ #
+-RTEMS_TOOLS = $(RTEMS_BASE)
++# Specify your desired command-line-input library
++#
++#EPICSCOMMANDLINE_LIBRARY = READLINE
++RTEMS_SITE_INSTALLDIR=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(SSRLAPPS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
++CROSS_INCLUDES+= -I$(RTEMS_SITE_INSTALLDIR)/include
++CROSS_LDFLAGS += -L$(RTEMS_SITE_INSTALLDIR)/lib
++
++GNU_DIR=$(RTEMS_BASE)
++CCC = $(CC)
++#TS, 2/6/2002 re-allow using the gnu dir
++#because I put libraries common to multiple BSPs there
++#GNU_TARGET_LIB_DIR resolves to GNU_DIR/GNU_TARGET/lib
++CROSS_LDFLAGS = $(addprefix -L,$(GNU_TARGET_LIB_DIR))
++CROSS_LDFLAGS+= -L$(PROJECT_RELEASE)/lib
++ifdef RTEMS_SITE_INSTALLDIR
++CROSS_LDFLAGS+= -L$(RTEMS_SITE_INSTALLDIR)/lib
++endif
++#OPT_CFLAGS_YES = -g -O3
++#OPT_CXXFLAGS_YES = -g -O3
++
++# =====================================================================
++# Recommended by Till Strauman:
++# For Host Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V) -g
++OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V) -g
++
++OBJCOPY = $(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET)
++XSYMS = $(RTEMS_BASE)/bin/xsyms
++
++OP_SYS_CPPFLAGS =
++# rtemsall is now rtemsbsp, we use termcap, not ncurses
++#OP_SYS_LDLIBS = -lrtemsCom -lrtemsbsp -lrtemscpu -lbspExt -lcexp -lbfd -lopcodes -liberty -lregexp -ltecla_r -lm
++
++#no LDLIBS whatsoever - we now do dynamic loading
++override EXE = .obj
+ 
+ # Link Generic System loadable objects instead of full executable.
+ #
+@@ -20,14 +63,32 @@ RTEMS_TOOLS = $(RTEMS_BASE)
+ # patch against RTEMS.
+ USE_GESYS = NO
+ 
+-# If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
+-# network configuration you must uncomment and specify your Internet
+-# Domain Name here
++#OP_SYS_LDLIBS = -lrtemsCom
++OP_SYS_LDFLAGS = -Wl,-S
++
++LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
++LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
++
++ 
++# ===========================================================================================
+ #
+-#OP_SYS_CFLAGS += -DRTEMS_NETWORK_CONFIG_DNS_DOMAINNAME=<domainname>
++# SSRLAPPS package. 
++# ===========================================================================================
++# Top location (for specific CPU and BSP):
++##SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
++
++# If anything, apps need the headers
++
++##OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
+ 
+-# Select the command-line-input library to use
++# Very unlikely that they need a library from there, too
++# since things are usually contained in modules that are
++# run-time loaded prior to EPICS.
++
++#
++# If any application really needs a library 'foo' then
++# their Makefile should say:
+ #
+-COMMANDLINE_LIBRARY = EPICS
+-#COMMANDLINE_LIBRARY = LIBTECLA
+-#COMMANDLINE_LIBRARY = READLINE
++# foo_DIR=$(SSRLAPPS_LIB)
++##SSRLAPPS_LIB=$(SSRLAPPS)/lib
++
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86 b/configure/os/CONFIG_SITE.Common.linux-x86
+index 0718282..d7f4316 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86
++++ b/configure/os/CONFIG_SITE.Common.linux-x86
+@@ -22,10 +22,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86_64 b/configure/os/CONFIG_SITE.Common.linux-x86_64
+index 18fb297..ca4879f 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86_64
++++ b/configure/os/CONFIG_SITE.Common.linux-x86_64
+@@ -22,10 +22,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq b/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq
+new file mode 100644
+index 0000000..5b837d6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq
+@@ -0,0 +1,43 @@
++# Location of linuxRT GNU ToolChain
++#LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
++LINUX_RT_HOME=/afs/slac/package/linuxRT
++#LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
++
++LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
++TARGET_CPU=$(ARCH_CLASS)
++# Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
++# GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(TARGET_CPU)/usr
++GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(TARGET_CPU)/usr
++
++# Cross Target Architecture
++GNU_TARGET=$(TARGET_CPU)-linux
++
++# Could substitute prefix of rpath here
++#SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
++# Only static build is supported at this time.
++SHARED_LIBRARIES=NO
++STATIC_BUILD=YES
++
++# =====================================================================
++# Recommended by Till Strauman:
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
++
++# =================================================
++# Add support for readline: used by
++# EPICS IOC Shell for command line history, etc...
++#  ================================================
++COMMANDLINE_LIBRARY = READLINE
++
++# =========================================================================
++# Valgrind support
++# =========================================================================
++VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
++VALGRIND_T_A=$(VALGRIND_TOP)/$(T_A)
++ifneq ($(wildcard $(VALGRIND_T_A)),)
++VALGRIND_INCLUDE=$(VALGRIND_T_A)/include
++VALGRIND_LIB=$(VALGRIND_T_A)/lib
++endif
++
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-i686 b/configure/os/CONFIG_SITE.Common.linuxRT-i686
+new file mode 100644
+index 0000000..dd15a35
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-i686
+@@ -0,0 +1,43 @@
++# Location of linuxRT GNU ToolChain
++#LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
++LINUX_RT_HOME=/afs/slac/package/linuxRT
++#LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
++
++LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
++TARGET_CPU=i686
++# Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
++# GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(TARGET_CPU)/usr
++GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(TARGET_CPU)/usr
++
++# Cross Target Architecture
++GNU_TARGET=$(TARGET_CPU)-linux
++
++# Could substitute prefix of rpath here
++#SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
++# Only static build is supported at this time.
++SHARED_LIBRARIES=NO
++STATIC_BUILD=YES
++
++# =====================================================================
++# Recommended by Till Strauman:
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
++
++# =================================================
++# Add support for readline: used by
++# EPICS IOC Shell for command line history, etc...
++#  ================================================
++COMMANDLINE_LIBRARY = READLINE
++
++# =========================================================================
++# Valgrind support
++# =========================================================================
++VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
++VALGRIND_T_A=$(VALGRIND_TOP)/$(T_A)
++ifneq ($(wildcard $(VALGRIND_T_A)),)
++VALGRIND_INCLUDE=$(VALGRIND_T_A)/include
++VALGRIND_LIB=$(VALGRIND_T_A)/lib
++endif
++
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-x86_64 b/configure/os/CONFIG_SITE.Common.linuxRT-x86_64
+new file mode 100644
+index 0000000..5b837d6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-x86_64
+@@ -0,0 +1,43 @@
++# Location of linuxRT GNU ToolChain
++#LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
++LINUX_RT_HOME=/afs/slac/package/linuxRT
++#LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
++
++LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
++TARGET_CPU=$(ARCH_CLASS)
++# Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
++# GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(TARGET_CPU)/usr
++GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(TARGET_CPU)/usr
++
++# Cross Target Architecture
++GNU_TARGET=$(TARGET_CPU)-linux
++
++# Could substitute prefix of rpath here
++#SHRLIBDIR_RPATH_LDFLAGS_YES = $(SHRLIB_DEPLIB_DIRS:%=-Wl,-rpath,%)
++# Only static build is supported at this time.
++SHARED_LIBRARIES=NO
++STATIC_BUILD=YES
++
++# =====================================================================
++# Recommended by Till Strauman:
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
++
++# =================================================
++# Add support for readline: used by
++# EPICS IOC Shell for command line history, etc...
++#  ================================================
++COMMANDLINE_LIBRARY = READLINE
++
++# =========================================================================
++# Valgrind support
++# =========================================================================
++VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
++VALGRIND_T_A=$(VALGRIND_TOP)/$(T_A)
++ifneq ($(wildcard $(VALGRIND_T_A)),)
++VALGRIND_INCLUDE=$(VALGRIND_T_A)/include
++VALGRIND_LIB=$(VALGRIND_T_A)/lib
++endif
++
+diff --git a/configure/os/CONFIG_SITE.Common.rhel6-x86_64 b/configure/os/CONFIG_SITE.Common.rhel6-x86_64
+new file mode 100644
+index 0000000..c762bd2
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.rhel6-x86_64
+@@ -0,0 +1,44 @@
++# CONFIG_SITE.Common.rhel6-x86_64
++#
++# Revision-Id: jba@aps.anl.gov-20130725154926-szg53grbkd982szq
++#
++# Site Specific definitions for rhel6-x86_64 target
++# Only the local epics system manager should modify this file
++
++# NOTE for SHARED_LIBRARIES: In most cases if this is set to YES the
++# shared libraries will be found automatically.  However if the .so
++# files are installed at a different path to their compile-time path
++# then in order to be found at runtime do one of these:
++# a) LD_LIBRARY_PATH must include the full absolute pathname to
++#    $(INSTALL_LOCATION)/lib/$(EPICS_HOST_ARCH) when invoking base
++#    executables.
++# b) Add the runtime path to SHRLIB_DEPLIB_DIRS and PROD_DEPLIB_DIRS, which
++#    will add the named directory to the list contained in the executables.
++# c) Add the runtime path to /etc/ld.so.conf and run ldconfig
++#    to inform the system of the shared library location.
++
++# Depending on your version of Linux you'll want one of the following
++# lines to enable command-line editing and history in iocsh.  If you're
++# not sure which, start with the top one and work downwards until the
++# build doesn't fail to link the readline library.  If none of them work,
++# comment them all out to build without readline support.
++
++# No other libraries needed (recent Fedora, Ubuntu etc.):
++#COMMANDLINE_LIBRARY = READLINE
++
++# Needs -lncurses (RHEL 5 etc.):
++COMMANDLINE_LIBRARY = READLINE_NCURSES
++
++# Needs -lcurses (older versions)
++#COMMANDLINE_LIBRARY = READLINE_CURSES
++
++
++# It makes sense to include debugging symbols even in optimized builds
++# in case you want to attach gdb to the process or examine a core-dump.
++# This does cost disk space, but not memory as debug symbols are not
++# loaded into RAM when the binary is loaded.
++OPT_CFLAGS_YES += -g
++OPT_CXXFLAGS_YES += -g
++
++# Support Package Architecture
++PKG_ARCH=x86_64-rhel6-gcc44-opt
+diff --git a/configure/os/CONFIG_SITE.Common.rhel7-x86_64 b/configure/os/CONFIG_SITE.Common.rhel7-x86_64
+new file mode 100644
+index 0000000..7625768
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.Common.rhel7-x86_64
+@@ -0,0 +1,44 @@
++# CONFIG_SITE.Common.rhel7-x86_64
++#
++# Revision-Id: jba@aps.anl.gov-20130725154926-szg53grbkd982szq
++#
++# Site Specific definitions for rhel7-x86_64 target
++# Only the local epics system manager should modify this file
++
++# NOTE for SHARED_LIBRARIES: In most cases if this is set to YES the
++# shared libraries will be found automatically.  However if the .so
++# files are installed at a different path to their compile-time path
++# then in order to be found at runtime do one of these:
++# a) LD_LIBRARY_PATH must include the full absolute pathname to
++#    $(INSTALL_LOCATION)/lib/$(EPICS_HOST_ARCH) when invoking base
++#    executables.
++# b) Add the runtime path to SHRLIB_DEPLIB_DIRS and PROD_DEPLIB_DIRS, which
++#    will add the named directory to the list contained in the executables.
++# c) Add the runtime path to /etc/ld.so.conf and run ldconfig
++#    to inform the system of the shared library location.
++
++# Depending on your version of Linux you'll want one of the following
++# lines to enable command-line editing and history in iocsh.  If you're
++# not sure which, start with the top one and work downwards until the
++# build doesn't fail to link the readline library.  If none of them work,
++# comment them all out to build without readline support.
++
++# No other libraries needed (recent Fedora, Ubuntu etc.):
++#COMMANDLINE_LIBRARY = READLINE
++
++# Needs -lncurses (RHEL 5 etc.):
++COMMANDLINE_LIBRARY = READLINE_NCURSES
++
++# Needs -lcurses (older versions)
++#COMMANDLINE_LIBRARY = READLINE_CURSES
++
++
++# It makes sense to include debugging symbols even in optimized builds
++# in case you want to attach gdb to the process or examine a core-dump.
++# This does cost disk space, but not memory as debug symbols are not
++# loaded into RAM when the binary is loaded.
++OPT_CFLAGS_YES += -g
++OPT_CXXFLAGS_YES += -g
++
++# Support Package Architecture
++PKG_ARCH=x86_64-rhel7-gcc44-opt
+diff --git a/configure/os/CONFIG_SITE.Common.vxWorksCommon b/configure/os/CONFIG_SITE.Common.vxWorksCommon
+index 9936943..16dcbf7 100644
+--- a/configure/os/CONFIG_SITE.Common.vxWorksCommon
++++ b/configure/os/CONFIG_SITE.Common.vxWorksCommon
+@@ -9,14 +9,14 @@
+ 
+ # Note: vxWorks 5.4.x (Tornado 2.0.x) is not supported
+ 
+-VXWORKS_VERSION = 5.5
++#VXWORKS_VERSION = 5.5
+ #VXWORKS_VERSION = 6.0
+ #VXWORKS_VERSION = 6.1
+ #VXWORKS_VERSION = 6.2
+ #VXWORKS_VERSION = 6.3
+ #VXWORKS_VERSION = 6.4
+ #VXWORKS_VERSION = 6.5
+-#VXWORKS_VERSION = 6.6
++VXWORKS_VERSION = 6.6
+ #VXWORKS_VERSION = 6.7
+ #VXWORKS_VERSION = 6.8
+ #VXWORKS_VERSION = 6.9
+@@ -29,19 +29,51 @@ VXWORKS_VERSION = 5.5
+ # WIND_BASE is where you installed the Wind River software.
+ # Under vxWorks 6.x this is *not* the same as the old VX_DIR setting
+ 
+-WIND_BASE = /usr/local/vw/tornado22-$(ARCH_CLASS)
++#WIND_BASE = /usr/local/vw/tornado22-$(ARCH_CLASS)
+ #WIND_BASE = /usr/local/vw/vxWorks-$(VXWORKS_VERSION)
+ #WIND_BASE = /ade/vxWorks/$(VXWORKS_VERSION)
++#WIND_BASE = /usr/local/lcls/vxWorks/$(VXWORKS_VERSION)
++WIND_BASE = /afs/slac/package/vxworks/devel/$(VXWORKS_VERSION)
++
++# ====================================================================
++# Added to support the new vxWorks 6.7 and 6.8
++# Unless we use "-DBSD=44" for osdSock.h, incorrect network interface
++# structure is assumed, and an incorrect list of interfaces is
++# constructed, then the EPICS_CA_{,AUTO_}ADDR_LIST behavior becomes
++# wrong.
++# =====================================================================
++#BSD_DEFINE_VERSION_6.7 = -DBSD=44
++##BSD_DEFINE_VERSION_6.8 = -DBSD=44
++##OP_BSD_DEFINE = $(BSD_DEFINE_VERSION_$(VXWORKS_VERSION))
++
++##OP_SYS_CPPFLAGS += -DvxWorks $(OP_BSD_DEFINE)
++##OP_SYS_CFLAGS += -fno-builtin $(OP_BSD_DEFINE)
++
++# For vxWorks 6.6 we just need:
++OP_SYS_CPPFLAGS += -DvxWorks
++OP_SYS_CFLAGS += -fno-builtin
++
++# =====================================================================
++
++#--------------------------------------------------
++# Optimization: Officially vxWorks only supports -O2 or less.
++# =====================================================================
++# Recommended by Till Strauman:
++# For Cross Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O2 -g
++OPT_CXXFLAGS_YES = -O2 -g
+ 
+ 
+ # WorkBench Version number, if you're using vxWorks 6.x
+ 
+ #WORKBENCH_VERSION = 2.6
+-#WORKBENCH_VERSION = 3.0
++WORKBENCH_VERSION = 3.0
+ #WORKBENCH_VERSION = 3.2
+ #WORKBENCH_VERSION = 3.3
+ 
+ 
+ # Utilities Version number, required from vxWorks 6.8 and later
+ 
+-#UTILITIES_VERSION = 1.0
++UTILITIES_VERSION = 1.0
+diff --git a/configure/os/CONFIG_SITE.linux-x86.Common b/configure/os/CONFIG_SITE.linux-x86.Common
+index dc29e8f..62e8285 100644
+--- a/configure/os/CONFIG_SITE.linux-x86.Common
++++ b/configure/os/CONFIG_SITE.linux-x86.Common
+@@ -7,3 +7,11 @@
+ #CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
+ #CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
+ #CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100 RTEMS-pc386 # RTEMS-mvme5500 RTEMS-mvme167
++
++# =====================================================================
++# Recommended by Till Strauman:
++# For Host Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
+diff --git a/configure/os/CONFIG_SITE.linux-x86_64.Common b/configure/os/CONFIG_SITE.linux-x86_64.Common
+index 244e163..a18cc09 100644
+--- a/configure/os/CONFIG_SITE.linux-x86_64.Common
++++ b/configure/os/CONFIG_SITE.linux-x86_64.Common
+@@ -7,3 +7,10 @@
+ #CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
+ #CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100
+ 
++# =====================================================================
++# Recommended by Till Strauman:
++# For Host Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
+diff --git a/configure/os/CONFIG_SITE.linux-x86_64.RTEMS b/configure/os/CONFIG_SITE.linux-x86_64.RTEMS
+new file mode 100644
+index 0000000..e99fce6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.linux-x86_64.RTEMS
+@@ -0,0 +1,19 @@
++
++#
++# Site-specific information for all RTEMS targets
++#
++#-------------------------------------------------------
++
++# CEXP run-time loading
++override EXE=.obj
++OP_SYS_LDFLAGS = $(CPU_CFLAGS) -Wl,-r -nostdlib
++
++# To strip debugging symbols add
++#OP_SYS_LDFLAGS += -Wl,-S
++
++#Don't bother to build munched binaries
++MUNCH_CMD=
++MUNCHNAME=
++ 
++#
++OP_SYS_LDLIBS=
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug b/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+new file mode 100644
+index 0000000..e747541
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific override definitions for solaris-sparc host builds
++# Only the local epics system manager should modify this file
++
++
++
++#Prepares the object code to collect data for profiling with prof. 
++#PROFILE=YES
++
++#Compiles for profiling with the gprof profiler.
++#GPROF=YES
++
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.Common b/configure/os/CONFIG_SITE.rhel6-x86_64.Common
+new file mode 100644
+index 0000000..ff124d6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.Common
+@@ -0,0 +1,19 @@
++# CONFIG_SITE.rhel6-x86_64.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Site override definitions for rhel6-x86_64 host builds
++#-------------------------------------------------------
++
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
++#CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100
++
++# =====================================================================
++# Recommended by Till Strauman:
++# For Host Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.RTEMS b/configure/os/CONFIG_SITE.rhel6-x86_64.RTEMS
+new file mode 100644
+index 0000000..e99fce6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.RTEMS
+@@ -0,0 +1,19 @@
++
++#
++# Site-specific information for all RTEMS targets
++#
++#-------------------------------------------------------
++
++# CEXP run-time loading
++override EXE=.obj
++OP_SYS_LDFLAGS = $(CPU_CFLAGS) -Wl,-r -nostdlib
++
++# To strip debugging symbols add
++#OP_SYS_LDFLAGS += -Wl,-S
++
++#Don't bother to build munched binaries
++MUNCH_CMD=
++MUNCHNAME=
++ 
++#
++OP_SYS_LDLIBS=
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon b/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon
+new file mode 100644
+index 0000000..bab8f7e
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.UnixCommon
+@@ -0,0 +1,7 @@
++# CONFIG_SITE.rhel6-x86_64.UnixCommon
++
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site Specific configure override definitions
++# Only the local epics system manager should modify this file
++ 
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64 b/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+new file mode 100644
+index 0000000..a2ea749
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific definitions for rhel6-x86_64 host - rhel6-x86_64 target builds
++#-------------------------------------------------------
++
++
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-68040 b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-68040
+new file mode 100644
+index 0000000..7b525c8
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-68040
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel6-x86_64.vxWorks-68040
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific definitions for rhel6-x86_64 host -  vxWorks-68040 target builds
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
++
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603 b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
+new file mode 100644
+index 0000000..7f44f8c
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
+@@ -0,0 +1,6 @@
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site-specific definitions for rhel6-x86_64 builds of vxWorks-ppc603
++#
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
+diff --git a/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
+new file mode 100644
+index 0000000..67bf54b
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
+@@ -0,0 +1,9 @@
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site-specific definitions for linux-x86 builds of vxWorks-ppc603_long
++#
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
++
++# Inherit settings from vxWorks-ppc603
++-include $(CONFIG)/os/CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug b/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
+new file mode 100644
+index 0000000..7978936
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
+@@ -0,0 +1,15 @@
++# CONFIG_SITE.rhel7-x86_64-debug.rhel7-x86_64-debug
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific override definitions for solaris-sparc host builds
++# Only the local epics system manager should modify this file
++
++
++
++#Prepares the object code to collect data for profiling with prof. 
++#PROFILE=YES
++
++#Compiles for profiling with the gprof profiler.
++#GPROF=YES
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.Common b/configure/os/CONFIG_SITE.rhel7-x86_64.Common
+new file mode 100644
+index 0000000..e61ed18
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.Common
+@@ -0,0 +1,19 @@
++# CONFIG_SITE.rhel7-x86_64.Common
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++# This file is maintained by the build community.
++#
++# Site override definitions for rhel7-x86_64 host builds
++#-------------------------------------------------------
++
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
++#CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
++#CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100
++
++# =====================================================================
++# Recommended by Till Strauman:
++# For Host Builds.
++# Let's build with optimization but have debug symbols for debugging:
++# =====================================================================
++OPT_CFLAGS_YES = -O3 -g
++OPT_CXXFLAGS_YES = -O3 -g
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.RTEMS b/configure/os/CONFIG_SITE.rhel7-x86_64.RTEMS
+new file mode 100644
+index 0000000..e99fce6
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.RTEMS
+@@ -0,0 +1,19 @@
++
++#
++# Site-specific information for all RTEMS targets
++#
++#-------------------------------------------------------
++
++# CEXP run-time loading
++override EXE=.obj
++OP_SYS_LDFLAGS = $(CPU_CFLAGS) -Wl,-r -nostdlib
++
++# To strip debugging symbols add
++#OP_SYS_LDFLAGS += -Wl,-S
++
++#Don't bother to build munched binaries
++MUNCH_CMD=
++MUNCHNAME=
++ 
++#
++OP_SYS_LDLIBS=
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon b/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon
+new file mode 100644
+index 0000000..8fb0c28
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.UnixCommon
+@@ -0,0 +1,7 @@
++# CONFIG_SITE.rhel7-x86_64.UnixCommon
++
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site Specific configure override definitions
++# Only the local epics system manager should modify this file
++ 
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64 b/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
+new file mode 100644
+index 0000000..fc9d829
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel7-x86_64.rhel7-x86_64
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific definitions for rhel7-x86_64 host - rhel7-x86_64 target builds
++#-------------------------------------------------------
++
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-68040 b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-68040
+new file mode 100644
+index 0000000..c630d94
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-68040
+@@ -0,0 +1,8 @@
++# CONFIG_SITE.rhel7-x86_64.vxWorks-68040
++#
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site specific definitions for rhel7-x86_64 host -  vxWorks-68040 target builds
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
++
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603 b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603
+new file mode 100644
+index 0000000..3082a0e
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603
+@@ -0,0 +1,6 @@
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site-specific definitions for rhel7-x86_64 builds of vxWorks-ppc603
++#
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
+diff --git a/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603_long b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603_long
+new file mode 100644
+index 0000000..886c55f
+--- /dev/null
++++ b/configure/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603_long
+@@ -0,0 +1,9 @@
++# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
++#
++# Site-specific definitions for linux-x86 builds of vxWorks-ppc603_long
++#
++# Only the local epics system manager should modify this file
++#-------------------------------------------------------
++
++# Inherit settings from vxWorks-ppc603
++-include $(CONFIG)/os/CONFIG_SITE.rhel7-x86_64.vxWorks-ppc603
+diff --git a/startup/EpicsHostArch b/startup/EpicsHostArch
+index 8861ac5..7f54895 100755
+--- a/startup/EpicsHostArch
++++ b/startup/EpicsHostArch
+@@ -24,6 +24,15 @@ case $sysname in
+     Linux )
+         os=linux
+         cpu=`uname -m`
++        release=`uname -r`
++		case $release in
++			*el6* )
++				os=rhel6 ;;
++			*el7* )
++				os=rhel7 ;;
++			*-rt* )
++				os=linuxRT ;;
++        esac
+         case $cpu in
+             i386 | i486 | i586 | i686 )
+                 cpu=x86 ;;
+diff --git a/startup/EpicsHostArch.pl b/startup/EpicsHostArch.pl
+index 09f7ffd..3ecb66d 100755
+--- a/startup/EpicsHostArch.pl
++++ b/startup/EpicsHostArch.pl
+@@ -25,9 +25,18 @@ sub GetEpicsHostArch { # no args
+     $arch=$Config{'archname'};
+     if ($arch =~ /sun4-solaris/)        { return "solaris-sparc";
+     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
+-    } elsif ($arch =~ m/i[3-6]86-linux/){ return "linux-x86";
+-    } elsif ($arch =~ m/x86_64-linux/)  { return "linux-x86_64";
+     } elsif ($arch =~ m/arm-linux/)     { return "linux-arm";
++    } elsif ($arch =~ m/linux/)        {
++            my($kernel, $hostname, $release, $version, $cpu) = POSIX::uname();
++            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
++            if ($cpu =~ m/x86_64/)	{
++				if ($release =~ m/el5/)     { return "linux-x86_64";  }
++				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
++				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
++				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
++				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
++			}
++            else							{ return "unsupported"; }
+     } elsif ($arch =~ m/MSWin32-x86/)   { return "win32-x86";
+     } elsif ($arch =~ m/MSWin32-x64/)   { return "windows-x64";
+     } elsif ($arch =~ m/cygwin/)        {
