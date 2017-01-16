@@ -4,6 +4,18 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0:   New linuxRT buildroot version
+               Modified EPICS Configuration files for linuxRT to use new buildroot version: 
+               <>/configure/CONFIG_SITE.Common.linuxRT-*
+
+               Modified <>/src/libCom/osi/os/posix/osdThread.c to include mlockall sucess message:
+                   See patch <>/patches/mlockall-success-msg.patch
+
+               Modified "CONFIG.Common.linuxRT-i686" to correct ARCH_CLASS.
+
+               Update: EPICS_SITE_VERSION = 1.0 ==> will append to EPICS version string at IOC runtime
+
+
 R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
                Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
                Add comment for HOST Build:
