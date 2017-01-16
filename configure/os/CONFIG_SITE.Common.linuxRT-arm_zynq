@@ -3,7 +3,7 @@
 LINUX_RT_HOME=/afs/slac/package/linuxRT
 #LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
 
-LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
+LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
 TARGET_CPU=$(ARCH_CLASS)
 # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
 # GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
