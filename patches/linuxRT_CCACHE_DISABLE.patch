@@ -1,0 +1,39 @@
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq b/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq
+index fd1f042..751c6d1 100644
+--- a/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-arm_zynq
+@@ -7,7 +7,7 @@ LINUX_RT_HOME=/afs/slac/package/linuxRT
+ LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
+ # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
+ # GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
+-GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
++GNU_DIR=CCACHE_DISABLE=1 $(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
+ 
+ # Cross Target Architecture
+ GNU_TARGET=$(ARCH_CLASS)-linux
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-i686 b/configure/os/CONFIG_SITE.Common.linuxRT-i686
+index fd1f042..751c6d1 100644
+--- a/configure/os/CONFIG_SITE.Common.linuxRT-i686
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-i686
+@@ -7,7 +7,7 @@ LINUX_RT_HOME=/afs/slac/package/linuxRT
+ LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
+ # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
+ # GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
+-GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
++GNU_DIR=CCACHE_DISABLE=1 $(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
+ 
+ # Cross Target Architecture
+ GNU_TARGET=$(ARCH_CLASS)-linux
+diff --git a/configure/os/CONFIG_SITE.Common.linuxRT-x86_64 b/configure/os/CONFIG_SITE.Common.linuxRT-x86_64
+index fd1f042..751c6d1 100644
+--- a/configure/os/CONFIG_SITE.Common.linuxRT-x86_64
++++ b/configure/os/CONFIG_SITE.Common.linuxRT-x86_64
+@@ -7,7 +7,7 @@ LINUX_RT_HOME=/afs/slac/package/linuxRT
+ LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
+ # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
+ # GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
+-GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
++GNU_DIR=CCACHE_DISABLE=1 $(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
+ 
+ # Cross Target Architecture
+ GNU_TARGET=$(ARCH_CLASS)-linux

@@ -6,8 +6,8 @@ LINUX_RT_HOME=/afs/slac/package/linuxRT
 LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
 TARGET_CPU=i686
 # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
-# GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(TARGET_CPU)/usr
-GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(TARGET_CPU)/usr
+# GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
+GNU_DIR=CCACHE_DISABLE=1 $(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/linux-x86_64/$(ARCH_CLASS)/usr
 
 # Cross Target Architecture
 GNU_TARGET=$(TARGET_CPU)-linux
