@@ -13,6 +13,10 @@ R3.15.5-1.0:   New linuxRT buildroot version
 
                Modified "CONFIG.Common.linuxRT-i686" to correct ARCH_CLASS.
 
+               Modified "CONFIG_SITE.Common.linuxRT*" to use environment variable CCACHE_DISABLE=1
+                   CCACHE when enabled was creating permission problems with the buildroot tmp dir.
+                   Changes made via patch <>/patches/linuxRT_CCACHE_DISABLE.patch
+
                Update: EPICS_SITE_VERSION = 1.0 ==> will append to EPICS version string at IOC runtime
 
 
