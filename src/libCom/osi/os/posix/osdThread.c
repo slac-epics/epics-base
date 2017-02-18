@@ -418,6 +418,10 @@ epicsShareFunc
 void epicsThreadRealtimeLock(void)
 {
 #if defined(_POSIX_MEMLOCK) && _POSIX_MEMLOCK > 0
+    if(errVerbose)  { 
+        fprintf(stderr, "LRT: min priority: %d max priority %d\n", 
+            pcommonAttr->minPriority, pcommonAttr->maxPriority);
+    }
     if (pcommonAttr->maxPriority > pcommonAttr->minPriority) {
         int status = mlockall(MCL_CURRENT | MCL_FUTURE);
 
@@ -425,8 +429,10 @@ void epicsThreadRealtimeLock(void)
             fprintf(stderr, "epicsThreadRealtimeLock "
                 "Warning: Unable to lock the virtual address space.\n"
                 "VM page faults may harm real-time performance.\n");
+        } else { 
+            fprintf(stderr,"Successfully locked memory using mlockAll\n");
         }
-    }
+   }
 #endif
 }
 
