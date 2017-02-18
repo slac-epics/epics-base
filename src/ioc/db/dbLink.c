@@ -536,7 +536,7 @@ long dbGetLink(struct link *plink, short dbrType, void *pbuffer,
     long status;
 
     if (poptions && *poptions) {
-        printf("dbGetLinkValue: Use of poptions no longer supported\n");
+        printf("dbGetLink: Use of poptions no longer supported\n");
         *poptions = 0;
     }
 
@@ -544,20 +544,34 @@ long dbGetLink(struct link *plink, short dbrType, void *pbuffer,
     case CONSTANT:
         status = dbConstGetLink(plink, dbrType, pbuffer, &stat, &sevr,
                 pnRequest);
+        if ( status )
+            recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
         break;
     case DB_LINK:
         status = dbDbGetValue(plink, dbrType, pbuffer, &stat, &sevr, pnRequest);
+        if ( status )
+            recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
         break;
     case CA_LINK:
         status = dbCaGetLink(plink, dbrType, pbuffer, &stat, &sevr, pnRequest);
+        if ( status ) {
+            if ( !dbCaIsLinkConnected( plink ) ) {
+                if ( precord->sevr < INVALID_ALARM )
+                    recGblRecordError(status, precord, "dbCaGetLink error, link not connected!");
+                recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+            } if ( !dbCaHasReadAccess( plink ) ) {
+                if ( precord->sevr < INVALID_ALARM )
+                    recGblRecordError(status, precord, "dbCaGetLink error, no read access!");
+                recGblSetSevr(precord, READ_ACCESS_ALARM, INVALID_ALARM);
+            }
+        }
         break;
     default:
-        cantProceed("dbGetLinkValue: Illegal link type %d\n", plink->type);
+        cantProceed("dbGetLink: Illegal link type %d\n", plink->type);
+        recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
         status = -1;
     }
-    if (status) {
-        recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
-    } else {
+    if (status == 0) {
         inherit_severity(&plink->value.pv_link, precord, stat, sevr);
     }
     return status;
@@ -646,6 +660,7 @@ long dbPutLink(struct link *plink, short dbrType, const void *pbuffer,
         long nRequest)
 {
     long status;
+    struct dbCommon *precord = NULL;
 
     switch (plink->type) {
     case CONSTANT:
@@ -653,18 +668,36 @@ long dbPutLink(struct link *plink, short dbrType, const void *pbuffer,
         break;
     case DB_LINK:
         status = dbDbPutValue(plink, dbrType, pbuffer, nRequest);
+		if (status) {
+    		precord = plink->value.pv_link.precord;
+			recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+		}
         break;
     case CA_LINK:
         status = dbCaPutLink(plink, dbrType, pbuffer, nRequest);
+        if ( status ) {
+    		precord = plink->value.pv_link.precord;
+            if ( !dbCaIsLinkConnected( plink ) ) {
+                if ( precord->sevr < INVALID_ALARM )
+                    recGblRecordError(status, precord, "dbCaPutLink error, link not connected!");
+                recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+            } if ( !dbCaHasReadAccess( plink ) ) {
+                if ( precord->sevr < INVALID_ALARM )
+                    recGblRecordError(status, precord, "dbCaPutLink error, no read access!");
+                recGblSetSevr(precord, READ_ACCESS_ALARM, INVALID_ALARM);
+ 			} if ( !dbCaHasWriteAccess( plink ) ) {
+				recGblRecordError(status, precord, "dbCaPutLink error, no write access!");
+				if ( precord->sevr < INVALID_ALARM )
+					recGblRecordError(status, precord, "dbCaPutLink error, no write access!");
+ 				recGblSetSevr(precord, WRITE_ACCESS_ALARM, INVALID_ALARM);
+        	}
+        }
         break;
     default:
         cantProceed("dbPutLinkValue: Illegal link type %d\n", plink->type);
         status = -1;
-    }
-    if (status) {
-        struct dbCommon *precord = plink->value.pv_link.precord;
-
-        recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+		precord = plink->value.pv_link.precord;
+		recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
     }
     return status;
 }
