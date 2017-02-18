@@ -100,7 +100,7 @@ sub scanFile {
    print "Scanning file $file\n" if $debug;
    open FILE, $file or return;
    foreach $line ( <FILE> ) {
-      $incfile = findNextIncName($line,$file=~/\.substitutions$/);
+      $incfile = findNextIncName($line,$file=~/\.sub/);
       next if !$incfile;
       next if $output{$incfile};   
       push @includes,$incfile;
