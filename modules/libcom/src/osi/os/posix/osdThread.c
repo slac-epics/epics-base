@@ -470,6 +470,10 @@ void epicsThreadRealtimeLock(void)
     mlocked = 0;
 #if USE_MEMLOCK
 #ifndef RTEMS_LEGACY_STACK // seems to be part of libbsd?
+    if(errVerbose)  { 
+        fprintf(stderr, "LRT: min priority: %d max priority %d\n", 
+            pcommonAttr->minPriority, pcommonAttr->maxPriority);
+    }
     if (pcommonAttr->maxPriority > pcommonAttr->minPriority && wantPrioScheduling) {
         int status = mlockall(MCL_CURRENT | MCL_FUTURE);
 
@@ -494,6 +498,7 @@ void epicsThreadRealtimeLock(void)
             }
         } else {
             mlocked = 1;
+            fprintf(stderr,"Successfully locked memory using mlockAll\n");
         }
     }
 #endif // LEGACY STACK
