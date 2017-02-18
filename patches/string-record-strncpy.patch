@@ -1,8 +1,8 @@
-diff --git a/src/rec/stringinRecord.c b/src/rec/stringinRecord.c
-index 02f4547..fce8c81 100644
---- a/src/rec/stringinRecord.c
-+++ b/src/rec/stringinRecord.c
-@@ -121,7 +121,7 @@ static long init_record(stringinRecord *prec, int pass)
+diff --git a/src/std/rec/stringinRecord.c b/src/std/rec/stringinRecord.c
+index 19f5586..c6d1747 100644
+--- a/src/std/rec/stringinRecord.c
++++ b/src/std/rec/stringinRecord.c
+@@ -119,7 +119,7 @@ static long init_record(stringinRecord *prec, int pass)
      if( pdset->init_record ) {
  	if((status=(*pdset->init_record)(prec))) return(status);
      }
@@ -11,11 +11,11 @@ index 02f4547..fce8c81 100644
      return(0);
  }
  
-diff --git a/src/rec/stringoutRecord.c b/src/rec/stringoutRecord.c
-index 6e7a858..12176ab 100644
---- a/src/rec/stringoutRecord.c
-+++ b/src/rec/stringoutRecord.c
-@@ -123,7 +123,7 @@ static long init_record(stringoutRecord *prec, int pass)
+diff --git a/src/std/rec/stringoutRecord.c b/src/std/rec/stringoutRecord.c
+index 33bf1e7..0014a14 100644
+--- a/src/std/rec/stringoutRecord.c
++++ b/src/std/rec/stringoutRecord.c
+@@ -121,7 +121,7 @@ static long init_record(stringoutRecord *prec, int pass)
      if( pdset->init_record ) {
  	if((status=(*pdset->init_record)(prec))) return(status);
      }

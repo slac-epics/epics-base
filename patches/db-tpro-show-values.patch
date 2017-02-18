@@ -1,20 +1,20 @@
-diff --git a/src/rec/aSubRecord.c b/src/rec/aSubRecord.c
-index 3523467..5a0791f 100644
---- a/src/rec/aSubRecord.c
-+++ b/src/rec/aSubRecord.c
-@@ -360,6 +360,8 @@ static void monitor(aSubRecord *prec)
+diff --git a/src/std/rec/aSubRecord.c b/src/std/rec/aSubRecord.c
+index c40f0b0..a950caf 100644
+--- a/src/std/rec/aSubRecord.c
++++ b/src/std/rec/aSubRecord.c
+@@ -467,6 +467,8 @@ static void monitor(aSubRecord *prec)
              if (nev != onv || memcmp(povl, pval, alen)) {
                  memcpy(povl, pval, alen);
                  db_post_events(prec, pval, monitor_mask);
-+				if ( prec->tpro >= 5 )
-+					printf( "%s.OUT%c changed!\n", prec->name, 'A' + i );
++                if ( prec->tpro >= 5 )
++                    printf( "%s.OUT%c changed!\n", prec->name, 'A' + i );
                  if (nev != onv) {
                      *ponv = nev;
                      db_post_events(prec, pnev, monitor_mask);
-diff --git a/src/rec/aiRecord.c b/src/rec/aiRecord.c
-index f0fd076..71e7fa7 100644
---- a/src/rec/aiRecord.c
-+++ b/src/rec/aiRecord.c
+diff --git a/src/std/rec/aiRecord.c b/src/std/rec/aiRecord.c
+index aab5529..1c09e3f 100644
+--- a/src/std/rec/aiRecord.c
++++ b/src/std/rec/aiRecord.c
 @@ -174,6 +174,10 @@ static long process(void *precord)
  	if (status==0) convert(prec);
  	else if (status==2) status=0;
@@ -24,14 +24,14 @@ index f0fd076..71e7fa7 100644
 +			epicsThreadGetNameSelf(), prec->name, prec->val );
 +
  	/* check for alarms */
- 	checkAlarms(prec);
+ 	checkAlarms(prec,&timeLast);
  	/* check event list */
-diff --git a/src/rec/aoRecord.c b/src/rec/aoRecord.c
-index d2b45e8..a6dfb2c 100644
---- a/src/rec/aoRecord.c
-+++ b/src/rec/aoRecord.c
-@@ -201,6 +201,10 @@ static long process(aoRecord *prec)
- 		prec->udf = isnan(prec->val);
+diff --git a/src/std/rec/aoRecord.c b/src/std/rec/aoRecord.c
+index f1fd71a..adcd89d 100644
+--- a/src/std/rec/aoRecord.c
++++ b/src/std/rec/aoRecord.c
+@@ -204,6 +204,10 @@ static long process(aoRecord *prec)
+ 		recGblGetTimeStamp(prec);
  	}
  
 +	if ( prec->tpro >= 2 )
@@ -41,132 +41,129 @@ index d2b45e8..a6dfb2c 100644
  	/* check for alarms */
  	checkAlarms(prec);
  
-diff --git a/src/rec/biRecord.c b/src/rec/biRecord.c
-index 1ba7b12..0720a43 100644
---- a/src/rec/biRecord.c
-+++ b/src/rec/biRecord.c
-@@ -141,7 +141,14 @@ static long process(biRecord *prec)
- 		else prec->val = 1;
+diff --git a/src/std/rec/biRecord.c b/src/std/rec/biRecord.c
+index b6af69a..5674fe9 100644
+--- a/src/std/rec/biRecord.c
++++ b/src/std/rec/biRecord.c
+@@ -140,6 +140,12 @@ static long process(biRecord *prec)
  		prec->udf = FALSE;
  	}
--	else if(status==2) status=0;
-+	else if(status==2)
-+		status=0;
+ 	else if(status==2) status=0;
 +
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %s\n",
-+			epicsThreadGetNameSelf(), prec->name,
-+			( prec->val ? prec->onam : prec->znam ) );
++        if ( prec->tpro >= 2 )
++                printf( "%s: Process %s, val %s\n",
++                        epicsThreadGetNameSelf(), prec->name,
++                        ( prec->val ? prec->onam : prec->znam ) );
 +
  	/* check for alarms */
  	checkAlarms(prec);
  	/* check event list */
-diff --git a/src/rec/boRecord.c b/src/rec/boRecord.c
-index ee21ce5..cfd98c0 100644
---- a/src/rec/boRecord.c
-+++ b/src/rec/boRecord.c
-@@ -219,6 +219,11 @@ static long process(boRecord *prec)
- 		} else prec->rval = (epicsUInt32)prec->val;
+diff --git a/src/std/rec/boRecord.c b/src/std/rec/boRecord.c
+index c305670..eee1cf1 100644
+--- a/src/std/rec/boRecord.c
++++ b/src/std/rec/boRecord.c
+@@ -226,6 +226,11 @@ static long process(boRecord *prec)
+ 		recGblGetTimeStamp(prec);
  	}
  
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %s\n",
-+			epicsThreadGetNameSelf(), prec->name,
-+			( prec->val ? prec->onam : prec->znam ) );
++        if ( prec->tpro >= 2 )
++                printf( "%s: Process %s, val %s\n",
++                        epicsThreadGetNameSelf(), prec->name,
++                        ( prec->val ? prec->onam : prec->znam ) );
 +
  	/* check for alarms */
  	checkAlarms(prec);
  
-diff --git a/src/rec/calcRecord.c b/src/rec/calcRecord.c
-index 1bff7b8..4fde893 100644
---- a/src/rec/calcRecord.c
-+++ b/src/rec/calcRecord.c
-@@ -119,6 +119,11 @@ static long process(calcRecord *prec)
- 	} else prec->udf = isnan(prec->val);
-     }
+diff --git a/src/std/rec/calcRecord.c b/src/std/rec/calcRecord.c
+index 39cf2ab..64d3efa 100644
+--- a/src/std/rec/calcRecord.c
++++ b/src/std/rec/calcRecord.c
+@@ -125,6 +125,11 @@ static long process(calcRecord *prec)
+ 
+     timeLast = prec->time;
      recGblGetTimeStamp(prec);
 +    
 +    if ( prec->tpro >= 2 )
-+	printf( "%s: Process %s, val %f\n",
-+		epicsThreadGetNameSelf(), prec->name, prec->val );
++        printf( "%s: Process %s, val %f\n",
++                epicsThreadGetNameSelf(), prec->name, prec->val );
 +
      /* check for alarms */
-     checkAlarms(prec);
+     checkAlarms(prec, &timeLast);
      /* check event list */
-diff --git a/src/rec/calcoutRecord.c b/src/rec/calcoutRecord.c
-index 37951f3..668f23c 100644
---- a/src/rec/calcoutRecord.c
-+++ b/src/rec/calcoutRecord.c
-@@ -224,6 +224,11 @@ static long process(calcoutRecord *prec)
+diff --git a/src/std/rec/calcoutRecord.c b/src/std/rec/calcoutRecord.c
+index 493b987..0df232b 100644
+--- a/src/std/rec/calcoutRecord.c
++++ b/src/std/rec/calcoutRecord.c
+@@ -232,6 +232,11 @@ static long process(calcoutRecord *prec)
                  prec->udf = isnan(prec->val);
              }
          }
 +
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %f\n",
-+			epicsThreadGetNameSelf(), prec->name, prec->val );
++        if ( prec->tpro >= 2 )
++                printf( "%s: Process %s, val %f\n",
++                        epicsThreadGetNameSelf(), prec->name, prec->val );
 +
          checkAlarms(prec);
-         /* check for output link execution */
-         switch (prec->oopt) {
-diff --git a/src/rec/longinRecord.c b/src/rec/longinRecord.c
-index 176b3b5..52cce12 100644
---- a/src/rec/longinRecord.c
-+++ b/src/rec/longinRecord.c
-@@ -148,6 +148,10 @@ static long process(longinRecord *prec)
+ 
+ 	if ( !pact ) {
+diff --git a/src/std/rec/longinRecord.c b/src/std/rec/longinRecord.c
+index f9a9232..47168d8 100644
+--- a/src/std/rec/longinRecord.c
++++ b/src/std/rec/longinRecord.c
+@@ -151,6 +151,10 @@ static long process(longinRecord *prec)
  	recGblGetTimeStamp(prec);
  	if (status==0) prec->udf = FALSE;
  
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %d\n",
-+			epicsThreadGetNameSelf(), prec->name, prec->val );
++        if ( prec->tpro >= 2 )
++                printf( "%s: Process %s, val %d\n",
++                        epicsThreadGetNameSelf(), prec->name, prec->val );
 +
  	/* check for alarms */
- 	checkAlarms(prec);
+ 	checkAlarms(prec, &timeLast);
  	/* check event list */
-diff --git a/src/rec/longoutRecord.c b/src/rec/longoutRecord.c
-index ce0ab80..5499271 100644
---- a/src/rec/longoutRecord.c
-+++ b/src/rec/longoutRecord.c
-@@ -150,6 +150,10 @@ static long process(longoutRecord *prec)
- 		if (!status) convert(prec,value);
+diff --git a/src/std/rec/longoutRecord.c b/src/std/rec/longoutRecord.c
+index f7b5fb9..fe14bf0 100644
+--- a/src/std/rec/longoutRecord.c
++++ b/src/std/rec/longoutRecord.c
+@@ -153,6 +153,10 @@ static long process(longoutRecord *prec)
+ 		recGblGetTimeStamp(prec);
  	}
  
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %d\n",
-+			epicsThreadGetNameSelf(), prec->name, prec->val );
++        if ( prec->tpro >= 2 )
++                printf( "%s: Process %s, val %d\n",
++                        epicsThreadGetNameSelf(), prec->name, prec->val );
 +
  	/* check for alarms */
  	checkAlarms(prec);
  
-diff --git a/src/rec/mbbiRecord.c b/src/rec/mbbiRecord.c
-index 0a07ba1..4c3190f 100644
---- a/src/rec/mbbiRecord.c
-+++ b/src/rec/mbbiRecord.c
-@@ -185,6 +185,10 @@ static long process(mbbiRecord *prec)
- 	}
- 	else if(status == 2) status = 0;
+diff --git a/src/std/rec/mbbiRecord.c b/src/std/rec/mbbiRecord.c
+index c7e008c..5223e93 100644
+--- a/src/std/rec/mbbiRecord.c
++++ b/src/std/rec/mbbiRecord.c
+@@ -202,6 +202,10 @@ static long process(mbbiRecord *prec)
+     else if (status == 2)
+         status = 0;
  
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %u\n",
-+			epicsThreadGetNameSelf(), prec->name, prec->val );
++    if ( prec->tpro >= 2 )
++        printf( "%s: Process %s, val %u\n",
++            epicsThreadGetNameSelf(), prec->name, prec->val );
 +
- 	/* check for alarms */
- 	checkAlarms(prec);
+     checkAlarms(prec, &timeLast);
+     monitor(prec);
  
-diff --git a/src/rec/mbboRecord.c b/src/rec/mbboRecord.c
-index 79a3c82..ab885b0 100644
---- a/src/rec/mbboRecord.c
-+++ b/src/rec/mbboRecord.c
-@@ -227,6 +227,11 @@ static long process(mbboRecord *prec)
+diff --git a/src/std/rec/mbboRecord.c b/src/std/rec/mbboRecord.c
+index a54f37e..544f748 100644
+--- a/src/std/rec/mbboRecord.c
++++ b/src/std/rec/mbboRecord.c
+@@ -229,6 +229,11 @@ static long process(mbboRecord *prec)
      }
  
  CONTINUE:
 +
-+	if ( prec->tpro >= 2 )
-+		printf( "%s: Process %s, val %u\n",
-+			epicsThreadGetNameSelf(), prec->name, prec->val );
++    if ( prec->tpro >= 2 )
++        printf( "%s: Process %s, val %u\n",
++            epicsThreadGetNameSelf(), prec->name, prec->val );
 +
-     /* check for alarms */
+     /* Check for alarms */
      checkAlarms(prec);
  

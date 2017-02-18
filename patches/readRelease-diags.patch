@@ -1,5 +1,5 @@
 diff --git a/src/tools/EPICS/Release.pm b/src/tools/EPICS/Release.pm
-index 1cc3073..06606e6 100644
+index ab12076..8ca2360 100644
 --- a/src/tools/EPICS/Release.pm
 +++ b/src/tools/EPICS/Release.pm
 @@ -18,6 +18,10 @@ sub readReleaseFiles {
@@ -22,7 +22,7 @@ index 1cc3073..06606e6 100644
 +	#	print "\t$macro\t=\t$val\n";
 +	#}
  
-     open(my $IN, '<', $file) or die "Can't open $file: $!\n";
+     open(my $IN, '<', $file) or croak "Can't open $file: $!\n";
      while (<$IN>) {
 @@ -83,11 +91,16 @@ sub readRelease {
  sub expandMacros {
@@ -45,8 +45,8 @@ index 1cc3073..06606e6 100644
  
      while (my ($macro, $val) = each %$Rmacros) {
          while (my ($pre,$var,$post) = $val =~ m/ (.*) \$\( (\w+) \) (.*) /x) {
--            warn "EPICS/Release.pm: Undefined macro \$($var) used\n"
-+            warn "EPICS/Release.pm: Undefined macro \$($var) used under $Rmacros->{'TOP'}\n"
+-            carp "EPICS/Release.pm: Undefined macro \$($var) used\n"
++            carp "EPICS/Release.pm: Undefined macro \$($var) used under $Rmacros->{'TOP'}\n"
                  unless exists $Rmacros->{$var};
-             die "EPICS/Release.pm: Circular definition of macro $macro\n"
+             croak "EPICS/Release.pm: Circular definition of macro $macro\n"
                  if $macro eq $var;

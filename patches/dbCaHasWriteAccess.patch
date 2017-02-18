@@ -1,61 +1,8 @@
-diff --git a/src/db/dbAccess.c b/src/db/dbAccess.c
-index 068e59b..6760db2 100644
---- a/src/db/dbAccess.c
-+++ b/src/db/dbAccess.c
-@@ -894,7 +894,14 @@ long epicsShareAPI dbGetLinkValue(struct link *plink, short dbrType,
- 
-         status=dbCaGetLink(plink,dbrType,pbuffer,&stat,&sevr,pnRequest);
-         if (status) {
--            recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
-+        	struct dbCommon *psource = plink->value.pv_link.precord;
-+			if ( !dbCaIsLinkConnected( plink ) ) {
-+				recGblRecordError(status, psource, "dbCaGetLink error, link not connected!");
-+				recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
-+			} if ( !dbCaHasReadAccess( plink ) ) {
-+				recGblRecordError(status, psource, "dbCaGetLink error, no read access!");
-+				recGblSetSevr(psource, READ_ACCESS_ALARM, INVALID_ALARM);
-+			}
-         } else {
-             inherit_severity(pcalink,precord,stat,sevr);
-         }
-@@ -928,16 +935,28 @@ long epicsShareAPI dbPutLinkValue(struct link *plink, short dbrType,
-                 pdest->rpro = TRUE;
-             } else { /* otherwise ask for the record to be processed*/
-                 status = dbScanLink(psource, pdest);
-+				if (status) {
-+					recGblRecordError(status, psource, "Error processing record via PROC field!");
-+					recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
-+				}
-             }
-         }
--        if (status)
--            recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
-     } else if (plink->type == CA_LINK) {
-         struct dbCommon *psource = plink->value.pv_link.precord;
- 
-         status = dbCaPutLink(plink, dbrType, pbuffer, nRequest);
--        if (status < 0)
--            recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
-+        if (status < 0) {
-+			if ( !dbCaIsLinkConnected( plink ) ) {
-+				recGblRecordError(status, psource, "dbCaPutLink error, link not connected!");
-+				recGblSetSevr(psource, LINK_ALARM, INVALID_ALARM);
-+			} if ( !dbCaHasReadAccess( plink ) ) {
-+				recGblRecordError(status, psource, "dbCaPutLink error, no read access!");
-+				recGblSetSevr(psource, READ_ACCESS_ALARM, INVALID_ALARM);
-+			} if ( !dbCaHasWriteAccess( plink ) ) {
-+				recGblRecordError(status, psource, "dbCaPutLink error, no write access!");
-+				recGblSetSevr(psource, WRITE_ACCESS_ALARM, INVALID_ALARM);
-+			}
-+		}
-     } else {
-         cantProceed("dbPutLinkValue: Illegal link type");
-     }
-diff --git a/src/db/dbCa.c b/src/db/dbCa.c
-index bb976bd..057a6ad 100644
---- a/src/db/dbCa.c
-+++ b/src/db/dbCa.c
-@@ -333,6 +333,7 @@ long dbCaPutLinkCallback(struct link *plink,short dbrType,
+diff --git a/src/ioc/db/dbCa.c b/src/ioc/db/dbCa.c
+index 3f67269..d2b5a97 100644
+--- a/src/ioc/db/dbCa.c
++++ b/src/ioc/db/dbCa.c
+@@ -377,6 +377,7 @@ long dbCaPutLinkCallback(struct link *plink,short dbrType,
      long   status = 0;
      short  link_action = 0;
  
@@ -63,8 +10,8 @@ index bb976bd..057a6ad 100644
      assert(pca);
      /* put the new value in */
      epicsMutexMustLock(pca->lock);
-@@ -417,6 +418,26 @@ int dbCaIsLinkConnected(const struct link *plink)
-     return pca->isConnected;
+@@ -468,6 +469,26 @@ void dbCaScanFwdLink(struct link *plink) {
+         dbCaPutLink(plink, DBR_SHORT, &fwdLinkValue, 1);
  }
  
 +int dbCaHasReadAccess(const struct link *plink)
@@ -90,16 +37,16 @@ index bb976bd..057a6ad 100644
  #define pcaGetCheck \
      assert(plink); \
      if (plink->type != CA_LINK) return -1; \
-diff --git a/src/db/dbCa.h b/src/db/dbCa.h
-index ee0fee1..2869a8b 100644
---- a/src/db/dbCa.h
-+++ b/src/db/dbCa.h
-@@ -40,6 +40,8 @@ epicsShareFunc long dbCaPutLinkCallback(struct link *plink,
+diff --git a/src/ioc/db/dbCa.h b/src/ioc/db/dbCa.h
+index cfdf732..e5ffad0 100644
+--- a/src/ioc/db/dbCa.h
++++ b/src/ioc/db/dbCa.h
+@@ -42,6 +42,8 @@ epicsShareFunc long dbCaPutLinkCallback(struct link *plink,
  #define dbCaPutLink(plink, dbrType, pbuffer, nRequest) \
      dbCaPutLinkCallback((plink), (dbrType), (pbuffer), (nRequest), 0, 0)
  epicsShareFunc int dbCaIsLinkConnected(const struct link *plink);
 +epicsShareFunc int dbCaHasReadAccess(  const struct link *plink);
 +epicsShareFunc int dbCaHasWriteAccess( const struct link *plink);
+ epicsShareFunc void dbCaScanFwdLink(struct link *plink);
  
  /* The following are available after the link is connected*/
- epicsShareFunc long dbCaGetNelements(const struct link *plink,

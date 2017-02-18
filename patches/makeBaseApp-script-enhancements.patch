@@ -1,9 +1,9 @@
-diff --git a/src/makeBaseApp/makeBaseApp.pl b/src/makeBaseApp/makeBaseApp.pl
+diff --git a/src/template/base/makeBaseApp.pl b/src/template/base/makeBaseApp.pl
 old mode 100644
 new mode 100755
 index cf65d29..8e9adee
---- a/src/makeBaseApp/makeBaseApp.pl
-+++ b/src/makeBaseApp/makeBaseApp.pl
+--- a/src/template/base/makeBaseApp.pl
++++ b/src/template/base/makeBaseApp.pl
 @@ -80,10 +80,15 @@ sub ReplaceFilename { # (filename)
      }
      if ($app) {

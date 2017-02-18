@@ -1,8 +1,8 @@
-diff --git a/src/cas/generic/casPVI.cc b/src/cas/generic/casPVI.cc
-index b8f6a2f..4615032 100644
---- a/src/cas/generic/casPVI.cc
-+++ b/src/cas/generic/casPVI.cc
-@@ -28,6 +28,11 @@
+diff --git a/src/ca/legacy/pcas/generic/casPVI.cc b/src/ca/legacy/pcas/generic/casPVI.cc
+index 50e5d27..ff9aa2e 100644
+--- a/src/ca/legacy/pcas/generic/casPVI.cc
++++ b/src/ca/legacy/pcas/generic/casPVI.cc
+@@ -26,6 +26,11 @@
  #include "casAsyncIOI.h"
  #include "casMonitor.h"
  
@@ -14,7 +14,7 @@ index b8f6a2f..4615032 100644
  casPVI::casPVI ( casPV & intf ) : 
  	pCAS ( NULL ), pPV ( & intf ), nMonAttached ( 0u ), 
          nIOAttached ( 0u ), deletePending ( false ) {}
-@@ -148,7 +153,7 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
+@@ -146,7 +151,7 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
      //	gddArray(int app, aitEnum prim, int dimen, ...);
      gdd * pTmp = new gddScalar ( gddAppType_enums );
      if ( pTmp == NULL ) {
@@ -23,7 +23,7 @@ index b8f6a2f..4615032 100644
              "unable to create gdd for read of application type \"enums\" string"
              " conversion table for enumerated PV" );
          return S_cas_noMemory;
-@@ -158,8 +163,8 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
+@@ -156,8 +161,8 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
           gddAppType_enums, MAX_ENUM_STATES );
      if ( status != S_cas_success ) {
          pTmp->unreference ();
@@ -34,16 +34,7 @@ index b8f6a2f..4615032 100644
              " conversion table for enumerated PV");
          return status;
      }
-@@ -173,7 +178,7 @@ caStatus casPVI::updateEnumStringTable ( casCtx & ctxIn )
- 	}
-     else if ( status != S_casApp_asyncCompletion && 
-                 status != S_casApp_postponeAsyncIO ) {
--        errMessage ( status, 
-+        casErrMessage ( status, 
-             "- unable to read application type \"enums\" string"
-             " conversion table for enumerated PV");
-     }
-@@ -188,9 +193,9 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
+@@ -187,9 +192,9 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
      epicsGuard < epicsMutex > guard ( this->mutex );
      
      if ( resp.isContainer() ) {
@@ -56,7 +47,7 @@ index b8f6a2f..4615032 100644
          return;
      }
      
-@@ -210,9 +215,8 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
+@@ -247,13 +252,12 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
              }
          }
          else {
@@ -65,18 +56,6 @@ index b8f6a2f..4615032 100644
 -                " table for enumerated PV isnt a string type?" );
 +         	casErrMessage( S_cas_badType,
 +                "bad \"enums\" string conversion table for enumerated PV" );
-         }
-     }
-     else if ( resp.dimension() == 1 ) {
-@@ -246,13 +250,12 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
-             }
-         }
-         else {
--            errMessage ( S_cas_badType, 
--                "application type \"enums\" string conversion"
--                " table for enumerated PV isnt a string type?" );
-+            casErrMessage ( S_cas_badType, 
-+                "Invalid \"enums\" string conversion table for enumerated PV" );
          }
      }
      else {

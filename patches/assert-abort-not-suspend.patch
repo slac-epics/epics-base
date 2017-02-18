@@ -1,8 +1,8 @@
 diff --git a/src/libCom/osi/os/default/osdAssert.c b/src/libCom/osi/os/default/osdAssert.c
-index 938a3c6..00067c6 100644
+index 14d548c..4595c31 100644
 --- a/src/libCom/osi/os/default/osdAssert.c
 +++ b/src/libCom/osi/os/default/osdAssert.c
-@@ -47,6 +47,11 @@ void epicsAssert (const char *pFile, const unsigned line,
+@@ -50,6 +50,11 @@ void epicsAssert (const char *pFile, const unsigned line,
      errlogPrintf("Please E-mail this message to %s or to tech-talk@aps.anl.gov\n",
          pAuthorName);
  

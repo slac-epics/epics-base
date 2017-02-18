@@ -1,7 +1,7 @@
-diff --git a/src/catools/caget.c b/src/catools/caget.c
+diff --git a/src/ca/client/tools/caget.c b/src/ca/client/tools/caget.c
 index a2b0e08..c9f9536 100644
---- a/src/catools/caget.c
-+++ b/src/catools/caget.c
+--- a/src/ca/client/tools/caget.c
++++ b/src/ca/client/tools/caget.c
 @@ -57,7 +57,8 @@ static void usage (void)
      "  -h: Help: Print this message\n"
      "Channel Access options:\n"

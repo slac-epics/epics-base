@@ -1,8 +1,8 @@
-diff --git a/src/ca/tcpiiu.cpp b/src/ca/tcpiiu.cpp
-index 377e3ac..4770094 100644
---- a/src/ca/tcpiiu.cpp
-+++ b/src/ca/tcpiiu.cpp
-@@ -1456,9 +1456,10 @@ void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard,
+diff --git a/src/ca/client/tcpiiu.cpp b/src/ca/client/tcpiiu.cpp
+index 7fd848b..f2d2fd9 100644
+--- a/src/ca/client/tcpiiu.cpp
++++ b/src/ca/client/tcpiiu.cpp
+@@ -1431,9 +1431,10 @@ void tcpiiu::readNotifyRequest ( epicsGuard < epicsMutex > & guard,
      else {
          maxBytes = MAX_TCP;
      }
@@ -15,7 +15,7 @@ index 377e3ac..4770094 100644
          throw cacChannel::msgBodyCacheTooSmall ();
      }
      if (nElem == 0 && !CA_V413(this->minorProtocolVersion))
-@@ -1569,8 +1570,10 @@ void tcpiiu::subscriptionRequest (
+@@ -1544,8 +1545,10 @@ void tcpiiu::subscriptionRequest (
      }
      unsigned dataType = subscr.getType ( guard );
      // data type bounds checked when sunscription created
@@ -27,7 +27,7 @@ index 377e3ac..4770094 100644
          throw cacChannel::msgBodyCacheTooSmall ();
      }
      comQueSendMsgMinder minder ( this->sendQue, guard );
-@@ -1616,8 +1619,10 @@ void tcpiiu::subscriptionUpdateRequest (
+@@ -1591,8 +1594,10 @@ void tcpiiu::subscriptionUpdateRequest (
      }
      unsigned dataType = subscr.getType ( guard );
      // data type bounds checked when subscription constructed

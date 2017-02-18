@@ -1,7 +1,27 @@
-diff --git a/src/rec/aaoRecord.c b/src/rec/aaoRecord.c
-index 318e29d..634f128 100644
---- a/src/rec/aaoRecord.c
-+++ b/src/rec/aaoRecord.c
+diff --git a/src/std/rec/aSubRecord.c b/src/std/rec/aSubRecord.c
+index c014dd0..c40f0b0 100644
+--- a/src/std/rec/aSubRecord.c
++++ b/src/std/rec/aSubRecord.c
+@@ -264,6 +264,7 @@ static long process(aSubRecord *prec)
+         return 0;
+ 
+     prec->pact = TRUE;
++    recGblGetTimeStamp(prec);
+ 
+     /* Push the output link values */
+     if (!status) {
+@@ -274,7 +275,6 @@ static long process(aSubRecord *prec)
+                 (&prec->neva)[i]);
+     }
+ 
+-    recGblGetTimeStamp(prec);
+     monitor(prec);
+     recGblFwdLink(prec);
+     prec->pact = FALSE;
+diff --git a/src/std/rec/aaoRecord.c b/src/std/rec/aaoRecord.c
+index 565fd28..9c908f3 100644
+--- a/src/std/rec/aaoRecord.c
++++ b/src/std/rec/aaoRecord.c
 @@ -165,12 +165,22 @@ static long process(aaoRecord *prec)
          return S_dev_missingSup;
      }
@@ -26,11 +46,11 @@ index 318e29d..634f128 100644
  
      monitor(prec);
      /* process the forward scan link record */
-diff --git a/src/rec/aoRecord.c b/src/rec/aoRecord.c
-index a6dfb2c..59cd864 100644
---- a/src/rec/aoRecord.c
-+++ b/src/rec/aoRecord.c
-@@ -199,6 +199,10 @@ static long process(aoRecord *prec)
+diff --git a/src/std/rec/aoRecord.c b/src/std/rec/aoRecord.c
+index 06dc158..f1fd71a 100644
+--- a/src/std/rec/aoRecord.c
++++ b/src/std/rec/aoRecord.c
+@@ -198,6 +198,10 @@ static long process(aoRecord *prec)
                  }
  		if(!status) convert(prec, value);
  		prec->udf = isnan(prec->val);
@@ -40,8 +60,8 @@ index a6dfb2c..59cd864 100644
 +		recGblGetTimeStamp(prec);
  	}
  
- 	if ( prec->tpro >= 2 )
-@@ -236,7 +240,10 @@ static long process(aoRecord *prec)
+ 	/* check for alarms */
+@@ -231,7 +235,10 @@ static long process(aoRecord *prec)
  	if ( !pact && prec->pact ) return(0);
  	prec->pact = TRUE;
  
@@ -53,11 +73,11 @@ index a6dfb2c..59cd864 100644
  
  	/* check event list */
  	monitor(prec);
-diff --git a/src/rec/boRecord.c b/src/rec/boRecord.c
-index cfd98c0..080cb55 100644
---- a/src/rec/boRecord.c
-+++ b/src/rec/boRecord.c
-@@ -217,6 +217,10 @@ static long process(boRecord *prec)
+diff --git a/src/std/rec/boRecord.c b/src/std/rec/boRecord.c
+index 8818455..c305670 100644
+--- a/src/std/rec/boRecord.c
++++ b/src/std/rec/boRecord.c
+@@ -220,6 +220,10 @@ static long process(boRecord *prec)
  			if(prec->val==0) prec->rval = 0;
  			else prec->rval = prec->mask;
  		} else prec->rval = (epicsUInt32)prec->val;
@@ -67,8 +87,8 @@ index cfd98c0..080cb55 100644
 +		recGblGetTimeStamp(prec);
  	}
  
- 	if ( prec->tpro >= 2 )
-@@ -258,7 +262,11 @@ static long process(boRecord *prec)
+ 	/* check for alarms */
+@@ -256,7 +260,11 @@ static long process(boRecord *prec)
  	if ( !pact && prec->pact ) return(0);
  	prec->pact = TRUE;
  
@@ -81,11 +101,11 @@ index cfd98c0..080cb55 100644
  	if((prec->val==1) && (prec->high>0)){
  	    myCallback *pcallback;
  	    pcallback = (myCallback *)(prec->rpvt);
-diff --git a/src/rec/calcoutRecord.c b/src/rec/calcoutRecord.c
-index 668f23c..0f4a53d 100644
---- a/src/rec/calcoutRecord.c
-+++ b/src/rec/calcoutRecord.c
-@@ -210,6 +210,7 @@ static long process(calcoutRecord *prec)
+diff --git a/src/std/rec/calcoutRecord.c b/src/std/rec/calcoutRecord.c
+index c62b3f4..493b987 100644
+--- a/src/std/rec/calcoutRecord.c
++++ b/src/std/rec/calcoutRecord.c
+@@ -217,6 +217,7 @@ static long process(calcoutRecord *prec)
  {
      rpvtStruct *prpvt = prec->rpvt;
      int doOutput;
@@ -93,9 +113,9 @@ index 668f23c..0f4a53d 100644
  
      if (!prec->pact) {
          prec->pact = TRUE;
-@@ -230,6 +231,12 @@ static long process(calcoutRecord *prec)
- 			epicsThreadGetNameSelf(), prec->name, prec->val );
- 
+@@ -232,6 +233,12 @@ static long process(calcoutRecord *prec)
+             }
+         }
          checkAlarms(prec);
 +
 +	if ( !pact ) {
@@ -106,7 +126,7 @@ index 668f23c..0f4a53d 100644
          /* check for output link execution */
          switch (prec->oopt) {
          case calcoutOOPT_Every_Time:
-@@ -258,7 +265,6 @@ static long process(calcoutRecord *prec)
+@@ -260,7 +267,6 @@ static long process(calcoutRecord *prec)
          if (doOutput) {
              if (prec->odly > 0.0) {
                  prec->dlya = 1;
@@ -114,7 +134,7 @@ index 668f23c..0f4a53d 100644
                  db_post_events(prec, &prec->dlya, DBE_VALUE);
                  callbackRequestProcessCallbackDelayed(&prpvt->doOutCb,
                          prec->prio, prec, (double)prec->odly);
-@@ -270,11 +276,12 @@ static long process(calcoutRecord *prec)
+@@ -272,11 +278,12 @@ static long process(calcoutRecord *prec)
                  prec->pact = TRUE;
              }
          }
@@ -129,7 +149,7 @@ index 668f23c..0f4a53d 100644
              db_post_events(prec, &prec->dlya, DBE_VALUE);
              /* Make pact FALSE for asynchronous device support*/
              prec->pact = FALSE;
-@@ -283,7 +290,6 @@ static long process(calcoutRecord *prec)
+@@ -285,7 +292,6 @@ static long process(calcoutRecord *prec)
              prec->pact = TRUE;
          } else {/*Device Support is asynchronous*/
              writeValue(prec);
@@ -137,11 +157,11 @@ index 668f23c..0f4a53d 100644
          }
      }
      monitor(prec);
-diff --git a/src/rec/longoutRecord.c b/src/rec/longoutRecord.c
-index 5499271..b5f9c07 100644
---- a/src/rec/longoutRecord.c
-+++ b/src/rec/longoutRecord.c
-@@ -148,6 +148,10 @@ static long process(longoutRecord *prec)
+diff --git a/src/std/rec/longoutRecord.c b/src/std/rec/longoutRecord.c
+index b168bf1..f7b5fb9 100644
+--- a/src/std/rec/longoutRecord.c
++++ b/src/std/rec/longoutRecord.c
+@@ -147,6 +147,10 @@ static long process(longoutRecord *prec)
  			value = prec->val;
  		}
  		if (!status) convert(prec,value);
@@ -151,8 +171,8 @@ index 5499271..b5f9c07 100644
 +		recGblGetTimeStamp(prec);
  	}
  
- 	if ( prec->tpro >= 2 )
-@@ -183,7 +187,10 @@ static long process(longoutRecord *prec)
+ 	/* check for alarms */
+@@ -178,7 +182,10 @@ static long process(longoutRecord *prec)
  	if ( !pact && prec->pact ) return(0);
  	prec->pact = TRUE;
  
@@ -164,105 +184,82 @@ index 5499271..b5f9c07 100644
  
  	/* check event list */
  	monitor(prec);
-diff --git a/src/rec/mbboDirectRecord.c b/src/rec/mbboDirectRecord.c
-index 8ec8a3a..01f2ad2 100644
---- a/src/rec/mbboDirectRecord.c
-+++ b/src/rec/mbboDirectRecord.c
-@@ -195,6 +195,10 @@ static long process(mbboDirectRecord *prec)
- 	}
- 	/* convert val to rval */
- 	convert(prec);
+diff --git a/src/std/rec/mbboDirectRecord.c b/src/std/rec/mbboDirectRecord.c
+index b985971..60e296a 100644
+--- a/src/std/rec/mbboDirectRecord.c
++++ b/src/std/rec/mbboDirectRecord.c
+@@ -203,6 +203,10 @@ static long process(mbboDirectRecord *prec)
+         prec->udf = FALSE;
+         /* Convert VAL to RVAL */
+         convert(prec);
 +
-+	/* Update the timestamp before writing output values so it
-+	 * will be uptodate if any downstream records fetch it via TSEL */
++        /* Update the timestamp before writing output values so it
++         * will be uptodate if any downstream records fetch it via TSEL */
 +        recGblGetTimeStamp(prec);
      }
  
  CONTINUE:
-@@ -224,7 +228,11 @@ CONTINUE:
-     if ( !pact && prec->pact ) return(0);
-     prec->pact = TRUE;
+@@ -233,7 +237,12 @@ CONTINUE:
+         return 0;
  
+     prec->pact = TRUE;
 -    recGblGetTimeStamp(prec);
++
 +    if ( pact ) {
-+    	/* Update timestamp again for asynchronous devices */
++        /* Update timestamp again for asynchronous devices */
 +        recGblGetTimeStamp(prec);
 +    }
 +
-     /* check event list */
      monitor(prec);
-     /* process the forward scan link record */
-diff --git a/src/rec/mbboRecord.c b/src/rec/mbboRecord.c
-index ab885b0..e474796 100644
---- a/src/rec/mbboRecord.c
-+++ b/src/rec/mbboRecord.c
-@@ -224,6 +224,10 @@ static long process(mbboRecord *prec)
- 	}
- 	/* convert val to rval */
- 	convert(prec);
+ 
+     /* Wrap up */
+diff --git a/src/std/rec/mbboRecord.c b/src/std/rec/mbboRecord.c
+index 0ba0cbf..a54f37e 100644
+--- a/src/std/rec/mbboRecord.c
++++ b/src/std/rec/mbboRecord.c
+@@ -222,6 +222,10 @@ static long process(mbboRecord *prec)
+         prec->udf = FALSE;
+         /* Convert VAL to RVAL */
+         convert(prec);
 +
-+	/* Update the timestamp before writing output values so it
-+	 * will be uptodate if any downstream records fetch it via TSEL */
++        /* Update the timestamp before writing output values so it
++         * will be uptodate if any downstream records fetch it via TSEL */
 +        recGblGetTimeStamp(prec);
      }
  
  CONTINUE:
-@@ -262,7 +266,11 @@ CONTINUE:
-     if ( !pact && prec->pact ) return(0);
-     prec->pact = TRUE;
+@@ -255,7 +259,12 @@ CONTINUE:
+         return 0;
  
+     prec->pact = TRUE;
 -    recGblGetTimeStamp(prec);
++
 +    if ( pact ) {
-+    	/* Update timestamp again for asynchronous devices */
++        /* Update timestamp again for asynchronous devices */
++        recGblGetTimeStamp(prec);
++    }
++
+     monitor(prec);
+ 
+     /* Wrap up */
+diff --git a/src/std/rec/stringoutRecord.c b/src/std/rec/stringoutRecord.c
+index ea90129..33bf1e7 100644
+--- a/src/std/rec/stringoutRecord.c
++++ b/src/std/rec/stringoutRecord.c
+@@ -148,6 +148,10 @@ static long process(stringoutRecord *prec)
+                 recGblSetSevr(prec,UDF_ALARM,prec->udfs);
+         }
+ 
++	/* Update the timestamp before writing output values so it
++	 * will be uptodate if any downstream records fetch it via TSEL */
 +	recGblGetTimeStamp(prec);
-+    }
 +
-     /* check event list */
-     monitor(prec);
-     /* process the forward scan link record */
-diff --git a/src/rec/stringoutRecord.c b/src/rec/stringoutRecord.c
-index 64532a6..6e7a858 100644
---- a/src/rec/stringoutRecord.c
-+++ b/src/rec/stringoutRecord.c
-@@ -138,18 +138,23 @@ static long process(stringoutRecord *prec)
- 		recGblRecordError(S_dev_missingSup,(void *)prec,"write_stringout");
- 		return(S_dev_missingSup);
- 	}
--        if (!prec->pact
--        && (prec->dol.type != CONSTANT)
--        && (prec->omsl == menuOmslclosed_loop)) {
--		status = dbGetLink(&(prec->dol),
--			DBR_STRING,prec->val,0,0);
--		if(prec->dol.type!=CONSTANT && RTN_SUCCESS(status)) prec->udf=FALSE;
-+        if ( !prec->pact ) {
-+		if ( (prec->dol.type != CONSTANT)
-+		&&   (prec->omsl == menuOmslclosed_loop)) {
-+			status = dbGetLink(&(prec->dol), DBR_STRING,prec->val,0,0);
-+			if ( RTN_SUCCESS(status) )
-+				prec->udf=FALSE;
-+		}
-+
-+		if(prec->udf == TRUE ){
-+			recGblSetSevr(prec,UDF_ALARM,INVALID_ALARM);
-+		}
-+
-+		/* Update the timestamp before writing output values so it
-+		* will be uptodate if any downstream records fetch it via TSEL */
-+		recGblGetTimeStamp(prec);
- 	}
- 
--        if(prec->udf == TRUE ){
--                recGblSetSevr(prec,UDF_ALARM,INVALID_ALARM);
--        }
--
          if (prec->nsev < INVALID_ALARM )
                  status=writeValue(prec); /* write the new value */
          else {
-@@ -174,9 +179,13 @@ static long process(stringoutRecord *prec)
- 
- 	/* check if device support set pact */
+@@ -174,7 +178,12 @@ static long process(stringoutRecord *prec)
  	if ( !pact && prec->pact ) return(0);
--
+ 
  	prec->pact = TRUE;
 -	recGblGetTimeStamp(prec);
 +

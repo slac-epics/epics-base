@@ -1,8 +1,8 @@
 diff --git a/src/tools/convertRelease.pl b/src/tools/convertRelease.pl
-index abf63c3..194d522 100644
+index 651faef..674ebe8 100644
 --- a/src/tools/convertRelease.pl
 +++ b/src/tools/convertRelease.pl
-@@ -25,10 +25,10 @@ use EPICS::Release;
+@@ -23,10 +23,10 @@ use EPICS::Release;
  
  use vars qw($arch $top $iocroot $root);
  
@@ -15,7 +15,7 @@ index abf63c3..194d522 100644
  
  my $cwd = UnixPath(cwd());
  
-@@ -60,6 +60,9 @@ if ($opt_t) {
+@@ -58,6 +58,9 @@ if ($opt_t) {
              chop $iocroot;
              chop $root;
          }
@@ -25,7 +25,7 @@ index abf63c3..194d522 100644
      }
  }
  
-@@ -71,10 +74,18 @@ my $outfile = $ARGV[0];
+@@ -69,10 +72,18 @@ my $outfile = $ARGV[0];
  my %macros = (TOP => LocalPath($top));
  my @apps   = ('TOP');   # Records the order of definitions in RELEASE file
  
@@ -42,10 +42,10 @@ index abf63c3..194d522 100644
 +		print "\t$macro\t=\t$val\n";
 +	}
 +}
- expandRelease(\%macros, \@apps);
+ expandRelease(\%macros);
  
  
-@@ -94,7 +105,11 @@ for ($outfile) {
+@@ -92,7 +103,11 @@ for ($outfile) {
  
  sub HELP_MESSAGE {
      print STDERR <<EOF;
@@ -58,7 +58,7 @@ index abf63c3..194d522 100644
      where outfile is one of:
          releaseTops - lists the module names defined in RELEASE*s
          dllPath.bat - path changes for cmd.exe to find Windows DLLs
-@@ -223,6 +238,12 @@ sub checkRelease {
+@@ -219,6 +234,12 @@ sub checkRelease {
          my @order = ();
          my $relfile = "$path/configure/RELEASE";
          readReleaseFiles($relfile, \%check, \@order, $arch);
@@ -68,6 +68,6 @@ index abf63c3..194d522 100644
 +				print "\t$macro\t=\t$val\n";
 +			}
 +		}
-         expandRelease(\%check, \@order);
+         expandRelease(\%check);
          delete $check{TOP};
          delete $check{EPICS_HOST_ARCH};

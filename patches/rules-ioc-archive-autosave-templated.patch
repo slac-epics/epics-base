@@ -1,8 +1,8 @@
 diff --git a/configure/CONFIG_COMMON b/configure/CONFIG_COMMON
-index 839c942..fe6796e 100644
+index e6e6033..d8f8156 100644
 --- a/configure/CONFIG_COMMON
 +++ b/configure/CONFIG_COMMON
-@@ -61,6 +61,10 @@ GNU_DIR = /usr
+@@ -59,6 +59,10 @@ GNU_DIR = /usr
  
  INSTALL_LOCATION            = $(TOP)
  
@@ -14,46 +14,36 @@ index 839c942..fe6796e 100644
  INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
  
 diff --git a/configure/RULES.Db b/configure/RULES.Db
-index 11e4d40..fdc886c 100644
+index b45e370..de7d1c0 100644
 --- a/configure/RULES.Db
 +++ b/configure/RULES.Db
-@@ -10,17 +10,20 @@
+@@ -13,16 +13,16 @@ SUBST_SUFFIX ?= .substitutions
  
  #####################################################  vpath
  
--vpath %.dbd $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
--vpath %.db $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB))
--vpath %.vdb $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB))
-+vpath %.dbd           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
-+vpath %.db            $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
-+vpath %.vdb           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DBD)
- vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
--vpath %.template $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
--vpath bpt%.data $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
--vpath %.acf $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
--vpath %.acs $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-+vpath %.sub-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-+vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
-+vpath %.tpl-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
-+vpath bpt%.data       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-+vpath %.acf           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
-+vpath %.acs           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+-vpath %.pm $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
+-vpath %.pod $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
+-vpath %.dbd $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
+-vpath %.db $(USR_VPATH) $(SRC_DIRS) $(dir $(DB))
+-vpath %.vdb $(USR_VPATH) $(SRC_DIRS) $(dir $(DB))
++vpath %.pm             $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
++vpath %.pod            $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
++vpath %.dbd            $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
++vpath %.db             $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
++vpath %.vdb            $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DBD)
+ vpath %$(SUBST_SUFFIX) $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
+-vpath %.template $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
+-vpath bpt%.data $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
+-vpath %.acf $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
+-vpath %.acs $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
++vpath %.template       $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
++vpath bpt%.data        $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
++vpath %.acf            $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
++vpath %.acs            $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
  
- ##################################################### dbdflags
+ ##################################################### dbflags dbdflags
  
-+# dbExpand
- DBD_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DBD) $(RELEASE_DBD_DIRS)
- DB_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DB) $(RELEASE_DB_DIRS)
- 
-@@ -68,6 +71,7 @@ SOURCE_DB_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_DB_aaa)  )
- SOURCE_DB_aaa = $(addsuffix /$(file), $(dir) )
- 
- COMMONS = $(COMMON_DIR)/*.dbd $(COMMON_DIR)/*.db $(COMMON_DIR)/*.h \
-+          $(COMMON_DIR)/*.sub-db        $(COMMON_DIR)/*.tpl-db \
-           $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template
- 
- # Remove trailing numbers (to 99) on stem
-@@ -77,8 +81,9 @@ TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(pats
+@@ -95,8 +95,9 @@ TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(pats
  TEMPLATE2=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
            $(patsubst %5,%,$(patsubst %6,%,$(patsubst %7,%,$(patsubst %8,%,$(patsubst %9,%, \
            $(TEMPLATE1)))))))))))
@@ -65,20 +55,16 @@ index 11e4d40..fdc886c 100644
  
  # dbst based database optimization
  ifeq '$(DB_OPT)' 'YES'
-@@ -199,7 +204,11 @@ $(COMMON_DIR)/%.substitutions:
+@@ -301,7 +302,7 @@ $(COMMON_DIR)/%$(SUBST_SUFFIX):
  endif
  
- $(INSTALL_DB)/%.substitutions: %.substitutions
+ $(INSTALL_DB)/%$(SUBST_SUFFIX): %$(SUBST_SUFFIX)
 -	$(ECHO) "Installing substitution file $@"
-+	$(ECHO) "Installing db substitutions file $@"
-+	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
-+
-+$(INSTALL_DB)/%.sub-db: %.sub-db
 +	$(ECHO) "Installing db substitutions file $@"
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
  
- .PRECIOUS: $(COMMON_DIR)/%.substitutions
-@@ -213,7 +222,7 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
+ $(INSTALL_DB)/%$(SUBST_SUFFIX): ../%$(SUBST_SUFFIX)
+@@ -319,7 +320,7 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
  	@$(RM) $@.VAR
  
  $(INSTALL_DB)/%.template: %.template
@@ -86,8 +72,8 @@ index 11e4d40..fdc886c 100644
 +	$(ECHO) "Installing db template file $@"
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
  
- .PRECIOUS: $(COMMON_DIR)/%.template
-@@ -293,7 +302,7 @@ $(INSTALL_DBD)/%: %
+ $(INSTALL_DB)/%.template: ../%.template
+@@ -418,7 +419,7 @@ $(INSTALL_DBD)/%: ../%
  
  define  DBD_INSTALLS_template
  $$(INSTALL_DBD)/$$(notdir $(1)) : $(1)
@@ -96,54 +82,48 @@ index 11e4d40..fdc886c 100644
  	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DBD)
  endef
  $(foreach file, $(DBD_INSTALLS), $(eval $(call DBD_INSTALLS_template, $(file))))
-@@ -307,14 +316,35 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
+@@ -456,16 +457,27 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
  	@$(REPLACEVAR) < $*.VAR > $@
  	@$(RM) $*.VAR
  
 +# Note:
 +# MSI expansion command was
-+#	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
++#	$(MSI3_15) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
 +# This is wrong for msi when both foo.template and foo.substitutions
 +# are used as in many of the PCDS IOc's.
 +# Specifying foo.template in the command line as above
 +# overrides the templates specified in the substitutions file.
 +# 
 +# PCDS changes it to
-+#   $(MSI) $(DBFLAGS) -S$< > $*.tmp
++#   $(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 +# to allow both foo.template and foo.subsitutions to coexist.
- $(COMMON_DIR)/%.db$(RAW): %.substitutions
- 	@$(RM) $(notdir $@)$(DEP)
-+	$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
-+	$(ECHO) "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-+	$(ECHO) "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
-+	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
-+	@$(RM) $@ $*.tmp
-+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
-+	$(MV) $*.tmp $@
-+
-+$(COMMON_DIR)/%.db$(RAW): %.sub-db
-+	@$(RM) $(notdir $@)$(DEP)
- 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
- 	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
- 	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+ $(COMMON_DIR)/%.db$(RAW): %$(SUBST_SUFFIX)
 -	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
 +	$(ECHO) "Inflating database from $<"
- 	@$(RM) $@ $*.tmp
--	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > $*.tmp
-+	$(MSI) $(DBFLAGS) -S$< > $*.tmp
- 	$(MV) $*.tmp $@
+ 	@$(RM) $(notdir $@)
+-	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$< $(TEMPLATE_FILENAME)
++	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
+ 	@$(MV) $(notdir $@) $@
+ 
+ $(COMMON_DIR)/%.db$(RAW): ../%$(SUBST_SUFFIX)
+-	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
++	$(ECHO) "Inflating database from $<"
+ 	@$(RM) $(notdir $@)
+-	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$< $(TEMPLATE_FILENAME)
++	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
+ 	@$(MV) $(notdir $@) $@
  
  $(COMMON_DIR)/%.db$(RAW): %.template
-@@ -351,7 +381,7 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.db$(RAW)
+@@ -509,7 +521,7 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.db$(RAW)
  else
  
  $(INSTALL_DB)/%: %
 -	$(ECHO) "Installing $@"
 +	$(ECHO) "Installing db file $@"
  	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
- endif
  
-@@ -361,7 +391,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
+ $(INSTALL_DB)/%: ../%
+@@ -523,7 +535,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
  
  define  DB_INSTALLS_template
  $$(INSTALL_DB)/$$(notdir $(1)) : $(1)
@@ -154,7 +134,7 @@ index 11e4d40..fdc886c 100644
  $(foreach file, $(DB_INSTALLS), $(eval $(call DB_INSTALLS_template, $(file))))
 diff --git a/configure/RULES.archive b/configure/RULES.archive
 new file mode 100644
-index 0000000..b65d7e9
+index 0000000..a1648cd
 --- /dev/null
 +++ b/configure/RULES.archive
 @@ -0,0 +1,114 @@
@@ -216,9 +196,9 @@ index 0000000..b65d7e9
 +
 +buildInstall:	build
 +
-+realclean:: clean
++realclean: clean
 +
-+clean:: archive_clean
++clean: archive_clean
 +
 +archive_clean:
 +	@$(RM) $(COMMONS)
@@ -274,7 +254,7 @@ index 0000000..b65d7e9
 +
 diff --git a/configure/RULES.autosave b/configure/RULES.autosave
 new file mode 100644
-index 0000000..bc78e4c
+index 0000000..f5c277c
 --- /dev/null
 +++ b/configure/RULES.autosave
 @@ -0,0 +1,122 @@
@@ -337,9 +317,9 @@ index 0000000..bc78e4c
 +
 +buildInstall:	build
 +
-+realclean:: clean
++realclean: clean
 +
-+clean:: autosave_clean
++clean: autosave_clean
 +
 +autosave_clean:
 +	@$(RM) $(COMMONS)
@@ -401,36 +381,20 @@ index 0000000..bc78e4c
 +endif
 +
 diff --git a/configure/RULES.ioc b/configure/RULES.ioc
-index 1024fcb..77f13d4 100644
+index da314a4..23c396e 100644
 --- a/configure/RULES.ioc
 +++ b/configure/RULES.ioc
-@@ -10,25 +10,33 @@
+@@ -10,29 +10,32 @@
  
  include $(CONFIG)/RULES_DIRS
  
 -build$(DIVIDER)$(ARCH) build: buildInstall
 -install$(DIVIDER)$(ARCH) install: buildInstall
 -$(ARCH): buildInstall
-+## PCDS moves the buildInstall, envPaths and other targets from
-+## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
-+## be configured w/ or w/o RULES_DIRS
-+include $(CONFIG)/RULES.ioc-targets
- 
+-
 -ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
 -    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
-+## PCDS rules for building archive and autosave files in ioc directories.
-+## These rules are needed to install autosave and archive files
-+## from IOC directories whose Makefile's end like this:
-+## include $(CONFIG)/RULES.ioc
-+## -include $(CONFIG)/RULES.archive
-+## -include $(CONFIG)/RULES.autosave
-+##
-+## However, the following style of Makefile works better as it creates
-+## O.Common and other O.* directories as needed for proper dependency checking
-+## include $(CONFIG)/RULES
-+## include $(CONFIG)/RULES.ioc-targets
-+## 
- 
+-
 -    clean$(DIVIDER)$(ARCH) clean:
 -	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
 -else
@@ -438,31 +402,52 @@ index 1024fcb..77f13d4 100644
 -    clean$(DIVIDER)$(ARCH) clean:
 -endif
 -
--cdCommands envPaths dllPath.bat relPaths.sh: \
+-cdCommands dllPath.bat relPaths.sh: \
 -    $(wildcard $(TOP)/configure/RELEASE*) \
--    $(wildcard $(TOP)/configure/CONFIG_SITE*) $(INSTALL_BIN)
+-    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
 -	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
+-
+-envPaths: $(wildcard $(TOP)/configure/RELEASE*) \
+-    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
+-	$(CONVERTRELEASE) -t $(IOCS_APPL_TOP) $@
 -
 -realclean:
 -	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
++## PCDS moves the buildInstall, envPaths and other targets from
++## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
++## be configured w/ or w/o RULES_DIRS
++include $(CONFIG)/RULES.ioc-targets
++
++## PCDS rules for building archive and autosave files in ioc directories.
++## These rules are needed to install autosave and archive files
++## from IOC directories whose Makefile's end like this:
++## include $(CONFIG)/RULES.ioc
++## -include $(CONFIG)/RULES.archive
++## -include $(CONFIG)/RULES.autosave
++## 
++## However, the following style of Makefile works better as it creates
++## O.Common and other O.* directories as needed for proper dependency checking
++## include $(CONFIG)/RULES
++## include $(CONFIG)/RULES.ioc-targets
++## 
 +$(INSTALL_ARCHIVE)/%.archive: %.sub-arch
 +	@echo "Inflating ioc archive file from $<"
-+	@$(RM) $@
-+	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
-+	$(MV) msi.tmp $@
-+	
++	@$(RM) $(notdir $@)
++	$(MSI3_15) $(ARCHIVEFLAGS) -o $(notdir $@) -S$<
++	@$(MV) $(notdir $@) $@
++
 +$(INSTALL_AUTOSAVE)/%.req: %.sub-req
 +	@echo "Inflating ioc autosave file from $<"
-+	@$(RM) $@ msi.tmp
-+	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
-+	$(MV) msi.tmp $@
++	@$(RM) $(notdir $@)
++	$(MSI3_15) $(AUTOSAVEFLAGS) -o $(notdir $@) -S$<
++	@$(MV) $(notdir $@) $@
  
 diff --git a/configure/RULES.ioc-targets b/configure/RULES.ioc-targets
 new file mode 100644
-index 0000000..17ea02b
+index 0000000..4f55a26
 --- /dev/null
 +++ b/configure/RULES.ioc-targets
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,62 @@
 +#*************************************************************************
 +# Copyright (c) 2013 UChicago Argonne LLC, as Operator of Argonne
 +#     National Laboratory.
@@ -474,18 +459,16 @@ index 0000000..17ea02b
 +#RULES.ioc-targets
 +# This file contains targets needed in IOC instance directories
 +
-+$(ARCH): build
++build$(DIVIDER)$(ARCH)   build:   buildInstall
++install$(DIVIDER)$(ARCH) install: buildInstall
++$(ARCH): buildInstall
 +
 +ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
-+	build$(DIVIDER)$(ARCH)        build: $(TARGETS)
 +    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
-+	install$(DIVIDER)$(ARCH)      install: $(TARGETS)
-+	clean$(DIVIDER)$(ARCH)        clean: ioc-targets_clean
++	clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
 +else
-+	build$(DIVIDER)$(ARCH)        build:
 +    buildInstall$(DIVIDER)$(ARCH) buildInstall:
-+	install$(DIVIDER)$(ARCH)      install:
-+    clean$(DIVIDER)$(ARCH)        clean:
++    clean$(DIVIDER)$(ARCH) clean:
 +endif
 +
 +# Notes re IOCS_APPL_TOP vs IOC_APPL_TOP
@@ -503,7 +486,7 @@ index 0000000..17ea02b
 +# -t option for IOCS_APPL_TOP and the
 +# -T option for IOC_APPL_TOP
 +# to find the RELEASE* files
-+cdCommands envPaths dllPath.bat relPaths.sh: \
++cdCommands dllPath.bat relPaths.sh: \
 +    $(wildcard $(TOP)/configure/RELEASE*) \
 +    $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)\
 +    $(wildcard $(TOP)/RELEASE_SITE) \
@@ -518,36 +501,40 @@ index 0000000..17ea02b
 +	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
 +endif
 +
++envPaths: $(wildcard $(TOP)/configure/RELEASE*) \
++    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
++	$(CONVERTRELEASE) -t $(IOCS_APPL_TOP) $@
++
 +realclean: ioc-targets_clean
 +
 +ioc-targets_clean:
 +	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
 +
 diff --git a/configure/RULES_BUILD b/configure/RULES_BUILD
-index c0e1ffb..ad0b663 100644
+index 2be4b33..3d127e6 100644
 --- a/configure/RULES_BUILD
 +++ b/configure/RULES_BUILD
-@@ -71,6 +71,10 @@ all:	install
+@@ -83,6 +83,10 @@ endif
+ -include $(CONFIG)/RULES_FILE_TYPE
  
  -include $(CONFIG)/RULES.Db
- 
++ 
 +-include $(CONFIG)/RULES.autosave
 +
 +-include $(CONFIG)/RULES.archive
-+
- -include $(CONFIG)/RULES_JAVA
  
- ifneq (,$(strip $(HDEPENDS_FILES)))
+ #---------------------------------------------------------------
+ # Include defines and rules for prod, library and test* targets
 diff --git a/configure/RULES_TOP b/configure/RULES_TOP
-index 1898f59..a23f28c 100644
+index 2aa2e1f..6596e1f 100644
 --- a/configure/RULES_TOP
 +++ b/configure/RULES_TOP
-@@ -22,8 +22,16 @@ realuninstall: uninstallDirs
+@@ -19,8 +19,17 @@ realuninstall: uninstallDirs
  	$(RMDIR) $(INSTALL_LOCATION_BIN)
  	$(RMDIR) $(INSTALL_LOCATION_LIB)
  
 -UNINSTALL_DIRS += $(INSTALL_DBD) $(INSTALL_INCLUDE) $(INSTALL_DOC) \
--    $(INSTALL_HTML) $(INSTALL_JAVA) $(INSTALL_TEMPLATES) $(INSTALL_DB)
+-    $(INSTALL_HTML) $(INSTALL_TEMPLATES) $(INSTALL_DB) $(DIRECTORY_TARGETS)
 +UNINSTALL_DIRS += $(INSTALL_ARCHIVE)
 +UNINSTALL_DIRS += $(INSTALL_AUTOSAVE)
 +UNINSTALL_DIRS += $(INSTALL_CFG)
@@ -558,6 +545,7 @@ index 1898f59..a23f28c 100644
 +UNINSTALL_DIRS += $(INSTALL_INCLUDE)
 +UNINSTALL_DIRS += $(INSTALL_JAVA)
 +UNINSTALL_DIRS += $(INSTALL_TEMPLATES)
- UNINSTALL_DIRS += $(DIRECTORY_TARGETS)
++UNINSTALL_DIRS += $(DIRECTORY_TARGETS)
  uninstallDirs:
  	$(RMDIR) $(UNINSTALL_DIRS)
+ 

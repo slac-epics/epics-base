@@ -1,8 +1,8 @@
 diff --git a/src/libCom/osi/os/posix/osdThread.c b/src/libCom/osi/os/posix/osdThread.c
-index 9b552f0..d0090ed 100644
+index c26df0f..e5e7c02 100644
 --- a/src/libCom/osi/os/posix/osdThread.c
 +++ b/src/libCom/osi/os/posix/osdThread.c
-@@ -560,7 +560,8 @@ static epicsThreadOSD *createImplicit(void)
+@@ -571,7 +571,8 @@ static epicsThreadOSD *createImplicit(void)
      struct sched_param param;
      int policy;
      if(pthread_getschedparam(tid,&policy,&param) == 0)

@@ -1,8 +1,8 @@
-diff --git a/src/makeBaseApp/Makefile b/src/makeBaseApp/Makefile
-index 7b72839..fd3d4b0 100644
---- a/src/makeBaseApp/Makefile
-+++ b/src/makeBaseApp/Makefile
-@@ -91,6 +91,359 @@ TEMPLATES += top/iocBoot/ioc/st.cmd@Cross
+diff --git a/src/template/base/Makefile b/src/template/base/Makefile
+index 865d95c..8c88458 100644
+--- a/src/template/base/Makefile
++++ b/src/template/base/Makefile
+@@ -90,6 +90,359 @@ TEMPLATES += top/iocBoot/ioc/st.cmd@Cross
  TEMPLATES += top/iocBoot/ioc/st.cmd@vxWorks
  TEMPLATES += top/iocBoot/ioc/st.cmd@RTEMS
  
@@ -362,48 +362,27 @@ index 7b72839..fd3d4b0 100644
  SCRIPTS_HOST += makeBaseApp.pl
  
  include $(TOP)/configure/RULES
-diff --git a/src/makeBaseApp/top/Makefile b/src/makeBaseApp/top/Makefile
-index f0d9ad7..5da0f13 100644
---- a/src/makeBaseApp/top/Makefile
-+++ b/src/makeBaseApp/top/Makefile
-@@ -1,7 +1,16 @@
- #Makefile at top of application tree
- TOP = .
-+
-+# Allow a local IOC_APPL_TOP file to redefine TOP
-+# for our templated IOC builds
-+-include $(TOP)/IOC_APPL_TOP
-+ifneq (,$(IOC_APPL_TOP))
-+TOP = $(IOC_APPL_TOP)
-+endif
-+
- include $(TOP)/configure/CONFIG
- DIRS := $(DIRS) $(filter-out $(DIRS), configure)
-+DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Lib))
- DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *App))
- DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard iocBoot))
- 
-diff --git a/src/makeBaseApp/top/README b/src/makeBaseApp/top/README
+diff --git a/src/template/base/top/README b/src/template/base/top/README
 new file mode 100644
 index 0000000..e93f84b
 --- /dev/null
-+++ b/src/makeBaseApp/top/README
++++ b/src/template/base/top/README
 @@ -0,0 +1,3 @@
 +TODO: Add notes on how to build and run this IOC,
 +along with any useful information that would help
 +someone else to support this IOC if needed.
-diff --git a/src/makeBaseApp/top/RELEASE_NOTES b/src/makeBaseApp/top/RELEASE_NOTES
+diff --git a/src/template/base/top/RELEASE_NOTES b/src/template/base/top/RELEASE_NOTES
 new file mode 100644
 index 0000000..0f00a06
 --- /dev/null
-+++ b/src/makeBaseApp/top/RELEASE_NOTES
++++ b/src/template/base/top/RELEASE_NOTES
 @@ -0,0 +1 @@
 +TODO: Add notes on each release
-diff --git a/src/makeBaseApp/top/RELEASE_SITE b/src/makeBaseApp/top/RELEASE_SITE
+diff --git a/src/template/base/top/RELEASE_SITE b/src/template/base/top/RELEASE_SITE
 new file mode 100644
 index 0000000..e081234
 --- /dev/null
-+++ b/src/makeBaseApp/top/RELEASE_SITE
++++ b/src/template/base/top/RELEASE_SITE
 @@ -0,0 +1,10 @@
 +# =============================================================
 +# Define the top of the EPICS tree for your site.
@@ -415,11 +394,11 @@ index 0000000..e081234
 +# EPICS module releases are kept here
 +EPICS_MODULES=$(EPICS_SITE_TOP)/modules
 +
-diff --git a/src/makeBaseApp/top/_APPNAME_Screens/_APPNAME_.edl b/src/makeBaseApp/top/_APPNAME_Screens/_APPNAME_.edl
+diff --git a/src/template/base/top/_APPNAME_Screens/_APPNAME_.edl b/src/template/base/top/_APPNAME_Screens/_APPNAME_.edl
 new file mode 100644
 index 0000000..23bfcb1
 --- /dev/null
-+++ b/src/makeBaseApp/top/_APPNAME_Screens/_APPNAME_.edl
++++ b/src/template/base/top/_APPNAME_Screens/_APPNAME_.edl
 @@ -0,0 +1,417 @@
 +4 0 1
 +beginScreenProperties
@@ -838,10 +817,10 @@ index 0000000..23bfcb1
 +autoSize
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/configure/CONFIG b/src/makeBaseApp/top/configure/CONFIG
+diff --git a/src/template/base/top/configure/CONFIG b/src/template/base/top/configure/CONFIG
 index c1a4703..55ed7e8 100644
---- a/src/makeBaseApp/top/configure/CONFIG
-+++ b/src/makeBaseApp/top/configure/CONFIG
+--- a/src/template/base/top/configure/CONFIG
++++ b/src/template/base/top/configure/CONFIG
 @@ -1,29 +1,26 @@
 -# CONFIG - Load build configuration data
 -#
@@ -880,10 +859,10 @@ index c1a4703..55ed7e8 100644
 + -include $(TOP)/configure/O.$(T_A)/CONFIG_APP_INCLUDE
  endif
  
-diff --git a/src/makeBaseApp/top/configure/CONFIG_SITE b/src/makeBaseApp/top/configure/CONFIG_SITE
-index 92156d9..cba8743 100644
---- a/src/makeBaseApp/top/configure/CONFIG_SITE
-+++ b/src/makeBaseApp/top/configure/CONFIG_SITE
+diff --git a/src/template/base/top/configure/CONFIG_SITE b/src/template/base/top/configure/CONFIG_SITE
+index 212485e..6b8239e 100644
+--- a/src/template/base/top/configure/CONFIG_SITE
++++ b/src/template/base/top/configure/CONFIG_SITE
 @@ -1,12 +1,12 @@
  # CONFIG_SITE
  
@@ -914,10 +893,10 @@ index 92156d9..cba8743 100644
  
  # To install files into a location other than $(TOP) define
  #   INSTALL_LOCATION here.
-diff --git a/src/makeBaseApp/top/configure/Makefile b/src/makeBaseApp/top/configure/Makefile
+diff --git a/src/template/base/top/configure/Makefile b/src/template/base/top/configure/Makefile
 index 9254309..0052e7e 100644
---- a/src/makeBaseApp/top/configure/Makefile
-+++ b/src/makeBaseApp/top/configure/Makefile
+--- a/src/template/base/top/configure/Makefile
++++ b/src/template/base/top/configure/Makefile
 @@ -1,8 +1,19 @@
 +# Makefile
 +
@@ -938,78 +917,10 @@ index 9254309..0052e7e 100644
  
  include $(TOP)/configure/RULES
 +
-diff --git a/src/makeBaseApp/top/configure/RELEASE b/src/makeBaseApp/top/configure/RELEASE
-index 84074fe..14476b8 100644
---- a/src/makeBaseApp/top/configure/RELEASE
-+++ b/src/makeBaseApp/top/configure/RELEASE
-@@ -1,32 +1,40 @@
--# RELEASE - Location of external support modules
-+# RELEASE
-+# Defines location of external products
- #
--# IF YOU MAKE ANY CHANGES to this file you must subsequently
--# do a "gnumake rebuild" in this application's top level
--# directory.
-+# IF YOU MAKE ANY CHANGES to this file you MUST at least run
-+# "gnumake" in this directory afterwards; you usually need
-+# to run "gnumake rebuild" in the application's top level
-+# directory each time this file is changed.
- #
--# The build process does not check dependencies against files
--# that are outside this application, thus you should do a
--# "gnumake rebuild" in the top level directory after EPICS_BASE
--# or any other external module pointed to below is rebuilt.
-+# NOTE: The build does not check dependencies against files
-+# that are outside this application, thus you should run
-+# "gnumake distclean install" in the top directory each time
-+# EPICS_BASE, SNCSEQ, or any other external module defined
-+# in the RELEASE file is rebuilt.
- #
--# Host- or target-specific settings can be given in files named
-+# Host/target specific settings can be specified in files named
- #  RELEASE.$(EPICS_HOST_ARCH).Common
- #  RELEASE.Common.$(T_A)
- #  RELEASE.$(EPICS_HOST_ARCH).$(T_A)
--#
--# This file should ONLY define paths to other support modules,
--# or include statements that pull in similar RELEASE files.
--# Build settings that are NOT module paths should appear in a
--# CONFIG_SITE file.
--
--TEMPLATE_TOP=_TEMPLATE_TOP_
- 
--# If using the sequencer, point SNCSEQ at its top directory:
--#SNCSEQ=$(EPICS_BASE)/../modules/soft/seq
-+# Site configuration, if it does not exist, the
-+# following environment variables must be set
-+#	EPICS_BASE
-+#	EPICS_HOST_ARCH
-+#	RTEMS_SITE_TOP
-+#	RTEMS_VER
-+#	EPICS_EXTENSIONS
-+#	EPICS_MODULES
-+#	MSI
-+-include $(TOP)/RELEASE_SITE
- 
--# EPICS_BASE usually appears last so other apps can override stuff:
--EPICS_BASE=_EPICS_BASE_
-+# ===============================================================
-+# Define the version of modules needed by
-+# IOC apps or other Support apps
-+# ===============================================================
-+# example: IPAC_MODULE_VERSION=R2.8.4-0.2.0
- 
--# Set RULES here if you want to take build rules from somewhere
--# other than EPICS_BASE:
--#RULES=/path/to/epics/support/module/rules/x-y
-+# ============================================================
-+# External Support
-+# ============================================================
-+# example: IPAC=$(EPICS_MODULES)/ipac/$(IPAC_MODULE_VERSION)
-diff --git a/src/makeBaseApp/top/configure/RULES b/src/makeBaseApp/top/configure/RULES
+diff --git a/src/template/base/top/configure/RULES b/src/template/base/top/configure/RULES
 index 6d56e14..1f2cb5d 100644
---- a/src/makeBaseApp/top/configure/RULES
-+++ b/src/makeBaseApp/top/configure/RULES
+--- a/src/template/base/top/configure/RULES
++++ b/src/template/base/top/configure/RULES
 @@ -1,6 +1,6 @@
  # RULES
  
@@ -1018,68 +929,68 @@ index 6d56e14..1f2cb5d 100644
  
  # Library should be rebuilt because LIBOBJS may have changed.
  $(LIBNAME): ../Makefile
-diff --git a/src/makeBaseApp/top/configure/RULES.archive b/src/makeBaseApp/top/configure/RULES.archive
+diff --git a/src/template/base/top/configure/RULES.archive b/src/template/base/top/configure/RULES.archive
 new file mode 100644
 index 0000000..a8efb44
 --- /dev/null
-+++ b/src/makeBaseApp/top/configure/RULES.archive
++++ b/src/template/base/top/configure/RULES.archive
 @@ -0,0 +1,2 @@
 +# RULES.archive
 +include $(EPICS_BASE)/configure/RULES.archive
-diff --git a/src/makeBaseApp/top/configure/RULES.autosave b/src/makeBaseApp/top/configure/RULES.autosave
+diff --git a/src/template/base/top/configure/RULES.autosave b/src/template/base/top/configure/RULES.autosave
 new file mode 100644
 index 0000000..c3b5cb0
 --- /dev/null
-+++ b/src/makeBaseApp/top/configure/RULES.autosave
++++ b/src/template/base/top/configure/RULES.autosave
 @@ -0,0 +1,2 @@
 +# RULES.autosave
 +include $(EPICS_BASE)/configure/RULES.autosave
-diff --git a/src/makeBaseApp/top/configure/RULES.copy b/src/makeBaseApp/top/configure/RULES.copy
+diff --git a/src/template/base/top/configure/RULES.copy b/src/template/base/top/configure/RULES.copy
 new file mode 100644
 index 0000000..6cf19e7
 --- /dev/null
-+++ b/src/makeBaseApp/top/configure/RULES.copy
++++ b/src/template/base/top/configure/RULES.copy
 @@ -0,0 +1,2 @@
 +# RULES.copy
 +include $(EPICS_BASE)/configure/RULES.copy
-diff --git a/src/makeBaseApp/top/configure/RULES.ioc b/src/makeBaseApp/top/configure/RULES.ioc
+diff --git a/src/template/base/top/configure/RULES.ioc b/src/template/base/top/configure/RULES.ioc
 index 901987c..5ba1013 100644
---- a/src/makeBaseApp/top/configure/RULES.ioc
-+++ b/src/makeBaseApp/top/configure/RULES.ioc
+--- a/src/template/base/top/configure/RULES.ioc
++++ b/src/template/base/top/configure/RULES.ioc
 @@ -1,2 +1,2 @@
  #RULES.ioc
 -include $(CONFIG)/RULES.ioc
 +include $(EPICS_BASE)/configure/RULES.ioc
-diff --git a/src/makeBaseApp/top/configure/RULES.ioc-targets b/src/makeBaseApp/top/configure/RULES.ioc-targets
+diff --git a/src/template/base/top/configure/RULES.ioc-targets b/src/template/base/top/configure/RULES.ioc-targets
 new file mode 100644
 index 0000000..5c0240f
 --- /dev/null
-+++ b/src/makeBaseApp/top/configure/RULES.ioc-targets
++++ b/src/template/base/top/configure/RULES.ioc-targets
 @@ -0,0 +1,2 @@
 +# RULES.ioc-targets
 +include $(EPICS_BASE)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/configure/RULES_DIRS b/src/makeBaseApp/top/configure/RULES_DIRS
+diff --git a/src/template/base/top/configure/RULES_DIRS b/src/template/base/top/configure/RULES_DIRS
 index 3ba269d..804faee 100644
---- a/src/makeBaseApp/top/configure/RULES_DIRS
-+++ b/src/makeBaseApp/top/configure/RULES_DIRS
+--- a/src/template/base/top/configure/RULES_DIRS
++++ b/src/template/base/top/configure/RULES_DIRS
 @@ -1,2 +1,2 @@
  #RULES_DIRS
 -include $(CONFIG)/RULES_DIRS
 +include $(EPICS_BASE)/configure/RULES_DIRS
-diff --git a/src/makeBaseApp/top/configure/RULES_TOP b/src/makeBaseApp/top/configure/RULES_TOP
+diff --git a/src/template/base/top/configure/RULES_TOP b/src/template/base/top/configure/RULES_TOP
 index d09d668..0620f08 100644
---- a/src/makeBaseApp/top/configure/RULES_TOP
-+++ b/src/makeBaseApp/top/configure/RULES_TOP
+--- a/src/template/base/top/configure/RULES_TOP
++++ b/src/template/base/top/configure/RULES_TOP
 @@ -1,3 +1,3 @@
  #RULES_TOP
 -include $(CONFIG)/RULES_TOP
 +include $(EPICS_BASE)/configure/RULES_TOP
  
-diff --git a/src/makeBaseApp/top/edm-_IOC_.cmd b/src/makeBaseApp/top/edm-_IOC_.cmd
-new file mode 100755
+diff --git a/src/template/base/top/edm-_IOC_.cmd b/src/template/base/top/edm-_IOC_.cmd
+new file mode 100644
 index 0000000..f514927
 --- /dev/null
-+++ b/src/makeBaseApp/top/edm-_IOC_.cmd
++++ b/src/template/base/top/edm-_IOC_.cmd
 @@ -0,0 +1,6 @@
 +#! /bin/bash
 +
@@ -1087,116 +998,11 @@ index 0000000..f514927
 +source /reg/g/pcds/setup/epicsenv-3.14.12.sh
 +
 +edm -x -m "IOC=_IOCPVROOT_" -eolc _APPNAME_Screens/_APPNAME_.edl &
-diff --git a/src/makeBaseApp/top/exampleApp/Db/Makefile b/src/makeBaseApp/top/exampleApp/Db/Makefile
-index 7ce990f..c285af8 100644
---- a/src/makeBaseApp/top/exampleApp/Db/Makefile
-+++ b/src/makeBaseApp/top/exampleApp/Db/Makefile
-@@ -1,19 +1,26 @@
- TOP=../..
- include $(TOP)/configure/CONFIG
- #----------------------------------------
--#  ADD MACRO DEFINITIONS BELOW HERE
-+#  ADD MACRO DEFINITIONS AFTER THIS LINE
- 
--# Install databases, templates & substitutions like this
-+#----------------------------------------------------
-+#  Optimization of db files using dbst (DEFAULT: NO)
-+#DB_OPT = YES
-+
-+#----------------------------------------------------
-+# Create and install (or just install)
-+# databases, templates, substitutions like this
- DB += dbExample1.db
- DB += dbExample2.db
- DB += dbSubExample.db
- DB += user.substitutions
- DB += userHost.substitutions
- 
-+#----------------------------------------------------
- # If <anyname>.db template is not named <anyname>*.template add
- # <anyname>_TEMPLATE = <templatename>
- 
- include $(TOP)/configure/RULES
- #----------------------------------------
--#  ADD EXTRA GNUMAKE RULES BELOW HERE
-+#  ADD RULES AFTER THIS LINE
- 
-diff --git a/src/makeBaseApp/top/exampleApp/src/Makefile b/src/makeBaseApp/top/exampleApp/src/Makefile
-index f3b262c..243cd92 100644
---- a/src/makeBaseApp/top/exampleApp/src/Makefile
-+++ b/src/makeBaseApp/top/exampleApp/src/Makefile
-@@ -2,37 +2,38 @@ TOP=../..
- 
- include $(TOP)/configure/CONFIG
- #----------------------------------------
--#  ADD MACRO DEFINITIONS BELOW HERE
-+#  ADD MACRO DEFINITIONS AFTER THIS LINE
-+
-+#=============================
-+# Build the IOC support library
-+
-+LIBRARY_IOC += _APPNAME_Support
- 
- # xxxRecord.h will be created from xxxRecord.dbd
- DBDINC += xxxRecord
--
--# Install xxxSupport.dbd into <top>/dbd
-+# Install devXxxSoft.dbd into <top>/dbd
- DBD += xxxSupport.dbd
- 
--# Build an IOC support library
--LIBRARY_IOC += _APPNAME_Support
--
- # Compile and add the code to the support library
- _APPNAME_Support_SRCS += xxxRecord.c
- _APPNAME_Support_SRCS += devXxxSoft.c
- 
- # Link locally-provided code into the support library,
- # rather than directly into the IOC application.
--# This is required for Windows DLL builds.
- _APPNAME_Support_SRCS += dbSubExample.c
- _APPNAME_Support_SRCS += _APPNAME_Hello.c
- _APPNAME_Support_SRCS += initTrace.c
- 
- _APPNAME_Support_LIBS += $(EPICS_BASE_IOC_LIBS)
- 
-+#=============================
- # Build the IOC application
--PROD_IOC = _APPNAME_
- 
-+PROD_IOC = _APPNAME_
- # _APPNAME_.dbd will be created and installed
- DBD += _APPNAME_.dbd
- 
--# _APPNAME_.dbd will include these files:
-+# _APPNAME_.dbd will be made up from these files:
- _APPNAME__DBD += base.dbd
- _APPNAME__DBD += xxxSupport.dbd
- _APPNAME__DBD += dbSubExample.dbd
-@@ -42,18 +43,19 @@ _APPNAME__DBD += initTrace.dbd
- # _APPNAME__registerRecordDeviceDriver.cpp derives from _APPNAME_.dbd
- _APPNAME__SRCS += _APPNAME__registerRecordDeviceDriver.cpp
- 
--# Build the main IOC entry point where needed
-+# Build the main IOC entry point on workstation OSs.
- _APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
- _APPNAME__SRCS_vxWorks += -nil-
- 
- # Add support from base/src/vxWorks if needed
- #_APPNAME__OBJS_vxWorks += $(EPICS_BASE_BIN)/vxComLibrary
- 
--# Link in the code from our support library
-+# Link in the code from the support library
- _APPNAME__LIBS += _APPNAME_Support
- 
--# To build SNL programs, SNCSEQ must be defined
-+# NOTE: To build SNL programs, SNCSEQ must be defined
- # in the <top>/configure/RELEASE file
-+
- ifneq ($(SNCSEQ),)
-     # Build sncExample into _APPNAME_Support
-     sncExample_SNCFLAGS += +r
-@@ -70,10 +72,12 @@ ifneq ($(SNCSEQ),)
+diff --git a/src/template/base/top/exampleApp/src/Makefile b/src/template/base/top/exampleApp/src/Makefile
+index bc9f186..5158572 100644
+--- a/src/template/base/top/exampleApp/src/Makefile
++++ b/src/template/base/top/exampleApp/src/Makefile
+@@ -70,10 +70,12 @@ ifneq ($(SNCSEQ),)
      sncProgram_LIBS += $(EPICS_BASE_HOST_LIBS)
  endif
  
@@ -1211,10 +1017,10 @@ index f3b262c..243cd92 100644
 -#  ADD EXTRA GNUMAKE RULES BELOW HERE
 +#  ADD RULES AFTER THIS LINE
  
-diff --git a/src/makeBaseApp/top/exampleBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/exampleBoot/ioc/st.cmd@Common
-index b3269ff..da313e1 100644
---- a/src/makeBaseApp/top/exampleBoot/ioc/st.cmd@Common
-+++ b/src/makeBaseApp/top/exampleBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/exampleBoot/ioc/st.cmd@Common b/src/template/base/top/exampleBoot/ioc/st.cmd@Common
+index 76360dd..47c031b 100644
+--- a/src/template/base/top/exampleBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/exampleBoot/ioc/st.cmd@Common
 @@ -5,7 +5,7 @@
  
  < envPaths
@@ -1224,7 +1030,7 @@ index b3269ff..da313e1 100644
  
  ## Register all support components
  dbLoadDatabase "dbd/_APPNAME_.dbd"
-@@ -21,7 +21,7 @@ dbLoadRecords "db/dbSubExample.db", "user=_USER_Host"
+@@ -21,7 +21,7 @@ dbLoadRecords "db/dbSubExample.db", "user=_USER_"
  ## Run this to trace the stages of iocInit
  #traceIocInit
  
@@ -1233,10 +1039,10 @@ index b3269ff..da313e1 100644
  iocInit
  
  ## Start any sequence programs
-diff --git a/src/makeBaseApp/top/iocBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/iocBoot/ioc/st.cmd@Common
-index 521a100..68cb619 100644
---- a/src/makeBaseApp/top/iocBoot/ioc/st.cmd@Common
-+++ b/src/makeBaseApp/top/iocBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/iocBoot/ioc/st.cmd@Common b/src/template/base/top/iocBoot/ioc/st.cmd@Common
+index ba71fbf..d902cef 100644
+--- a/src/template/base/top/iocBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/iocBoot/ioc/st.cmd@Common
 @@ -5,7 +5,7 @@
  
  < envPaths
@@ -1248,18 +1054,18 @@ index 521a100..68cb619 100644
  dbLoadDatabase "dbd/_APPNAME_.dbd"
 @@ -14,7 +14,7 @@ _CSAFEAPPNAME__registerRecordDeviceDriver pdbbase
  ## Load record instances
- #dbLoadRecords("db/xxx.db","user=_USER_Host")
+ #dbLoadRecords("db/xxx.db","user=_USER_")
  
 -cd "${TOP}/iocBoot/${IOC}"
 +cd ${TOP}/iocBoot/${IOC}
  iocInit
  
  ## Start any sequence programs
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Bx9000.substitutions b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Bx9000.substitutions
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Db/Bx9000.substitutions b/src/template/base/top/pcdsBeckhoffApp/Db/Bx9000.substitutions
 new file mode 100644
 index 0000000..2a0efe7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Bx9000.substitutions
++++ b/src/template/base/top/pcdsBeckhoffApp/Db/Bx9000.substitutions
 @@ -0,0 +1,42 @@
 +#==============================================================================
 +#
@@ -1303,11 +1109,11 @@ index 0000000..2a0efe7
 +	{	16		}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Makefile b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Db/Makefile b/src/template/base/top/pcdsBeckhoffApp/Db/Makefile
 new file mode 100644
 index 0000000..f2027e6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/Makefile
++++ b/src/template/base/top/pcdsBeckhoffApp/Db/Makefile
 @@ -0,0 +1,35 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -1344,11 +1150,11 @@ index 0000000..f2027e6
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..04490ee
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,42 @@
 +#
 +# _APPNAME_ substitutions file
@@ -1392,11 +1198,11 @@ index 0000000..04490ee
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..7f74c88
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,13 @@
 +#
 +# _APPNAME_ substitutions file
@@ -1411,11 +1217,11 @@ index 0000000..7f74c88
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -1448,11 +1254,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/Makefile b/src/makeBaseApp/top/pcdsBeckhoffApp/Makefile
+diff --git a/src/template/base/top/pcdsBeckhoffApp/Makefile b/src/template/base/top/pcdsBeckhoffApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/Makefile
++++ b/src/template/base/top/pcdsBeckhoffApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -1462,11 +1268,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl b/src/makeBaseApp/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl
+diff --git a/src/template/base/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl b/src/template/base/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl
 new file mode 100644
 index 0000000..e8fb961
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl
++++ b/src/template/base/top/pcdsBeckhoffApp/_APPNAME_Screens/_APPNAME_.edl
 @@ -0,0 +1,886 @@
 +4 0 1
 +beginScreenProperties
@@ -2354,11 +2160,11 @@ index 0000000..e8fb961
 +
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/configure/RELEASE b/src/makeBaseApp/top/pcdsBeckhoffApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsBeckhoffApp/configure/RELEASE b/src/template/base/top/pcdsBeckhoffApp/configure/RELEASE
 new file mode 100644
 index 0000000..b7581fa
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/configure/RELEASE
++++ b/src/template/base/top/pcdsBeckhoffApp/configure/RELEASE
 @@ -0,0 +1,37 @@
 +# RELEASE
 +# Defines location of external products
@@ -2397,11 +2203,11 @@ index 0000000..b7581fa
 +IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +MODBUSTCPCLNT=$(EPICS_MODULES)/ModBusTCPClnt/$(MODBUSTCPCLNT_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/src/Makefile b/src/makeBaseApp/top/pcdsBeckhoffApp/src/Makefile
+diff --git a/src/template/base/top/pcdsBeckhoffApp/src/Makefile b/src/template/base/top/pcdsBeckhoffApp/src/Makefile
 new file mode 100644
 index 0000000..21f7794
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/src/Makefile
++++ b/src/template/base/top/pcdsBeckhoffApp/src/Makefile
 @@ -0,0 +1,41 @@
 +TOP=../..
 +
@@ -2444,11 +2250,11 @@ index 0000000..21f7794
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsBeckhoffApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -2473,11 +2279,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/Makefile b/src/makeBaseApp/top/pcdsBeckhoffBoot/Makefile
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/Makefile b/src/template/base/top/pcdsBeckhoffBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/Makefile
++++ b/src/template/base/top/pcdsBeckhoffBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -2492,11 +2298,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/Makefile@Common b/src/template/base/top/pcdsBeckhoffBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..eb36b38
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/Makefile@Common
 @@ -0,0 +1,24 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -2522,11 +2328,11 @@ index 0000000..eb36b38
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/README@Common b/src/template/base/top/pcdsBeckhoffBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -2537,11 +2343,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/README@RTEMS b/src/template/base/top/pcdsBeckhoffBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -2549,14 +2355,14 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsBeckhoffBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..faeee53
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,11 @@
 +# IOC archive file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -2569,11 +2375,11 @@ index 0000000..faeee53
 +	{ IOC = "_IOCPVROOT_", COUPLER_LOC = HUTCH:RXX:BHC:XX }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..19c4c24
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,11 @@
 +# IOC autosave file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -2586,11 +2392,11 @@ index 0000000..19c4c24
 +	{ IOC = "_IOCPVROOT_", COUPLER_LOC = HUTCH:RXX:BHC:XX }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..1e31c43
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@Common
 @@ -0,0 +1,65 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -2657,11 +2463,11 @@ index 0000000..1e31c43
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..da978bc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,65 @@
 +## Example RTEMS startup script
 +
@@ -2728,11 +2534,11 @@ index 0000000..da978bc
 +# Start autosave backups
 +create_monitor_set( "$(IOC).req", 5 )
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..5589466
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -2751,11 +2557,11 @@ index 0000000..5589466
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsBeckhoffBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -2772,11 +2578,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -2804,11 +2610,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -2839,11 +2645,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsBeckhoffBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -2874,11 +2680,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/Db/Makefile b/src/makeBaseApp/top/pcdsDemoApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsDemoApp/Db/Makefile b/src/template/base/top/pcdsDemoApp/Db/Makefile
 new file mode 100644
 index 0000000..035b9f0
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/Db/Makefile
++++ b/src/template/base/top/pcdsDemoApp/Db/Makefile
 @@ -0,0 +1,24 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -2904,11 +2710,11 @@ index 0000000..035b9f0
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample1.db b/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample1.db
+diff --git a/src/template/base/top/pcdsDemoApp/Db/dbExample1.db b/src/template/base/top/pcdsDemoApp/Db/dbExample1.db
 new file mode 100644
 index 0000000..4f16ada
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample1.db
++++ b/src/template/base/top/pcdsDemoApp/Db/dbExample1.db
 @@ -0,0 +1,62 @@
 +record(ai, "$(user):aiExample")
 +{
@@ -2972,11 +2778,11 @@ index 0000000..4f16ada
 +	field(EGU,"Counts")
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample2.db b/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample2.db
+diff --git a/src/template/base/top/pcdsDemoApp/Db/dbExample2.db b/src/template/base/top/pcdsDemoApp/Db/dbExample2.db
 new file mode 100644
 index 0000000..836c53d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/Db/dbExample2.db
++++ b/src/template/base/top/pcdsDemoApp/Db/dbExample2.db
 @@ -0,0 +1,38 @@
 +record(calc, "$(user):calcExample$(no)")
 +{
@@ -3016,22 +2822,22 @@ index 0000000..836c53d
 +	field(LSV, "MINOR")
 +	field(LLSV, "MAJOR")
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/Db/dbSubExample.db b/src/makeBaseApp/top/pcdsDemoApp/Db/dbSubExample.db
+diff --git a/src/template/base/top/pcdsDemoApp/Db/dbSubExample.db b/src/template/base/top/pcdsDemoApp/Db/dbSubExample.db
 new file mode 100644
 index 0000000..96b8638
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/Db/dbSubExample.db
++++ b/src/template/base/top/pcdsDemoApp/Db/dbSubExample.db
 @@ -0,0 +1,5 @@
 +record(sub,"$(user):subExample")
 +{
 +    field(INAM,"mySubInit")
 +    field(SNAM,"mySubProcess")
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/Makefile b/src/makeBaseApp/top/pcdsDemoApp/Makefile
+diff --git a/src/template/base/top/pcdsDemoApp/Makefile b/src/template/base/top/pcdsDemoApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/Makefile
++++ b/src/template/base/top/pcdsDemoApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -3041,11 +2847,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/configure/RELEASE b/src/makeBaseApp/top/pcdsDemoApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsDemoApp/configure/RELEASE b/src/template/base/top/pcdsDemoApp/configure/RELEASE
 new file mode 100644
 index 0000000..92f19ae
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/configure/RELEASE
++++ b/src/template/base/top/pcdsDemoApp/configure/RELEASE
 @@ -0,0 +1,33 @@
 +# RELEASE
 +# Defines location of external products
@@ -3080,11 +2886,11 @@ index 0000000..92f19ae
 +# AUTOSAVE=$(EPICS_MODULES)/autosave/$(AUTOSAVE_MODULE_VERSION)
 +# IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/Makefile b/src/makeBaseApp/top/pcdsDemoApp/src/Makefile
+diff --git a/src/template/base/top/pcdsDemoApp/src/Makefile b/src/template/base/top/pcdsDemoApp/src/Makefile
 new file mode 100644
 index 0000000..3ab7ca1
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/Makefile
++++ b/src/template/base/top/pcdsDemoApp/src/Makefile
 @@ -0,0 +1,76 @@
 +TOP=../..
 +
@@ -3162,11 +2968,11 @@ index 0000000..3ab7ca1
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.c b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.c
+diff --git a/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.c b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.c
 new file mode 100644
 index 0000000..6582b84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.c
++++ b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.c
 @@ -0,0 +1,31 @@
 +/* Example showing how to register a new command with iocsh */
 +
@@ -3199,18 +3005,18 @@ index 0000000..6582b84
 +    iocshRegister(&helloFuncDef, helloCallFunc);
 +}
 +epicsExportRegistrar(helloRegister);
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.dbd b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.dbd
+diff --git a/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.dbd b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.dbd
 new file mode 100644
 index 0000000..64eb038
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Hello.dbd
++++ b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Hello.dbd
 @@ -0,0 +1 @@
 +registrar(helloRegister)
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsDemoApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsDemoApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -3235,11 +3041,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.c b/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.c
+diff --git a/src/template/base/top/pcdsDemoApp/src/dbSubExample.c b/src/template/base/top/pcdsDemoApp/src/dbSubExample.c
 new file mode 100644
 index 0000000..9a5776d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.c
++++ b/src/template/base/top/pcdsDemoApp/src/dbSubExample.c
 @@ -0,0 +1,32 @@
 +#include <stdio.h>
 +
@@ -3273,20 +3079,20 @@ index 0000000..9a5776d
 +epicsExportAddress(int, mySubDebug);
 +epicsRegisterFunction(mySubInit);
 +epicsRegisterFunction(mySubProcess);
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.dbd b/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.dbd
+diff --git a/src/template/base/top/pcdsDemoApp/src/dbSubExample.dbd b/src/template/base/top/pcdsDemoApp/src/dbSubExample.dbd
 new file mode 100644
 index 0000000..a907fb7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/dbSubExample.dbd
++++ b/src/template/base/top/pcdsDemoApp/src/dbSubExample.dbd
 @@ -0,0 +1,3 @@
 +variable(mySubDebug)
 +function(mySubInit)
 +function(mySubProcess)
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/devXxxSoft.c b/src/makeBaseApp/top/pcdsDemoApp/src/devXxxSoft.c
+diff --git a/src/template/base/top/pcdsDemoApp/src/devXxxSoft.c b/src/template/base/top/pcdsDemoApp/src/devXxxSoft.c
 new file mode 100644
 index 0000000..0507fdf
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/devXxxSoft.c
++++ b/src/template/base/top/pcdsDemoApp/src/devXxxSoft.c
 @@ -0,0 +1,58 @@
 +/* devXxxSoft.c */
 +/* Example device support module */
@@ -3346,18 +3152,18 @@ index 0000000..0507fdf
 +    if(!status) pxxx->udf = FALSE;
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.dbd b/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.dbd
+diff --git a/src/template/base/top/pcdsDemoApp/src/sncExample.dbd b/src/template/base/top/pcdsDemoApp/src/sncExample.dbd
 new file mode 100644
 index 0000000..df61066
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.dbd
++++ b/src/template/base/top/pcdsDemoApp/src/sncExample.dbd
 @@ -0,0 +1 @@
 +registrar(sncExampleRegistrar)
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.stt b/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.stt
+diff --git a/src/template/base/top/pcdsDemoApp/src/sncExample.stt b/src/template/base/top/pcdsDemoApp/src/sncExample.stt
 new file mode 100644
 index 0000000..bc1a576
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/sncExample.stt
++++ b/src/template/base/top/pcdsDemoApp/src/sncExample.stt
 @@ -0,0 +1,28 @@
 +program sncExample
 +double v;
@@ -3387,18 +3193,18 @@ index 0000000..bc1a576
 +	    } state high
 +	}
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/sncProgram.st b/src/makeBaseApp/top/pcdsDemoApp/src/sncProgram.st
+diff --git a/src/template/base/top/pcdsDemoApp/src/sncProgram.st b/src/template/base/top/pcdsDemoApp/src/sncProgram.st
 new file mode 100644
 index 0000000..1ba2989
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/sncProgram.st
++++ b/src/template/base/top/pcdsDemoApp/src/sncProgram.st
 @@ -0,0 +1 @@
 +#include "../sncExample.stt"
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.c b/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.c
+diff --git a/src/template/base/top/pcdsDemoApp/src/xxxRecord.c b/src/template/base/top/pcdsDemoApp/src/xxxRecord.c
 new file mode 100644
 index 0000000..6fb1472
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.c
++++ b/src/template/base/top/pcdsDemoApp/src/xxxRecord.c
 @@ -0,0 +1,272 @@
 +/* xxxRecord.c */
 +/* Example record support module */
@@ -3672,11 +3478,11 @@ index 0000000..6fb1472
 +	}
 +	return;
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.dbd b/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.dbd
+diff --git a/src/template/base/top/pcdsDemoApp/src/xxxRecord.dbd b/src/template/base/top/pcdsDemoApp/src/xxxRecord.dbd
 new file mode 100644
 index 0000000..4a71c54
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/xxxRecord.dbd
++++ b/src/template/base/top/pcdsDemoApp/src/xxxRecord.dbd
 @@ -0,0 +1,117 @@
 +recordtype(xxx) {
 +	include "dbCommon.dbd" 
@@ -3795,19 +3601,19 @@ index 0000000..4a71c54
 +		interest(3)
 +	}
 +}
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/src/xxxSupport.dbd b/src/makeBaseApp/top/pcdsDemoApp/src/xxxSupport.dbd
+diff --git a/src/template/base/top/pcdsDemoApp/src/xxxSupport.dbd b/src/template/base/top/pcdsDemoApp/src/xxxSupport.dbd
 new file mode 100644
 index 0000000..8094bdd
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/src/xxxSupport.dbd
++++ b/src/template/base/top/pcdsDemoApp/src/xxxSupport.dbd
 @@ -0,0 +1,2 @@
 +include "xxxRecord.dbd"
 +device(xxx,CONSTANT,devXxxSoft,"SoftChannel")
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/srcDisplay/Makefile b/src/makeBaseApp/top/pcdsDemoApp/srcDisplay/Makefile
+diff --git a/src/template/base/top/pcdsDemoApp/srcDisplay/Makefile b/src/template/base/top/pcdsDemoApp/srcDisplay/Makefile
 new file mode 100644
 index 0000000..dec71f3
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/srcDisplay/Makefile
++++ b/src/template/base/top/pcdsDemoApp/srcDisplay/Makefile
 @@ -0,0 +1,29 @@
 +#  -*- Makefile -*-
 +T_A=$EPICS_HOST_ARCH
@@ -3838,14 +3644,14 @@ index 0000000..dec71f3
 +include $(TOP)/configure/RULES
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/srcDisplay/example.edl b/src/makeBaseApp/top/pcdsDemoApp/srcDisplay/example.edl
+diff --git a/src/template/base/top/pcdsDemoApp/srcDisplay/example.edl b/src/template/base/top/pcdsDemoApp/srcDisplay/example.edl
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/Makefile b/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/Makefile
+diff --git a/src/template/base/top/pcdsDemoApp/srcProtocol/Makefile b/src/template/base/top/pcdsDemoApp/srcProtocol/Makefile
 new file mode 100644
 index 0000000..ee58d1c
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/Makefile
++++ b/src/template/base/top/pcdsDemoApp/srcProtocol/Makefile
 @@ -0,0 +1,29 @@
 +# Makefile for copying streamDevice protocol files during build.
 +# Author: Jason Tiller
@@ -3876,11 +3682,11 @@ index 0000000..ee58d1c
 +
 +######################################################################
 +# Add additional RULES files, if necessary.
-diff --git a/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/example.proto b/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/example.proto
+diff --git a/src/template/base/top/pcdsDemoApp/srcProtocol/example.proto b/src/template/base/top/pcdsDemoApp/srcProtocol/example.proto
 new file mode 100644
 index 0000000..22d7882
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoApp/srcProtocol/example.proto
++++ b/src/template/base/top/pcdsDemoApp/srcProtocol/example.proto
 @@ -0,0 +1,24 @@
 +# This is an example streamDevice protocol file.
 +
@@ -3906,11 +3712,11 @@ index 0000000..22d7882
 +# read_X      {out "*9900XY"; in "$%f,%(AMO:MT:HFP:CLIN:Y.VAL)f,%(AMO:MT:HFP:CLIN:TEMP.VAL)f,N%(AMO:MT:HFP:CLIN:SERL.VAL)4s";}
 +
 +# debug {in "%s"}
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/Makefile b/src/makeBaseApp/top/pcdsDemoBoot/Makefile
+diff --git a/src/template/base/top/pcdsDemoBoot/Makefile b/src/template/base/top/pcdsDemoBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/Makefile
++++ b/src/template/base/top/pcdsDemoBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -3925,11 +3731,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/Makefile@Common b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..cf3369b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@Common
 @@ -0,0 +1,10 @@
 +# Makefile to install the st.cmd into the correctly location.
 +# Author: Jason Tiller
@@ -3941,11 +3747,11 @@ index 0000000..cf3369b
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks
 new file mode 100644
 index 0000000..c7f3254
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks
++++ b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks
 @@ -0,0 +1,6 @@
 +TOP = ../..
 +include $(TOP)/configure/CONFIG
@@ -3953,11 +3759,11 @@ index 0000000..c7f3254
 +TARGETS = cdCommands
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks6 b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks6
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks6 b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks6
 new file mode 100644
 index 0000000..c7f3254
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/Makefile@vxWorks6
++++ b/src/template/base/top/pcdsDemoBoot/ioc/Makefile@vxWorks6
 @@ -0,0 +1,6 @@
 +TOP = ../..
 +include $(TOP)/configure/CONFIG
@@ -3965,11 +3771,11 @@ index 0000000..c7f3254
 +TARGETS = cdCommands
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/README@Common b/src/template/base/top/pcdsDemoBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsDemoBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -3980,11 +3786,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/README@RTEMS b/src/template/base/top/pcdsDemoBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsDemoBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -3992,17 +3798,17 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@vxWorks b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@vxWorks
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/README@vxWorks b/src/template/base/top/pcdsDemoBoot/ioc/README@vxWorks
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsDemoBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsDemoBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..d04070f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Common
 @@ -0,0 +1,41 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -4045,11 +3851,11 @@ index 0000000..d04070f
 +## startup.
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Cross b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Cross
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Cross b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Cross
 new file mode 100644
 index 0000000..7f33928
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@Cross
++++ b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@Cross
 @@ -0,0 +1,26 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -4077,11 +3883,11 @@ index 0000000..7f33928
 +## Start any sequence programs
 +#seq sncExample,"user=_USER_"
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..7127a27
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,42 @@
 +## Example RTEMS startup script
 +
@@ -4125,11 +3931,11 @@ index 0000000..7127a27
 +
 +
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks
 new file mode 100644
 index 0000000..947003d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks
++++ b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks
 @@ -0,0 +1,52 @@
 +## Example vxWorks startup file
 +
@@ -4183,11 +3989,11 @@ index 0000000..947003d
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6 b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
+diff --git a/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6 b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
 new file mode 100644
 index 0000000..947003d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
++++ b/src/template/base/top/pcdsDemoBoot/ioc/st.cmd@vxWorks6
 @@ -0,0 +1,52 @@
 +## Example vxWorks startup file
 +
@@ -4241,11 +4047,11 @@ index 0000000..947003d
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsDemoBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsDemoBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsDemoBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -4273,11 +4079,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -4308,11 +4114,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsDemoBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsDemoBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -4343,11 +4149,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/Makefile b/src/makeBaseApp/top/pcdsEvrApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsEvrApp/Db/Makefile b/src/template/base/top/pcdsEvrApp/Db/Makefile
 new file mode 100644
 index 0000000..94bab4a
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/Makefile
++++ b/src/template/base/top/pcdsEvrApp/Db/Makefile
 @@ -0,0 +1,35 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -4384,11 +4190,11 @@ index 0000000..94bab4a
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..cac2d87
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,43 @@
 +#
 +# _APPNAME_ substitutions file
@@ -4433,11 +4239,11 @@ index 0000000..cac2d87
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..0b4256a
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,23 @@
 +#
 +# _APPNAME_ substitutions file
@@ -4462,11 +4268,11 @@ index 0000000..0b4256a
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/evrPmc230.substitutions b/src/makeBaseApp/top/pcdsEvrApp/Db/evrPmc230.substitutions
+diff --git a/src/template/base/top/pcdsEvrApp/Db/evrPmc230.substitutions b/src/template/base/top/pcdsEvrApp/Db/evrPmc230.substitutions
 new file mode 100644
 index 0000000..136a201
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/evrPmc230.substitutions
++++ b/src/template/base/top/pcdsEvrApp/Db/evrPmc230.substitutions
 @@ -0,0 +1,89 @@
 +#
 +# Basic PMC EVR 230 Event Substitutions file
@@ -4557,11 +4363,11 @@ index 0000000..136a201
 +   { DEV="$(EVR)", CARD="0" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/evrVme230.substitutions b/src/makeBaseApp/top/pcdsEvrApp/Db/evrVme230.substitutions
+diff --git a/src/template/base/top/pcdsEvrApp/Db/evrVme230.substitutions b/src/template/base/top/pcdsEvrApp/Db/evrVme230.substitutions
 new file mode 100644
 index 0000000..20e5d06
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/evrVme230.substitutions
++++ b/src/template/base/top/pcdsEvrApp/Db/evrVme230.substitutions
 @@ -0,0 +1,91 @@
 +#
 +# Basic VME EVR 230 Event Substitutions file
@@ -4654,11 +4460,11 @@ index 0000000..20e5d06
 +   { DEV="$(EVR)", CARD="0" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsEvrApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsEvrApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsEvrApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsEvrApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -4691,11 +4497,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/Makefile b/src/makeBaseApp/top/pcdsEvrApp/Makefile
+diff --git a/src/template/base/top/pcdsEvrApp/Makefile b/src/template/base/top/pcdsEvrApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/Makefile
++++ b/src/template/base/top/pcdsEvrApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -4705,11 +4511,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/configure/RELEASE b/src/makeBaseApp/top/pcdsEvrApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsEvrApp/configure/RELEASE b/src/template/base/top/pcdsEvrApp/configure/RELEASE
 new file mode 100644
 index 0000000..64cfb98
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/configure/RELEASE
++++ b/src/template/base/top/pcdsEvrApp/configure/RELEASE
 @@ -0,0 +1,38 @@
 +# RELEASE
 +# Defines location of external products
@@ -4749,11 +4555,11 @@ index 0000000..64cfb98
 +EVENT=$(EPICS_MODULES)/event/$(EVENT_MODULE_VERSION)
 +MISCUTILS=$(EPICS_MODULES)/miscUtils/$(MISCUTILS_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/src/Makefile b/src/makeBaseApp/top/pcdsEvrApp/src/Makefile
+diff --git a/src/template/base/top/pcdsEvrApp/src/Makefile b/src/template/base/top/pcdsEvrApp/src/Makefile
 new file mode 100644
 index 0000000..8b5f586
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/src/Makefile
++++ b/src/template/base/top/pcdsEvrApp/src/Makefile
 @@ -0,0 +1,45 @@
 +TOP=../..
 +
@@ -4800,11 +4606,11 @@ index 0000000..8b5f586
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsEvrApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsEvrApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsEvrApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsEvrApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -4829,11 +4635,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/Makefile b/src/makeBaseApp/top/pcdsEvrBoot/Makefile
+diff --git a/src/template/base/top/pcdsEvrBoot/Makefile b/src/template/base/top/pcdsEvrBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/Makefile
++++ b/src/template/base/top/pcdsEvrBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -4848,11 +4654,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsEvrBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/Makefile@Common b/src/template/base/top/pcdsEvrBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..eb36b38
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsEvrBoot/ioc/Makefile@Common
 @@ -0,0 +1,24 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -4878,11 +4684,11 @@ index 0000000..eb36b38
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/README@Common b/src/template/base/top/pcdsEvrBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsEvrBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -4893,11 +4699,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/README@RTEMS b/src/template/base/top/pcdsEvrBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsEvrBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -4905,14 +4711,14 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsEvrBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsEvrBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..11bee62
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,10 @@
 +# IOC archive file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -4924,11 +4730,11 @@ index 0000000..11bee62
 +	{ IOC = "_IOCPVROOT_", EVR = "_EVRPVROOT_" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..22b1ad5
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsEvrBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,10 @@
 +# IOC autosave file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -4940,11 +4746,11 @@ index 0000000..22b1ad5
 +	{ IOC = "_IOCPVROOT_", EVR = "_EVRPVROOT_" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..0e5254f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@Common
 @@ -0,0 +1,57 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -5003,11 +4809,11 @@ index 0000000..0e5254f
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..32ec48c
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsEvrBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,68 @@
 +## Example RTEMS startup script
 +
@@ -5077,11 +4883,11 @@ index 0000000..32ec48c
 +# Start autosave backups
 +create_monitor_set( "$(IOC).req", 5 )
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..5589466
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -5100,11 +4906,11 @@ index 0000000..5589466
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsEvrBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -5121,11 +4927,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsEvrBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsEvrBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsEvrBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5153,11 +4959,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5188,11 +4994,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsEvrBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsEvrBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5223,11 +5029,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsIocApp/Db/Makefile b/src/makeBaseApp/top/pcdsIocApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsIocApp/Db/Makefile b/src/template/base/top/pcdsIocApp/Db/Makefile
 new file mode 100644
 index 0000000..ec86d6f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/Db/Makefile
++++ b/src/template/base/top/pcdsIocApp/Db/Makefile
 @@ -0,0 +1,33 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -5262,11 +5068,11 @@ index 0000000..ec86d6f
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..86ba3e2
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,29 @@
 +#
 +# _APPNAME_ substitutions file
@@ -5297,11 +5103,11 @@ index 0000000..86ba3e2
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..7f74c88
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,13 @@
 +#
 +# _APPNAME_ substitutions file
@@ -5316,11 +5122,11 @@ index 0000000..7f74c88
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsIocApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsIocApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsIocApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsIocApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -5353,11 +5159,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsIocApp/Makefile b/src/makeBaseApp/top/pcdsIocApp/Makefile
+diff --git a/src/template/base/top/pcdsIocApp/Makefile b/src/template/base/top/pcdsIocApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/Makefile
++++ b/src/template/base/top/pcdsIocApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -5367,11 +5173,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/configure/RELEASE b/src/makeBaseApp/top/pcdsIocApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsIocApp/configure/RELEASE b/src/template/base/top/pcdsIocApp/configure/RELEASE
 new file mode 100644
 index 0000000..0e05655
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/configure/RELEASE
++++ b/src/template/base/top/pcdsIocApp/configure/RELEASE
 @@ -0,0 +1,33 @@
 +# RELEASE
 +# Defines location of external products
@@ -5406,11 +5212,11 @@ index 0000000..0e05655
 +AUTOSAVE=$(EPICS_MODULES)/autosave/$(AUTOSAVE_MODULE_VERSION)
 +IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/src/Makefile b/src/makeBaseApp/top/pcdsIocApp/src/Makefile
+diff --git a/src/template/base/top/pcdsIocApp/src/Makefile b/src/template/base/top/pcdsIocApp/src/Makefile
 new file mode 100644
 index 0000000..a06ea00
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/src/Makefile
++++ b/src/template/base/top/pcdsIocApp/src/Makefile
 @@ -0,0 +1,38 @@
 +TOP=../..
 +
@@ -5450,11 +5256,11 @@ index 0000000..a06ea00
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsIocApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsIocApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsIocApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsIocApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsIocApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -5479,11 +5285,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/Makefile b/src/makeBaseApp/top/pcdsIocBoot/Makefile
+diff --git a/src/template/base/top/pcdsIocBoot/Makefile b/src/template/base/top/pcdsIocBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/Makefile
++++ b/src/template/base/top/pcdsIocBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -5498,11 +5304,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsIocBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/Makefile@Common b/src/template/base/top/pcdsIocBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..eb36b38
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsIocBoot/ioc/Makefile@Common
 @@ -0,0 +1,24 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -5528,11 +5334,11 @@ index 0000000..eb36b38
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsIocBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/README@Common b/src/template/base/top/pcdsIocBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsIocBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -5543,11 +5349,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsIocBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/README@RTEMS b/src/template/base/top/pcdsIocBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsIocBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -5555,14 +5361,14 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsIocBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsIocBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..17c36f7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,10 @@
 +# IOC archive file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -5574,11 +5380,11 @@ index 0000000..17c36f7
 +	{ IOC = "_IOCPVROOT_" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..b4a50ff
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsIocBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,9 @@
 +# _APPNAME_ IOC instance autosave file
 +
@@ -5589,11 +5395,11 @@ index 0000000..b4a50ff
 +}
 +
 +
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsIocBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..e82d0ab
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsIocBoot/ioc/st.cmd@Common
 @@ -0,0 +1,50 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -5645,11 +5451,11 @@ index 0000000..e82d0ab
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsIocBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..3704bd6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsIocBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,65 @@
 +## Example RTEMS startup script
 +
@@ -5716,11 +5522,11 @@ index 0000000..3704bd6
 +# Start autosave backups
 +create_monitor_set( "$(IOC).req", 5, "" )
 +
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..5589466
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -5739,11 +5545,11 @@ index 0000000..5589466
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsIocBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -5760,11 +5566,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsIocBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsIocBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsIocBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5792,11 +5598,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5827,11 +5633,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsIocBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsIocBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -5862,11 +5668,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/Db/Makefile b/src/makeBaseApp/top/pcdsModuleApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsModuleApp/Db/Makefile b/src/template/base/top/pcdsModuleApp/Db/Makefile
 new file mode 100644
 index 0000000..035b9f0
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/Db/Makefile
++++ b/src/template/base/top/pcdsModuleApp/Db/Makefile
 @@ -0,0 +1,24 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -5892,11 +5698,11 @@ index 0000000..035b9f0
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample1.db b/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample1.db
+diff --git a/src/template/base/top/pcdsModuleApp/Db/dbExample1.db b/src/template/base/top/pcdsModuleApp/Db/dbExample1.db
 new file mode 100644
 index 0000000..4f16ada
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample1.db
++++ b/src/template/base/top/pcdsModuleApp/Db/dbExample1.db
 @@ -0,0 +1,62 @@
 +record(ai, "$(user):aiExample")
 +{
@@ -5960,11 +5766,11 @@ index 0000000..4f16ada
 +	field(EGU,"Counts")
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample2.db b/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample2.db
+diff --git a/src/template/base/top/pcdsModuleApp/Db/dbExample2.db b/src/template/base/top/pcdsModuleApp/Db/dbExample2.db
 new file mode 100644
 index 0000000..836c53d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/Db/dbExample2.db
++++ b/src/template/base/top/pcdsModuleApp/Db/dbExample2.db
 @@ -0,0 +1,38 @@
 +record(calc, "$(user):calcExample$(no)")
 +{
@@ -6004,22 +5810,22 @@ index 0000000..836c53d
 +	field(LSV, "MINOR")
 +	field(LLSV, "MAJOR")
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/Db/dbSubExample.db b/src/makeBaseApp/top/pcdsModuleApp/Db/dbSubExample.db
+diff --git a/src/template/base/top/pcdsModuleApp/Db/dbSubExample.db b/src/template/base/top/pcdsModuleApp/Db/dbSubExample.db
 new file mode 100644
 index 0000000..96b8638
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/Db/dbSubExample.db
++++ b/src/template/base/top/pcdsModuleApp/Db/dbSubExample.db
 @@ -0,0 +1,5 @@
 +record(sub,"$(user):subExample")
 +{
 +    field(INAM,"mySubInit")
 +    field(SNAM,"mySubProcess")
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/Makefile b/src/makeBaseApp/top/pcdsModuleApp/Makefile
+diff --git a/src/template/base/top/pcdsModuleApp/Makefile b/src/template/base/top/pcdsModuleApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/Makefile
++++ b/src/template/base/top/pcdsModuleApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -6029,11 +5835,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/Makefile b/src/makeBaseApp/top/pcdsModuleApp/src/Makefile
+diff --git a/src/template/base/top/pcdsModuleApp/src/Makefile b/src/template/base/top/pcdsModuleApp/src/Makefile
 new file mode 100644
 index 0000000..3ab7ca1
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/Makefile
++++ b/src/template/base/top/pcdsModuleApp/src/Makefile
 @@ -0,0 +1,76 @@
 +TOP=../..
 +
@@ -6111,11 +5917,11 @@ index 0000000..3ab7ca1
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.c b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.c
+diff --git a/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.c b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.c
 new file mode 100644
 index 0000000..6582b84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.c
++++ b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.c
 @@ -0,0 +1,31 @@
 +/* Example showing how to register a new command with iocsh */
 +
@@ -6148,18 +5954,18 @@ index 0000000..6582b84
 +    iocshRegister(&helloFuncDef, helloCallFunc);
 +}
 +epicsExportRegistrar(helloRegister);
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.dbd b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.dbd
+diff --git a/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.dbd b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.dbd
 new file mode 100644
 index 0000000..64eb038
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Hello.dbd
++++ b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Hello.dbd
 @@ -0,0 +1 @@
 +registrar(helloRegister)
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsModuleApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsModuleApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -6184,11 +5990,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.c b/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.c
+diff --git a/src/template/base/top/pcdsModuleApp/src/dbSubExample.c b/src/template/base/top/pcdsModuleApp/src/dbSubExample.c
 new file mode 100644
 index 0000000..9a5776d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.c
++++ b/src/template/base/top/pcdsModuleApp/src/dbSubExample.c
 @@ -0,0 +1,32 @@
 +#include <stdio.h>
 +
@@ -6222,20 +6028,20 @@ index 0000000..9a5776d
 +epicsExportAddress(int, mySubDebug);
 +epicsRegisterFunction(mySubInit);
 +epicsRegisterFunction(mySubProcess);
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.dbd b/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.dbd
+diff --git a/src/template/base/top/pcdsModuleApp/src/dbSubExample.dbd b/src/template/base/top/pcdsModuleApp/src/dbSubExample.dbd
 new file mode 100644
 index 0000000..a907fb7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/dbSubExample.dbd
++++ b/src/template/base/top/pcdsModuleApp/src/dbSubExample.dbd
 @@ -0,0 +1,3 @@
 +variable(mySubDebug)
 +function(mySubInit)
 +function(mySubProcess)
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/devXxxSoft.c b/src/makeBaseApp/top/pcdsModuleApp/src/devXxxSoft.c
+diff --git a/src/template/base/top/pcdsModuleApp/src/devXxxSoft.c b/src/template/base/top/pcdsModuleApp/src/devXxxSoft.c
 new file mode 100644
 index 0000000..0507fdf
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/devXxxSoft.c
++++ b/src/template/base/top/pcdsModuleApp/src/devXxxSoft.c
 @@ -0,0 +1,58 @@
 +/* devXxxSoft.c */
 +/* Example device support module */
@@ -6295,18 +6101,18 @@ index 0000000..0507fdf
 +    if(!status) pxxx->udf = FALSE;
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.dbd b/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.dbd
+diff --git a/src/template/base/top/pcdsModuleApp/src/sncExample.dbd b/src/template/base/top/pcdsModuleApp/src/sncExample.dbd
 new file mode 100644
 index 0000000..df61066
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.dbd
++++ b/src/template/base/top/pcdsModuleApp/src/sncExample.dbd
 @@ -0,0 +1 @@
 +registrar(sncExampleRegistrar)
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.stt b/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.stt
+diff --git a/src/template/base/top/pcdsModuleApp/src/sncExample.stt b/src/template/base/top/pcdsModuleApp/src/sncExample.stt
 new file mode 100644
 index 0000000..bc1a576
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/sncExample.stt
++++ b/src/template/base/top/pcdsModuleApp/src/sncExample.stt
 @@ -0,0 +1,28 @@
 +program sncExample
 +double v;
@@ -6336,18 +6142,18 @@ index 0000000..bc1a576
 +	    } state high
 +	}
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/sncProgram.st b/src/makeBaseApp/top/pcdsModuleApp/src/sncProgram.st
+diff --git a/src/template/base/top/pcdsModuleApp/src/sncProgram.st b/src/template/base/top/pcdsModuleApp/src/sncProgram.st
 new file mode 100644
 index 0000000..1ba2989
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/sncProgram.st
++++ b/src/template/base/top/pcdsModuleApp/src/sncProgram.st
 @@ -0,0 +1 @@
 +#include "../sncExample.stt"
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.c b/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.c
+diff --git a/src/template/base/top/pcdsModuleApp/src/xxxRecord.c b/src/template/base/top/pcdsModuleApp/src/xxxRecord.c
 new file mode 100644
 index 0000000..6fb1472
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.c
++++ b/src/template/base/top/pcdsModuleApp/src/xxxRecord.c
 @@ -0,0 +1,272 @@
 +/* xxxRecord.c */
 +/* Example record support module */
@@ -6621,11 +6427,11 @@ index 0000000..6fb1472
 +	}
 +	return;
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.dbd b/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.dbd
+diff --git a/src/template/base/top/pcdsModuleApp/src/xxxRecord.dbd b/src/template/base/top/pcdsModuleApp/src/xxxRecord.dbd
 new file mode 100644
 index 0000000..4a71c54
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/xxxRecord.dbd
++++ b/src/template/base/top/pcdsModuleApp/src/xxxRecord.dbd
 @@ -0,0 +1,117 @@
 +recordtype(xxx) {
 +	include "dbCommon.dbd" 
@@ -6744,19 +6550,19 @@ index 0000000..4a71c54
 +		interest(3)
 +	}
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/src/xxxSupport.dbd b/src/makeBaseApp/top/pcdsModuleApp/src/xxxSupport.dbd
+diff --git a/src/template/base/top/pcdsModuleApp/src/xxxSupport.dbd b/src/template/base/top/pcdsModuleApp/src/xxxSupport.dbd
 new file mode 100644
 index 0000000..8094bdd
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/src/xxxSupport.dbd
++++ b/src/template/base/top/pcdsModuleApp/src/xxxSupport.dbd
 @@ -0,0 +1,2 @@
 +include "xxxRecord.dbd"
 +device(xxx,CONSTANT,devXxxSoft,"SoftChannel")
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/srcDisplay/Makefile b/src/makeBaseApp/top/pcdsModuleApp/srcDisplay/Makefile
+diff --git a/src/template/base/top/pcdsModuleApp/srcDisplay/Makefile b/src/template/base/top/pcdsModuleApp/srcDisplay/Makefile
 new file mode 100644
 index 0000000..dec71f3
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/srcDisplay/Makefile
++++ b/src/template/base/top/pcdsModuleApp/srcDisplay/Makefile
 @@ -0,0 +1,29 @@
 +#  -*- Makefile -*-
 +T_A=$EPICS_HOST_ARCH
@@ -6787,14 +6593,14 @@ index 0000000..dec71f3
 +include $(TOP)/configure/RULES
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/srcDisplay/example.edl b/src/makeBaseApp/top/pcdsModuleApp/srcDisplay/example.edl
+diff --git a/src/template/base/top/pcdsModuleApp/srcDisplay/example.edl b/src/template/base/top/pcdsModuleApp/srcDisplay/example.edl
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/Makefile b/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/Makefile
+diff --git a/src/template/base/top/pcdsModuleApp/srcProtocol/Makefile b/src/template/base/top/pcdsModuleApp/srcProtocol/Makefile
 new file mode 100644
 index 0000000..ee58d1c
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/Makefile
++++ b/src/template/base/top/pcdsModuleApp/srcProtocol/Makefile
 @@ -0,0 +1,29 @@
 +# Makefile for copying streamDevice protocol files during build.
 +# Author: Jason Tiller
@@ -6825,11 +6631,11 @@ index 0000000..ee58d1c
 +
 +######################################################################
 +# Add additional RULES files, if necessary.
-diff --git a/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/example.proto b/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/example.proto
+diff --git a/src/template/base/top/pcdsModuleApp/srcProtocol/example.proto b/src/template/base/top/pcdsModuleApp/srcProtocol/example.proto
 new file mode 100644
 index 0000000..22d7882
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleApp/srcProtocol/example.proto
++++ b/src/template/base/top/pcdsModuleApp/srcProtocol/example.proto
 @@ -0,0 +1,24 @@
 +# This is an example streamDevice protocol file.
 +
@@ -6855,11 +6661,11 @@ index 0000000..22d7882
 +# read_X      {out "*9900XY"; in "$%f,%(AMO:MT:HFP:CLIN:Y.VAL)f,%(AMO:MT:HFP:CLIN:TEMP.VAL)f,N%(AMO:MT:HFP:CLIN:SERL.VAL)4s";}
 +
 +# debug {in "%s"}
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/Makefile b/src/makeBaseApp/top/pcdsModuleBoot/Makefile
+diff --git a/src/template/base/top/pcdsModuleBoot/Makefile b/src/template/base/top/pcdsModuleBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/Makefile
++++ b/src/template/base/top/pcdsModuleBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -6874,11 +6680,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/Makefile@Common b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..7790152
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@Common
 @@ -0,0 +1,15 @@
 +# Makefile to install the st.cmd into the correctly location.
 +# Author: Jason Tiller
@@ -6895,11 +6701,11 @@ index 0000000..7790152
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks
 new file mode 100644
 index 0000000..c7f3254
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks
++++ b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks
 @@ -0,0 +1,6 @@
 +TOP = ../..
 +include $(TOP)/configure/CONFIG
@@ -6907,11 +6713,11 @@ index 0000000..c7f3254
 +TARGETS = cdCommands
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks6 b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks6
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks6 b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks6
 new file mode 100644
 index 0000000..c7f3254
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/Makefile@vxWorks6
++++ b/src/template/base/top/pcdsModuleBoot/ioc/Makefile@vxWorks6
 @@ -0,0 +1,6 @@
 +TOP = ../..
 +include $(TOP)/configure/CONFIG
@@ -6919,11 +6725,11 @@ index 0000000..c7f3254
 +TARGETS = cdCommands
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/README@Common b/src/template/base/top/pcdsModuleBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsModuleBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -6934,11 +6740,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/README@RTEMS b/src/template/base/top/pcdsModuleBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsModuleBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -6946,17 +6752,17 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@vxWorks b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@vxWorks
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/README@vxWorks b/src/template/base/top/pcdsModuleBoot/ioc/README@vxWorks
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsModuleBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsModuleBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..d04070f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Common
 @@ -0,0 +1,41 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -6999,11 +6805,11 @@ index 0000000..d04070f
 +## startup.
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Cross b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Cross
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Cross b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Cross
 new file mode 100644
 index 0000000..7f33928
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@Cross
++++ b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@Cross
 @@ -0,0 +1,26 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -7031,11 +6837,11 @@ index 0000000..7f33928
 +## Start any sequence programs
 +#seq sncExample,"user=_USER_"
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..7127a27
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,42 @@
 +## Example RTEMS startup script
 +
@@ -7079,11 +6885,11 @@ index 0000000..7127a27
 +
 +
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks
 new file mode 100644
 index 0000000..947003d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks
++++ b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks
 @@ -0,0 +1,52 @@
 +## Example vxWorks startup file
 +
@@ -7137,11 +6943,11 @@ index 0000000..947003d
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6 b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6
+diff --git a/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6 b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6
 new file mode 100644
 index 0000000..947003d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6
++++ b/src/template/base/top/pcdsModuleBoot/ioc/st.cmd@vxWorks6
 @@ -0,0 +1,52 @@
 +## Example vxWorks startup file
 +
@@ -7195,11 +7001,11 @@ index 0000000..947003d
 +## The file: post_st.cmd does the trick
 +#</afs/slac/g/lcls/build/epics/iocCommon/All/post_st.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsModuleBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsModuleBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsModuleBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -7227,11 +7033,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -7262,11 +7068,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsModuleBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -7297,11 +7103,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/Makefile b/src/makeBaseApp/top/pcdsModuleLib/Db/Makefile
+diff --git a/src/template/base/top/pcdsModuleLib/Db/Makefile b/src/template/base/top/pcdsModuleLib/Db/Makefile
 new file mode 100644
 index 0000000..d8b4ab6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/Makefile
++++ b/src/template/base/top/pcdsModuleLib/Db/Makefile
 @@ -0,0 +1,32 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -7335,11 +7141,11 @@ index 0000000..d8b4ab6
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.substitutions b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.substitutions
+diff --git a/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.substitutions b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.substitutions
 new file mode 100644
 index 0000000..34faf3d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.substitutions
++++ b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.substitutions
 @@ -0,0 +1,16 @@
 +#
 +# _APPNAME_ database substitutions file
@@ -7357,11 +7163,11 @@ index 0000000..34faf3d
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.template b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.template
+diff --git a/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.template b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.template
 new file mode 100644
 index 0000000..9da42d8
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.template
++++ b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.template
 @@ -0,0 +1,7 @@
 +
 +
@@ -7370,29 +7176,29 @@ index 0000000..9da42d8
 +	field( DTYP, "Soft Channel" )
 +	field( VAL,	 "Unknown status" )
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch
+diff --git a/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch
 new file mode 100644
 index 0000000..355528e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch
++++ b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-arch
 @@ -0,0 +1,3 @@
 +# _APPNAME_ archive template file
 +
 +# TODO: Add list of PV's to archive w/ rates and monitor/scan
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-req b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-req
+diff --git a/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-req b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-req
 new file mode 100644
 index 0000000..2f2e83d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/_APPNAME_.tpl-req
++++ b/src/template/base/top/pcdsModuleLib/Db/_APPNAME_.tpl-req
 @@ -0,0 +1,3 @@
 +# _APPNAME_ autosave template file
 +
 +# TODO: Add list of PV's to autosave
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch b/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
+diff --git a/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch b/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
 new file mode 100644
 index 0000000..e1cd8c7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
++++ b/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.sub-arch
 @@ -0,0 +1,16 @@
 +#
 +# _APPNAME_ archive substitutions file
@@ -7410,11 +7216,11 @@ index 0000000..e1cd8c7
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch b/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
+diff --git a/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch b/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
 new file mode 100644
 index 0000000..4aef458
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
++++ b/src/template/base/top/pcdsModuleLib/Db/archive__APPNAME_.tpl-arch
 @@ -0,0 +1,30 @@
 +#
 +# Archive template for _APPNAME_
@@ -7446,11 +7252,11 @@ index 0000000..4aef458
 +#
 +# TODO:	Add a list of PV's for sampled archiving
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req b/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
+diff --git a/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req b/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
 new file mode 100644
 index 0000000..018ea14
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
++++ b/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.sub-req
 @@ -0,0 +1,16 @@
 +#
 +# _APPNAME_ autosave substitutions file
@@ -7468,11 +7274,11 @@ index 0000000..018ea14
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req b/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
+diff --git a/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req b/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
 new file mode 100644
 index 0000000..901c735
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
++++ b/src/template/base/top/pcdsModuleLib/Db/autosave__APPNAME_.tpl-req
 @@ -0,0 +1,10 @@
 +#
 +# Autosave template for _APPNAME_
@@ -7484,11 +7290,11 @@ index 0000000..901c735
 +# TODO:	Add a list of PV's which should be saved
 +# periodically and restored when the IOC reboots
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Makefile b/src/makeBaseApp/top/pcdsModuleLib/Makefile
+diff --git a/src/template/base/top/pcdsModuleLib/Makefile b/src/template/base/top/pcdsModuleLib/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Makefile
++++ b/src/template/base/top/pcdsModuleLib/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -7498,11 +7304,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/Replace.pl b/src/makeBaseApp/top/pcdsModuleLib/Replace.pl
+diff --git a/src/template/base/top/pcdsModuleLib/Replace.pl b/src/template/base/top/pcdsModuleLib/Replace.pl
 new file mode 100644
 index 0000000..66ce6ae
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/Replace.pl
++++ b/src/template/base/top/pcdsModuleLib/Replace.pl
 @@ -0,0 +1,15 @@
 +#!/usr/bin/perl
 +
@@ -7519,11 +7325,11 @@ index 0000000..66ce6ae
 +
 +# Always end Replace.pl with a "1" so it returns true
 +1;
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/configure/RELEASE b/src/makeBaseApp/top/pcdsModuleLib/configure/RELEASE
+diff --git a/src/template/base/top/pcdsModuleLib/configure/RELEASE b/src/template/base/top/pcdsModuleLib/configure/RELEASE
 new file mode 100644
 index 0000000..07fb72d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/configure/RELEASE
++++ b/src/template/base/top/pcdsModuleLib/configure/RELEASE
 @@ -0,0 +1,31 @@
 +# RELEASE
 +# Defines location of external products
@@ -7556,11 +7362,11 @@ index 0000000..07fb72d
 +# ============================================================
 +# Ex: IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/src/Makefile b/src/makeBaseApp/top/pcdsModuleLib/src/Makefile
+diff --git a/src/template/base/top/pcdsModuleLib/src/Makefile b/src/template/base/top/pcdsModuleLib/src/Makefile
 new file mode 100644
 index 0000000..89238ce
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/src/Makefile
++++ b/src/template/base/top/pcdsModuleLib/src/Makefile
 @@ -0,0 +1,34 @@
 +TOP=../..
 +
@@ -7596,11 +7402,11 @@ index 0000000..89238ce
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.cpp b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.cpp
+diff --git a/src/template/base/top/pcdsModuleLib/src/_APPNAME_.cpp b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.cpp
 new file mode 100644
 index 0000000..6990d77
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.cpp
++++ b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.cpp
 @@ -0,0 +1,14 @@
 +/* _APPNAME_.cpp */
 +/* Author:  _USER_	 */
@@ -7616,18 +7422,18 @@ index 0000000..6990d77
 +    printf( "_APPNAME_ Initialized.\n" );
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.dbd b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.dbd
+diff --git a/src/template/base/top/pcdsModuleLib/src/_APPNAME_.dbd b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.dbd
 new file mode 100644
 index 0000000..ec6ea3f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.dbd
++++ b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.dbd
 @@ -0,0 +1 @@
 +include "base.dbd"
-diff --git a/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.h b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.h
+diff --git a/src/template/base/top/pcdsModuleLib/src/_APPNAME_.h b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.h
 new file mode 100644
 index 0000000..b55ca28
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsModuleLib/src/_APPNAME_.h
++++ b/src/template/base/top/pcdsModuleLib/src/_APPNAME_.h
 @@ -0,0 +1,29 @@
 +#ifndef	_APPNAME__H
 +#define _APPNAME__H
@@ -7658,11 +7464,11 @@ index 0000000..b55ca28
 +}
 +#endif	/*	__cplusplus	*/
 +#endif	/*	_APPNAME_H	*/
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/Db/Makefile b/src/makeBaseApp/top/pcdsMotorApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsMotorApp/Db/Makefile b/src/template/base/top/pcdsMotorApp/Db/Makefile
 new file mode 100644
 index 0000000..ec86d6f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/Db/Makefile
++++ b/src/template/base/top/pcdsMotorApp/Db/Makefile
 @@ -0,0 +1,33 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -7697,11 +7503,11 @@ index 0000000..ec86d6f
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..60a6698
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,32 @@
 +#
 +# _APPNAME_ substitutions file
@@ -7735,11 +7541,11 @@ index 0000000..60a6698
 +}
 +
 +# TODO: Add your custom template expansions here
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..e9a5054
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,20 @@
 +#
 +# _APPNAME_ autosave substitutions file
@@ -7761,11 +7567,11 @@ index 0000000..e9a5054
 +}
 +
 +# TODO: Add your custom template expansions here
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsMotorApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsMotorApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsMotorApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsMotorApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -7798,11 +7604,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/Makefile b/src/makeBaseApp/top/pcdsMotorApp/Makefile
+diff --git a/src/template/base/top/pcdsMotorApp/Makefile b/src/template/base/top/pcdsMotorApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/Makefile
++++ b/src/template/base/top/pcdsMotorApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -7812,11 +7618,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
+diff --git a/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
 new file mode 100644
 index 0000000..4a3e16e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
++++ b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
 @@ -0,0 +1,1393 @@
 +4 0 1
 +beginScreenProperties
@@ -9211,11 +9017,11 @@ index 0000000..4a3e16e
 +}
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor.edl b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor.edl
+diff --git a/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor.edl b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor.edl
 new file mode 100644
 index 0000000..4a3e16e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor.edl
++++ b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor.edl
 @@ -0,0 +1,1393 @@
 +4 0 1
 +beginScreenProperties
@@ -10610,11 +10416,11 @@ index 0000000..4a3e16e
 +}
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl
+diff --git a/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl
 new file mode 100644
 index 0000000..658bfb8
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl
++++ b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_mcode.edl
 @@ -0,0 +1,8385 @@
 +4 0 1
 +beginScreenProperties
@@ -19001,11 +18807,11 @@ index 0000000..658bfb8
 +}
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl
+diff --git a/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl
 new file mode 100644
 index 0000000..8311437
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl
++++ b/src/template/base/top/pcdsMotorApp/_APPNAME_Screens/motor_setup.edl
 @@ -0,0 +1,2156 @@
 +4 0 1
 +beginScreenProperties
@@ -21163,11 +20969,11 @@ index 0000000..8311437
 +objType "controls"
 +endObjectProperties
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/configure/CONFIG_SITE b/src/makeBaseApp/top/pcdsMotorApp/configure/CONFIG_SITE
+diff --git a/src/template/base/top/pcdsMotorApp/configure/CONFIG_SITE b/src/template/base/top/pcdsMotorApp/configure/CONFIG_SITE
 new file mode 100644
 index 0000000..58faa15
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/configure/CONFIG_SITE
++++ b/src/template/base/top/pcdsMotorApp/configure/CONFIG_SITE
 @@ -0,0 +1,31 @@
 +# CONFIG_SITE
 +
@@ -21200,11 +21006,11 @@ index 0000000..58faa15
 +# define INSTALL_LOCATION here
 +#INSTALL_LOCATION=<fullpathname>
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/configure/RELEASE b/src/makeBaseApp/top/pcdsMotorApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsMotorApp/configure/RELEASE b/src/template/base/top/pcdsMotorApp/configure/RELEASE
 new file mode 100644
 index 0000000..f36c8e4
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/configure/RELEASE
++++ b/src/template/base/top/pcdsMotorApp/configure/RELEASE
 @@ -0,0 +1,46 @@
 +# RELEASE
 +# Defines location of external products
@@ -21252,11 +21058,11 @@ index 0000000..f36c8e4
 +SSCAN=$(EPICS_MODULES)/sscan/$(SSCAN_MODULE_VERSION)
 +STREAMDEVICE=$(EPICS_MODULES)/streamdevice/$(STREAMDEVICE_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/src/Makefile b/src/makeBaseApp/top/pcdsMotorApp/src/Makefile
+diff --git a/src/template/base/top/pcdsMotorApp/src/Makefile b/src/template/base/top/pcdsMotorApp/src/Makefile
 new file mode 100644
 index 0000000..c06d14f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/src/Makefile
++++ b/src/template/base/top/pcdsMotorApp/src/Makefile
 @@ -0,0 +1,77 @@
 +TOP=../..
 +
@@ -21335,11 +21141,11 @@ index 0000000..c06d14f
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsMotorApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsMotorApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsMotorApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsMotorApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -21364,11 +21170,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsMotorApp/srcProtocol/Makefile b/src/makeBaseApp/top/pcdsMotorApp/srcProtocol/Makefile
+diff --git a/src/template/base/top/pcdsMotorApp/srcProtocol/Makefile b/src/template/base/top/pcdsMotorApp/srcProtocol/Makefile
 new file mode 100644
 index 0000000..4c8280d
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorApp/srcProtocol/Makefile
++++ b/src/template/base/top/pcdsMotorApp/srcProtocol/Makefile
 @@ -0,0 +1,31 @@
 +# Makefile for copying streamDevice protocol files during build.
 +# Author: Jason Tiller
@@ -21401,11 +21207,11 @@ index 0000000..4c8280d
 +
 +######################################################################
 +# Add additional RULES files, if necessary.
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/Makefile b/src/makeBaseApp/top/pcdsMotorBoot/Makefile
+diff --git a/src/template/base/top/pcdsMotorBoot/Makefile b/src/template/base/top/pcdsMotorBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/Makefile
++++ b/src/template/base/top/pcdsMotorBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -21420,11 +21226,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsMotorBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/Makefile@Common b/src/template/base/top/pcdsMotorBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..823e36a
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsMotorBoot/ioc/Makefile@Common
 @@ -0,0 +1,30 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -21456,11 +21262,11 @@ index 0000000..823e36a
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/README@Common b/src/template/base/top/pcdsMotorBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsMotorBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -21471,11 +21277,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/README@RTEMS b/src/template/base/top/pcdsMotorBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsMotorBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -21483,11 +21289,11 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions
 new file mode 100644
 index 0000000..3d1ac35
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions
++++ b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-motors.substitutions
 @@ -0,0 +1,55 @@
 +# P and M combine to make the instance's name.
 +# P EPICS PV Prefix
@@ -21544,11 +21350,11 @@ index 0000000..3d1ac35
 +#   { "TST:XXX:MMS:$(M)", "02", 1      }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
 new file mode 100644
 index 0000000..9a37d52
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
++++ b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_-positions.sub-req
 @@ -0,0 +1,8 @@
 +# Generate motor postions PV list for each motor
 +# Note: Motor positions are not always restored automatically
@@ -21558,11 +21364,11 @@ index 0000000..9a37d52
 +#	{ MOTOR = "TST:XXX:MMS:02" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..6d0a435
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,16 @@
 +# _APPNAME_ IOC instance archive file
 +
@@ -21580,11 +21386,11 @@ index 0000000..6d0a435
 +#	{ MOTOR = "TST:XXX:MMS:02" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..cb0c000
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsMotorBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,18 @@
 +# _APPNAME_ IOC instance autosave file
 +
@@ -21604,11 +21410,11 @@ index 0000000..cb0c000
 +#	{ MOTOR = "TST:XXX:MMS:02" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..31935f5
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@Common
 @@ -0,0 +1,80 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -21690,11 +21496,11 @@ index 0000000..31935f5
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..fdd0be2
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsMotorBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,93 @@
 +## Example RTEMS startup script
 +
@@ -21789,11 +21595,11 @@ index 0000000..fdd0be2
 +create_monitor_set( "$(IOC).req", 30, "" )
 +create_monitor_set( "$(IOC)-positions.req", 5, "" )
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..8e1e577
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -21812,11 +21618,11 @@ index 0000000..8e1e577
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsMotorBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -21833,11 +21639,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsMotorBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsMotorBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsMotorBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -21865,11 +21671,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -21900,11 +21706,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsMotorBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsMotorBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -21935,11 +21741,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/Makefile b/src/makeBaseApp/top/pcdsSerialApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsSerialApp/Db/Makefile b/src/template/base/top/pcdsSerialApp/Db/Makefile
 new file mode 100644
 index 0000000..2975c15
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/Makefile
++++ b/src/template/base/top/pcdsSerialApp/Db/Makefile
 @@ -0,0 +1,36 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -21977,11 +21783,11 @@ index 0000000..2975c15
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..80af2bd
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,34 @@
 +#
 +# _APPNAME_ substitutions file
@@ -22017,11 +21823,11 @@ index 0000000..80af2bd
 +}
 +
 +# TODO: Add your custom template expansions here
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..e9a5054
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,20 @@
 +#
 +# _APPNAME_ autosave substitutions file
@@ -22043,11 +21849,11 @@ index 0000000..e9a5054
 +}
 +
 +# TODO: Add your custom template expansions here
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.db b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.db
+diff --git a/src/template/base/top/pcdsSerialApp/Db/exampleDevice.db b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.db
 new file mode 100644
 index 0000000..91a91d4
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.db
++++ b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.db
 @@ -0,0 +1,386 @@
 +#
 +# Example serial device database template file
@@ -22435,11 +22241,11 @@ index 0000000..91a91d4
 +	field( OUT,  "@example.proto set_cal_delay $(P)" )
 +    field( FLNK, "$(P):GetCalDelay PP" )
 +}
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-arch b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-arch
+diff --git a/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-arch b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-arch
 new file mode 100644
 index 0000000..d79ecca
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-arch
++++ b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-arch
 @@ -0,0 +1,18 @@
 +# Archive list for Scientech Vector S310 Power/Energy Meter
 +$(P):ID				10	monitor
@@ -22459,11 +22265,11 @@ index 0000000..d79ecca
 +$(P):SetCalib		1	monitor
 +$(P):GetAtten		1
 +$(P):SetAtten		1	monitor
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-req b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-req
+diff --git a/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-req b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-req
 new file mode 100644
 index 0000000..108f9c4
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/exampleDevice.tpl-req
++++ b/src/template/base/top/pcdsSerialApp/Db/exampleDevice.tpl-req
 @@ -0,0 +1,8 @@
 +# Autosave list for Scientech Vector S310 Power/Energy Meter
 +$(P):SET_DARKAVAL
@@ -22473,11 +22279,11 @@ index 0000000..108f9c4
 +$(P):SetCount
 +$(P):SetCalib
 +$(P):SetAtten
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsSerialApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsSerialApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsSerialApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsSerialApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -22510,11 +22316,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/Makefile b/src/makeBaseApp/top/pcdsSerialApp/Makefile
+diff --git a/src/template/base/top/pcdsSerialApp/Makefile b/src/template/base/top/pcdsSerialApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/Makefile
++++ b/src/template/base/top/pcdsSerialApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -22524,11 +22330,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/configure/CONFIG_SITE b/src/makeBaseApp/top/pcdsSerialApp/configure/CONFIG_SITE
+diff --git a/src/template/base/top/pcdsSerialApp/configure/CONFIG_SITE b/src/template/base/top/pcdsSerialApp/configure/CONFIG_SITE
 new file mode 100644
 index 0000000..34f853c
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/configure/CONFIG_SITE
++++ b/src/template/base/top/pcdsSerialApp/configure/CONFIG_SITE
 @@ -0,0 +1,37 @@
 +# CONFIG_SITE
 +
@@ -22567,11 +22373,11 @@ index 0000000..34f853c
 +# define INSTALL_LOCATION here
 +#INSTALL_LOCATION=<fullpathname>
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/configure/RELEASE b/src/makeBaseApp/top/pcdsSerialApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsSerialApp/configure/RELEASE b/src/template/base/top/pcdsSerialApp/configure/RELEASE
 new file mode 100644
 index 0000000..44dd3bf
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/configure/RELEASE
++++ b/src/template/base/top/pcdsSerialApp/configure/RELEASE
 @@ -0,0 +1,36 @@
 +# RELEASE
 +# Defines location of external products
@@ -22609,11 +22415,11 @@ index 0000000..44dd3bf
 +IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +ASYN=$(EPICS_MODULES)/asyn/$(ASYN_MODULE_VERSION)
 +STREAMDEVICE=$(EPICS_MODULES)/streamdevice/$(STREAMDEVICE_MODULE_VERSION)
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/src/Makefile b/src/makeBaseApp/top/pcdsSerialApp/src/Makefile
+diff --git a/src/template/base/top/pcdsSerialApp/src/Makefile b/src/template/base/top/pcdsSerialApp/src/Makefile
 new file mode 100644
 index 0000000..4adf1ac
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/src/Makefile
++++ b/src/template/base/top/pcdsSerialApp/src/Makefile
 @@ -0,0 +1,50 @@
 +TOP=../..
 +
@@ -22665,11 +22471,11 @@ index 0000000..4adf1ac
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsSerialApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsSerialApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsSerialApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsSerialApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -22694,11 +22500,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/Makefile b/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/Makefile
+diff --git a/src/template/base/top/pcdsSerialApp/srcProtocol/Makefile b/src/template/base/top/pcdsSerialApp/srcProtocol/Makefile
 new file mode 100644
 index 0000000..296735a
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/Makefile
++++ b/src/template/base/top/pcdsSerialApp/srcProtocol/Makefile
 @@ -0,0 +1,32 @@
 +# Makefile for copying streamDevice protocol files during build.
 +# Author: Jason Tiller
@@ -22732,11 +22538,11 @@ index 0000000..296735a
 +
 +######################################################################
 +# Add additional RULES files, if necessary.
-diff --git a/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/example.proto b/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/example.proto
+diff --git a/src/template/base/top/pcdsSerialApp/srcProtocol/example.proto b/src/template/base/top/pcdsSerialApp/srcProtocol/example.proto
 new file mode 100644
 index 0000000..385249b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialApp/srcProtocol/example.proto
++++ b/src/template/base/top/pcdsSerialApp/srcProtocol/example.proto
 @@ -0,0 +1,59 @@
 +# This is an example protocol file
 +# This protocol file was based on the Scientech Vector S310 Calorimeter/Power Meter
@@ -22797,11 +22603,11 @@ index 0000000..385249b
 +
 +set_cal_delay	{	out "CDELAY_%u";		}
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/Makefile b/src/makeBaseApp/top/pcdsSerialBoot/Makefile
+diff --git a/src/template/base/top/pcdsSerialBoot/Makefile b/src/template/base/top/pcdsSerialBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/Makefile
++++ b/src/template/base/top/pcdsSerialBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -22816,11 +22622,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsSerialBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/Makefile@Common b/src/template/base/top/pcdsSerialBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..eb36b38
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsSerialBoot/ioc/Makefile@Common
 @@ -0,0 +1,24 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -22846,11 +22652,11 @@ index 0000000..eb36b38
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/README@Common b/src/template/base/top/pcdsSerialBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsSerialBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -22861,11 +22667,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/README@RTEMS b/src/template/base/top/pcdsSerialBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsSerialBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -22873,14 +22679,14 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsSerialBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsSerialBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..2df6e90
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,15 @@
 +# _APPNAME_ IOC instance archive file
 +
@@ -22897,11 +22703,11 @@ index 0000000..2df6e90
 +	{ P = "TST:EXP:XXX:01" }
 +#	{ P = "TST:EXP:XXX:02" }
 +}
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..022e059
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsSerialBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,16 @@
 +# _APPNAME_ IOC instance autosave file
 +
@@ -22919,11 +22725,11 @@ index 0000000..022e059
 +#	{ P = "TST:EXP:XXX:02" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@Common
+new file mode 100644
 index 0000000..9353210
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@Common
 @@ -0,0 +1,74 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -22999,11 +22805,11 @@ index 0000000..9353210
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@RTEMS
+new file mode 100644
 index 0000000..605b639
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsSerialBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,90 @@
 +## Example RTEMS startup script
 +
@@ -23095,11 +22901,11 @@ index 0000000..605b639
 +# Start autosave backups
 +create_monitor_set( "$(IOC).req", 5, "" )
 +
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..5589466
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -23118,11 +22924,11 @@ index 0000000..5589466
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsSerialBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -23139,11 +22945,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/Db/Makefile b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/Makefile
+diff --git a/src/template/base/top/pcdsTemplateIocApp/Db/Makefile b/src/template/base/top/pcdsTemplateIocApp/Db/Makefile
 new file mode 100644
 index 0000000..ec86d6f
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/Makefile
++++ b/src/template/base/top/pcdsTemplateIocApp/Db/Makefile
 @@ -0,0 +1,33 @@
 +TOP=../..
 +include $(TOP)/configure/CONFIG
@@ -23178,11 +22984,11 @@ index 0000000..ec86d6f
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
+diff --git a/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch b/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
 new file mode 100644
 index 0000000..86ba3e2
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
++++ b/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
 @@ -0,0 +1,29 @@
 +#
 +# _APPNAME_ substitutions file
@@ -23213,11 +23019,11 @@ index 0000000..86ba3e2
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
+diff --git a/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req b/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
 new file mode 100644
 index 0000000..7f74c88
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
++++ b/src/template/base/top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
 @@ -0,0 +1,13 @@
 +#
 +# _APPNAME_ substitutions file
@@ -23232,11 +23038,11 @@ index 0000000..7f74c88
 +	}
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
+diff --git a/src/template/base/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions b/src/template/base/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
 new file mode 100644
 index 0000000..4ebe401
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
++++ b/src/template/base/top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
 @@ -0,0 +1,31 @@
 +#==============================================================================
 +#
@@ -23269,11 +23075,11 @@ index 0000000..4ebe401
 +	{ $(IOC)  ,  1   ,  0   , System }
 +	{ $(IOC)  ,  1   ,  1   , System }
 +}
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/Makefile b/src/makeBaseApp/top/pcdsTemplateIocApp/Makefile
+diff --git a/src/template/base/top/pcdsTemplateIocApp/Makefile b/src/template/base/top/pcdsTemplateIocApp/Makefile
 new file mode 100644
 index 0000000..10e0126
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/Makefile
++++ b/src/template/base/top/pcdsTemplateIocApp/Makefile
 @@ -0,0 +1,8 @@
 +TOP = ..
 +include $(TOP)/configure/CONFIG
@@ -23283,11 +23089,11 @@ index 0000000..10e0126
 +DIRS := $(DIRS) $(filter-out $(DIRS), $(wildcard *Db*))
 +include $(TOP)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/configure/RELEASE b/src/makeBaseApp/top/pcdsTemplateIocApp/configure/RELEASE
+diff --git a/src/template/base/top/pcdsTemplateIocApp/configure/RELEASE b/src/template/base/top/pcdsTemplateIocApp/configure/RELEASE
 new file mode 100644
 index 0000000..0e05655
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/configure/RELEASE
++++ b/src/template/base/top/pcdsTemplateIocApp/configure/RELEASE
 @@ -0,0 +1,33 @@
 +# RELEASE
 +# Defines location of external products
@@ -23322,11 +23128,11 @@ index 0000000..0e05655
 +AUTOSAVE=$(EPICS_MODULES)/autosave/$(AUTOSAVE_MODULE_VERSION)
 +IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/src/Makefile b/src/makeBaseApp/top/pcdsTemplateIocApp/src/Makefile
+diff --git a/src/template/base/top/pcdsTemplateIocApp/src/Makefile b/src/template/base/top/pcdsTemplateIocApp/src/Makefile
 new file mode 100644
 index 0000000..a06ea00
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/src/Makefile
++++ b/src/template/base/top/pcdsTemplateIocApp/src/Makefile
 @@ -0,0 +1,38 @@
 +TOP=../..
 +
@@ -23366,11 +23172,11 @@ index 0000000..a06ea00
 +#----------------------------------------
 +#  ADD RULES AFTER THIS LINE
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp b/src/makeBaseApp/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp
+diff --git a/src/template/base/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp b/src/template/base/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp
 new file mode 100644
 index 0000000..ae0ecb6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp
++++ b/src/template/base/top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp
 @@ -0,0 +1,23 @@
 +/* _APPNAME_Main.cpp */
 +/* Author:  Marty Kraimer Date:    17MAR2000 */
@@ -23395,11 +23201,11 @@ index 0000000..ae0ecb6
 +    epicsExit(0);
 +    return(0);
 +}
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/Makefile b/src/makeBaseApp/top/pcdsTemplateIocBoot/Makefile
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/Makefile b/src/template/base/top/pcdsTemplateIocBoot/Makefile
 new file mode 100644
 index 0000000..0b68dbc
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/Makefile
++++ b/src/template/base/top/pcdsTemplateIocBoot/Makefile
 @@ -0,0 +1,13 @@
 +TOP = ..
 +
@@ -23414,11 +23220,11 @@ index 0000000..0b68dbc
 +DIRS += $(wildcard *ioc*)
 +include $(EPICS_BASE)/configure/RULES_DIRS
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/Makefile@Common b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/Makefile@Common
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/Makefile@Common b/src/template/base/top/pcdsTemplateIocBoot/ioc/Makefile@Common
 new file mode 100644
 index 0000000..eb36b38
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/Makefile@Common
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/Makefile@Common
 @@ -0,0 +1,24 @@
 +# IOC instance Makefile
 +# Generates envPaths and expands the instance
@@ -23444,11 +23250,11 @@ index 0000000..eb36b38
 +
 +include $(TOP)/configure/RULES
 +include $(TOP)/configure/RULES.ioc-targets
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@Common b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@Common
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/README@Common b/src/template/base/top/pcdsTemplateIocBoot/ioc/README@Common
 new file mode 100644
 index 0000000..f6dc23b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@Common
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/README@Common
 @@ -0,0 +1,9 @@
 +To start the ioc from this directory execute the command
 +    ../../bin/_ARCH_/<appname> st.cmd
@@ -23459,11 +23265,11 @@ index 0000000..f6dc23b
 +
 +You may need to change the name of the .dbd file given in the
 +st.cmd's dbLoadDatabase() command before starting the ioc.
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@RTEMS b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@RTEMS
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/README@RTEMS b/src/template/base/top/pcdsTemplateIocBoot/ioc/README@RTEMS
 new file mode 100644
 index 0000000..b040e84
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@RTEMS
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/README@RTEMS
 @@ -0,0 +1,6 @@
 +Copy the startup script (st.cmd) and top level db and dbd directories and
 +contents to
@@ -23471,14 +23277,14 @@ index 0000000..b040e84
 +
 +Then load the executable into the IOC (floppy disk, network boot, debugger,
 +etc.) and start it.
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@vxWorks6 b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/README@vxWorks6
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/README@vxWorks6 b/src/template/base/top/pcdsTemplateIocBoot/ioc/README@vxWorks6
 new file mode 100644
 index 0000000..e69de29
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch b/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch
 new file mode 100644
 index 0000000..17c36f7
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-arch
 @@ -0,0 +1,10 @@
 +# IOC archive file
 +## Replace _IOCPVROOT_ with the PV prefix used for
@@ -23490,11 +23296,11 @@ index 0000000..17c36f7
 +	{ IOC = "_IOCPVROOT_" }
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req b/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req
 new file mode 100644
 index 0000000..b4a50ff
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/_IOC_.sub-req
 @@ -0,0 +1,9 @@
 +# _APPNAME_ IOC instance autosave file
 +
@@ -23505,11 +23311,11 @@ index 0000000..b4a50ff
 +}
 +
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@Common b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@Common
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@Common b/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@Common
 new file mode 100644
 index 0000000..e82d0ab
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@Common
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@Common
 @@ -0,0 +1,50 @@
 +#!../../bin/_ARCH_/_APPNAME_
 +
@@ -23561,11 +23367,11 @@ index 0000000..e82d0ab
 +
 +# All IOCs should dump some common info after initial startup.
 +< /reg/d/iocCommon/All/post_linux.cmd
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS b/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS
 new file mode 100644
 index 0000000..3704bd6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/st.cmd@RTEMS
 @@ -0,0 +1,65 @@
 +## Example RTEMS startup script
 +
@@ -23632,11 +23438,11 @@ index 0000000..3704bd6
 +# Start autosave backups
 +create_monitor_set( "$(IOC).req", 5, "" )
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common
-new file mode 100755
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common b/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common
+new file mode 100644
 index 0000000..5589466
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@Common
 @@ -0,0 +1,17 @@
 +#!/bin/bash
 +
@@ -23655,11 +23461,11 @@ index 0000000..5589466
 +
 +# Launch the IOC
 +$RUNUSER "$PROCSERV --logfile $IOC_DATA/$IOC/iocInfo/ioc.log --name $IOC 30001 ../../bin/_ARCH_/_APPNAME_ st.cmd"
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS
-new file mode 100755
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS b/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS
+new file mode 100644
 index 0000000..fa7d46e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS
++++ b/src/template/base/top/pcdsTemplateIocBoot/ioc/startup.cmd@RTEMS
 @@ -0,0 +1,15 @@
 +# Run the setup script
 +# TODO: Change tst as needed for your hutch
@@ -23676,11 +23482,11 @@ index 0000000..fa7d46e
 +
 +< /home/All/post_rtems.cmd
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@RTEMS b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@RTEMS
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@RTEMS b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@RTEMS
 new file mode 100644
 index 0000000..0ba95a6
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@RTEMS
++++ b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@RTEMS
 @@ -0,0 +1,26 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -23708,11 +23514,11 @@ index 0000000..0ba95a6
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks
++++ b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -23743,11 +23549,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6 b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6 b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6
 new file mode 100644
 index 0000000..7cb8232
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6
++++ b/src/template/base/top/pcdsTemplateIocBoot/nfsCommands@vxWorks6
 @@ -0,0 +1,29 @@
 +#Instructions for creating and using a real nfsCommands file
 +# 
@@ -23778,11 +23584,11 @@ index 0000000..7cb8232
 +# 
 +# hostAdd("mercury","155.77.2.56")
 +# nfsMount("mercury","/home/mercury5/iocinfo","/iocinfo")
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/Makefile b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/Makefile
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/templates/Makefile b/src/template/base/top/pcdsTemplateIocBoot/templates/Makefile
 new file mode 100644
 index 0000000..77bf07a
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/Makefile
++++ b/src/template/base/top/pcdsTemplateIocBoot/templates/Makefile
 @@ -0,0 +1,34 @@
 +# Makefile for ioc instance
 +TOP = ../..
@@ -23818,11 +23624,11 @@ index 0000000..77bf07a
 +include $(TOP)/configure/RULES.ioc
 +-include $(TOP)/configure/RULES.archive
 +-include $(TOP)/configure/RULES.autosave
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg
 new file mode 100644
 index 0000000..c5818a9
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg
++++ b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc-sample.cfg
 @@ -0,0 +1,15 @@
 +# Sample CONFIG file for templated ioc
 +
@@ -23839,11 +23645,11 @@ index 0000000..c5818a9
 +CAMERA(NAME=TST:EXP:CVV:03,TYPE=UP900F,BOARD=1,CHAN=0)
 +CAMERA(NAME=TST:EXP:CVV:04,TYPE=UP900F,BOARD=1,CHAN=1)
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-arch b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-arch
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-arch b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-arch
 new file mode 100644
 index 0000000..c3ead7e
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-arch
++++ b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-arch
 @@ -0,0 +1,21 @@
 +#
 +# unixCam IOC archive substitutions file
@@ -23866,11 +23672,11 @@ index 0000000..c3ead7e
 +$$ENDLOOP(CAMERA)
 +}
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-req b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-req
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-req b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-req
 new file mode 100644
 index 0000000..43e5127
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/ioc.sub-req
++++ b/src/template/base/top/pcdsTemplateIocBoot/templates/ioc.sub-req
 @@ -0,0 +1,63 @@
 +#
 +# unixCam IOC substitutions file
@@ -23935,11 +23741,11 @@ index 0000000..43e5127
 +$$ENDIF(DOPRJ)
 +$$ENDLOOP(CAMERA)
 +
-diff --git a/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/st.cmd b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/st.cmd
-new file mode 100755
+diff --git a/src/template/base/top/pcdsTemplateIocBoot/templates/st.cmd b/src/template/base/top/pcdsTemplateIocBoot/templates/st.cmd
+new file mode 100644
 index 0000000..c36f77b
 --- /dev/null
-+++ b/src/makeBaseApp/top/pcdsTemplateIocBoot/templates/st.cmd
++++ b/src/template/base/top/pcdsTemplateIocBoot/templates/st.cmd
 @@ -0,0 +1,142 @@
 +#!$$IOCTOP/bin/linux-x86_64/unixCam$$PDV_VERSION
 +
