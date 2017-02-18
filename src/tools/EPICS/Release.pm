@@ -18,6 +18,10 @@ sub readReleaseFiles {
 
     return unless (-e $relfile);
     &readRelease($relfile, $Rmacros, $Rapps);
+	#print "readReleaseFiles macros:";
+	#while ( my ( $macro, $val ) = each %$Rmacros ) {
+	#	print "\t$macro\t=\t$val\n";
+	#}
 
     if ($hostarch) {
         my $hrelfile = "$relfile.$hostarch";
@@ -43,6 +47,10 @@ sub readReleaseFiles {
 sub readRelease {
     my ($file, $Rmacros, $Rapps) = @_;
     # $Rmacros is a reference to a hash, $Rapps a ref to an array
+	#print "readRelease file=$file, initial macros:";
+	#while ( my ( $macro, $val ) = each %$Rmacros ) {
+	#	print "\t$macro\t=\t$val\n";
+	#}
 
     open(my $IN, '<', $file) or croak "Can't open $file: $!\n";
     while (<$IN>) {
@@ -83,11 +91,16 @@ sub readRelease {
 sub expandMacros {
     my ($str, $Rmacros) = @_;
     # $Rmacros is a reference to a hash
+	#print "expandMacros $str:\n";
 
     while (my ($pre, $var, $post) = $str =~ m/ (.*) \$\( (\w+) \) (.*) /x) {
         last unless exists $Rmacros->{$var};
         $str = $pre . $Rmacros->{$var} . $post;
     }
+	#print "expandMacros returning $str, macros:\n";
+	#while ( my ( $macro, $val ) = each %$Rmacros ) {
+	#	print "\t$macro\t=\t$val\n";
+    #}
     return $str;
 }
 
@@ -100,7 +113,7 @@ sub expandRelease {
 
     while (my ($macro, $val) = each %$Rmacros) {
         while (my ($pre,$var,$post) = $val =~ m/ (.*) \$\( (\w+) \) (.*) /x) {
-            carp "EPICS/Release.pm: Undefined macro \$($var) used\n"
+            carp "EPICS/Release.pm: Undefined macro \$($var) used under $Rmacros->{'TOP'}\n"
                 unless exists $Rmacros->{$var};
             croak "EPICS/Release.pm: Circular definition of macro $macro\n"
                 if $macro eq $var;
