@@ -1,69 +1,98 @@
 diff --git a/configure/CONFIG_SITE b/configure/CONFIG_SITE
-index 3063a99..785c0c3 100644
+index ecb0da1..b0ede55 100644
 --- a/configure/CONFIG_SITE
 +++ b/configure/CONFIG_SITE
-@@ -108,0 +109 @@
-+#       linuxRT_glibc-x86_64
-@@ -111,0 +113,6 @@
+@@ -109,18 +109,41 @@
+ #
+ 
+ # Which target architectures to cross-compile for.
 +# SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
 +ifndef EPICS_HOST_ARCH
-+EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch.pl)
++EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch)
 +export EPICS_HOST_ARCH
 +endif
 +
-@@ -117 +124,13 @@ CROSS_COMPILER_TARGET_ARCHS=
--#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
-+
+ #  Definitions in configure/os/CONFIG_SITE.<host>.Common
+ #  may override this setting.
+-#CROSS_COMPILER_TARGET_ARCHS=
+-#CROSS_COMPILER_TARGET_ARCHS=rt-linux
+-CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
++#CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
++CROSS_COMPILER_TARGET_ARCHS=
 +
 +# RHEL6 currently supports linuxRT and RTEMS-beatnik cross compiles
 +ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
-+CROSS_COMPILER_TARGET_ARCHS		+=	linuxRT_glibc-x86_64
-+CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
++CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64
++CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik
 +endif
 +
 +# RHEL5 currently supports linux-x86 (RHEL5 32bit) and RTEMS-beatnik cross compiles
 +ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
-+CROSS_COMPILER_TARGET_ARCHS		+=  linux-x86
-+CROSS_COMPILER_TARGET_ARCHS		+=	RTEMS-beatnik
++CROSS_COMPILER_TARGET_ARCHS	+= linux-x86
++CROSS_COMPILER_TARGET_ARCHS	+= RTEMS-beatnik
 +endif
-@@ -122,2 +141,8 @@ CROSS_COMPILER_TARGET_ARCHS=
--#
+ 
+ # If only some of your host architectures can compile the
+ #  above CROSS_COMPILER_TARGET_ARCHS specify those host
+ #  architectures here.  If the combination is complicated,
+ #  set CROSS_COMPILER_TARGET_ARCHS in the appropriate
+ #  configure/os/CONFIG_SITE.<host>.Common files instead.
 -CROSS_COMPILER_HOST_ARCHS=
 +#CROSS_COMPILER_HOST_ARCHS=
 +
-+###################################
 +# PCDS build targets:
 +#  host:	linux-x86    targets: RTEMS-beatnik linux-x86
 +#  host:	linux-x86_64 targets: RTEMS-beatnik linux-x86 linux-x86_64
 +#  host:	rhel6-x86_64 targets: RTEMS-beatnik rhel6-x86_64 linuxRT_glibc-x86_64
 +CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
-@@ -139 +164 @@ SHARED_LIBRARIES=YES
--STATIC_BUILD=NO
-+STATIC_BUILD=YES
-@@ -188 +213 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
--EPICS_SITE_VERSION =
+ 
+ #  The 'make runtests' and 'make tapfiles' build targets normally only run
+ #  self-tests for the EPICS_HOST_ARCH architecture. If the host can execute
+@@ -167,13 +190,12 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
+ 
+ # Site version number, if set will append '-' and this string to the
+ #  EPICS version number string that is reported by many tools.
+-#  Optimized Build
+-EPICS_SITE_VERSION = 0.2
 +EPICS_SITE_VERSION = 2.0
-@@ -192 +217 @@ EPICS_SITE_VERSION =
+ 
+ # For GNU compiler, use pipes rather than temporary files for
+ #  communication between the various stages of compilation.
+ #  Must be either YES or NO
 -GCC_PIPE = NO
 +GCC_PIPE = YES
+ 
+ # Set RPATH when linking executables and libraries.
+ #  Must be either YES or NO.  If you set this to NO you must also provide a
 diff --git a/configure/CONFIG_SITE_ENV b/configure/CONFIG_SITE_ENV
-index 75bf1a2..1c7bca8 100644
+index e0659d2..daa448f 100644
 --- a/configure/CONFIG_SITE_ENV
 +++ b/configure/CONFIG_SITE_ENV
-@@ -44,0 +45,2 @@
-+#	DST for 2016  US: Mar 08 - Nov 01
+@@ -42,6 +42,7 @@
+ #	DST for 2020  US: Mar 08 - Nov 01
+ #	              EU: Mar 29 - Oct 25
+ #	DST for 2021  US: Mar 14 - Nov 07
 +#	              EU: Mar 29 - Oct 25
-@@ -47,3 +49,2 @@
--# These values are for 2011:
--EPICS_TIMEZONE=CUS::360:031302:110602
--#EPICS_TIMEZONE=MET::-60:032702:103002
-+# These values are for 2016:
-+EPICS_TIMEZONE=PUS::480:030802:110102
-@@ -51 +51,0 @@ EPICS_TIMEZONE=CUS::360:031302:110602
+ #	              EU: Mar 28 - Oct 31
+ #	(see: http://www.timeanddate.com/time/dst/2016.html etc. )
+ #
+@@ -50,9 +51,8 @@
+ EPICS_TIMEZONE=PUS::480:031302:110602
+ #EPICS_TIMEZONE=CET/CEST::-60:032702:103002
+ 
 -# EPICS_TS_NTP_INET
-@@ -53 +53 @@ EPICS_TIMEZONE=CUS::360:031302:110602
+ #	NTP time server ip address.  Uses boot host if not set.
 -EPICS_TS_NTP_INET=
 +# EPICS_TS_NTP_INET
-@@ -61 +61 @@ IOCSH_PS1="epics> "
+ 
+ # IOC Shell:
+ # IOCSH_PS1
+@@ -60,7 +60,7 @@ EPICS_TS_NTP_INET=
+ # IOCSH_HISTSIZE
+ #	Number of lines of command history to keep.
+ IOCSH_PS1="epics> "
 -IOCSH_HISTSIZE=50
 +IOCSH_HISTSIZE=100
+ 
+ # Log Server:
+ # EPICS_IOC_LOG_INET 
