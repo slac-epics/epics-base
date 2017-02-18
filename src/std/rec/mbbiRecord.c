@@ -202,6 +202,10 @@ static long process(mbbiRecord *prec)
     else if (status == 2)
         status = 0;
 
+    if ( prec->tpro >= 2 )
+        printf( "%s: Process %s, val %u\n",
+            epicsThreadGetNameSelf(), prec->name, prec->val );
+
     checkAlarms(prec, &timeLast);
     monitor(prec);
 

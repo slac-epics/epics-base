@@ -229,6 +229,11 @@ static long process(mbboRecord *prec)
     }
 
 CONTINUE:
+
+    if ( prec->tpro >= 2 )
+        printf( "%s: Process %s, val %u\n",
+            epicsThreadGetNameSelf(), prec->name, prec->val );
+
     /* Check for alarms */
     checkAlarms(prec);
 
