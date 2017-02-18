@@ -1,0 +1,73 @@
+diff --git a/src/libCom/Makefile b/src/libCom/Makefile
+index 5e08d7a..4285899 100644
+--- a/src/libCom/Makefile
++++ b/src/libCom/Makefile
+@@ -18,6 +18,7 @@ epicsReadline_INCLUDES += $(INCLUDES_$(COMMANDLINE_LIBRARY))
+ #POSIX thread priority scheduling flag
+ THREAD_CPPFLAGS_NO += -DDONT_USE_POSIX_THREAD_PRIORITY_SCHEDULING
+ osdThread_CPPFLAGS += $(THREAD_CPPFLAGS_$(USE_POSIX_THREAD_PRIORITY_SCHEDULING))
++osdThread_CPPFLAGS_Linux += -DSHOW_LINUX_PIDS
+ 
+ #epicsVersion is created by this Makefile
+ INC += epicsVersion.h
+diff --git a/src/libCom/osi/os/posix/osdThread.c b/src/libCom/osi/os/posix/osdThread.c
+index 30583e1..b3178cf 100644
+--- a/src/libCom/osi/os/posix/osdThread.c
++++ b/src/libCom/osi/os/posix/osdThread.c
+@@ -23,6 +23,9 @@
+ #include <signal.h>
+ #include <sched.h>
+ #include <unistd.h>
++#ifdef SHOW_LINUX_PIDS
++#include <sys/syscall.h>
++#endif
+ 
+ #define epicsExportSharedSymbols
+ #include "epicsStdio.h"
+@@ -72,6 +75,9 @@ typedef struct epicsThreadOSD {
+     int                isFifoScheduled;
+     int                isOnThreadList;
+     unsigned int       osiPriority;
++#ifdef SHOW_LINUX_PIDS
++    pid_t              pid;
++#endif
+     char              *name;
+ } epicsThreadOSD;
+ 
+@@ -349,6 +355,9 @@ static void once(void)
+     if(errVerbose) fprintf(stderr,"task priorities are not implemented\n");
+ #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
+     pthreadInfo = init_threadInfo("_main_",0,epicsThreadGetStackSize(epicsThreadStackSmall),0,0);
++#ifdef SHOW_LINUX_PIDS
++    pthreadInfo->pid=syscall(SYS_gettid);
++#endif
+     status = pthread_setspecific(getpthreadInfo,(void *)pthreadInfo);
+     checkStatusOnceQuit(status,"pthread_setspecific","epicsThreadInit");
+     status = mutexLock(&listLock);
+@@ -381,6 +390,9 @@ static void * start_routine(void *arg)
+     pthreadInfo->isOnThreadList = 1;
+     status = pthread_mutex_unlock(&listLock);
+     checkStatusQuit(status,"pthread_mutex_unlock","start_routine");
++#ifdef SHOW_LINUX_PIDS
++    pthreadInfo->pid = syscall(SYS_gettid);
++#endif
+ 
+     (*pthreadInfo->createFunc)(pthreadInfo->createArg);
+ 
+@@ -754,9 +766,14 @@ static void showThreadInfo(epicsThreadOSD *pthreadInfo,unsigned int level)
+             status = pthread_getschedparam(pthreadInfo->tid,&policy,&param);
+             if(!status) priority = param.sched_priority;
+         }
++
+         fprintf(epicsGetStdout(),"%16.16s %12p %12lu    %3d%8d %8.8s\n",
+-             pthreadInfo->name,(void *)
+-             pthreadInfo,(unsigned long)pthreadInfo->tid,
++             pthreadInfo->name,(void *) pthreadInfo,
++#ifdef SHOW_LINUX_PIDS
++             (unsigned long)pthreadInfo->pid,
++#else
++             (unsigned long)pthreadInfo->tid,
++#endif
+              pthreadInfo->osiPriority,priority,
+              pthreadInfo->isSuspended?"SUSPEND":"OK");
+     }

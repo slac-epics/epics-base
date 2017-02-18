@@ -1,0 +1,1072 @@
+diff --git a/configure/CONFIG_COMMON b/configure/CONFIG_COMMON
+index 839c942..fe6796e 100644
+--- a/configure/CONFIG_COMMON
++++ b/configure/CONFIG_COMMON
+@@ -61,6 +61,10 @@ GNU_DIR = /usr
+ 
+ INSTALL_LOCATION            = $(TOP)
+ 
++# SLAC Specific Install locations
++INSTALL_ARCHIVE             = $(INSTALL_LOCATION)/archive
++INSTALL_AUTOSAVE            = $(INSTALL_LOCATION)/autosave
++
+ INSTALL_LOCATION_LIB        = $(INSTALL_LOCATION)/lib
+ INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
+ 
+diff --git a/configure/RULES.Db b/configure/RULES.Db
+index 11e4d40..48c8885 100644
+--- a/configure/RULES.Db
++++ b/configure/RULES.Db
+@@ -10,22 +10,25 @@
+ 
+ #####################################################  vpath
+ 
+-vpath %.dbd $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
+-vpath %.db $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB))
+-vpath %.vdb $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DB))
++vpath %.dbd           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(DBD))
++vpath %.db            $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
++vpath %.vdb           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DBD)
+ vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+-vpath %.template $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+-vpath bpt%.data $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+-vpath %.acf $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+-vpath %.acs $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
++vpath %.sub-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
++vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
++vpath %.tpl-db        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
++vpath bpt%.data       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
++vpath %.acf           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
++vpath %.acs           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+ 
+ ##################################################### dbdflags
+ 
++# dbExpand
+ DBD_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DBD) $(RELEASE_DBD_DIRS)
+ DB_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_DB) $(RELEASE_DB_DIRS)
+ 
+-DBDFLAGS = $(USR_DBDFLAGS) $(CMD_DBDFLAGS) $(addprefix -I,$(DBD_SEARCH_DIRS))
+-DBFLAGS = $($*_DBFLAGS) $(USR_DBFLAGS) $(CMD_DBFLAGS) $(addprefix -I,$(DB_SEARCH_DIRS))
++DBDFLAGS = $(USR_DBDFLAGS) $(addprefix -I,$(DBD_SEARCH_DIRS))
++DBFLAGS = $($*_DBFLAGS) $(USR_DBFLAGS) $(addprefix -I,$(DB_SEARCH_DIRS))
+ 
+ #####################################################
+ # To allow os specific dbd files AND have the -j option work properly,
+@@ -68,7 +71,8 @@ SOURCE_DB_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_DB_aaa)  )
+ SOURCE_DB_aaa = $(addsuffix /$(file), $(dir) )
+ 
+ COMMONS = $(COMMON_DIR)/*.dbd $(COMMON_DIR)/*.db $(COMMON_DIR)/*.h \
+-          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template
++          $(COMMON_DIR)/*.substitutions $(COMMON_DIR)/*.template \
++          $(COMMON_DIR)/*.sub-db        $(COMMON_DIR)/*.tpl-db
+ 
+ # Remove trailing numbers (to 99) on stem
+ TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
+@@ -77,8 +81,9 @@ TEMPLATE1=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(pats
+ TEMPLATE2=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(patsubst %4,%, \
+           $(patsubst %5,%,$(patsubst %6,%,$(patsubst %7,%,$(patsubst %8,%,$(patsubst %9,%, \
+           $(TEMPLATE1)))))))))))
+-TEMPLATE3=$(addsuffix .template,$(addprefix ../,$(TEMPLATE2)))
+-TEMPLATE_FILENAME=$(firstword $(wildcard $($*_TEMPLATE) $(addprefix ../,$($*_TEMPLATE)) ../$*.template $(TEMPLATE3) ../template))
++TEMPLATE3 =$(addsuffix .template,$(addprefix ../,$(TEMPLATE2)))
++TEMPLATE3+=$(addsuffix .tpl-db,  $(addprefix ../,$(TEMPLATE2)))
++TEMPLATE_FILENAME=$(firstword $(wildcard $($*_TEMPLATE) $(addprefix ../,$($*_TEMPLATE)) ../$*.template ../$*.tpl-db $(TEMPLATE3) ../template))
+ 
+ # dbst based database optimization
+ ifeq '$(DB_OPT)' 'YES'
+@@ -119,9 +124,6 @@ DBDDEPENDS_CMD = -$(MKMF) -m $(notdir $@)$(DEP) $(DBDDEPENDS_FLAGS) $@ $<
+ 
+ ifndef T_A
+ 
+-DEP = .d
+-TEMPLATE3+=$(addsuffix .template, $(TEMPLATE2))
+-
+ COMMON_DIR = .
+ INSTALL_DBDS =
+ INSTALL_DBS =
+@@ -134,7 +136,7 @@ ACTIONS += build
+ ACTIONS += install
+ ACTIONS += buildInstall
+ ACTIONS += browse
+-ACTIONS += runtests tapfiles
++ACTIONS += runtests
+ 
+ actionArchTargets = $(foreach x, $(ACTIONS),\ $(foreach arch,$(BUILD_ARCHS), $(x)$(DIVIDER)$(arch)))
+ 
+@@ -173,12 +175,14 @@ build : $(COMMON_DBDS) $(COMMON_DBS) \
+ 	$(DBDDEPENDS_FILES) $(TARGETS) \
+ 	$(INSTALL_DB_INSTALLS) $(INSTALL_DBD_INSTALLS)
+ 
+-clean:: 
++clean: db_clean
++
++db_clean:
+ 	@$(RM) $(COMMONS) $(DBDDEPENDS_FILES)
+ 	@$(RM) *_registerRecordDeviceDriver.cpp
+ 	@$(RM) $(TARGETS)
+ 
+-realclean:: clean
++realclean: clean
+ 
+ ##################################################### CapFast filter
+ 
+@@ -199,7 +203,11 @@ $(COMMON_DIR)/%.substitutions:
+ endif
+ 
+ $(INSTALL_DB)/%.substitutions: %.substitutions
+-	$(ECHO) "Installing substitution file $@"
++	$(ECHO) "Installing db substitutions file $@"
++	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
++
++$(INSTALL_DB)/%.sub-db: %.sub-db
++	$(ECHO) "Installing db substitutions file $@"
+ 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
+ 
+ .PRECIOUS: $(COMMON_DIR)/%.substitutions
+@@ -213,7 +221,7 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
+ 	@$(RM) $@.VAR
+ 
+ $(INSTALL_DB)/%.template: %.template
+-	$(ECHO) "Installing template file $@"
++	$(ECHO) "Installing db template file $@"
+ 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
+ 
+ .PRECIOUS: $(COMMON_DIR)/%.template
+@@ -293,7 +301,7 @@ $(INSTALL_DBD)/%: %
+ 
+ define  DBD_INSTALLS_template
+ $$(INSTALL_DBD)/$$(notdir $(1)) : $(1)
+-	$(ECHO) "Installing $$@"
++	$(ECHO) "Installing DBD_INSTALLS $$@"
+ 	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DBD)
+ endef
+ $(foreach file, $(DBD_INSTALLS), $(eval $(call DBD_INSTALLS_template, $(file))))
+@@ -307,14 +315,36 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
+ 	@$(REPLACEVAR) < $*.VAR > $@
+ 	@$(RM) $*.VAR
+ 
++# Note:
++# MSI expansion command was
++#	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
++# This is wrong for msi when both foo.template and foo.substitutions
++# are used as in many of the PCDS IOc's.
++# Specifying foo.template in the command line as above
++# overrides the templates specified in the substitutions file.
++# 
++# PCDS changes it to
++#   $(MSI) $(DBFLAGS) -S$< > $*.tmp
++# to allow both foo.template and foo.subsitutions to coexist.
+ $(COMMON_DIR)/%.db$(RAW): %.substitutions
+ 	@$(RM) $(notdir $@)$(DEP)
++	$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
++	$(ECHO) "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
++	$(ECHO) "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
++	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
++	@$(RM) $@ $*.tmp
++	$(MSI) $(DBFLAGS) -S$< > $*.tmp
++	$(MV) $*.tmp $@
++
++$(COMMON_DIR)/%.db$(RAW): %.sub-db
++	@$(RM) $(notdir $@)$(DEP)
+ 	@$(MKMF) -m$(notdir $@)$(DEP) $(DBFLAGS) $@ $< $(TEMPLATE_FILENAME)
+ 	echo "$@ : $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+ 	echo "$(notdir $@)$(DEP): $(TEMPLATE_FILENAME)" >> $(notdir $@)$(DEP)
+ 	$(ECHO) "Inflating database from $< $(TEMPLATE_FILENAME)"
++	$(ECHO) "Inflating database from $<"
+ 	@$(RM) $@ $*.tmp
+-	$(MSI) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > $*.tmp
++	$(MSI) $(DBFLAGS) -S$< > $*.tmp
+ 	$(MV) $*.tmp $@
+ 
+ $(COMMON_DIR)/%.db$(RAW): %.template
+@@ -351,7 +381,7 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.db$(RAW)
+ else
+ 
+ $(INSTALL_DB)/%: %
+-	$(ECHO) "Installing $@"
++	$(ECHO) "Installing db file $@"
+ 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
+ endif
+ 
+@@ -361,7 +391,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
+ 
+ define  DB_INSTALLS_template
+ $$(INSTALL_DB)/$$(notdir $(1)) : $(1)
+-	$(ECHO) "Installing $$@"
++	$(ECHO) "Installing DB_INSTALLS $$@"
+ 	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DB)
+ endef
+ $(foreach file, $(DB_INSTALLS), $(eval $(call DB_INSTALLS_template, $(file))))
+diff --git a/configure/RULES.archive b/configure/RULES.archive
+new file mode 100644
+index 0000000..a1648cd
+--- /dev/null
++++ b/configure/RULES.archive
+@@ -0,0 +1,114 @@
++####################################################
++# RULES for building and installing archive files
++
++# Display how this makefile was called
++$(info RULES.archive: '$(MAKECMDGOALS)')
++
++########################################################
++# NOTE: The rules for generating archive files from
++# %.substitutions files shouldn't be needed any more.
++# If you think you need them, please see Bruce Hill, bhill,
++# so we can discuss.
++
++####################################################
++# Where to find and install files for archive
++
++vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
++vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
++vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
++vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
++
++INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
++
++include $(CONFIG)/CONFIG_APP_INCLUDE
++
++####################################################
++# archive Flags (-I path)
++define  ARCHIVE_DIRS_template
++  RELEASE_ARCHIVE_DIRS += $$(wildcard $$(strip $$($(1)))/archive)
++endef
++$(foreach top, $(RELEASE_TOPS), $(eval $(call ARCHIVE_DIRS_template,$(top)) ))
++ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(TOP)/archive $(RELEASE_ARCHIVE_DIRS)
++ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
++ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
++
++####################################################
++# Generate COMMON_ARCHIVES list
++COMMON_ARCHIVES  += $(filter $(COMMON_DIR)/%, $(foreach file, $(ARCHIVE), \
++	$(firstword $(SOURCE_ARCHIVE) $(COMMON_DIR)/$(file) ) ) )
++SOURCE_ARCHIVE = $(wildcard $(file) $(SOURCE_ARCHIVE_bbb) )
++SOURCE_ARCHIVE_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ARCHIVE_aaa)  )
++SOURCE_ARCHIVE_aaa = $(addsuffix /$(file), $(dir) )
++INSTALL_ARCHIVES += $(addprefix $(INSTALL_ARCHIVE)/, $(notdir $(ARCHIVE)))
++
++####################################################
++# Generate ARCHIVE_DEPENDS_FILES list
++ARCHIVEDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_ARCHIVES)))
++
++####################################################
++# Build targets
++
++build:		$(INSTALL_ARCHIVES)
++
++install:		$(INSTALL_ARCHIVES)
++
++rebuild:        clean install
++
++buildInstall:	build
++
++realclean: clean
++
++clean: archive_clean
++
++archive_clean:
++	@$(RM) $(COMMONS)
++	@$(RM) $(TARGETS)
++	@echo "Cleaning"
++
++####################################################
++# Build and install Rules
++
++$(COMMON_DIR)/%.archive: %.sub-arch
++	@$(RM) $(notdir $@)$(DEP)
++	$(MKMF) -m$(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
++	$(ECHO) "Inflating archive file from $<"
++	@$(RM) $@ msi.tmp
++	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
++	$(MV) msi.tmp $@
++
++INSTALL = $(PERL) $(TOOLS)/installEpics.pl
++
++$(INSTALL_ARCHIVE)/%: $(COMMON_DIR)/%
++	@echo "Installing common archive file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_ARCHIVE)/%.archive:	%.archive  
++	@echo "Installing archive file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++#.PRECIOUS: $(COMMON_DIR)/%.archive
++
++#$(INSTALL_ARCHIVE)/%.substitutions: %.substitutions
++#	@echo "Installing archive substitutions file $@"
++#	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_ARCHIVE)/%.sub-arch: %.sub-arch
++	$(ECHO) "Installing archive substitutions file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++# This rule is obsolete
++# Please rename any archive template files <basename>.tpl-arch
++#$(INSTALL_ARCHIVE)/%.template: %.template
++#	@echo "Installing archive template file $@"
++#	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_ARCHIVE)/%.tpl-arch: %.tpl-arch
++	@echo "Installing archive tpl-arch file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++#####################################################
++# Include archive dependency files
++ifneq (,$(strip $(ARCHIVEDEPENDS_FILES)))
++-include $(ARCHIVEDEPENDS_FILES)
++endif
++
+diff --git a/configure/RULES.autosave b/configure/RULES.autosave
+new file mode 100644
+index 0000000..f5c277c
+--- /dev/null
++++ b/configure/RULES.autosave
+@@ -0,0 +1,122 @@
++####################################################
++# RULES for building and installing autosave files
++
++# Display how this makefile was called
++$(info RULES.autosave: '$(MAKECMDGOALS)')
++
++########################################################
++# NOTE: The rules for generating autosave files from
++# %.substitutions files shouldn't be needed any more.
++# If you think you need them, please see Bruce Hill, bhill,
++# so we can discuss.
++
++####################################################
++# Where to find and install files for autosave
++
++vpath %.req           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ))
++vpath %.sub-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
++#vpath %.substitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
++vpath %.template      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
++vpath %.tpl-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
++
++INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
++
++include $(CONFIG)/CONFIG_APP_INCLUDE
++
++####################################################
++# Autosave Flags (-I path)
++define  AUTOSAVE_DIRS_template
++  RELEASE_AUTOSAVE_DIRS += $$(wildcard $$(strip $$($(1)))/autosave)
++endef
++$(foreach top, $(RELEASE_TOPS), $(eval $(call AUTOSAVE_DIRS_template,$(top)) ))
++AUTOSAVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_AUTOSAVE) $(TOP)/autosave $(RELEASE_AUTOSAVE_DIRS)
++AUTOSAVE_INCLUDES  = $(addprefix -I, $(AUTOSAVE_SEARCH_DIRS))
++AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) $(AUTOSAVE_INCLUDES)
++
++####################################################
++# Generate COMMON_REQS list
++COMMON_REQS  += $(filter $(COMMON_DIR)/%, $(foreach file, $(REQ), \
++	$(firstword $(SOURCE_REQ) $(COMMON_DIR)/$(file) ) ) )
++SOURCE_REQ = $(wildcard $(file) $(SOURCE_REQ_bbb) )
++SOURCE_REQ_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_REQ_aaa)  )
++SOURCE_REQ_aaa = $(addsuffix /$(file), $(dir) )
++INSTALL_REQS += $(addprefix $(INSTALL_AUTOSAVE)/, $(notdir $(REQ)))
++
++####################################################
++# Generate REQ_DEPENDS_FILES list
++REQDEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_REQS)))
++
++####################################################
++# Build targets
++
++build:		$(INSTALL_REQS)
++
++install:	$(INSTALL_REQS)
++
++rebuild:        clean install
++
++buildInstall:	build
++
++realclean: clean
++
++clean: autosave_clean
++
++autosave_clean:
++	@$(RM) $(COMMONS)
++	@$(RM) $(TARGETS)
++	@echo "Cleaning"
++
++####################################################
++# Build and install Rules
++
++$(COMMON_DIR)/%.req: %.sub-req
++	@$(RM) $(notdir $@)$(DEP)
++	$(MKMF) -m$(notdir $@)$(DEP) $(AUTOSAVE_INCLUDES) $@ $< 
++	$(ECHO) "Inflating autosave request from $<"
++	@$(RM) $@ msi.tmp
++	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
++	$(MV) msi.tmp $@
++
++
++INSTALL = $(PERL) $(TOOLS)/installEpics.pl
++
++$(INSTALL_AUTOSAVE)/%: $(COMMON_DIR)/%
++	@echo "Installing autosave file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_AUTOSAVE)/%.req:	%.req  
++	@echo "Installing autosave file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_AUTOSAVE)/%.sub-req:	%.sub-req  
++	@echo "Installing autosave file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++#.PRECIOUS: $(COMMON_DIR)/%.req
++
++#$(INSTALL_AUTOSAVE)/%.substitutions: %.substitutions
++#	@echo "Installing autosave substitutions file $@"
++#	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_AUTOSAVE)/%.sub-req: %.sub-req
++	@echo "Installing autosave substitutions file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++#.PRECIOUS: $(COMMON_DIR)/%.substitutions
++
++$(INSTALL_AUTOSAVE)/%.template: %.template
++	@echo "Installing autosave template file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++$(INSTALL_AUTOSAVE)/%.tpl-req: %.tpl-req
++	@echo "Installing autosave template file $@"
++	@$(INSTALL) -d -m 644 $< $(@D)
++
++#.PRECIOUS: $(COMMON_DIR)/%.template
++
++#####################################################
++# Include autosave dependency files
++ifneq (,$(strip $(REQDEPENDS_FILES)))
++-include $(REQDEPENDS_FILES)
++endif
++
+diff --git a/configure/RULES.copy b/configure/RULES.copy
+new file mode 100644
+index 0000000..24d68b8
+--- /dev/null
++++ b/configure/RULES.copy
+@@ -0,0 +1,105 @@
++# Make rules to copy files into a specific subdirectory in the
++# INSTALL_LOCATION.  Useful for files that are relevant to a
++# particular version of an IOC but aren't built or modified during the
++# make process.  Examples might be EDM files, ASYN protocol files,
++# autosave definition files, IOC startup files, etc.
++
++# Author: Jason Tiller
++
++# Do nothing if the caller hasn't set the required variables.
++files_set=$(if $(COPY_FILES),1,0)
++subdir_set=$(if $(COPY_SUBDIR),1,0)
++ifeq ($(files_set)$(subdir_set),11)
++
++# Display how this makefile was called.
++$(info RULES.copy: '$(MAKECMDGOALS)')
++
++# For the standard development build, the 'INSTALL_LOCATION' is just
++# the current directory.  For some directory structures, they only
++# want to be copied if the INSTALL_LOCATION is different from the
++# package's TOP directory.  An IOC's iocBoot directory is an example -
++# because it hangs off the TOP directory, installing to itself would
++# make no sense and would actually be destructive when 'make clean' is
++# called.  In this case, only when the INSTALL_LOCATION is different
++# do we want to do anything.
++
++# This makefile is configured by three make variables that should be
++# set before this file is included:
++
++# COPY_ONLY_IF_NON_LOCAL
++#    Define this if you only want the install/clean operation to occur
++#    IF the installation directory is different from the IOC's <top>
++#    source directory.
++
++# COPY_SUBDIR
++#    Set this to the target directory where your files should be
++#    copied.  This is relative to INSTALL_LOCATION.
++
++# COPY_FILES
++#    Set this to the list of files, space-separated, that you want to
++#    have copied into COPY_SUBDIR.
++
++# Add 'include RULES.copy' to bottom of Makefile in the source
++# directory after setting the 'COPY_{SUBDIR,FILES}' variables and
++# optionally setting the 'COPY_ONLY_...' flag.
++
++INSTALL_DIR   := $(INSTALL_LOCATION)/$(COPY_SUBDIR)
++INSTALL_FILES := $(addprefix $(INSTALL_DIR)/,$(notdir $(COPY_FILES)))
++
++all: install
++
++rebuild: clean install
++
++INSTALL = $(PERL) $(TOOLS)/installEpics.pl
++
++# If the source makefile doesn't set this, we'll always perform the
++# copy/clean operation, regardless of installation directory.
++ifndef COPY_ONLY_IF_NON_LOCAL
++
++install: $(INSTALL_FILES)
++
++buildInstall: $(INSTALL_FILES)
++
++$(INSTALL_FILES): $(COPY_FILES)
++	@echo "RULES.copy: Installing $(?F) -> $(INSTALL_DIR)"
++	@$(INSTALL) -d -m 644 $? $(INSTALL_DIR)
++
++clean:
++	@echo RULES.copy: Cleaning $(INSTALL_DIR)
++	rm -rf $(INSTALL_DIR)
++
++else
++
++# If the flag is set, then we look at the install location.
++ifeq ($(patsubst $(TOP),,$(INSTALL_LOCATION)),)
++
++# We're installing locally, so don't try to copy or respond to clean
++# requests because we might overwrite/delete something important.
++
++install:
++
++else
++
++# The flag was set, but we're not installing locally, so perform the
++# complete operations.
++
++install: $(INSTALL_FILES)
++
++buildInstall: $(INSTALL_FILES)
++
++$(INSTALL_FILES): $(COPY_FILES)
++	@echo "RULES.copy: Installing $(?F) -> $(INSTALL_DIR)"
++	@$(INSTALL) -d -m 644 $? $(INSTALL_DIR)
++
++clean:
++	@echo RULES.copy: Cleaning $(INSTALL_DIR)
++	rm -rf $(INSTALL_DIR)
++
++# endif the flag was set and the install directory is different.
++endif
++
++# endif the flag wasn't set
++endif
++
++# endif both configuration variables weren't set
++endif
+diff --git a/configure/RULES.ioc b/configure/RULES.ioc
+index 1024fcb..77f13d4 100644
+--- a/configure/RULES.ioc
++++ b/configure/RULES.ioc
+@@ -10,25 +10,33 @@
+ 
+ include $(CONFIG)/RULES_DIRS
+ 
+-build$(DIVIDER)$(ARCH) build: buildInstall
+-install$(DIVIDER)$(ARCH) install: buildInstall
+-$(ARCH): buildInstall
++## PCDS moves the buildInstall, envPaths and other targets from
++## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
++## be configured w/ or w/o RULES_DIRS
++include $(CONFIG)/RULES.ioc-targets
+ 
+-ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
+-    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
++## PCDS rules for building archive and autosave files in ioc directories.
++## These rules are needed to install autosave and archive files
++## from IOC directories whose Makefile's end like this:
++## include $(CONFIG)/RULES.ioc
++## -include $(CONFIG)/RULES.archive
++## -include $(CONFIG)/RULES.autosave
++##
++## However, the following style of Makefile works better as it creates
++## O.Common and other O.* directories as needed for proper dependency checking
++## include $(CONFIG)/RULES
++## include $(CONFIG)/RULES.ioc-targets
++## 
+ 
+-    clean$(DIVIDER)$(ARCH) clean:
+-	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
+-else
+-    buildInstall$(DIVIDER)$(ARCH) buildInstall:
+-    clean$(DIVIDER)$(ARCH) clean:
+-endif
+-
+-cdCommands envPaths dllPath.bat relPaths.sh: \
+-    $(wildcard $(TOP)/configure/RELEASE*) \
+-    $(wildcard $(TOP)/configure/CONFIG_SITE*) $(INSTALL_BIN)
+-	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
+-
+-realclean:
+-	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
++$(INSTALL_ARCHIVE)/%.archive: %.sub-arch
++	@echo "Inflating ioc archive file from $<"
++	@$(RM) $@
++	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
++	$(MV) msi.tmp $@
++	
++$(INSTALL_AUTOSAVE)/%.req: %.sub-req
++	@echo "Inflating ioc autosave file from $<"
++	@$(RM) $@ msi.tmp
++	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
++	$(MV) msi.tmp $@
+ 
+diff --git a/configure/RULES.ioc-targets b/configure/RULES.ioc-targets
+new file mode 100644
+index 0000000..9a6ae7b
+--- /dev/null
++++ b/configure/RULES.ioc-targets
+@@ -0,0 +1,47 @@
++#*************************************************************************
++# Copyright (c) 2002 The University of Chicago, as Operator of Argonne
++#     National Laboratory.
++# Copyright (c) 2002 The Regents of the University of California, as
++#     Operator of Los Alamos National Laboratory.
++# EPICS BASE Versions 3.13.7
++# and higher are distributed subject to a Software License Agreement found
++# in file LICENSE that is included with this distribution. 
++#*************************************************************************
++#RULES.ioc-targets
++# This file contains targets needed in IOC instance directories
++
++$(ARCH): build
++
++##########################################
++ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
++	build$(DIVIDER)$(ARCH)        build: $(TARGETS)
++    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
++	install$(DIVIDER)$(ARCH)      install: $(TARGETS)
++	clean$(DIVIDER)$(ARCH)        clean: ioc-targets_clean
++else
++	build$(DIVIDER)$(ARCH)        build:
++    buildInstall$(DIVIDER)$(ARCH) buildInstall:
++	install$(DIVIDER)$(ARCH)      install:
++    clean$(DIVIDER)$(ARCH)        clean:
++endif
++
++cdCommands envPaths dllPath.bat relPaths.sh: \
++    $(wildcard $(TOP)/configure/RELEASE*) \
++    $(wildcard $(TOP)/configure/CONFIG*) \
++ifeq ($(IOC_APPL_TOP),)
++ifeq ($(IOCS_APPL_TOP),)
++	$(CONVERTRELEASE) -a $(ARCH) $@
++else
++	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
++endif
++else
++	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
++endif
++
++realclean: ioc-targets_clean
++
++ioc-targets_clean:
++	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
++
++##########################################
++##########################################
+diff --git a/configure/RULES_ARCHS b/configure/RULES_ARCHS
+index 5dd343f..dc9c5cd 100644
+--- a/configure/RULES_ARCHS
++++ b/configure/RULES_ARCHS
+@@ -17,40 +17,44 @@ ACTIONS += build
+ ACTIONS += install
+ ACTIONS += buildInstall
+ ACTIONS += browse
+-ACTIONS += runtests tapfiles
++ACTIONS += runtests
+ #ACTIONS += rebuild
+ 
+-actionArchTargets = $(foreach action, $(ACTIONS), \
+-    $(foreach arch, $(BUILD_ARCHS), \
+-        $(action)$(DIVIDER)$(arch)))
++actionPart = $(word 1, $(subst $(DIVIDER), ,$@))
++archPart = $(word 2, $(subst $(DIVIDER), ,$@))
+ 
+-cleanArchTargets = $(foreach arch, $(BUILD_ARCHS), \
+-    clean$(DIVIDER)$(arch))
++actionArchTargets = $(foreach x, $(ACTIONS),\
++		$(foreach arch,$(BUILD_ARCHS), $(x)$(DIVIDER)$(arch)))
+ 
+-buildDirs = $(addprefix O.,$(BUILD_ARCHS))
++cleanArchTargets = $(foreach arch,$(BUILD_ARCHS), clean$(DIVIDER)$(arch))
+ 
+-# Include <top>/cfg/DIR_RULES* files from tops defined in RELEASE* files
+-# Do this here so they can add ACTIONS
+-#
+-RELEASE_CFG_DIR_RULES = $(foreach top, $(RELEASE_TOPS), \
+-    $(wildcard $($(top))/cfg/DIR_RULES*))
+-ifneq ($(RELEASE_CFG_DIR_RULES),)
+-  include $(RELEASE_CFG_DIR_RULES)
+-endif
++buildDirs = $(addprefix O.,$(BUILD_ARCHS))
+ 
+-# Create EPICS_HOST_ARCH dependancies for GNU make -j option.
++#*************************************************************************
++# PCDS Change: Only generate these dependencies if we're building $EPICS_HOST_ARCH
++ifeq ($(filter $(EPICS_HOST_ARCH),$(BUILD_ARCHS)),$(EPICS_HOST_ARCH))
++# Create epics_host_arch dependancies for GNU make -j option
++# Only works with GNU make 3.81 or later (uses eval function)
+ # Needed in dirs where EPICS_HOST_ARCH build creates a tool used in 
+ # cross arch builds
+ 
+ CROSS_ARCHS += $(CROSS1) $(CROSS2)
+ 
++# j is NOT found in MAKEFLAGS when using make 3.81
++# Hope to uncomment this for GNU make 3.82
++#ifeq ($(findstring j,$(MAKEFLAGS)),j)
++
+ define DEP_template
+ $(2): $$(EPICS_HOST_ARCH)
+ $(1)$$(DIVIDER)$(2): $(1)$$(DIVIDER)$$(EPICS_HOST_ARCH) O.$(2)
+ endef
+-$(foreach action, $(ACTIONS), \
+-    $(foreach arch, $(CROSS_ARCHS), \
+-        $(eval $(call DEP_template,$(action),$(arch)))))
++
++$(foreach action, $(ACTIONS), $(foreach arch,\
++      $(CROSS_ARCHS),$(eval $(call DEP_template,$(action),$(arch)))))
++
++endif
++
++#*************************************************************************
+ 
+ # Allows rebuild to work with parallel builds option, -j.
+ ifeq (rebuild,$(filter rebuild,$(MAKECMDGOALS)))
+@@ -58,11 +62,8 @@ $(buildDirs) O.Common : clean
+ rebuild: install
+ endif
+ 
+-archPart = $(word 2, $(subst $(DIVIDER), ,$@))
+-actionPart = $(word 1, $(subst $(DIVIDER), ,$@))
+ $(actionArchTargets) : $(buildDirs) O.Common
+-	$(MAKE) -C O.$(archPart) -f ../Makefile TOP=$(TOP)/.. \
+-	    T_A=$(archPart) $(actionPart)
++	$(MAKE) -C O.$(archPart) -f ../Makefile TOP=$(TOP)/.. T_A=$(archPart) $(actionPart)
+ 
+ $(BUILD_ARCHS) : % : O.% O.Common
+ 	$(MAKE) -C O.$@ -f ../Makefile TOP=$(TOP)/.. T_A=$@
+@@ -75,18 +76,21 @@ $(buildDirs):
+ O.Common:
+ 	$(MKDIR) O.Common
+ 
+-# Clean rules
+ #
+-clean ::
++# special clean rule
++#
++clean : archs_common_clean
++
++archs_common_clean:
+ 	$(RMDIR) $(addprefix O.,$(BUILD_ARCHS)) O.Common
+ 
+-archclean ::
++archclean :
+ 	$(RMDIR) $(addprefix O.,$(BUILD_ARCHS))
+ 
+-$(cleanArchTargets) ::
++$(cleanArchTargets) :
+ 	$(RMDIR) O.$(archPart)
+ 
+-realclean ::
++realclean :
+ 	$(RMDIR) O.*
+ 
+ .PHONY : $(actionArchTargets)
+@@ -94,6 +98,3 @@ realclean ::
+ .PHONY : $(BUILD_ARCHS) rebuild
+ .PHONY : $(ACTIONS) clean realclean archclean all
+ 
+-#  User specific rules
+-#
+--include $(HOME)/configure/RULES_USER
+diff --git a/configure/RULES_BUILD b/configure/RULES_BUILD
+index c0e1ffb..0d06618 100644
+--- a/configure/RULES_BUILD
++++ b/configure/RULES_BUILD
+@@ -71,6 +71,10 @@ all:	install
+ 
+ -include $(CONFIG)/RULES.Db
+ 
++-include $(CONFIG)/RULES.autosave
++
++-include $(CONFIG)/RULES.archive
++
+ -include $(CONFIG)/RULES_JAVA
+ 
+ ifneq (,$(strip $(HDEPENDS_FILES)))
+@@ -96,8 +100,6 @@ ifneq (,$(strip $(TESTS)))
+ TARGETS += testspec
+ endif
+ 
+-TAPFILES += $(TESTSCRIPTS:.t=.tap)
+-
+ #---------------------------------------------------------------
+ #   Libraries 
+ #
+@@ -139,13 +141,14 @@ buildInstall : \
+ 	$(INSTALL_TEMPLATE) \
+ 	$(INSTALL_BIN_INSTALLS)
+ 
+-clean::
++clean : build_clean
++
++build_clean :
+ 	$(ECHO) "Cleaning"
+ 	@$(RM) *.i *$(OBJ) *.a $(TESTPRODNAME) $(LIBNAME) $(SHRLIBNAME) \
+ 	$(INC) $(TARGETS) $(DLL_LINK_LIBNAME) $(TDS) \
+ 	*.out MakefileInclude  $(LOADABLE_SHRLIBNAME) *.manifest *.exp \
+-	$(COMMON_INC) $(HDEPENDS_FILES) $(PRODTARGETS) \
+-	$(TESTSCRIPTS) $(TAPFILES)
++	$(COMMON_INC) $(HDEPENDS_FILES) $(PRODTARGETS) $(TESTSCRIPTS)
+ ifdef RES
+ 	@$(RM) *$(RES)
+ endif
+@@ -198,23 +201,17 @@ $(OBJLIBNAME):%$(OBJ):
+ 	@$(RM) $@
+ 	$(COMPILE.ctdt) $<
+ 
+-# Cancel GNUMake's built-in rules, which don't have our _INC
+-# dependencies so could get used in some circumstances (gdd)
+-%.o : %.c
+-%.o : %.cc
+-%.o : %.cpp
+-
+-%$(OBJ): %.c $(COMMON_INC) $(INSTALL_INC)
++%$(OBJ): %.c
+ 	@$(HDEPENDS_CMD)
+ 	@$(RM) $@
+ 	$(COMPILE.c) $(call PATH_FILTER,$<) $(COMPILE_FILTER.c)
+ 
+-%$(OBJ): %.cc $(COMMON_INC) $(INSTALL_INC)
++%$(OBJ): %.cc
+ 	@$(HDEPENDS_CMD)
+ 	@$(RM) $@
+ 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
+ 
+-%$(OBJ): %.cpp $(COMMON_INC) $(INSTALL_INC)
++%$(OBJ): %.cpp
+ 	@$(HDEPENDS_CMD)
+ 	@$(RM) $@
+ 	$(COMPILE.cpp) $(call PATH_FILTER,$<) $(COMPILE_FILTER.cpp)
+@@ -331,12 +328,6 @@ $(OBJLIB_MUNCHNAME):%.munch : %_ctdt$(OBJ) %$(OBJ)
+ 	@$(RM) $@
+ 	$(MUNCH_CMD)
+ 
+-# GeSys modules for RTEMS
+-$(MODNAME): %$(MODEXT): %$(EXE)
+-	@echo "Building module $@"
+-	@$(RM) $@
+-	$(LINK.mod)
+-
+ runtests: $(TESTSCRIPTS)
+ 	-$(PERL) -MTest::Harness -e 'runtests @ARGV if @ARGV;' $^
+ 
+@@ -347,22 +338,16 @@ testspec: $(TESTSCRIPTS)
+ 	$(if $^, @echo Tests: $^ >> $@)
+ 	$(if $(TESTSPEC_$(OS_CLASS)), @echo "Harness: $(TESTSPEC_$(OS_CLASS))" >> $@)
+ 
+-tapfiles: $(TESTSCRIPTS) $(TAPFILES)
+-
+-# A .tap file is the output from running the associated test script
+-%.tap: %.t
+-	-$(PERL) $< -tap > $@
+-
+ # If there's a perl test script (.plt) available, use it
+ %.t: ../%.plt
+ 	@$(RM) $@
+-	$(CP) $< $@
++	@$(CP) $< $@
+ 
+-# Test programs (.t files) must be written in Perl.
++# Some versions of Test::Harness expect test programs in perl only.
+ # Generate a perl program to exec the real test binary.
+-%.t: %$(EXE) $(TOOLS)/makeTestfile.pl
++%.t: %$(EXE)
+ 	@$(RM) $@
+-	$(PERL) $(TOOLS)/makeTestfile.pl $@ $<
++	@$(PERL) $(TOOLS)/makeTestfile.pl $@ $<
+ 
+ #---------------------------------------------------------------
+ ## Install rules for BIN_INSTALLS and LIB_INSTALLS
+diff --git a/configure/RULES_EXPAND b/configure/RULES_EXPAND
+index 7bc4c86..c0cc24c 100644
+--- a/configure/RULES_EXPAND
++++ b/configure/RULES_EXPAND
+@@ -17,7 +17,9 @@ $(EXPANDED): %: ../%@
+ 	@$(RM) $@
+ 	@$(EXPAND_TOOL) $(EXPANDFLAGS) $($@_EXPANDFLAGS) $< $@
+ 
+-clean::
++clean: expand_clean
++
++expand_clean:
+ 	@$(RM) $(EXPANDED)
+ 
+ endif
+diff --git a/configure/RULES_FILE_TYPE b/configure/RULES_FILE_TYPE
+index e4d459a..46d56d2 100644
+--- a/configure/RULES_FILE_TYPE
++++ b/configure/RULES_FILE_TYPE
+@@ -6,27 +6,27 @@
+ # EPICS BASE is distributed subject to a Software License Agreement found
+ # in the file LICENSE that is included with this distribution.
+ #*************************************************************************
+-#
+ # $Revision-Id$
+ #
+ 
+-# Include <top>/configure/RULES_BUILD from tops defined in RELEASE* files
++#---------------------------------------------------------------
++# Include <top>/configure/RULES_BUILD definitions from tops defined in RELEASE* files
+ #
+-RELEASE_RULES_BUILDS = $(foreach top, $(RELEASE_TOPS), \
+-    $(wildcard $($(top))/configure/RULES_BUILD))
++RELEASE_RULES_BUILDS = $(foreach top, $(RELEASE_TOPS), $(wildcard $($(top))/configure/RULES_BUILD))
+ ifneq ($(RELEASE_RULES_BUILDS),)
+   include $(RELEASE_RULES_BUILDS)
+ endif
+ 
+-# Include <top>/cfg/RULES* files from tops defined in RELEASE* files
++#---------------------------------------------------------------
++# Include <top>/cfg/RULES* definitions from tops defined in RELEASE* files
+ #
+-RELEASE_CFG_RULES = $(foreach top, $(RELEASE_TOPS), \
+-    $(wildcard $($(top))/cfg/RULES*))
++RELEASE_CFG_RULES = $(foreach top, $(RELEASE_TOPS), $(wildcard $($(top))/cfg/RULES*))
+ ifneq ($(RELEASE_CFG_RULES),)
+   include $(RELEASE_CFG_RULES)
+ endif
+ 
+-# If this is not BASE then include <TOP>/configure/RULES_BUILD
++#---------------------------------------------------------------
++# If this is not BASE then include TOP/configure/RULES_BUILD definitions
+ #
+ ifeq ($(wildcard $(TOP)/configure/CONFIG_BASE_VERSION),)
+ TOP_RULES_BUILDS = $(wildcard $(TOP)/configure/RULES_BUILD)
+@@ -35,38 +35,39 @@ ifneq ($(TOP_RULES_BUILDS),)
+ endif
+ endif
+ 
+-# Include our own $(INSTALL_CFG)/RULES* files
++#---------------------------------------------
++# Include our own $(INSTALL_CFG)/RULES* definitions
+ #
+ TOP_CFG_RULES = $(wildcard $(INSTALL_CFG)/RULES*)
+ ifneq ($(TOP_CFG_RULES),)
+   include $(TOP_CFG_RULES)
+ endif
+ 
+-# Rules to install each FILE_TYPE
+-#
++#---------------------------------------------------------------
++
+ define FILE_TYPE_template
+-$(1) += $$(if $$(strip $$($(1)_$(OS_CLASS))), \
+-    $$(subst -nil-,,$$($(1)_$(OS_CLASS))), \
+-    $$($(1)_DEFAULT))
++
++$(1) += $$(if $$(strip $$($(1)_$$(OS_CLASS))),$$(subst -nil-,,$$($(1)_$$(OS_CLASS))), $$($(1)_DEFAULT))
++
+ INSTALLS_$(1) = $$($(1):%=$$(INSTALL_$(1))/%)
+ 
+ $$(INSTALL_$(1))/%: ../%
+ 	$(ECHO) "Installing $(1) file $$@"
+ 	@$$(INSTALL) -d -m  $$(INSTALL_PERMISSIONS) $$< $$(dir $$@)
++
+ $$(INSTALL_$(1))/%: %
+ 	$(ECHO) "Installing $(1) file $$@"
+ 	@$$(INSTALL) -d -m  $$(INSTALL_PERMISSIONS) $$< $$(dir $$@)
+ 
+-buildInstall: $$(INSTALLS_$(1))
++buildInstall : $$(INSTALLS_$(1))
++
+ endef
+-$(foreach type, $(FILE_TYPE), \
+-    $(eval $(call FILE_TYPE_template,$(strip $(type)))))
+ 
+-# Cleaning FILE_TYPE files
+-#
+-clean::
++$(foreach type, $(FILE_TYPE),$(eval $(call FILE_TYPE_template,$(strip $(type)))))
++#---------------------------------------------
++
++clean: file_type_clean
++
++file_type_clean:
+ 	@$(RM) $(foreach type, $(FILE_TYPE), $($(type)))
+ 
+-#  User specific rules
+-#
+--include $(HOME)/configure/RULES_USER
+diff --git a/configure/RULES_JAVA b/configure/RULES_JAVA
+index 9b05f42..ab7d26f 100644
+--- a/configure/RULES_JAVA
++++ b/configure/RULES_JAVA
+@@ -103,7 +103,9 @@ build:  $(COMMON_TESTCLASSES)
+ buildInstall : $(INSTALL_JAR) $(INSTALL_JAVADOC)
+ 
+ #This clean works only from O.* dirs.
+-clean:: 
++clean: java_clean
++
++java_clean:
+ 	@$(RMDIR) $(INSTALL_CLASSES) $(PACKAGEDIRS)
+ 	@$(RM) $(INSTALL_JAR) $(INSTALL_JAVADOC)
+ 	@$(RM) $(COMMON_TESTCLASSES) $(COMMON_JAVAINC)
+diff --git a/configure/RULES_OCTAVE b/configure/RULES_OCTAVE
+index 149944b..6e3fdb3 100644
+--- a/configure/RULES_OCTAVE
++++ b/configure/RULES_OCTAVE
+@@ -32,7 +32,7 @@ endef
+ $(foreach file, $(OCTAVES),$(eval $(call OCTAVES_template,$(strip $(file)))))
+ 
+ #This clean works from O.* dirs.
+-clean:: 
++clean: 
+ 	@$(RM) *.mex *.m
+ 
+ .PRECIOUS: *.m *.mex
+diff --git a/configure/RULES_TOP b/configure/RULES_TOP
+index 1898f59..a8a12c5 100644
+--- a/configure/RULES_TOP
++++ b/configure/RULES_TOP
+@@ -22,8 +22,16 @@ realuninstall: uninstallDirs
+ 	$(RMDIR) $(INSTALL_LOCATION_BIN)
+ 	$(RMDIR) $(INSTALL_LOCATION_LIB)
+ 
+-UNINSTALL_DIRS += $(INSTALL_DBD) $(INSTALL_INCLUDE) $(INSTALL_DOC) \
+-    $(INSTALL_HTML) $(INSTALL_JAVA) $(INSTALL_TEMPLATES) $(INSTALL_DB)
++UNINSTALL_DIRS += $(INSTALL_ARCHIVE)
++UNINSTALL_DIRS += $(INSTALL_AUTOSAVE)
++UNINSTALL_DIRS += $(INSTALL_CFG)
++UNINSTALL_DIRS += $(INSTALL_DB)
++UNINSTALL_DIRS += $(INSTALL_DBD)
++UNINSTALL_DIRS += $(INSTALL_DOC)
++UNINSTALL_DIRS += $(INSTALL_HTML)
++UNINSTALL_DIRS += $(INSTALL_INCLUDE)
++UNINSTALL_DIRS += $(INSTALL_JAVA)
++UNINSTALL_DIRS += $(INSTALL_TEMPLATES)
+ UNINSTALL_DIRS += $(DIRECTORY_TARGETS)
+ uninstallDirs:
+ 	$(RMDIR) $(UNINSTALL_DIRS)
+@@ -37,6 +45,11 @@ uninstall$(DIVIDER)%:
+ 	$(RMDIR) $(INSTALL_LOCATION_BIN)/$(archPart)
+ 	$(RMDIR) $(INSTALL_LOCATION_LIB)/$(archPart)
+ 
++archPart = $(word 2, $(subst $(DIVIDER), ,$@))
++uninstall$(DIVIDER)%:
++	$(RMDIR) $(INSTALL_LOCATION_BIN)/$(archPart)
++	$(RMDIR) $(INSTALL_LOCATION_LIB)/$(archPart)
++
+ cleandirs:
+ 	@$(NOP)
+ ifeq ($(wildcard $(INSTALL_LOCATION_BIN)/*),)
+diff --git a/configure/os/CONFIG.unsupported.Common b/configure/os/CONFIG.unsupported.Common
+new file mode 100644
+index 0000000..5c1fd96
+--- /dev/null
++++ b/configure/os/CONFIG.unsupported.Common
+@@ -0,0 +1 @@
++$(error Unsupported architecture or undefined variable EPICS_HOST_ARCH)
