@@ -42,6 +42,7 @@
 #	DST for 2020  US: Mar 08 - Nov 01
 #	              EU: Mar 29 - Oct 25
 #	DST for 2021  US: Mar 14 - Nov 07
+#	              EU: Mar 29 - Oct 25
 #	              EU: Mar 28 - Oct 31
 #	(see: http://www.timeanddate.com/time/dst/2016.html etc. )
 #
@@ -50,9 +51,8 @@
 EPICS_TIMEZONE=PUS::480:031302:110602
 #EPICS_TIMEZONE=CET/CEST::-60:032702:103002
 
-# EPICS_TS_NTP_INET
 #	NTP time server ip address.  Uses boot host if not set.
-EPICS_TS_NTP_INET=
+# EPICS_TS_NTP_INET
 
 # IOC Shell:
 # IOCSH_PS1
@@ -60,7 +60,7 @@ EPICS_TS_NTP_INET=
 # IOCSH_HISTSIZE
 #	Number of lines of command history to keep.
 IOCSH_PS1="epics> "
-IOCSH_HISTSIZE=50
+IOCSH_HISTSIZE=100
 
 # Log Server:
 # EPICS_IOC_LOG_INET 
