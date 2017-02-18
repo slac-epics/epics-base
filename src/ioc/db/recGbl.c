@@ -285,11 +285,14 @@ void recGblTSELwasModified(struct link *plink)
         errlogPrintf("recGblTSELwasModified called for non PV_LINK\n");
         return;
     }
-    /*If pvname ends in .TIME then just ask for VAL*/
-    /*Note that the VAL value will not be used*/
+    /* pvname must end in .TIME to be recognized as a TSEL time link,
+     * however, we then strip it to make field default to VAL
+     * and set the pvlMask to mark it as a TSEL time link */
     pfieldname = strstr(ppv_link->pvname, ".TIME");
     if (pfieldname) {
         *pfieldname = 0;
+        /* When this TSELisTime flag is set, the VAL field will not be fetched
+         * Instead we'll call dbGetTimeStamp() to just copy the timestamp */
         ppv_link->pvlMask |= pvlOptTSELisTime;
     }
 }
