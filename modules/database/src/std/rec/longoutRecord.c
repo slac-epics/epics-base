@@ -159,6 +159,10 @@ static long process(struct dbCommon *pcommon)
         recGblGetTimeStampSimm(prec, prec->simm, NULL);
     }
 
+    if ( prec->tpro >= 2 )
+        printf( "%s: Process %s, val %d\n",
+                epicsThreadGetNameSelf(), prec->name, prec->val );
+
     /* check for alarms */
     checkAlarms(prec);
 
