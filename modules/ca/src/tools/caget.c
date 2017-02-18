@@ -60,7 +60,8 @@ static void usage (void)
     "  -V: Version: Show EPICS and CA versions\n"
     "Channel Access options:\n"
     "  -w <sec>: Wait time, specifies CA timeout, default is %f second(s)\n"
-    "  -c: Asynchronous get (use ca_get_callback and wait for completion)\n"
+    "  -c: Asynchronous get (default, uses ca_array_get_callback and waits for completion)\n"
+    "  -G: Synchronous  get (use ca_array_get, no dynamic array sizing)\n"
     "  -p <prio>: CA priority (0-%u, default 0=lowest)\n"
     "Format options:\n"
     "      Default output format is \"name value\"\n"
@@ -379,7 +380,7 @@ int main (int argc, char *argv[])
     int n;
     int result;                 /* CA result */
     OutputT format = plain;     /* User specified format */
-    RequestT request = get;     /* User specified request type */
+    RequestT request = callback;/* User specified request type */
     IntFormatT outType;         /* Output type */
 
     int count = 0;              /* 0 = not specified by -# option */
@@ -394,7 +395,7 @@ int main (int argc, char *argv[])
 
     use_ca_timeout_env ( &caTimeout);
 
-    while ((opt = getopt(argc, argv, ":taicnhsSVe:f:g:l:#:d:0:w:p:F:")) != -1) {
+    while ((opt = getopt(argc, argv, ":taiGcnhsSVe:f:g:l:#:d:0:w:p:F:")) != -1) {
         switch (opt) {
         case 'h':               /* Print usage */
             usage();
@@ -407,6 +408,9 @@ int main (int argc, char *argv[])
             break;
         case 'a':               /* Wide output mode */
             complainIfNotPlainAndSet(&format, all);
+            break;
+        case 'G':               /* Synchronous mode */
+            request = get;
             break;
         case 'c':               /* Callback mode */
             request = callback;
