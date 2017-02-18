@@ -1,57 +1,124 @@
-# ==============================================================================================================
-# Documenting changes that happen locally here at SLAC
-# Naming Convention: base-<community_version_string>-x.y.z
-# x.y.z; major, minor, bug fix locally respectively
-# Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
-# ==============================================================================================================
-R3.15.5-0.2:	New linuxRT buildroot version?
-				Replaced 3 prior patches w/ new lcls-build-support.patch based on final set of changes.
-				?, 1/?/2017
+#
+# RELEASE_NOTES for EPICS BASE
+#
+# Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
+#           before each release
+#
+R3.15.5-2.0?	Bruce Hill	2017-02-01
+	Built from merge of R3.14.12.5-2.branch into R3.15.5-0.branch
 
-R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
-               Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
-               Add comment for HOST Build:
-               # rhel6-x86_64           (GNU compiler used for host builds)
+R3.15.5-0.1:	Hugo Slepicka	2017-01-16
+	Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
+	Added all LCLS-II cross-compile targets and host architectures
 
-               Add Comments for SLAC added CROSS Builds:
-               # linuxRT-x86_64 (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
-               # linuxRT-i686   (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
-               # linuxRT-arm_zynq (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+R3.14.12.5-2.1	Bruce Hill 2017-01-05
+	Built from R3.14.12.5-2.branch which was derived from tag R3.14.12.5 on the github-3.14 branch.
+	Primary changes from R3.14.12.4 to R3.14.12.5
+		aoRecord raw converion overflow fix
+		Back-ported dbLoadRecordsHook from the 3.15 branch
+		Fix buffer overflow in epicsStrnRawFromEscaped()
+		epicsString.h comparison functions fixed
+		gdd: Fix crash issue when copying array q/ zero elements
+	For more details on collaboration fixes in R3.14.12.5, see documentation/RELEASE_NOTES.html
 
-               For LCLS II and LCLS 1 Mission Readiness, we build the following targets:
-                -- CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq \
-                                           RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
-               Use POSIX thread priority scheduling
-               Build both shared and static libraries
-                -- EPICS BASE executables/binaries are built statically to support a production deployment scheme
-               Always build with debug symbols even in production image
-               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
+	Then the pcds-trunk branch (from svn) was decomposed into the patches shown below
+	which were applied to R3.14.12.5 to create this release
 
-               Modified "CONFIG_SITE_ENV" to prepare EPICS_TIMEZONE for Pacific Timezone.
-               Added new config files to <>/configure/os  directory to support HOST build for rhel6
-                   CONFIG.Common.rhel6-x86_64
-                   CONFIG.Common.rhel6-x86_64-debug
-                   CONFIG.rhel6-x86_64-debug.Common
-                   CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
-                   CONFIG.rhel6-x86_64.Common
-                   CONFIG.rhel6-x86_64.rhel6-x86_64
-                   CONFIG.rhel6-x86_64.rhel6-x86_64-debug
-                   CONFIG_SITE.Common.rhel6-x86_64
-                   CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
-                   CONFIG_SITE.rhel6-x86_64.Common
-                   CONFIG_SITE.rhel6-x86_64.RTEMS
-                   CONFIG_SITE.rhel6-x86_64.UnixCommon
-                   CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-68040
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
-               Added new config files to <>/configure/os  directory to support linuxRT CROSS builds: 
-                   CONFIG.Common.linuxRT-arm_zynq
-                   CONFIG_SITE.Common.linuxRT-arm_zynq
-                   CONFIG.Common.linuxRT-i686
-                   CONFIG_SITE.Common.linuxRT-i686
-                   CONFIG.Common.linuxRT-x86_64
-                   CONFIG_SITE.Common.linuxRT-x86_64
+	Includes the following patches:
+		pcds-RTEMS-support.patch
+			SLAC PCDS modifications for RTEMS build support
+		pcds-RTEMS-support2.patch
+			More SLAC PCDS modifications for RTEMS build support
+		linuxRT-build-support.patch
+			SLAC PCDS modifications for linuxRT build support
+		rhel6-rhel7-build-support.patch
+			SLAC PCDS modifications for rhel6 and rhel7 build support
+		add-msi1.6-to-base-w-CONFIG_BASE.patch
+			Adding msi 1.6 so we can build EPICS w/o needing msi in our PATH
+		pcds-config-site.patch
+			PCDS site configuration
+		aSubTimeStamp.patch
+			Makes aSub record's update their timestamp before processing their output links.
+			Needed for proper timestamp propagation in areaDetector templates and plugins.
+		timestamp-before-writing-output.patch
+			Update timestamps in ao, aao, bo, calcout, longout, mbboDirect, mbbo, and stringout records before writing output values.
+			Fixes timing errors when downstream records inherit timestamps via TSEL
+		gdd-free-list-race.patch
+			Fixes race condition in gdd when returning a DD object to the free list.
+		OSDThread.patch
+			Adds some code to the POSIX OSDThread once function to memlock all if the appropriate limits are set
+		db_get_field_and_count.patch
+			Fixes Launchpad bug 1581212, race condition in db_get_field_and_count().
+		perl-makeBaseApp-features.patch
+			PCDS enhancements to makeBaseApp:
+				-d option for diagnostic output
+				-r to specify _IOCPVROOT_ PV prefix
+			Add support for _APPNAME_Screens to create custom screens directories
+			Do global substitution for _APPNAME_, _APPTYPE_, ... so they can appear more than once per line
+			Add support for install files in TOP
+			Force iocBoot/ioc-name directories to begin w/ ioc-
+			Allow _APPNAME_Lib directory for modules in contrast to _APPNAME_App for ioc apps
+			Makes startup scripts executable Misc diagnostics
+		pcds-makeBaseApp-templates.patch
+			Install PCDS makeBaseApp templates
+		readline_ncurses.patch
+			Use READLINE_NCURSES for linux redhat targets.
+		convertRelease-diag.patch
+			Adds a debug option, -d, to convertRelease.pl
+			Was quite usefull when debugging our templated ioc builds which build w/ a local TOP and a parent IOC_TOP.
+		rules-ioc-archive-autosave-templated.patch
+			Adds support for building archive and autosave request files
+			New file suffixes and INSTALL locations:		*.tpl-arch:	
+			Templates for archive request files:			*.sub-arch:
+			Substitution files for archive request files:	*.archive:
+			Archive request files TOP/archive
+			Default install location
+		caget-dynamic-array.patch
+			Made asynchronous ca_array_get_callback the default for caget, thus supporting dynamic array sizing.
+			Added -G option to force synchronous fetch w/o dynamic arrays.
+		active-scan-count-exceeded-error-msg.patch
+			Show more helpful msgs for active scan count exceeded.
+		assert-abort-not-suspend.patch
+			An unhandled exception will abort the process instead of suspending the thread.
+			Thus, procServ restarts the ioc instead of leaving it crippled.
+		epics-thread-show-linux-pids.patch
+			Show linux PID instead of pthreads in epicsThreadShowAll
+		non-rt-thread-priority-zero.patch
+			Fix bug Mike found w/ default 0 priority when thread is non-RT and can't be set less than 1.
+		string-record-strncpy.patch
+			Protect against buffer overruns
+		db-tpro-show-values.patch
+			to show record VAL fields for tpro >= 2
+		ca-sizes-in-error-msgs.patch
+			to show data size vs max size in CA error msgs
+		new-host-arch-names.patch
+			to update startup/EpicsHostArch scripts
+		pv-name-in-ca-error-msgs.patch
+			Modified CA error msgs for invalid pv types to include the PV name.
+		mkmf-db-dep-for-sub-arch.patch
+			Extended the new db dependency fixes using mkmf.pl to also work for our *.sub-{db,tpl,arch} files.
+		readRelease-diags.patch
+			Improved user diagnostics for readRelease perl module
+		convertRelease-typo.patch
+			Fixed typo in rule for convertRelease envPaths
+		pcds-gitignore.patch
+			Adding a .gitignore file from pcds-trunk branch.
+		tsel-implementation-comments.patch
+			Improved comments re how TSEL links are implemented.
+		only-one-ca-no-write-access-error-msg.patch2
+			Added another ck to suppress error msg spewing
+		only-one-ca-no-write-access-error-msg.patch
+			Add tests for sevr already INVALID before issuing recGbl link errors to avoid spewing msgs endlessly to the console
+		dbCaHasWriteAccess.patch
+			Added new methods dbCaHasReadAccess() and dbCaHasWriteAccess() to 
+			dbCa.c and dbCa.h following the pattern of the current dbCaIsConnected().
+			Modified error messages in db/dbAccess.c to check for CA read and
+			write access in order to set the record status to READ_ACCESS_ALARM
+			or WRITE_ACCESS_ALARM as appropriate.
+		dst2016.patch
+			Fix 2016 DST dates
+		startup-EpicsHostArch.patch
+			Use startup/EpicsHostArch instead of startup/EpicsHostArch.pl to determine EPICS_HOST_ARCH.
 
-               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
-
+Release Notes for R3.14.12.5-2.0: bhill Oct 20, 2016
+		This release is deprecated as it only has some of the patches listed above.
