@@ -195,6 +195,10 @@ static long process(struct dbCommon *pcommon)
                 }
 		if(!status) convert(prec, value);
 		prec->udf = isnan(prec->val);
+
+		/* Update the timestamp before writing output values so it
+		 * will be uptodate if any downstream records fetch it via TSEL */
+		recGblGetTimeStamp(prec);
 	}
 
 	if ( prec->tpro >= 2 )
@@ -232,7 +236,10 @@ static long process(struct dbCommon *pcommon)
 	if ( !pact && prec->pact ) return(0);
 	prec->pact = TRUE;
 
-	recGblGetTimeStamp(prec);
+	if ( pact ) {
+		/* Update timestamp again for asynchronous devices */
+		recGblGetTimeStamp(prec);
+	}
 
 	/* check event list */
 	monitor(prec);

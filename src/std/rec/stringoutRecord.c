@@ -152,6 +152,10 @@ static long process(struct dbCommon *pcommon)
                 recGblSetSevr(prec,UDF_ALARM,prec->udfs);
         }
 
+	/* Update the timestamp before writing output values so it
+	 * will be uptodate if any downstream records fetch it via TSEL */
+	recGblGetTimeStamp(prec);
+
         if (prec->nsev < INVALID_ALARM )
                 status=writeValue(prec); /* write the new value */
         else {
@@ -178,7 +182,12 @@ static long process(struct dbCommon *pcommon)
 	if ( !pact && prec->pact ) return(0);
 
 	prec->pact = TRUE;
-	recGblGetTimeStamp(prec);
+
+	if ( pact ) {
+		/* Update timestamp again for asynchronous devices */
+		recGblGetTimeStamp(prec);
+	}
+
 	monitor(prec);
 	recGblFwdLink(prec);
 	prec->pact=FALSE;

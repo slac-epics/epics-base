@@ -164,12 +164,22 @@ static long process(struct dbCommon *pcommon)
         return S_dev_missingSup;
     }
 
+    if ( !pact ) {
+	/* Update the timestamp before writing output values so it
+	 * will be uptodate if any downstream records fetch it via TSEL */
+	recGblGetTimeStamp(prec);
+    }
+
     status = writeValue(prec); /* write the data */
     if (!pact && prec->pact) return 0;
     prec->pact = TRUE;
 
+    if ( pact ) {
+    	/* Update timestamp again for asynchronous devices */
+	recGblGetTimeStamp(prec);
+    }
+
     prec->udf = FALSE;
-    recGblGetTimeStamp(prec);
 
     monitor(prec);
     /* process the forward scan link record */
