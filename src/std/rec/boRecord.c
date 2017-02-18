@@ -220,6 +220,10 @@ static long process(boRecord *prec)
 			if(prec->val==0) prec->rval = 0;
 			else prec->rval = prec->mask;
 		} else prec->rval = (epicsUInt32)prec->val;
+
+		/* Update the timestamp before writing output values so it
+		 * will be uptodate if any downstream records fetch it via TSEL */
+		recGblGetTimeStamp(prec);
 	}
 
 	/* check for alarms */
@@ -256,7 +260,11 @@ static long process(boRecord *prec)
 	if ( !pact && prec->pact ) return(0);
 	prec->pact = TRUE;
 
-	recGblGetTimeStamp(prec);
+	if ( pact ) {
+	    /* Update timestamp again for asynchronous devices */
+	    recGblGetTimeStamp(prec);
+	}
+
 	if((prec->val==1) && (prec->high>0)){
 	    myCallback *pcallback;
 	    pcallback = (myCallback *)(prec->rpvt);

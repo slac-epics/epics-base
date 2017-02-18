@@ -203,6 +203,10 @@ static long process(mbboDirectRecord *prec)
         prec->udf = FALSE;
         /* Convert VAL to RVAL */
         convert(prec);
+
+        /* Update the timestamp before writing output values so it
+         * will be uptodate if any downstream records fetch it via TSEL */
+        recGblGetTimeStamp(prec);
     }
 
 CONTINUE:
@@ -233,7 +237,12 @@ CONTINUE:
         return 0;
 
     prec->pact = TRUE;
-    recGblGetTimeStamp(prec);
+
+    if ( pact ) {
+        /* Update timestamp again for asynchronous devices */
+        recGblGetTimeStamp(prec);
+    }
+
     monitor(prec);
 
     /* Wrap up */
