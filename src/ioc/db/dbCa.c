@@ -377,6 +377,7 @@ long dbCaPutLinkCallback(struct link *plink,short dbrType,
     long   status = 0;
     short  link_action = 0;
 
+    assert(plink->type == CA_LINK);
     assert(pca);
     /* put the new value in */
     epicsMutexMustLock(pca->lock);
@@ -466,6 +467,26 @@ void dbCaScanFwdLink(struct link *plink) {
 
     if (plink->value.pv_link.pvlMask & pvlOptFWD)
         dbCaPutLink(plink, DBR_SHORT, &fwdLinkValue, 1);
+}
+
+int dbCaHasReadAccess(const struct link *plink)
+{
+    caLink *pca;
+
+    if (!plink || plink->type != CA_LINK) return FALSE;
+    pca = (caLink *)plink->value.pv_link.pvt;
+    if (!pca || !pca->chid) return FALSE;
+    return pca->hasReadAccess;
+}
+
+int dbCaHasWriteAccess(const struct link *plink)
+{
+    caLink *pca;
+
+    if (!plink || plink->type != CA_LINK) return FALSE;
+    pca = (caLink *)plink->value.pv_link.pvt;
+    if (!pca || !pca->chid) return FALSE;
+    return pca->hasWriteAccess;
 }
 
 #define pcaGetCheck \
