@@ -1,0 +1,77 @@
+TOP=../..
+
+include $(TOP)/configure/CONFIG
+#----------------------------------------
+#  ADD MACRO DEFINITIONS AFTER THIS LINE
+#=============================
+
+#=============================
+# Build an ioc application
+# Use PROD_IOC_RTEMS for RTEMS only
+# Use PROD_IOC_Linux for Linux only
+PROD_IOC = _APPNAME_
+
+# _APPNAME_.dbd will be created and installed
+DBD += _APPNAME_.dbd
+
+# _APPNAME_.dbd will be made up from these files:
+_APPNAME__DBD += base.dbd
+_APPNAME__DBD += calc.dbd
+_APPNAME__DBD += calcSupport.dbd
+_APPNAME__DBD += iocAdmin.dbd
+_APPNAME__DBD += autosaveSupport.dbd
+_APPNAME__DBD += asyn.dbd
+_APPNAME__DBD += asynRecord.dbd
+_APPNAME__DBD += stream.dbd
+_APPNAME__DBD += drvAsynSerialPort.dbd
+_APPNAME__DBD += drvAsynIPPort.dbd
+_APPNAME__DBD += motorSupport.dbd
+_APPNAME__DBD += devImsMotor.dbd
+_APPNAME__DBD += devSoftMotor.dbd
+_APPNAME__DBD += sscan.dbd
+_APPNAME__DBD += sscanSupport.dbd
+
+# <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
+_APPNAME__SRCS += _APPNAME__registerRecordDeviceDriver.cpp
+_APPNAME__SRCS_DEFAULT += _APPNAME_Main.cpp
+
+# Add locally compiled object code
+#_APPNAME__SRCS += dbSubExample.c
+
+_APPNAME__LIBS += Ims
+_APPNAME__LIBS += softMotor
+_APPNAME__LIBS += motor
+_APPNAME__LIBS += stream
+_APPNAME__LIBS += asyn
+_APPNAME__LIBS += devIocStats
+_APPNAME__LIBS += autosave
+_APPNAME__LIBS += sscan
+_APPNAME__LIBS += calc
+_APPNAME__LIBS += $(EPICS_BASE_IOC_LIBS)
+
+#Disable Regexp for RTEMS-beatnik as pcre lib not avail
+ifneq '$(T_A)' 'RTEMS-beatnik'
+PCRE_INCLUDE=/usr/include
+ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
+PCRE_LIB=/usr/lib64
+else
+PCRE_LIB=/usr/lib
+endif
+endif
+
+ifdef PCRE
+LIB_LIBS += pcre
+else
+ifneq ($(words $(PCRE_LIB) $(PCRE_INCLUDE)),0)
+PROD_SYS_LIBS_DEFAULT += pcre
+PROD_SYS_LIBS_WIN32 += $(PCRE_LIB)\\pcre
+SHRLIB_DEPLIB_DIRS += $(PCRE_LIB)
+endif
+endif
+
+#===========================
+
+include $(TOP)/configure/RULES
+#----------------------------------------
+#  ADD RULES AFTER THIS LINE
+

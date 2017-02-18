@@ -1,0 +1,24 @@
+# This is an example streamDevice protocol file.
+
+Terminator = CR LF;
+ReadTimeout = 10;
+# ReplyTimeout = 2000;
+# MaxInput = 32;
+# InTerminator = CR LF;
+# ExtraInput = Ignore;
+
+# read_X      {in "$%f,%*f,%*f,N%*4s\r\n";}
+# read_X      {out "*9900XY"; in "$%f,%*f,%*f,N%*4s";}
+# read_Y      {               in "$%*f,%f,%*f,N%*4s";}
+# read_temp   {               in "$%*f,%*f,%f,N%*4s";}
+# read_serial {               in "$%*f,%*f,%*f,N%4s";}
+
+# For I/O Intr mode - every 1 second.
+start_X { out "*9900XYC2"; }
+read_X      {in "$%f,%(AMO:HFP:CLIN:Y.VAL)f,%(AMO:HFP:CLIN:TEMP.VAL)f,N%(AMO:HFP:CLIN:SERL.VAL)4s";}
+
+# For SCAN mode.
+# start_X { out "*9900XYC-OFF"; }
+# read_X      {out "*9900XY"; in "$%f,%(AMO:MT:HFP:CLIN:Y.VAL)f,%(AMO:MT:HFP:CLIN:TEMP.VAL)f,N%(AMO:MT:HFP:CLIN:SERL.VAL)4s";}
+
+# debug {in "%s"}

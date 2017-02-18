@@ -1,0 +1,16 @@
+# _APPNAME_ IOC instance archive file
+
+# Generate archive PV list for IOC
+file _APPNAME_-ioc.archive
+{
+	{ IOC = "_IOCPVROOT_" }
+}
+
+
+# Generate archive PV list for motors
+file archive_motor-mc.template
+{
+	{ MOTOR = "TST:XXX:MMS:01" }
+#	{ MOTOR = "TST:XXX:MMS:02" }
+}
+

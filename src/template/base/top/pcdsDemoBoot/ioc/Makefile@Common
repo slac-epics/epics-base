@@ -1,0 +1,10 @@
+# Makefile to install the st.cmd into the correctly location.
+# Author: Jason Tiller
+
+TOP = ../..
+include $(TOP)/configure/CONFIG
+ARCH = _ARCH_
+TARGETS = envPaths
+
+include $(TOP)/configure/RULES
+include $(TOP)/configure/RULES.ioc-targets

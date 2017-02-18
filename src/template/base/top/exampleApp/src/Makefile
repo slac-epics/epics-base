@@ -70,10 +70,12 @@ ifneq ($(SNCSEQ),)
     sncProgram_LIBS += $(EPICS_BASE_HOST_LIBS)
 endif
 
-# Finally link IOC to the EPICS Base libraries
+# Finally link to the EPICS Base libraries
 _APPNAME__LIBS += $(EPICS_BASE_IOC_LIBS)
+
+#=============================
 
 include $(TOP)/configure/RULES
 #----------------------------------------
-#  ADD EXTRA GNUMAKE RULES BELOW HERE
+#  ADD RULES AFTER THIS LINE
 

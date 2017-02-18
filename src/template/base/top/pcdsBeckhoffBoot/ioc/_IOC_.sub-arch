@@ -1,0 +1,11 @@
+# IOC archive file
+## Replace _IOCPVROOT_ with the PV prefix used for
+## iocAdmin PV's on this IOC
+
+# Generate IOC archive request 
+# TODO: replace HUTCH:RXX:BHC:XX with the real location
+file _APPNAME_-ioc.archive
+{
+	{ IOC = "_IOCPVROOT_", COUPLER_LOC = HUTCH:RXX:BHC:XX }
+}
+

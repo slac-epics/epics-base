@@ -1,0 +1,8 @@
+# Generate motor postions PV list for each motor
+# Note: Motor positions are not always restored automatically
+file autosave_motor_positions.template
+{
+	{ MOTOR = "TST:XXX:MMS:01" }
+#	{ MOTOR = "TST:XXX:MMS:02" }
+}
+
