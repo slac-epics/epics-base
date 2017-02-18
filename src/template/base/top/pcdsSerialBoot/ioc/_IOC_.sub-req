@@ -1,0 +1,16 @@
+# _APPNAME_ IOC instance autosave file
+
+# Generate autosave PV list for IOC specific PV's
+file _APPNAME_-ioc.req
+{
+	{ IOC = "_IOCPVROOT_" }
+}
+
+
+# Generate autosave PV list for each serial device
+file exampleDevice.tpl-req
+{
+	{ P = "TST:EXP:XXX:01" }
+#	{ P = "TST:EXP:XXX:02" }
+}
+

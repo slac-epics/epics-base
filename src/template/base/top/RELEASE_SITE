@@ -1,0 +1,11 @@
+# =============================================================
+# Define the top of the EPICS tree for your site.
+# We will build some tools/scripts that allow us to
+# change this easily when relocating software.
+# ==============================================================
+EPICS_SITE_TOP=_EPICS_SITE_TOP_
+BASE_MODULE_VERSION=_BASE_MODULE_VERSION_
+
+# EPICS module releases are kept here
+EPICS_MODULES=$(EPICS_SITE_TOP)/$(BASE_MODULE_VERSION)/modules
+

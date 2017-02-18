@@ -1,0 +1,23 @@
+#
+# _APPNAME_ substitutions file
+#
+
+# Generate iocAdmin autosave request 
+file autosave_iocAdmin.tpl-req
+{
+	{
+		# Hack till msi supports empty substitutions
+		IOC		=	$(IOC)
+	}
+}
+
+# Generate EVR autosave request 
+file autosave_evr.tpl-req
+{
+	{
+		# Hack till msi supports empty substitutions
+		IOC		=	$(IOC),
+		EVR		=	$(EVR)
+	}
+}
+
