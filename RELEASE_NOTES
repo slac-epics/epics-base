@@ -6,6 +6,28 @@
 #
 R3.15.5-2.0?	Bruce Hill	2017-02-01
 	Built from merge of R3.14.12.5-2.branch into R3.15.5-0.branch
+	Includes the following patches:
+		pcds-config-site.patch
+		OSDThread-diag.patch for more verbose mlockall status.
+		timestamp-before-writing-output.patch to update timestamp before processing outlinks
+		perl-makeBaseApp-features.patch for pcds template support
+		pcds-makeBaseApp-templates.patch for pcds templates
+		convertRelease-diag.patch for new convertRelease option and better diagnostics
+		rules-ioc-archive-autosave-templated.patch to build db, req, and archive files in ioc dirs
+		caget-dynamic-array.patch to make async mode the default for better performance
+		active-scan-count-exceeded-error-msg.patch for better error msg on Active scan count exceeded
+		assert-abort-not-suspend.patch so ioc's exit on error
+		epics-thread-show-linux-pids.patch so we can see linux pid in epicsThreadShow()
+		non-rt-thread-priority-zero.patch, fixes neg priority bug if thread is non-RT
+		string-record-strncpy.patch to avoid dangerous strcpy calls
+		db-tpro-show-values.patch
+		ca-sizes-in-error-msgs.patch
+		pv-name-in-ca-error-msgs.patch
+		mkmf-db-dep-for-sub-arch.patch
+		readRelease-diags.patch for more informative readRelease error msgs
+		tsel-implementation-comments.patch
+		dbCaHasWriteAccess.patch to add dbCaHasWriteAccess() and dbCaHasReadAccess()
+		db-link-error-diag.patch
 
 R3.15.5-0.1:	Hugo Slepicka	2017-01-16
 	Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
