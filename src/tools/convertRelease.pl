@@ -26,9 +26,9 @@ use EPICS::Release;
 
 use vars qw($arch $top $iocroot $root);
 
-our ($opt_a, $opt_t, $opt_T);
+our ($opt_a, $opt_d, $opt_t, $opt_T);
 
-getopts('a:t:T:') or HELP_MESSAGE();
+getopts('a:dt:T:') or HELP_MESSAGE();
 
 my $cwd = UnixPath(cwd());
 
@@ -60,6 +60,9 @@ if ($opt_t) {
             chop $iocroot;
             chop $root;
         }
+        if ( $opt_d ) {
+                print "-t option enabled: substituting $iocroot for $root in paths.\n";
+        }
     }
 }
 
@@ -71,12 +74,21 @@ my $outfile = $ARGV[0];
 my %macros = (TOP => LocalPath($top));
 my @apps   = ('TOP');   # Records the order of definitions in RELEASE file
 
+$ENV{MAKEFLAGS} = "";
+
 # Read the RELEASE file(s)
 my $relfile = "$top/configure/RELEASE";
-die "Can't find $relfile" unless (-f $relfile);
+die "convertRelease.pl can't find $relfile\n" unless (-f $relfile);
 readReleaseFiles($relfile, \%macros, \@apps, $arch);
+printMacros( 'macros from readReleaseFiles', \%macros ) if $opt_d;
+#if ( $opt_d ) {
+#	print( "macros from readReleaseFiles" ) if $opt_d;
+    #while ( my ( $macro, $val ) = each %macros ) {
+    #    print "\t$macro\t=\t$val\n";
+    #}
+#}
 expandRelease(\%macros);
-
+printMacros( "macros after expandRelease", \%macros ) if $opt_d;
 
 # This is a perl switch statement:
 for ($outfile) {
@@ -94,7 +106,11 @@ for ($outfile) {
 
 sub HELP_MESSAGE {
     print STDERR <<EOF;
-Usage: convertRelease.pl [-a arch] [-T top] [-t ioctop] outfile
+Usage: convertRelease.pl [-a arch] [-d] [-T top] [-t ioctop] outfile
+    -a can be used to specify the architecture, defaults to O.<arch> in current dir
+    -d enables diagnostic output
+    -T can be used to specify \$TOP, defaults to current dir w/ iocBoot/* or configure/* stripped off
+    -t can be used if IOC has a different \$TOP
     where outfile is one of:
         releaseTops - lists the module names defined in RELEASE*s
         dllPath.bat - path changes for cmd.exe to find Windows DLLs
@@ -222,6 +238,13 @@ sub checkRelease {
         my @order = ();
         my $relfile = "$path/configure/RELEASE";
         readReleaseFiles($relfile, \%check, \@order, $arch);
+		printMacros( "checkRelease checking macros", \%check ) if $opt_d;
+        #if ( $opt_d ) {
+		#	print( "checkRelease checking macros:\n" );
+			#while ( my ( $macro, $val ) = each %check ) {
+			#	print "\t$macro\t=\t$val\n";
+			#}
+        #}
         expandRelease(\%check);
         delete $check{TOP};
         delete $check{EPICS_HOST_ARCH};
@@ -269,4 +292,13 @@ sub checkRelease {
 
     print "\n" if $status;
     exit $status;
+}
+
+# print out these macros w/ a header line
+sub printMacros {
+    my ($header, $RmacroList) = @_;
+    print "$header:\n";
+    while ( my ( $macro, $val ) = each %{$RmacroList} ) {
+        print "\t$macro\t=\t$val\n";
+    }
 }
