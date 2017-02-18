@@ -434,6 +434,10 @@ void epicsThreadRealtimeLock(void)
 {
 #if USE_MEMLOCK
 #ifndef RTEMS_LEGACY_STACK // seems to be part of libbsd?
+    if(errVerbose)  { 
+        fprintf(stderr, "LRT: min priority: %d max priority %d\n", 
+            pcommonAttr->minPriority, pcommonAttr->maxPriority);
+    }
     if (pcommonAttr->maxPriority > pcommonAttr->minPriority) {
         int status = mlockall(MCL_CURRENT | MCL_FUTURE);
 
@@ -456,6 +460,8 @@ void epicsThreadRealtimeLock(void)
                                 "VM page faults may harm real-time performance. errno=%d\n",
                         err);
             }
+        } else { 
+            fprintf(stderr,"Successfully locked memory using mlockAll\n");
         }
     }
 #endif // LEGACY STACK
