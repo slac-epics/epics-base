@@ -119,7 +119,7 @@ static long init_record(stringinRecord *prec, int pass)
     if( pdset->init_record ) {
 	if((status=(*pdset->init_record)(prec))) return(status);
     }
-    strcpy(prec->oval,prec->val);
+    strncpy(prec->oval,prec->val,sizeof(prec->oval));
     return(0);
 }
 
