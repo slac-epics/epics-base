@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.1: Fix at <>/configure/os/CONFIG_SITE.Common.linuxRT-* and CCACHE_DISABLE
+               Applied patch: <>/patches/linuxRT_CCACHE_DISABLE_FIX.patch
+
 R3.15.5-1.0:   New linuxRT buildroot version
                Modified EPICS Configuration files for linuxRT to use new buildroot version: 
                <>/configure/CONFIG_SITE.Common.linuxRT-*
