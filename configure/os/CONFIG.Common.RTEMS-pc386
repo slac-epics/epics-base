@@ -18,10 +18,3 @@ endef
 
 include $(CONFIG)/os/CONFIG.Common.RTEMS
 
-#
-# Put text segment where it will work with etherboot
-#
-# Suggested by Till Strauman
-# Must be removed for CEXP/run-time loading:
-#OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
-

@@ -18,10 +18,7 @@ GNU_TARGET=$(TARGET_CPU)-linux
 SHARED_LIBRARIES=NO
 STATIC_BUILD=YES
 
-# =====================================================================
-# Recommended by Till Strauman:
-# Let's build with optimization but have debug symbols for debugging:
-# =====================================================================
+# Build with optimization but have debug symbols for debugging:
 OPT_CFLAGS_YES = -O3 -g
 OPT_CXXFLAGS_YES = -O3 -g
 

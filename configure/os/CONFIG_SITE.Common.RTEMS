@@ -35,14 +35,8 @@ CROSS_LDFLAGS+= -L$(PROJECT_RELEASE)/lib
 ifdef RTEMS_SITE_INSTALLDIR
 CROSS_LDFLAGS+= -L$(RTEMS_SITE_INSTALLDIR)/lib
 endif
-#OPT_CFLAGS_YES = -g -O3
-#OPT_CXXFLAGS_YES = -g -O3
 
-# =====================================================================
-# Recommended by Till Strauman:
-# For Host Builds.
-# Let's build with optimization but have debug symbols for debugging:
-# =====================================================================
+# Build with optimization but have debug symbols for debugging:
 OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V) -g
 OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V) -g
 

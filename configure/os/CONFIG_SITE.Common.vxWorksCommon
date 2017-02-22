@@ -57,11 +57,7 @@ OP_SYS_CFLAGS += -fno-builtin
 
 #--------------------------------------------------
 # Optimization: Officially vxWorks only supports -O2 or less.
-# =====================================================================
-# Recommended by Till Strauman:
-# For Cross Builds.
-# Let's build with optimization but have debug symbols for debugging:
-# =====================================================================
+# Build with optimization but have debug symbols for debugging:
 OPT_CFLAGS_YES = -O2 -g
 OPT_CXXFLAGS_YES = -O2 -g
 
