@@ -52,8 +52,16 @@ else
 endif
 
 envPaths: $(wildcard $(TOP)/configure/RELEASE*) \
-    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
-	$(CONVERTRELEASE) -t $(IOCS_APPL_TOP) $@
+    $(wildcard $(TOP)/configure/CONFIG_SITE*) $(INSTALL_BIN)
+ifeq ($(IOC_APPL_TOP),)
+ifeq ($(IOCS_APPL_TOP),)
+	$(CONVERTRELEASE) -a $(ARCH) $@
+else
+	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
+endif
+else
+	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
+endif
 
 realclean: ioc-targets_clean
 

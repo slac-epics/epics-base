@@ -306,7 +306,7 @@ $(INSTALL_DB)/%$(SUBST_SUFFIX): %$(SUBST_SUFFIX)
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_DB)/%$(SUBST_SUFFIX): ../%$(SUBST_SUFFIX)
-	$(ECHO) "Installing substitution file $@"
+	$(ECHO) "Installing db substitution file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PRECIOUS: $(COMMON_DIR)/%$(SUBST_SUFFIX)
