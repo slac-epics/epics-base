@@ -370,10 +370,10 @@ static void once(void)
 #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
 
     pthreadInfo = init_threadInfo("_main_",0,epicsThreadGetStackSize(epicsThreadStackSmall),0,0);
+    assert(pthreadInfo!=NULL);
 #ifdef SHOW_LINUX_PIDS
     pthreadInfo->lwpId=syscall(SYS_gettid);
 #endif
-    assert(pthreadInfo!=NULL);
     status = pthread_setspecific(getpthreadInfo,(void *)pthreadInfo);
     checkStatusOnceQuit(status,"pthread_setspecific","epicsThreadInit");
     status = mutexLock(&listLock);
