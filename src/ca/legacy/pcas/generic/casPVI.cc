@@ -252,7 +252,7 @@ void casPVI::updateEnumStringTableAsyncCompletion ( const gdd & resp )
             }
         }
         else {
-         	casErrMessage( S_cas_badType,
+            casErrMessage( S_cas_badType,
                 "bad \"enums\" string conversion table for enumerated PV" );
         }
     }

@@ -58,9 +58,9 @@ if ($opt_t) {
             chop $iocroot;
             chop $root;
         }
-		if ( $opt_d ) {
-			print "-t option enabled: substituting $iocroot for $root in paths.\n";
-		}
+        if ( $opt_d ) {
+                print "-t option enabled: substituting $iocroot for $root in paths.\n";
+        }
     }
 }
 
@@ -79,10 +79,10 @@ my $relfile = "$top/configure/RELEASE";
 die "convertRelease.pl can't find \$TOP/configure/RELEASE w/ TOP=$top\n" unless (-f $relfile);
 readReleaseFiles($relfile, \%macros, \@apps, $arch);
 if ( $opt_d ) {
-	print "Initial expandRelease call for macros:\n";
-	while ( my ( $macro, $val ) = each %macros ) {
-		print "\t$macro\t=\t$val\n";
-	}
+    print "Initial expandRelease call for macros:\n";
+    while ( my ( $macro, $val ) = each %macros ) {
+        print "\t$macro\t=\t$val\n";
+    }
 }
 expandRelease(\%macros);
 
@@ -234,12 +234,12 @@ sub checkRelease {
         my @order = ();
         my $relfile = "$path/configure/RELEASE";
         readReleaseFiles($relfile, \%check, \@order, $arch);
-		if ( $opt_d ) {
-			print "checkRelease checking macros:\n";
-			while ( my ( $macro, $val ) = each %check ) {
-				print "\t$macro\t=\t$val\n";
-			}
-		}
+        if ( $opt_d ) {
+                print "checkRelease checking macros:\n";
+                while ( my ( $macro, $val ) = each %check ) {
+                        print "\t$macro\t=\t$val\n";
+                }
+        }
         expandRelease(\%check);
         delete $check{TOP};
         delete $check{EPICS_HOST_ARCH};
