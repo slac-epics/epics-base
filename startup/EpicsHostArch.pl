@@ -15,6 +15,8 @@ eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
 use Config;
 use POSIX;
 
+use Config qw( config_sh myconfig );
+
 $suffix="";
 $suffix="-".$ARGV[0] if ($ARGV[0] ne "");
 
@@ -23,6 +25,7 @@ print "$EpicsHostArch$suffix";
 
 sub GetEpicsHostArch { # no args
     $arch=$Config{'archname'};
+    #print "Config{'archname'}=".$arch."\n";
     if ($arch =~ /sun4-solaris/)        { return "solaris-sparc";
     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
     } elsif ($arch =~ m/arm-linux/)     { return "linux-arm";
@@ -31,6 +34,9 @@ sub GetEpicsHostArch { # no args
             if ($cpu =~ m/i686/)			{ return "linux-x86";  }
             if ($cpu =~ m/x86_64/)	{
 				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/2.6.35.13-rt/)  { return "linux-x86_64"; }
+				elsif ($release =~ m/3.14.12-rt9/)  { return "linuxRT_glibc-x86_64"; }
+				elsif ($release =~ m/3.18.11-rt7/)  { return "linuxRT_glibc-x86_64"; }
 				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
 				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
 				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
