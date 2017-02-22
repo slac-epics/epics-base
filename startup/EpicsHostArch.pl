@@ -41,6 +41,9 @@ sub GetEpicsHostArch { # no args
             if ($cpu =~ m/i686/)			{ return "linux-x86";  }
             if ($cpu =~ m/x86_64/)	{
 				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/2.6.35.13-rt/)  { return "linux-x86_64"; }
+				elsif ($release =~ m/3.14.12-rt9/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/3.18.11-rt7/)  { return "linuxRT-x86_64"; }
 				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
 				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
 				elsif ($release =~ m/el7/)  { if ( $gcc =~ "-gcc494" ) { return "rhel7-gcc494-x86_64";
