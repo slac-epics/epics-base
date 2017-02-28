@@ -28,6 +28,7 @@ R3.15.5-2.0?	Bruce Hill	2017-02-01
 		tsel-implementation-comments.patch
 		dbCaHasWriteAccess.patch to add dbCaHasWriteAccess() and dbCaHasReadAccess()
 		db-link-error-diag.patch
+		dbConvert.patch to fix crash on 64bit os when calling getFloatString()
 
 R3.15.5-0.1:	Hugo Slepicka	2017-01-16
 	Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
