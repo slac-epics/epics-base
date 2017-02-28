@@ -5,6 +5,7 @@
 /html/
 /include/
 /templates/
+tags
 O.*
 *.log
 *.swp
