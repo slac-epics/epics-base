@@ -410,11 +410,11 @@ $(INSTALL_DBD)/%: $(COMMON_DIR)/%
 	$(ECHO) "Installing created dbd file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
-$(INSTALL_DBD)/%: %
+$(INSTALL_DBD)/%: ../%
 	$(ECHO) "Installing dbd file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
-$(INSTALL_DBD)/%: ../%
+$(INSTALL_DBD)/%: %
 	$(ECHO) "Installing dbd file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
