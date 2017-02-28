@@ -15,7 +15,7 @@ $(ARCH): buildInstall
 
 ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(ARCH))
     buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
-	clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
+    clean$(DIVIDER)$(ARCH) clean: ioc-targets_clean
 else
     buildInstall$(DIVIDER)$(ARCH) buildInstall:
     clean$(DIVIDER)$(ARCH) clean:
