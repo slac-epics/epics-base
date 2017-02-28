@@ -97,6 +97,7 @@ TEMPLATE2=$(patsubst %0,%,$(patsubst %1,%,$(patsubst %2,%,$(patsubst %3,%,$(pats
           $(TEMPLATE1)))))))))))
 TEMPLATE3 =$(addsuffix .template,$(addprefix ../,$(TEMPLATE2)))
 TEMPLATE3+=$(addsuffix .tpl-db,  $(addprefix ../,$(TEMPLATE2)))
+
 TEMPLATE_FILENAME=$(firstword $(wildcard $($*_TEMPLATE) $(addprefix ../,$($*_TEMPLATE)) ../$*.template ../$*.tpl-db $(TEMPLATE3) ../template))
 
 # dbst based database optimization
@@ -265,11 +266,11 @@ menu%.h$(DEP): ../menu%.dbd
 	@$(RM) $@
 	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< $(TEMPLATE_FILENAME) > $@
 
-%.db$(RAW)$(DEP): %.template
+%.db$(RAW)$(DEP): ../%.template
 	@$(RM) $@
 	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) $< > $@
 
-%.db$(RAW)$(DEP): ../%.template
+%.db$(RAW)$(DEP): %.template
 	@$(RM) $@
 	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) $< > $@
 
@@ -319,12 +320,12 @@ $(COMMON_DIR)/%.template: $(COMMON_DIR)/%.edf
 	@$(REPLACEVAR) < $@.VAR > $@
 	@$(RM) $@.VAR
 
-$(INSTALL_DB)/%.template: %.template
-	$(ECHO) "Installing db template file $@"
+$(INSTALL_DB)/%.template: ../%.template
+	$(ECHO) "Installing ../template file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
-$(INSTALL_DB)/%.template: ../%.template
-	$(ECHO) "Installing template file $@"
+$(INSTALL_DB)/%.template: %.template
+	$(ECHO) "Installing db template file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PRECIOUS: $(COMMON_DIR)/%.template
@@ -458,14 +459,14 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 	@$(RM) $*.VAR
 
 # Note:
-# MSI expansion command was
-#	$(MSI3_15) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
+# MSI expansion command for substitution files was
+#	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$< $(TEMPLATE_FILENAME) > msi.tmp
 # This is wrong for msi when both foo.template and foo.substitutions
 # are used as in many of the PCDS IOc's.
 # Specifying foo.template in the command line as above
 # overrides the templates specified in the substitutions file.
 # 
-# PCDS changes it to
+# PCDS removes $(TEMPLATE_FILENAME), changing the substitutions cmd to
 #   $(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 # to allow both foo.template and foo.subsitutions to coexist.
 $(COMMON_DIR)/%.db$(RAW): %$(SUBST_SUFFIX)
@@ -480,14 +481,14 @@ $(COMMON_DIR)/%.db$(RAW): ../%$(SUBST_SUFFIX)
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 	@$(MV) $(notdir $@) $@
 
-$(COMMON_DIR)/%.db$(RAW): %.template
-	$(ECHO) "Inflating database from $<"
+$(COMMON_DIR)/%.db$(RAW): ../%.template
+	$(ECHO) "Inflating database from ../template $<"
 	@$(RM) $(notdir $@)
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
-$(COMMON_DIR)/%.db$(RAW): ../%.template
-	$(ECHO) "Inflating database from $<"
+$(COMMON_DIR)/%.db$(RAW): %.template
+	$(ECHO) "Inflating database from template $<"
 	@$(RM) $(notdir $@)
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
