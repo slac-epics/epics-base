@@ -333,32 +333,32 @@ $(INSTALL_DB)/%.template: %.template
 ##################################################### INC files
 
 $(COMMON_DIR)/%Record.h: $(COMMON_DIR)/%Record.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTORECORDTYPEH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%Record.h: %Record.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTORECORDTYPEH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%Record.h: ../%Record.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTORECORDTYPEH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/menu%.h: $(COMMON_DIR)/menu%.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTOMENUH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/menu%.h: menu%.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTOMENUH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/menu%.h: ../menu%.dbd
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBTOMENUH) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
@@ -367,24 +367,24 @@ $(COMMON_DIR)/menu%.h: ../menu%.dbd
 ##################################################### DBD files
 
 $(COMMON_DIR)/bpt%.dbd: bpt%.data
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(MAKEBPT) $< $(notdir $@)
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.dbd: %.dbd.pod
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(PERL) $(TOOLS)/podRemove.pl -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.dbd: %Include.dbd
 	$(ECHO) "Expanding dbd file $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBEXPAND) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.dbd: ../%Include.dbd
 	$(ECHO) "Expanding dbd file $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBEXPAND) $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
@@ -396,13 +396,13 @@ $(foreach name,$(subst .dbd,,$(DBDCAT)), $(eval $(call DBDCAT_template,$(name)))
 
 $(COMMON_DBDCATS):$(COMMON_DIR)/%.dbd:
 	$(ECHO) "Creating dbd file $(notdir $@)"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBDCAT_COMMAND)
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.dbd:
 	$(ECHO) "Creating dbd file $(notdir $@)"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(DBEXPAND) $(DBDFLAGS) -o $(notdir $@) $($*_DBD)
 	@$(MV) $(notdir $@) $@
 
@@ -430,22 +430,22 @@ $(foreach file, $(DBD_INSTALLS), $(eval $(call DBD_INSTALLS_template, $(file))))
 ##################################################### HTML files
 
 $(COMMON_DIR)/%.html: %.dbd.pod $(TOOLS)/dbdToHtml.pl
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(PERL) $(TOOLS)/dbdToHtml.pl $(DBDFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.html: %.pod $(TOOLS)/podToHtml.pl
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(PERL) $(TOOLS)/podToHtml.pl -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.html: %.pm $(TOOLS)/podToHtml.pl
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(PERL) $(TOOLS)/podToHtml.pl -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.html: ../%.pm $(TOOLS)/podToHtml.pl
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(PERL) $(TOOLS)/podToHtml.pl -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
@@ -471,25 +471,25 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 # to allow both foo.template and foo.subsitutions to coexist.
 $(COMMON_DIR)/%.db$(RAW): %$(SUBST_SUFFIX)
 	$(ECHO) "Inflating database from $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.db$(RAW): ../%$(SUBST_SUFFIX)
 	$(ECHO) "Inflating database from $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.db$(RAW): ../%.template
 	$(ECHO) "Inflating database from ../template $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
 $(COMMON_DIR)/%.db$(RAW): %.template
 	$(ECHO) "Inflating database from template $<"
-	@$(RM) $(notdir $@)
+	@$(RM) $(notdir $@) $@
 	$(MSI3_15) $(DBFLAGS) -o $(notdir $@) $<
 	@$(MV) $(notdir $@) $@
 
