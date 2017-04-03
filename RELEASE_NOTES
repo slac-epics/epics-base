@@ -31,6 +31,7 @@ R3.15.5-2.0?	Bruce Hill	2017-02-01
 		dbConvert.patch to fix crash on 64bit os when calling getFloatString()
 		linuxRT_CCACHE_DISABLE.patch - Set CCACHE_DISABLE=1 to avoid permission problems with buildroot tmp dir
 		linuxRT_CCACHE_DISABLE_FIX.patch - Fix to prior patch
+		DBR_CTRL_CHAR_1elem_crash.patch - Fix IOC crash for DBR_CTRL_CHAR request with 1 array element
 
 R3.15.5-0.1:	Hugo Slepicka	2017-01-16
 	Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
