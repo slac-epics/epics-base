@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.2: IOC crashes for DBR_CTRL_CHAR request with 1 array element
+               dbGet() DBF_CHAR with nRequest==1 not handled correctly. Results in crash.
+                   See patch <>/patches/DBR_CTRL_CHAR_1elem_crash.patch
+
 R3.15.5-1.0.1: Fix at <>/configure/os/CONFIG_SITE.Common.linuxRT-* and CCACHE_DISABLE
                Applied patch: <>/patches/linuxRT_CCACHE_DISABLE_FIX.patch
 
