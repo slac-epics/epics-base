@@ -4,73 +4,79 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
-R3.15.5-1.0.2: IOC crashes for DBR_CTRL_CHAR request with 1 array element
-               dbGet() DBF_CHAR with nRequest==1 not handled correctly. Results in crash.
-                   See patch <>/patches/DBR_CTRL_CHAR_1elem_crash.patch
+R3.15.5-1.0.3:	2017-04-03 from R3.15.5-1.branch
+	Applied dbConvert.patch to R3.15.5-1.branch to fix crash on 64bit os when calling getFloatString()
 
-R3.15.5-1.0.1: Fix at <>/configure/os/CONFIG_SITE.Common.linuxRT-* and CCACHE_DISABLE
-               Applied patch: <>/patches/linuxRT_CCACHE_DISABLE_FIX.patch
+R3.15.5-1.0.2:	2017-04-03 from R3.15.5-1.branch
+	IOC crashes for DBR_CTRL_CHAR request with 1 array element
+        dbGet() DBF_CHAR with nRequest==1 not handled correctly. Results in crash.
+        See patch <>/patches/DBR_CTRL_CHAR_1elem_crash.patch
 
-R3.15.5-1.0:   New linuxRT buildroot version
-               Modified EPICS Configuration files for linuxRT to use new buildroot version: 
-               <>/configure/CONFIG_SITE.Common.linuxRT-*
+R3.15.5-1.0.1:	2017-02-22 from R3.15.5-1.branch
+	Fix at <>/configure/os/CONFIG_SITE.Common.linuxRT-* and CCACHE_DISABLE
+    Applied patch: <>/patches/linuxRT_CCACHE_DISABLE_FIX.patch to R3.15.5-1.branch
 
-               Modified <>/src/libCom/osi/os/posix/osdThread.c to include mlockall sucess message:
-                   See patch <>/patches/mlockall-success-msg.patch
+R3.15.5-1.0:   2017-01-16 from R3.15.5-1.branch
+	New linuxRT buildroot version
+	Modified EPICS Configuration files for linuxRT to use new buildroot version: 
+	<>/configure/CONFIG_SITE.Common.linuxRT-*
 
-               Modified "CONFIG.Common.linuxRT-i686" to correct ARCH_CLASS.
+	Modified <>/src/libCom/osi/os/posix/osdThread.c to include mlockall sucess message:
+	   See patch <>/patches/mlockall-success-msg.patch
 
-               Modified "CONFIG_SITE.Common.linuxRT*" to use environment variable CCACHE_DISABLE=1
-                   CCACHE when enabled was creating permission problems with the buildroot tmp dir.
-                   Changes made via patch <>/patches/linuxRT_CCACHE_DISABLE.patch
+	Modified "CONFIG.Common.linuxRT-i686" to correct ARCH_CLASS.
 
-               Update: EPICS_SITE_VERSION = 1.0 ==> will append to EPICS version string at IOC runtime
+	Modified "CONFIG_SITE.Common.linuxRT*" to use environment variable CCACHE_DISABLE=1
+	   CCACHE when enabled was creating permission problems with the buildroot tmp dir.
+	   Changes made via patch <>/patches/linuxRT_CCACHE_DISABLE.patch
 
+	Update: EPICS_SITE_VERSION = 1.0 ==> will append to EPICS version string at IOC runtime
 
-R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
-               Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
-               Add comment for HOST Build:
-               # rhel6-x86_64           (GNU compiler used for host builds)
+R3.15.5-0.1:   2017-01-13 from R3.15.5-0.branch
+	Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
+	Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
+	Add comment for HOST Build:
+	# rhel6-x86_64           (GNU compiler used for host builds)
 
-               Add Comments for SLAC added CROSS Builds:
-               # linuxRT-x86_64 (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
-               # linuxRT-i686   (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
-               # linuxRT-arm_zynq (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+	Add Comments for SLAC added CROSS Builds:
+	# linuxRT-x86_64 (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+	# linuxRT-i686   (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+	# linuxRT-arm_zynq (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 
-               For LCLS II and LCLS 1 Mission Readiness, we build the following targets:
-                -- CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq \
-                                           RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
-               Use POSIX thread priority scheduling
-               Build both shared and static libraries
-                -- EPICS BASE executables/binaries are built statically to support a production deployment scheme
-               Always build with debug symbols even in production image
-               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
+	For LCLS II and LCLS 1 Mission Readiness, we build the following targets:
+	-- CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq \
+							   RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
+	Use POSIX thread priority scheduling
+	Build both shared and static libraries
+	-- EPICS BASE executables/binaries are built statically to support a production deployment scheme
+	Always build with debug symbols even in production image
+	Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
 
-               Modified "CONFIG_SITE_ENV" to prepare EPICS_TIMEZONE for Pacific Timezone.
-               Added new config files to <>/configure/os  directory to support HOST build for rhel6
-                   CONFIG.Common.rhel6-x86_64
-                   CONFIG.Common.rhel6-x86_64-debug
-                   CONFIG.rhel6-x86_64-debug.Common
-                   CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
-                   CONFIG.rhel6-x86_64.Common
-                   CONFIG.rhel6-x86_64.rhel6-x86_64
-                   CONFIG.rhel6-x86_64.rhel6-x86_64-debug
-                   CONFIG_SITE.Common.rhel6-x86_64
-                   CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
-                   CONFIG_SITE.rhel6-x86_64.Common
-                   CONFIG_SITE.rhel6-x86_64.RTEMS
-                   CONFIG_SITE.rhel6-x86_64.UnixCommon
-                   CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-68040
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
-                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
-               Added new config files to <>/configure/os  directory to support linuxRT CROSS builds: 
-                   CONFIG.Common.linuxRT-arm_zynq
-                   CONFIG_SITE.Common.linuxRT-arm_zynq
-                   CONFIG.Common.linuxRT-i686
-                   CONFIG_SITE.Common.linuxRT-i686
-                   CONFIG.Common.linuxRT-x86_64
-                   CONFIG_SITE.Common.linuxRT-x86_64
+	Modified "CONFIG_SITE_ENV" to prepare EPICS_TIMEZONE for Pacific Timezone.
+	Added new config files to <>/configure/os  directory to support HOST build for rhel6
+	   CONFIG.Common.rhel6-x86_64
+	   CONFIG.Common.rhel6-x86_64-debug
+	   CONFIG.rhel6-x86_64-debug.Common
+	   CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+	   CONFIG.rhel6-x86_64.Common
+	   CONFIG.rhel6-x86_64.rhel6-x86_64
+	   CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+	   CONFIG_SITE.Common.rhel6-x86_64
+	   CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+	   CONFIG_SITE.rhel6-x86_64.Common
+	   CONFIG_SITE.rhel6-x86_64.RTEMS
+	   CONFIG_SITE.rhel6-x86_64.UnixCommon
+	   CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+	   CONFIG_SITE.rhel6-x86_64.vxWorks-68040
+	   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
+	   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
+	Added new config files to <>/configure/os  directory to support linuxRT CROSS builds: 
+	   CONFIG.Common.linuxRT-arm_zynq
+	   CONFIG_SITE.Common.linuxRT-arm_zynq
+	   CONFIG.Common.linuxRT-i686
+	   CONFIG_SITE.Common.linuxRT-i686
+	   CONFIG.Common.linuxRT-x86_64
+	   CONFIG_SITE.Common.linuxRT-x86_64
 
-               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
+	Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
 
