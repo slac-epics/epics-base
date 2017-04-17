@@ -869,7 +869,7 @@ static void refer ( MAC_HANDLE *handle, MAC_ENTRY *entry, int level,
             if ( !handle->dirty ) {
                 /* copy the already-expanded value, merge any error status */
                 cpy2val( refentry->value, &v, valend );
-                entry->error = entry->error || refentry->error;
+                if (refentry->error == TRUE) entry->error = TRUE;
             } else {
                 /* translate raw value */
                 const char *rv = refentry->rawval;
