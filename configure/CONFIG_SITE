@@ -168,7 +168,7 @@ USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 # Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools.
 #  Optimized Build
-EPICS_SITE_VERSION = 1.0.3
+EPICS_SITE_VERSION = 1.0.4
 
 # For GNU compiler, use pipes rather than temporary files for
 #  communication between the various stages of compilation.
