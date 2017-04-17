@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.4:  2017-04-17 from R3.15.5-1.brach
+    Applied macLib-macExpandString.patch to R3.15.5-1.branch to fix bug with macLib macExpandString.
+        More info at: http://www.aps.anl.gov/epics/core-talk/2017/msg00123.php
+
 R3.15.5-1.0.3:	2017-04-03 from R3.15.5-1.branch
 	Applied dbConvert.patch to R3.15.5-1.branch to fix crash on 64bit os when calling getFloatString()
 
