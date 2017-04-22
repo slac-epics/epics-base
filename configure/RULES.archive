@@ -73,7 +73,7 @@ $(COMMON_DIR)/%.archive: %.sub-arch
 	$(MKMF) -m$(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
 	$(ECHO) "Inflating archive file from $<"
 	@$(RM) $@ msi.tmp
-	$(MSI) $(ARCHIVEFLAGS) -S$< > msi.tmp
+	$(MSI3_15) $(ARCHIVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
 
 INSTALL = $(PERL) $(TOOLS)/installEpics.pl

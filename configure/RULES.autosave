@@ -74,7 +74,7 @@ $(COMMON_DIR)/%.req: %.sub-req
 	$(MKMF) -m$(notdir $@)$(DEP) $(AUTOSAVE_INCLUDES) $@ $< 
 	$(ECHO) "Inflating autosave request from $<"
 	@$(RM) $@ msi.tmp
-	$(MSI) $(AUTOSAVEFLAGS) -S$< > msi.tmp
+	$(MSI3_15) $(AUTOSAVEFLAGS) -S$< > msi.tmp
 	$(MV) msi.tmp $@
 
 
