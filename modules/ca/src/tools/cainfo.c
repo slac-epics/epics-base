@@ -83,6 +83,8 @@ int cainfo (pv *pvs, int nPvs)
                                 /* Print the status data */
                                 /* --------------------- */
 
+            if ( pvs[n].chid == 0 )
+				continue;
             state   = ca_state(pvs[n].chid);
             nElems  = ca_element_count(pvs[n].chid);
             dbfType = ca_field_type(pvs[n].chid);
