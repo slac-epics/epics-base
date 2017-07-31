@@ -4,7 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
-R3.15.5-1.0.4:  2017-04-17 from R3.15.5-1.brach
+R3.15.5-1.0.5:  2017-07-31 from R3.15.5-1.branch
+    Added support for RTEMS-svgm
+    Added protection at CONFIG_SITE to only do CROSS if EPICS_HOST_ARCH is rhel6-x86_64
+
+R3.15.5-1.0.4:  2017-04-17 from R3.15.5-1.branch
     Applied macLib-macExpandString.patch to R3.15.5-1.branch to fix bug with macLib macExpandString.
         More info at: http://www.aps.anl.gov/epics/core-talk/2017/msg00123.php
 
