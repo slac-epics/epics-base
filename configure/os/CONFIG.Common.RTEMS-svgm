@@ -1,0 +1,33 @@
+#
+# CONFIG.Common.RTEMS-svgm
+# Author: Till Straumann
+#	  SSRL
+#         strauman@slac.stanford.edu
+#
+# All RTEMS targets use the same Makefile fragment
+#
+override EXE=.elf
+RTEMS_TARGET_CPU = powerpc
+GNU_TARGET       = powerpc-rtems
+
+MUNCH_SUFFIX = .boot
+MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
+define MUNCH_CMD
+	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+endef
+
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-svgm
+
+include $(CONFIG)/os/CONFIG.Common.RTEMS
+RTEMSSYMS=$(PRODNAME:%$(EXE)=%.sym)
+RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
+INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
+INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
+
+#OP_SYS_LDLIBS += -lbspExt
+
+%.sym: %$(EXE)
+	$(XSYMS) $^ $@
+
+%.bin: %$(EXE)
+	$(OBJCOPY) -Obinary $^ $@
