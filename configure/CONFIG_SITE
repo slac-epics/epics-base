@@ -111,6 +111,7 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       RTEMS-mvme5500
 #       RTEMS-pc386
 #       RTEMS-psim
+#       RTEMS-svgm
 #       RTEMS-uC5282
 #       win32-x86-mingw         (linux-x86 or -x86_64 host)
 #
@@ -120,7 +121,7 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #  may override this setting.
 #CROSS_COMPILER_TARGET_ARCHS=
 #CROSS_COMPILER_TARGET_ARCHS=rt-linux
-CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
+CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
