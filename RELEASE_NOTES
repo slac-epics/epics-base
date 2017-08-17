@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.6:	2017-08-17 from R3.15.5-1.branch
+    Fixed RTEMS targets to USE_GESYS=YES.
+	From EPICS R3.15.1 to R3.15.2 a change was added and RTEMS target builds can now be configured to make GESYS modules by changing the USE_GESYS=NO setting in the file configure/os/CONFIG_SITE.Common.RTEMS to YES.
+	Please see: http://www.aps.anl.gov/epics/base/R3-15/5-docs/RELEASE_NOTES.html
+
 R3.15.5-1.0.5:  2017-07-31 from R3.15.5-1.branch
     Added support for RTEMS-svgm
     Added protection at CONFIG_SITE to only do CROSS if EPICS_HOST_ARCH is rhel6-x86_64

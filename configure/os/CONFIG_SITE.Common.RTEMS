@@ -61,7 +61,7 @@ override EXE = .obj
 # A GeSys object is similar to a shared library.  It can be (un)loaded
 # at runtime by the Generic System loader which is available as a
 # patch against RTEMS.
-USE_GESYS = NO
+USE_GESYS = YES
 
 #OP_SYS_LDLIBS = -lrtemsCom
 OP_SYS_LDFLAGS = -Wl,-S
