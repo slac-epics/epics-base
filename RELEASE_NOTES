@@ -33,6 +33,7 @@ R3.15.5-2.0?	Bruce Hill	2017-02-01
 		linuxRT_CCACHE_DISABLE_FIX.patch - Fix to prior patch
 		DBR_CTRL_CHAR_1elem_crash.patch - Fix IOC crash for DBR_CTRL_CHAR request with 1 array element
     	macLib-macExpandString.patch - Fix bug with macLib macExpandString.
+    	Fixed RTEMS targets to USE_GESYS=YES.
 
 R3.14.12.5-2.1	Bruce Hill 2017-01-05
 	Built from R3.14.12.5-2.branch which was derived from tag R3.14.12.5 on the github-3.14 branch.
