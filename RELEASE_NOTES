@@ -4,6 +4,12 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.7:	2017-08-17 from R3.15.5-1.branch
+    Applied community patches as follow:
+	patches/dbCa-warning.patch: fixes the issue for IOCs with very large numbers of CA links may crash on shutdown due to a bug in the dbCa code.
+	patches/fix-1699445.patch: fixes the issue and allows hex constants in some places where they didn't work before.
+	patches/RTEMS_rsrv_mcast.patch: fixes rsrv - failed to set mcast loopback in src/ioc/rsrv/caservertask.c.
+ 
 R3.15.5-1.0.6:	2017-08-17 from R3.15.5-1.branch
     Fixed RTEMS targets to USE_GESYS=YES.
 	From EPICS R3.15.1 to R3.15.2 a change was added and RTEMS target builds can now be configured to make GESYS modules by changing the USE_GESYS=NO setting in the file configure/os/CONFIG_SITE.Common.RTEMS to YES.
