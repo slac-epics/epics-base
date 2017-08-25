@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.8:	2017-08-25 from R3.15.5-1.branch
+    Reverted patch patches/RTEMS_rsrv_mcast.patch
+    Applied community patch as follow:
+	patches/osiSockOptMcastLoop.patch: setsockopt(..., IP_MULTICAST_LOOP, ...) needs a different type for its data value argument on different OSs.
+
 R3.15.5-1.0.7:	2017-08-17 from R3.15.5-1.branch
     Applied community patches as follow:
 	patches/dbCa-warning.patch: fixes the issue for IOCs with very large numbers of CA links may crash on shutdown due to a bug in the dbCa code.
