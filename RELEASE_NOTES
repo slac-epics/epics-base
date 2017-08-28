@@ -4,7 +4,21 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
-R3.15.5-2.0?	Bruce Hill	2017-02-01
+R3.15.5-2.0.2	Bruce Hill	2017-08-28
+	Hugo Slepicka
+		community patch patches/osiSockOptMcastLoop.patch
+		Applying patches/fix-1699445.patch
+		Applying patches/dbCa-warning.patch
+		Fixed RTEMS targets to USE_GESYS=YES
+
+R3.15.5-2.0.1	Bruce Hill	2017-06-05
+	Fix seg fault when empty string is passed to caget or cainfo as the pvname parameter
+	Applied macLib-macExpandString.patch to R3.15.5-1.branch to fix bug with macLib macExpandString.
+	DBR_CTRL_CHAR_1elem_crash.patch, fixes IOC crashes for DBR_CTRL_CHAR request with 1 array element
+	Various build fixes to remove warnings and set appropriate build flags
+	Applied dbConvert.patch to fix crash on 64bit systems on calls to get_precision()
+
+R3.15.5-2.0.0	Bruce Hill	2017-02-01
 	Built from merge of R3.14.12.5-2.branch into R3.15.5-0.branch
 	Includes the following patches:
 		pcds-config-site.patch
