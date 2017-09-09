@@ -629,7 +629,9 @@ long dbGetLink(struct link *plink, short dbrType, void *pbuffer,
         long *poptions, long *pnRequest)
 {
     struct dbCommon *precord = plink->value.pv_link.precord;
+    DBADDR *paddr = (DBADDR *) plink->value.pv_link.pvt;
     epicsEnum16 sevr = 0, stat = 0;
+	int doInheritSeverity = 1;
     long status;
 
     if (poptions && *poptions) {
@@ -648,6 +650,9 @@ long dbGetLink(struct link *plink, short dbrType, void *pbuffer,
         status = dbDbGetValue(plink, dbrType, pbuffer, &stat, &sevr, pnRequest);
         if ( status )
             recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
+		if(precord == paddr->precord) {
+			doInheritSeverity = 0;
+		}
         break;
     case CA_LINK:
         status = dbCaGetLink(plink, dbrType, pbuffer, &stat, &sevr, pnRequest);
@@ -668,7 +673,7 @@ long dbGetLink(struct link *plink, short dbrType, void *pbuffer,
         recGblSetSevr(precord, LINK_ALARM, INVALID_ALARM);
         status = -1;
     }
-    if (status == 0) {
+    if (status == 0 && doInheritSeverity) {
         inherit_severity(&plink->value.pv_link, precord, stat, sevr);
     }
     return status;
