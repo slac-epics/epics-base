@@ -63,6 +63,7 @@ void usage (void)
     "            'i' = incremental timestamps (time elapsed since last update)\n"
     "            'I' = incremental timestamps (time since last update, by channel)\n"
     "            'r', 'i' or 'I' require 's' or 'c' to select the time source\n"
+    "  -P:       Show fiducial pulse ID with timestamps\n"
     "Enum format:\n"
     "  -n:       Print DBF_ENUM values as number (default is enum string)\n"
     "Array values: Print number of elements, then list of values\n"
@@ -211,7 +212,7 @@ int main (int argc, char *argv[])
 
     LINE_BUFFER(stdout);        /* Configure stdout buffering */
 
-    while ((opt = getopt(argc, argv, ":nhVm:sSe:f:g:l:#:0:w:t:p:F:")) != -1) {
+    while ((opt = getopt(argc, argv, ":nhPVm:sSe:f:g:l:#:0:w:t:p:F:")) != -1) {
         switch (opt) {
         case 'h':               /* Print usage */
             usage();
@@ -222,6 +223,9 @@ int main (int argc, char *argv[])
         case 'n':               /* Print ENUM as index numbers */
             enumAsNr=1;
             break;
+        case 'P':               /* Show Fiducial Pulse ID from timestamps */
+            tsShowPulseId = 1;
+			break;
         case 't':               /* Select timestamp source(s) and type */
             tsSrcServer = 0;
             tsSrcClient = 0;
