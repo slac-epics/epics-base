@@ -44,6 +44,7 @@ static int tsInitC = 0;              /* Flag: Client timestamps init'd */
 TimeT tsType = absolute;             /* Timestamp type flag (-t option) */
 int tsSrcServer = 1;                 /* Timestamp source flag (-t option) */
 int tsSrcClient = 0;                 /* Timestamp source flag (-t option) */
+int tsShowPulseId = 0;               /* Show PulseID flag (-P option) */
 IntFormatT outTypeI = dec;           /* For -0.. output format option */
 IntFormatT outTypeF = dec;           /* For -l.. output format option */
 
@@ -395,6 +396,15 @@ char *dbr2str (const void *value, unsigned type)
     return str;
 }
 
+#define PULSEID_MASK    0x1FFFF
+#define FID(pts)        ((pts)->nsec & PULSEID_MASK)
+#define FID_MAX         0x1FFE0
+#define FID_ROLL_LO     0x00200
+#define FID_ROLL_HI     (FID_MAX-FID_ROLL_LO)
+#define FID_ROLL(a,b)   ((b) < FID_ROLL_LO && (a) > FID_ROLL_HI)
+#define FID_GT(a,b)     (FID_ROLL(b, a) || ((a) > (b) && !FID_ROLL(a, b)))
+#define FID_DIFF(a,b)   ((FID_ROLL(b, a) ? FID_MAX : 0) + (int)(a) - (int)(b) - (FID_ROLL(a, b) ? FID_MAX : 0))
+
 
 
 /*+**************************************************************************
@@ -442,6 +452,9 @@ char *dbr2str (const void *value, unsigned type)
         if (tsSrcServer) {                                              \
             epicsTimeToStrftime(timeText, TIMETEXTLEN, timeFormatStr, ptsNewS); \
             printf("%s", timeText);                                     \
+            if (tsShowPulseId) {                                        \
+                printf("(%d)", FID(ptsNewS) );                          \
+            }                                                           \
         }                                                               \
         if (tsSrcClient) {                                              \
             epicsTimeToStrftime(timeText, TIMETEXTLEN, timeFormatStr, ptsNewC); \
@@ -451,6 +464,9 @@ char *dbr2str (const void *value, unsigned type)
     } else {                                                            \
         if (tsSrcServer) {                                              \
             printf("              %+12.6f", epicsTimeDiffInSeconds(ptsNewS, ptsRefS) ); \
+            if (tsShowPulseId) {                                        \
+                printf("(%+d)", FID_DIFF(FID(ptsNewS),FID(ptsRefS)));   \
+            }                                                           \
         }                                                               \
         if (tsSrcClient) {                                              \
             printf("              (%+12.6f)", epicsTimeDiffInSeconds(ptsNewC, ptsRefC) ); \
