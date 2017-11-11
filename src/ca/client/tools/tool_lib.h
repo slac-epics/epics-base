@@ -84,6 +84,7 @@ typedef struct
 extern TimeT tsType;        /* Timestamp type flag (-t option) */
 extern int tsSrcServer;     /* Timestamp source flag (-t option) */
 extern int tsSrcClient;     /* Timestamp source flag (-t option) */
+extern int tsShowPulseId;   /* Timestamp show PulseID flag (-P option) */
 extern IntFormatT outTypeI; /* Flag used for -0.. output format option */
 extern IntFormatT outTypeF; /* Flag used for -l.. output format option */
 extern int enumAsNr;        /* Used for -n option (get DBF_ENUM as number) */
