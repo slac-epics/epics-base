@@ -80,6 +80,7 @@ static void usage (void)
     " DBR_STS_STRING 7  DBR_TIME_FLOAT  16  DBR_GR_LONG     26  DBR_CLASS_NAME    38\n"
     " DBR_STS_SHORT  8  DBR_TIME_ENUM   17  DBR_GR_DOUBLE   27\n"
     " DBR_STS_INT    8  DBR_TIME_CHAR   18  DBR_CTRL_STRING 28\n"
+    "  -P:       Show fiducial pulse ID with timestamps\n"
     "Enum format:\n"
     "  -n: Print DBF_ENUM value as number (default is enum string)\n"
     "Arrays: Value format: print number of requested values, then list of values\n"
@@ -397,7 +398,7 @@ int main (int argc, char *argv[])
 
     use_ca_timeout_env ( &caTimeout);
 
-    while ((opt = getopt(argc, argv, ":taiGcnhsSVe:f:g:l:#:d:0:w:p:F:")) != -1) {
+    while ((opt = getopt(argc, argv, ":taiGcPnhsSVe:f:g:l:#:d:0:w:p:F:")) != -1) {
         switch (opt) {
         case 'h':               /* Print usage */
             usage();
@@ -405,6 +406,9 @@ int main (int argc, char *argv[])
         case 'V':
             printf( "\nEPICS Version %s, CA Protocol version %s\n", EPICS_VERSION_STRING, ca_version() );
             return 0;
+        case 'P':               /* Show Fiducial Pulse ID from timestamps */
+            tsShowPulseId = 1;
+			break;
         case 't':               /* Terse output mode */
             complainIfNotPlainAndSet(&format, terse);
             break;
