@@ -4,6 +4,14 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.4	Bruce Hill	2017-11-21
+	Got most pcds makeBaseApp templates building again.
+		pcdsBeckhoff and pcdsMotor need new module releases for R3.15.5-2.0
+	Added new features to makeBaseApp.pl to support pcds templates.
+
+R3.15.5-2.0.3	Bruce Hill	2017-11-10
+	Added -P option to caget and camonitor to show SLAC fiducial pulse ID.
+
 R3.15.5-2.0.2	Bruce Hill	2017-08-28
 	Hugo Slepicka
 		community patch patches/osiSockOptMcastLoop.patch
