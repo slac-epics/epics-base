@@ -4,6 +4,12 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.9:	2017-11-16 from R3.15.5-1.branch
+	Applied rules-ioc-archive-autosave-templated.patch to add support for generating autosave
+		and archive request files.
+		Also allows building db, autosave, and archive files from ioc directories.
+	Fix to block calc input records from inheriting status from themselves via INP* MS
+
 R3.15.5-1.0.8:	2017-08-25 from R3.15.5-1.branch
     Reverted patch patches/RTEMS_rsrv_mcast.patch
     Applied community patch as follow:
