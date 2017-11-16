@@ -1,0 +1,82 @@
+# RULES.alh
+# RULES for building and installing alarm handler files
+
+# Display how this makefile was called
+#$(info RULES.alh: '$(MAKECMDGOALS)')
+
+####################################################
+# Where to find Alarm Handler files
+#vpath %.alhConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
+vpath %.alhConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH)) $(COMMON_DIR) 
+vpath %.tpl-alh          $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
+vpath %.sub-alh 	     $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
+vpath %.alhsubstitutions $(USR_VPATH) $(GENERIC_SRC_DIRS)
+
+# Install Alarm Handler files here
+INSTALL_ALH = $(INSTALL_LOCATION)/alh
+
+####################################################
+# Alarm Handler include Flags (msi -I path)
+define  ALH_DIRS_template
+  RELEASE_ALH_DIRS += $$(wildcard $$(strip $$($(1)))/alh)
+endef
+$(foreach top, $(RELEASE_TOPS), \
+	$(eval $(call ALH_DIRS_template,$(top)) ))
+ALH_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ALH) $(RELEASE_ALH_DIRS)
+ALH_INCLUDES = $(addprefix -I, $(ALH_SEARCH_DIRS))
+ALHFLAGS  = $($*_ALHFLAGS) $(USR_ALHFLAGS) $(ALH_INCLUDES)
+
+####################################################
+# Generate COMMON_ALHS list
+COMMON_ALHS  += $(filter $(COMMON_DIR)/%, \
+	$(foreach file, $(ALH), \
+		$(firstword $(SOURCE_ALH) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_ALH = $(wildcard $(file) $(SOURCE_ALH_bbb) )
+SOURCE_ALH_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ALH_aaa)  )
+SOURCE_ALH_aaa = $(addsuffix /$(file), $(dir) )
+
+# Generate INSTALL_ALHS list
+INSTALL_ALHS += $(addprefix $(INSTALL_ALH)/,$(notdir $(ALH)))
+
+####################################################
+# Generate ALH_DEPENDS_FILES list
+ALH_DEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_ALHS)))
+
+####################################################
+# Build targets
+
+install:        $(INSTALL_ALHS)
+
+build:          $(COMMON_ALHS)
+
+####################################################
+# Build and install Rules
+
+$(INSTALL_ALH)/%:	%
+	@$(ECHO) "Installing alh file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(COMMON_DIR)/%.alhConfig: %.sub-alh
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(ALH_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating alh file from $<"
+	@$(RM) $@
+	$(MSI3_15) $(ALHFLAGS) -S$< > $@
+
+$(COMMON_DIR)/%.alhConfig: %.alhsubstitutions
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(ALH_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating alh file from $<"
+	@$(RM) $@
+	$(MSI3_15) $(ALHFLAGS) -S$< > $@
+
+$(INSTALL_ALH)/%: $(COMMON_DIR)/%
+	@$(ECHO) "Installing inflated alh file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+#####################################################
+# Include archive dependency files
+ifneq (,$(strip $(ALH_DEPENDS_FILES)))
+-include $(ALH_DEPENDS_FILES)
+endif
+

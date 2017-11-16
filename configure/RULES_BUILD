@@ -99,6 +99,12 @@ endif
 include $(CONFIG)/RULES_FILE_TYPE
 
 include $(CONFIG)/RULES.Db
+ 
+# Additional SLAC RULES
+-include $(CONFIG)/RULES.alh
+-include $(CONFIG)/RULES.autosave
+-include $(CONFIG)/RULES.archive
+-include $(CONFIG)/RULES.Restore
 
 #---------------------------------------------------------------
 # Include defines and rules for prod, library and test* targets
