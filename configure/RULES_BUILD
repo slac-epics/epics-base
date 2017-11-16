@@ -83,6 +83,10 @@ endif
 -include $(CONFIG)/RULES_FILE_TYPE
 
 -include $(CONFIG)/RULES.Db
+ 
+-include $(CONFIG)/RULES.autosave
+
+-include $(CONFIG)/RULES.archive
 
 #---------------------------------------------------------------
 # Include defines and rules for prod, library and test* targets
