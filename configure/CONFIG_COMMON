@@ -55,6 +55,10 @@ GNU_DIR = /usr
 
 INSTALL_LOCATION            = $(TOP)
 
+# SLAC Specific Install locations
+INSTALL_ARCHIVE             = $(INSTALL_LOCATION)/archive
+INSTALL_AUTOSAVE            = $(INSTALL_LOCATION)/autosave
+
 INSTALL_LOCATION_LIB        = $(INSTALL_LOCATION)/lib
 INSTALL_LOCATION_BIN        = $(INSTALL_LOCATION)/bin
 
