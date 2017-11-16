@@ -1,0 +1,73 @@
+# RULES.archive
+# RULES for building and installing archive files
+
+# Display how this makefile was called
+#$(info RULES.archive: '$(MAKECMDGOALS)')
+
+####################################################
+# Where to find archive files
+vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
+vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+
+# Install archive files here
+INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
+
+####################################################
+# archive include Flags (msi -I path)
+define  ARCHIVE_DIRS_template
+  RELEASE_ARCHIVE_DIRS += $$(wildcard $$(strip $$($(1)))/archive)
+endef
+$(foreach top, $(RELEASE_TOPS), \
+	$(eval $(call ARCHIVE_DIRS_template,$(top)) ))
+ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(TOP)/archive $(RELEASE_ARCHIVE_DIRS)
+ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
+ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
+
+####################################################
+# Generate COMMON_ARCHIVES list
+COMMON_ARCHIVES  += $(filter $(COMMON_DIR)/%, \
+	$(foreach file, $(ARCHIVE), \
+		$(firstword $(SOURCE_ARCHIVE) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_ARCHIVE = $(wildcard $(file) $(SOURCE_ARCHIVE_bbb) )
+SOURCE_ARCHIVE_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ARCHIVE_aaa)  )
+SOURCE_ARCHIVE_aaa = $(addsuffix /$(file), $(dir) )
+
+# Generate INSTALL_ARCHIVES list
+INSTALL_ARCHIVES += $(addprefix $(INSTALL_ARCHIVE)/, $(notdir $(ARCHIVE)))
+
+####################################################
+# Generate ARCHIVE_DEPENDS_FILES list
+ARCHIVE_DEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_ARCHIVES)))
+
+####################################################
+# Build targets
+
+install:        $(INSTALL_ARCHIVES)
+
+build:          $(COMMON_ARCHIVES)
+
+####################################################
+# Build and install Rules
+
+$(INSTALL_ARCHIVE)/%:	%
+	@$(ECHO) "Installing archive file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(COMMON_DIR)/%.archive: %.sub-arch
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating archive file from $<"
+	@$(RM) $@
+	$(MSI3_15) $(ARCHIVEFLAGS) -S$< > $@
+
+$(INSTALL_ARCHIVE)/%: $(COMMON_DIR)/%
+	@$(ECHO) "Installing inflated archive file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+#####################################################
+# Include archive dependency files
+ifneq (,$(strip $(ARCHIVE_DEPENDS_FILES)))
+-include $(ARCHIVE_DEPENDS_FILES)
+endif
+
