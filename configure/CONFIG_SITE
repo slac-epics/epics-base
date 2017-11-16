@@ -11,6 +11,12 @@
 #  CONFIG_SITE  - Global site configuration file
 #
 
+# Add SLAC specific file types
+FILE_TYPE += PROTO
+INSTALL_PROTO = $(INSTALL_LOCATION)/db
+FILE_TYPE += CMD
+INSTALL_CMD = $(INSTALL_LOCATION)/db
+
 #  The host architecture performing the build, in the form
 #       <operating system>-<architecture>[-<toolset>]
 #

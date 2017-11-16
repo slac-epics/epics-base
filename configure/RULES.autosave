@@ -1,0 +1,71 @@
+####################################################
+# RULES for building and installing autosave files
+
+# Display how this makefile was called
+#$(info RULES.autosave: '$(MAKECMDGOALS)')
+
+####################################################
+# Where to find and install files for autosave
+vpath %.req           $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ))
+vpath %.sub-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
+vpath %.tpl-req       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(REQ)) $(COMMON_DIR)
+
+# Install autosave files here
+INSTALL_AUTOSAVE = $(INSTALL_LOCATION)/autosave
+
+####################################################
+# Autosave Flags (-I path)
+define  AUTOSAVE_DIRS_template
+  RELEASE_AUTOSAVE_DIRS += $$(wildcard $$(strip $$($(1)))/autosave)
+endef
+$(foreach top, $(RELEASE_TOPS), $(eval $(call AUTOSAVE_DIRS_template,$(top)) ))
+AUTOSAVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_AUTOSAVE) $(TOP)/autosave $(RELEASE_AUTOSAVE_DIRS)
+AUTOSAVE_INCLUDES  = $(addprefix -I, $(AUTOSAVE_SEARCH_DIRS))
+AUTOSAVEFLAGS  = $($*_AUTOSAVEFLAGS) $(USR_AUTOSAVEFLAGS) $(AUTOSAVE_INCLUDES)
+
+####################################################
+# Generate COMMON_REQS list
+COMMON_REQS  += $(filter $(COMMON_DIR)/%, \
+	$(foreach file, $(REQ), \
+		$(firstword $(SOURCE_REQ) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_REQ = $(wildcard $(file) $(SOURCE_REQ_bbb) )
+SOURCE_REQ_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_REQ_aaa)  )
+SOURCE_REQ_aaa = $(addsuffix /$(file), $(dir) )
+INSTALL_REQS += $(addprefix $(INSTALL_AUTOSAVE)/, $(notdir $(REQ)))
+
+####################################################
+# Generate REQ_DEPENDS_FILES list
+REQ_DEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_REQS)))
+
+####################################################
+# Build targets
+
+install:	$(INSTALL_REQS)
+
+build:		$(COMMON_REQS)
+
+####################################################
+# Build and install Rules
+
+$(INSTALL_AUTOSAVE)/%:	%  
+	@$(ECHO) "Installing autosave file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(COMMON_DIR)/%.req: %.sub-req
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(AUTOSAVE_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating autosave request from $<"
+	@$(RM) $@
+	$(MSI3_15) $(AUTOSAVEFLAGS) -S$< > $@
+
+$(INSTALL_AUTOSAVE)/%: $(COMMON_DIR)/%
+	@echo "Installing inflated autosave file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+
+#####################################################
+# Include autosave dependency files
+ifneq (,$(strip $(REQ_DEPENDS_FILES)))
+-include $(REQ_DEPENDS_FILES)
+endif
+
