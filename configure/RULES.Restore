@@ -1,0 +1,83 @@
+# Where to install configuration files for ChannelWatcher
+# RULES for building and installing ChannelWatcher *.cwConfig files
+
+# Display how this makefile was called
+#$(info RULES.Restore: '$(MAKECMDGOALS)')
+
+####################################################
+# Where to find ChannelWatcher files
+vpath %.cw              $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(RESTORE))
+vpath %.cwConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(RESTORE))
+vpath %.tpl-cw          $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(RESTORE))
+vpath %.sub-cw          $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(RESTORE))
+vpath %.cwsubstitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(RESTORE))
+
+# Install ChannelWatcher files here
+INSTALL_RESTORE = $(INSTALL_LOCATION)/restore
+
+####################################################
+# channelWatcher include Flags (msi -I path)
+define  RESTORE_DIRS_template
+  RELEASE_RESTORE_DIRS += $$(wildcard $$(strip $$($(1)))/restore)
+endef
+$(foreach top, $(RELEASE_TOPS), \
+	$(eval $(call RESTORE_DIRS_template,$(top)) ))
+RESTORE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_RESTORE) $(TOP)/archive $(RELEASE_RESTORE_DIRS)
+RESTORE_INCLUDES = $(addprefix -I, $(RESTORE_SEARCH_DIRS))
+RESTOREFLAGS  = $($*_RESTOREFLAGS) $(USR_RESTOREFLAGS) $(RESTORE_INCLUDES)
+
+####################################################
+# Generate COMMON_RESTORES list
+COMMON_RESTORES  += $(filter $(COMMON_DIR)/%, \
+	$(foreach file, $(RESTORE), \
+		$(firstword $(SOURCE_RESTORES) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_RESTORES = $(wildcard $(file) $(SOURCE_RESTORES_bbb) )
+SOURCE_RESTORES_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_RESTORES_aaa)  )
+SOURCE_RESTORES_aaa = $(addsuffix /$(file), $(dir) )
+
+# Generate INSTALL_RESTORES list
+INSTALL_RESTORES += $(addprefix $(INSTALL_RESTORE)/, $(notdir $(RESTORE)))
+
+####################################################
+# Generate RESTORE_DEPENDS_FILES list
+RESTORE_DEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMMON_RESTORES)))
+
+####################################################
+# Build targets
+
+install:        $(INSTALL_RESTORES)
+
+build:          $(COMMON_RESTORES)
+
+####################################################
+# Build and install Rules
+
+$(INSTALL_RESTORE)/%: %
+	@$(ECHO) "Installing cwConfig file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(COMMON_DIR)/%.cwConfig: %.sub-cw
+	$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(RESTORE_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating cwConfig from $<"
+	@$(RM) $@
+	$(MSI3_15) $(RESTOREFLAGS) -S$< > $@
+
+$(COMMON_DIR)/%.cwConfig: %.cwsubstitutions
+	$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(RESTORE_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating cwConfig from $<"
+	@$(RM) $@
+	$(MSI3_15) $(RESTOREFLAGS) -S$< > $@
+
+$(INSTALL_RESTORE)/%.cwConfig: $(COMMON_DIR)/%.cwConfig
+	@$(ECHO) "Installing generated cwConfig file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+#####################################################
+# Include ChannelWatcher config dependency files
+ifneq (,$(strip $(RESTORE_DEPENDS_FILES)))
+-include $(RESTORE_DEPENDS_FILES)
+endif
+
+##################################################### END OF FILE
