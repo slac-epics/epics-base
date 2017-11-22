@@ -12,7 +12,7 @@ include $(TOP)/configure/CONFIG
 # Enable this line to install example.proto to $(TOP)/protocol
 # However, this is not necessary as long as your st.cmd sets
 # the env var STREAM_PROTOCOL_PATH to $(TOP)/_APPNAME_App/srcProtocol
-#COPY_FILES += example.proto
+COPY_FILES += example.proto
 
 # What subdirectory should hold the protcol files.  For this example,
 # $INSTALL_LOCATION/protocol will be created.
@@ -23,10 +23,12 @@ COPY_SUBDIR = protocol
 # target directories are actually the same.
 # COPY_ONLY_IF_NON_LOCAL=1
 
+DB_INSTALLS += $(TOP)/_APPNAME_App/srcProtocol/example.proto
+
 ######################################################################
 # Don't change these.
 include $(TOP)/configure/RULES
-include $(TOP)/configure/RULES.copy
+-include $(TOP)/configure/RULES.copy
 
 ######################################################################
 # Add additional RULES files, if necessary.

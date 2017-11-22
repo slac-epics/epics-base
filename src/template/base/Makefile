@@ -185,7 +185,6 @@ TEMPLATES += top/pcdsIocApp/Makefile
 TEMPLATES += top/pcdsIocApp/Db/Makefile
 TEMPLATES += top/pcdsIocApp/Db/_APPNAME_-ioc.sub-req
 TEMPLATES += top/pcdsIocApp/Db/_APPNAME_-ioc.sub-arch
-TEMPLATES += top/pcdsIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsIocApp/src/Makefile
 TEMPLATES += top/pcdsIocApp/src/_APPNAME_Main.cpp
 
@@ -223,7 +222,6 @@ TEMPLATES += top/pcdsEvrApp/Makefile
 TEMPLATES += top/pcdsEvrApp/Db/Makefile
 TEMPLATES += top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-req
 TEMPLATES += top/pcdsEvrApp/Db/_APPNAME_-ioc.sub-arch
-TEMPLATES += top/pcdsEvrApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evrPmc230.substitutions
 TEMPLATES += top/pcdsEvrApp/Db/evrVme230.substitutions
 
@@ -262,7 +260,6 @@ TEMPLATES += top/pcdsMotorApp/Makefile
 TEMPLATES += top/pcdsMotorApp/Db/Makefile
 TEMPLATES += top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsMotorApp/Db/_APPNAME_-ioc.sub-req
-TEMPLATES += top/pcdsMotorApp/Db/iocAdmin.substitutions
 
 TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/_APPNAME_.edl
 TEMPLATES += top/pcdsMotorApp/_APPNAME_Screens/motor.edl
@@ -326,7 +323,6 @@ TEMPLATES += top/pcdsBeckhoffApp/Makefile
 TEMPLATES += top/pcdsBeckhoffApp/Db/Makefile
 TEMPLATES += top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-req
 TEMPLATES += top/pcdsBeckhoffApp/Db/_APPNAME_-ioc.sub-arch
-TEMPLATES += top/pcdsBeckhoffApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsBeckhoffApp/Db/Bx9000.substitutions
 
 TEMPLATES += top/pcdsBeckhoffApp/src/Makefile
@@ -365,7 +361,6 @@ TEMPLATES += top/pcdsSerialApp/Makefile
 TEMPLATES += top/pcdsSerialApp/Db/Makefile
 TEMPLATES += top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsSerialApp/Db/_APPNAME_-ioc.sub-req
-TEMPLATES += top/pcdsSerialApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.db
 TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.tpl-arch
 TEMPLATES += top/pcdsSerialApp/Db/exampleDevice.tpl-req
@@ -410,7 +405,6 @@ TEMPLATES += top/pcdsTemplateIocApp/Makefile
 TEMPLATES += top/pcdsTemplateIocApp/Db/Makefile
 TEMPLATES += top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-arch
 TEMPLATES += top/pcdsTemplateIocApp/Db/_APPNAME_-ioc.sub-req
-TEMPLATES += top/pcdsTemplateIocApp/Db/iocAdmin.substitutions
 TEMPLATES += top/pcdsTemplateIocApp/configure/RELEASE
 TEMPLATES += top/pcdsTemplateIocApp/src/Makefile
 TEMPLATES += top/pcdsTemplateIocApp/src/_APPNAME_Main.cpp

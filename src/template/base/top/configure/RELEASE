@@ -29,9 +29,6 @@
 # If using the sequencer, point SNCSEQ at its top directory:
 #SNCSEQ = $(MODULES)/seq-ver
 
-# EPICS_BASE should appear last so earlier modules can override stuff:
-EPICS_BASE = _EPICS_BASE_
-
 # Set RULES here if you want to use build rules from somewhere
 # other than EPICS_BASE:
 #RULES = $(MODULES)/build-rules
@@ -41,3 +38,11 @@ EPICS_BASE = _EPICS_BASE_
 -include $(TOP)/../RELEASE.local
 -include $(TOP)/configure/RELEASE.local
 
+# EPICS_BASE should appear last so earlier modules can override stuff:
+# EPICS_BASE = _EPICS_BASE_
+EPICS_BASE = $(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
+
+# Check for valid EPICS_BASE
+ifeq ($(wildcard $(EPICS_BASE)/include),)
+$(error Invlaid EPICS_BASE: $(EPICS_BASE)/include)
+endif

@@ -23,7 +23,7 @@ include $(TOP)/configure/CONFIG
 ######################################################################
 # Don't change these.
 include $(TOP)/configure/RULES
-include $(TOP)/configure/RULES.copy
+-include $(TOP)/configure/RULES.copy
 
 ######################################################################
 # Add additional RULES files, if necessary.

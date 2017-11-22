@@ -3,16 +3,10 @@
 include $(TOP)/RELEASE_SITE
 
 # ===============================================================
-# Define the location and version of EPICS base
-# ===============================================================
-BASE_MODULE_VERSION=R3.14.12-0.4.0
-EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
-
-# ===============================================================
 # Define the version of modules needed by
 # IOC apps or other Support apps
 # ===============================================================
-# Ex: IOCADMIN_MODULE_VERSION=R2.0.0-1.0.0
+# Ex: IOCADMIN_MODULE_VERSION		= R2.0.0-1.0.0
 
 # ============================================================
 # External Support module path definitions
@@ -28,4 +22,14 @@ EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
 # If your build fails, look for these paths in your build output
 # ============================================================
 # Ex: IOCADMIN=$(EPICS_MODULES)/iocAdmin/$(IOCADMIN_MODULE_VERSION)
+
+# ===============================================================
+# Define the location and version of EPICS base
+# ===============================================================
+EPICS_BASE=$(EPICS_SITE_TOP)/base/$(BASE_MODULE_VERSION)
+
+# Check for valid EPICS_BASE
+ifeq ($(wildcard $(EPICS_BASE)/include),)
+$(error Invalid EPICS_BASE: $(EPICS_BASE)/include)
+endif
 

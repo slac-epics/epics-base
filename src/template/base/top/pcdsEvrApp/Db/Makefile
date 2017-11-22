@@ -10,7 +10,6 @@ include $(TOP)/configure/CONFIG
 #----------------------------------------------------
 # Create and install (or just install)
 # databases, templates, substitutions like this
-DB += iocAdmin.db
 DB += evrPmc230.db
 DB += evrVme230.db
 
@@ -28,6 +27,8 @@ REQ += _APPNAME_-ioc.req
 
 # Nothing to build for autosave, just install from $AUTOSAVE/db
 DB_INSTALLS += $(AUTOSAVE)/db/save_restoreStatus.db
+DB_INSTALLS += $(IOCADMIN)/db/iocHard.db
+DB_INSTALLS += $(IOCADMIN)/db/iocSoft.db
 
 include $(TOP)/configure/RULES
 #----------------------------------------

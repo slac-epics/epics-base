@@ -17,6 +17,10 @@ COPY_FILES += $(PCDS_MOTION)/protocol/AGI_MD900_clinometer.proto
 # $INSTALL_LOCATION/protocol will be created.
 COPY_SUBDIR = protocol
 
+DB_INSTALLS += $(PCDS_MOTION)/protocol/mcode.proto
+DB_INSTALLS += $(PCDS_MOTION)/protocol/newall-shg-a2.proto
+DB_INSTALLS += $(PCDS_MOTION)/protocol/AGI_MD900_clinometer.proto
+
 # Uncomment this if you only want to copy when *not* installing to
 # your development area.  Useful for iocBoot, where the source and
 # target directories are actually the same.
@@ -25,7 +29,7 @@ COPY_SUBDIR = protocol
 ######################################################################
 # Don't change these.
 include $(TOP)/configure/RULES
-include $(TOP)/configure/RULES.copy
+-include $(TOP)/configure/RULES.copy
 
 ######################################################################
 # Add additional RULES files, if necessary.

@@ -17,7 +17,7 @@ DBD += _APPNAME_.dbd
 # _APPNAME_.dbd will be made up from these files:
 _APPNAME__DBD += base.dbd
 _APPNAME__DBD += iocAdmin.dbd
-_APPNAME__DBD += autosaveSupport.dbd
+_APPNAME__DBD += asSupport.dbd
 _APPNAME__DBD += Bx9000_MBT.dbd
 
 # <name>_registerRecordDeviceDriver.cpp will be created from <name>.dbd
