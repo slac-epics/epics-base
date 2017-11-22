@@ -7,6 +7,7 @@ use lib ("$Bin/../../lib/perl", $Bin);
 
 use Cwd;
 use Getopt::Std;
+use File::Basename;
 use File::Find;
 use File::Path 'mkpath';
 use EPICS::Path;
@@ -76,6 +77,7 @@ sub ReplaceFilename { # (filename)
 	$file =~ s|_IOC_|$ioc|;
     } else {
 	$file =~ s|.*/iocBoot/ioc/?.*||;	# Not doing IOCs here
+	$file =~ s|.*_IOC_.*||; # Ignore files with unexpanded _IOC_
     }
     if ($app) {
 	$file =~ s|/$apptypename|/$appdir|;	# templateApp => namedApp
@@ -102,6 +104,8 @@ sub ReplaceLine { # (line)
     $line =~ s/_IOC_/$ioc/g if ($ioc);
     $line =~ s/_USER_/$user/go;
     $line =~ s/_EPICS_BASE_/$app_epics_base/go;
+    $line =~ s/_EPICS_SITE_TOP_/$app_epics_site_top/go;
+    $line =~ s/_BASE_MODULE_VERSION_/$app_epics_base_ver/go;
     $line =~ s/_TEMPLATE_TOP_/$app_template_top/go;
     $line =~ s/_TOP_/$app_top/go;
     $line =~ s/_APPNAME_/$appname/g;
@@ -123,7 +127,10 @@ sub ReplaceLine { # (line)
 sub CopyTop {
     opendir TOPDIR, "$top" or die "Can't open $top: $!";
     foreach $f ( grep !/^\.\.?$|^[^\/]*(App|Boot|Lib)/, readdir TOPDIR ) {
-       find({wanted => \&FCopyTree, follow => 1}, "$top/$f") unless (-e "$f");
+	   # Was find({wanted => \&FCopyTree, follow => 1}, "$top/$f") unless (-e "$f");
+	   # Dropped -e test so templates can override configure/RELEASE but
+	   # inherit the standard set of configure/* files.
+       find({wanted => \&FCopyTree, follow => 1}, "$top/$f");
     }
     closedir TOPDIR;
 }
@@ -184,10 +191,12 @@ foreach $app ( @names ) {
     }
     ($csafeappname = $appname) =~ s/$bad_ident_chars/_/og;
     $appdir  = $appname . $appext;
-    if (-d "$appdir") {
-	print "$appname exists, not modified.\n";
-	next;
-    }
+    # This test commented out because we want to go ahead
+    # and process the appdir directory to fill in missing pieces
+    #if (-d "$appdir") {
+    #print "$appname exists, not modified.\n";
+    #next;
+    #}
     print "Creating $appname from template type $apptypename\n" if $opt_d; 
     find({wanted => \&FCopyTree, follow => 1}, "$top/$apptypename/");
 
@@ -233,6 +242,10 @@ sub get_commandline_opts { #no args
     $epics_base and -d "$epics_base" or Cleanup(1, "Can't find EPICS base");
     $app_epics_base = LocalPath($epics_base);
     $app_epics_base =~ s|^\.\.|\$(TOP)/..|;
+	$app_epics_base_ver = basename($epics_base);
+	$app_epics_site_top = dirname(dirname($epics_base));
+    print "EPICS_SITE_TOP = $app_epics_site_top\n" if $opt_d; 
+    print "BASE_MODULE_VERSION = $app_epics_base_ver\n" if $opt_d; 
 
     # Locate template top directory
     if ($opt_T) {		# first choice is -T templ-top
