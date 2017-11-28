@@ -1,0 +1,97 @@
+# Where to install configuration files for ALH (Alarm Handler)
+
+vpath %.alhConfig $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
+vpath %.alhsubstitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(COMMON_DIR)
+
+INSTALL_ALH = $(INSTALL_LOCATION)/alh
+
+##################################################### Restore Flags
+
+INSTALL_ALHFLAGS = -I $(INSTALL_ALH)
+RELEASE_ALHFLAGS = $(patsubst %/dbd,%/restore, $(RELEASE_DBDFLAGS))
+ALHFLAGS  = $($*_ALHFLAGS) $(USR_ALHFLAGS) -I. $(GENERIC_SRC_INCLUDES) $(INSTALL_ALHFLAGS) $(RELEASE_ALHFLAGS)
+ALHFLAGS += -I$(COMMON_DIR)
+
+#####################################################  Targets
+
+INSTALL_ALHS += $(addprefix $(INSTALL_ALH)/,$(notdir $(ALHS)))
+
+COMMON_ALHS += $(filter $(COMMON_DIR)/%, $(foreach file, $(ALHS), \
+    $(firstword  $(SOURCE_ALHS) $(COMMON_DIR)/$(file) ) ) )
+SOURCE_ALHS = $(wildcard $(file) $(SOURCE_ALHS_bbb) )
+SOURCE_ALHS_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_ALHS_aaa)  )
+SOURCE_ALHS_aaa = $(addsuffix /$(file), $(dir) )
+
+COMMONS = $(COMMON_DIR)/*.alhConfig \
+          $(COMMON_DIR)/*.alhsubstitutions
+
+##################################################### 
+
+ifndef T_A
+
+COMMON_DIR = .
+INSTALL_ALHS =
+COMMON_ALHS = .
+COMMONS = $(ALHS)
+
+-include $(TOP)/configure/O.$(EPICS_HOST_ARCH)/CONFIG_APP_INCLUDE
+
+all:    install
+
+install: buildInstall
+
+buildInstall : build
+
+rebuild: clean install
+
+.PHONY: all inc build install clean rebuild buildInstall
+
+endif # T_A defined
+
+ifneq (,$(strip $(ALH_INSTALLS)))
+buildInstall : restoreInstalls
+endif
+
+.PHONY: restoreInstalls
+
+build : $(COMMON_ALHS) \
+	$(INSTALL_ALHS)
+
+clean: 
+	@$(RM) $(COMMONS)
+
+##################################################### Substitution files
+
+$(INSTALL_ALH)/%.alhsubstitutions: %.alhsubstitutions
+	@echo "Installing alhsubstitutions file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+.PRECIOUS: $(COMMON_DIR)/%.alhsubstitutions
+
+##################################################### alhConfig files
+
+$(COMMON_DIR)/%.alhConfig: %.alhsubstitutions
+	@echo "Inflating alhConfig from $< using local rule"
+	@$(RM) $@
+	@echo "$(MSI) -S$< > $(@F) </dev/null"
+	@$(MSI) -I.. $(ALHFLAGS) -S$< </dev/null > $@
+
+$(INSTALL_ALH)/%.alhConfig: $(COMMON_DIR)/%.alhConfig
+	@echo "Installing alhConfig file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(INSTALL_ALH)/%: %
+	@echo "Installing restore file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+$(INSTALL_ALH)/%: ../%
+	@echo "Installing restore file $@"
+	@$(INSTALL) -d -m 644 $< $(@D)
+
+restoreInstalls:  $(ALH_INSTALLS)
+	@echo "Installing $(^F)"
+	@$(INSTALL) -d -m 555 $^ $(INSTALL_ALH)
+
+.PRECIOUS: $(COMMON_ALHS)
+
+##################################################### END OF FILE
