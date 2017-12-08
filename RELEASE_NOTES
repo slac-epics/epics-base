@@ -4,6 +4,18 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.5	Bruce Hill	2017-12-08
+	Cleaned up custom rules for Restore, alh, archive, and autosave.
+		CMD     += foo.cmd      # installs foo.cmd      to $INSTALL_LOCATION/db
+		PROTO   += foo.proto    # installs foo.proto    to $INSTALL_LOCATION/db
+		RESTORE += foo.cwConfig # installs foo.cwConfig to $INSTALL_LOCATION/restore
+		ALH     += fool.alh     # installs foo.alh      to $INSTALL_LOCATION/alh
+	Also made sure *.cmd and *.proto files can be installed via CMD += and PROTO +=. Default INSTALL dir for both is INSTALL_LOCATION/db, but 
+	Install locations can be overridden by redefining INSTALL_CMD, INSTALL_PROTO, INSTALL_RESTORE, and INSTALL_ALH
+	Sort DIRECTORY_TARGETS to avoid errors if 2 FILE_TYPEs have the same INSTALL directory.
+	Rework module dependency conflict error message for easier debugging.
+		Now a simply grep for asyn in the build log will show you line by line which modules depend on which asyn versions.
+
 R3.15.5-2.0.4	Bruce Hill	2017-11-21
 	Got most pcds makeBaseApp templates building again.
 		pcdsBeckhoff and pcdsMotor need new module releases for R3.15.5-2.0
