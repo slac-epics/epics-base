@@ -251,8 +251,8 @@ sub checkRelease {
                 print "Definition of $parent conflict between this app and $app.\n";
                 print "In this application a RELEASE file\n";
                 print "conflicts with $app at $path\n";
-                print "\tThis App:\t$parent = $macros{$parent}\n";
-                print "\t$app:\t$parent = $ppath\n";
+                print "  This App: $parent = $macros{$parent}\n";
+                print "  $app: $parent = $ppath\n";
                 $status = 1;
             }
         }
