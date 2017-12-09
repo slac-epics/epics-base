@@ -4,7 +4,21 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.10:	2017-12-08 from R3.15.5-1.branch
+	No src changes, just build related.
+	Cleaned up custom rules for Restore, alh, archive, and autosave.
+	Also made sure *.cmd and *.proto files can be installed via
+	CMD += and PROTO +=.
+	Default INSTALL dir for both is INSTALL_LOCATION/db, but that
+	can be overridden by ioc by redefining INSTALL_CMD and INSTALL_PROTO.
+	Sort DIRECTORY_TARGETS to avoid errors if 2 FILE_TYPEs have
+	the same INSTALL directory.
+	Rework module dependency conflict error message for easier debugging.
+		Now a simply grep for asyn in the build log will show you
+		line by line which modules depend on which asyn versions.
+
 R3.15.5-1.0.9:	2017-11-16 from R3.15.5-1.branch
+	Fix vpath error that broke installing templates via DB += file.template
 	Applied rules-ioc-archive-autosave-templated.patch to add support for generating autosave
 		and archive request files.
 		Also allows building db, autosave, and archive files from ioc directories.
