@@ -305,7 +305,7 @@ $(INSTALL_DB)/%$(SUBST_SUFFIX): %$(SUBST_SUFFIX)
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_DB)/%$(SUBST_SUFFIX): ../%$(SUBST_SUFFIX)
-	$(ECHO) "Installing substitution file $@"
+	$(ECHO) "Installing substitutions file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PRECIOUS: $(COMMON_DIR)/%$(SUBST_SUFFIX)
@@ -459,14 +459,13 @@ $(COMMON_DIR)/%.db$(RAW): $(COMMON_DIR)/%.edf
 # Note:
 # MSI expansion command was
 #	$(MSI3_15) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
-# This is wrong for msi when both foo.template and foo.substitutions
-# are used as in many of the PCDS IOc's.
-# Specifying foo.template in the command line as above
-# overrides the templates specified in the substitutions file.
+# This produces unexpected results when both foo.template and
+# foo.substitutions files exist.
+#
+# Specifying foo.template via $(TEMPLATE_FILENAME) in the command line as
+# above overrides all the template filenames specified in foo.substitutions,
+# presumable for some backward compatibility w/ early msi.
 # 
-# PCDS changes it to
-#   $(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
-# to allow both foo.template and foo.subsitutions to coexist.
 $(COMMON_DIR)/%.db$(RAW): %$(SUBST_SUFFIX)
 	$(ECHO) "Inflating database from $<"
 	@$(RM) $(notdir $@)
