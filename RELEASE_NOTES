@@ -4,6 +4,9 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.6	Bruce Hill	2018-1-24
+	Updated LINUXRT_BUILDROOT_VERSION from buildroot-2015.02 to buildroot-2016.11.1
+
 R3.15.5-2.0.5	Bruce Hill	2017-12-08
 	Cleaned up custom rules for Restore, alh, archive, and autosave.
 		CMD     += foo.cmd      # installs foo.cmd      to $INSTALL_LOCATION/db
