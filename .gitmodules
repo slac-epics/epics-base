@@ -1,36 +1,36 @@
 [submodule "modules/libcom"]
     path = modules/libcom
     url = ./
-    branch = libcom/master
+    branch = libcom/slac-master
 [submodule "modules/database"]
     path = modules/database
     url = ./
-    branch = database/master
+    branch = database/slac-master
 [submodule "modules/ca"]
     path = modules/ca
     url = ./
-    branch = ca/master
+    branch = ca/slac-master
 [submodule "modules/pvData"]
     path = modules/pvData
-    url = https://github.com/epics-base/pvDataCPP
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvDataCPP.git
+    branch = R7.0.0-0.branch
 [submodule "modules/pvAccess"]
     path = modules/pvAccess
-    url = https://github.com/epics-base/pvAccessCPP
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvAccessCPP.git
+    branch = R6.0.0-0.branch
 [submodule "modules/normativeTypes"]
     path = modules/normativeTypes
-    url = https://github.com/epics-base/normativeTypesCPP
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/normativeTypesCPP.git
+    branch = R5.2.0-0.branch
 [submodule "modules/pvaClient"]
     path = modules/pvaClient
-    url = https://github.com/epics-base/pvaClientCPP
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvaClient.git
+    branch = R4.2.0-0.branch
 [submodule "modules/pvDatabase"]
     path = modules/pvDatabase
-    url = https://github.com/epics-base/pvDatabaseCPP
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvDataBaseCPP.git
+    branch = R4.3.0-0.branch
 [submodule "modules/pva2pva"]
     path = modules/pva2pva
-    url = https://github.com/epics-base/pva2pva
-    branch = master
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pva2pva.git
+    branch = R1.0.0-0.branch
