@@ -28,7 +28,7 @@
     branch = R4.2.0-0.branch
 [submodule "modules/pvDatabase"]
     path = modules/pvDatabase
-	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvDataBaseCPP.git
+	url = /afs/slac.stanford.edu/g/cd/swe/git/repos/package/epics/modules/pvDatabaseCPP.git
     branch = R4.3.0-0.branch
 [submodule "modules/pva2pva"]
     path = modules/pva2pva
