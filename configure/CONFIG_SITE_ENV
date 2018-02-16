@@ -48,13 +48,13 @@
 #EPICS_TZ = "EST5EDT,M3.2.0/2,M11.1.0/2"
 
 # US Central Standard/Daylight Time:
-EPICS_TZ = "CST6CDT,M3.2.0/2,M11.1.0/2"
+#EPICS_TZ = "CST6CDT,M3.2.0/2,M11.1.0/2"
 
 # US Mountain Standard/Daylight Time:
 #EPICS_TZ = "MST7MDT,M3.2.0/2,M11.1.0/2"
 
 # US Pacific Standard/Daylight Time:
-#EPICS_TZ = "PST8PDT,M3.2.0/2,M11.1.0/2"
+EPICS_TZ = "PST8PDT,M3.2.0/2,M11.1.0/2"
 
 # US Hawaiian Standard Time, no DST:
 #EPICS_TZ = "HST10"
