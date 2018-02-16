@@ -1,0 +1,8 @@
+# CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+#
+# Revision-Id: anj@aps.anl.gov-20101005192737-disfz3vs0f3fiixd
+#
+# Site specific definitions for rhel6-x86_64 host - rhel6-x86_64 target builds
+#-------------------------------------------------------
+
+
