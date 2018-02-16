@@ -1,0 +1,64 @@
+# ==============================================================================================================
+# Documenting changes that happen locally here at SLAC
+# Naming Convention: base-<community_version_string>-x.y.z
+# x.y.z; major, minor, bug fix locally respectively
+# Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
+# ==============================================================================================================
+R3.16.1-0.1.0:	2018-02-15 Bruce Hill
+	R3.16.1 plus local slac build support
+		Add support for rhel6-x86_64 and rhel7-x86_64 target arches
+		Select STATIC_BUILD and set EPICS_SITE_VERSION = 0.1.0
+		Set EPICS_TIMEZONE for PST
+		Select NCURSES instead of readline
+
+R3.15.5-0.2:	New linuxRT buildroot version?
+				Replaced 3 prior patches w/ new lcls-build-support.patch based on final set of changes.
+				?, 1/?/2017
+
+R3.15.5-0.1:   Initial Release of R3.15.5 w/ minimal changes for SLAC build support and targets
+               Modifications EPICS Configuration files: <>/configure/CONFIG_SITE and <>/configure/CONFIG_SITE_ENV
+               Add comment for HOST Build:
+               # rhel6-x86_64           (GNU compiler used for host builds)
+
+               Add Comments for SLAC added CROSS Builds:
+               # linuxRT-x86_64 (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+               # linuxRT-i686   (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+               # linuxRT-arm_zynq (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+
+               For LCLS II and LCLS 1 Mission Readiness, we build the following targets:
+                -- CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq \
+                                           RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
+               Use POSIX thread priority scheduling
+               Build both shared and static libraries
+                -- EPICS BASE executables/binaries are built statically to support a production deployment scheme
+               Always build with debug symbols even in production image
+               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
+
+               Modified "CONFIG_SITE_ENV" to prepare EPICS_TIMEZONE for Pacific Timezone.
+               Added new config files to <>/configure/os  directory to support HOST build for rhel6
+                   CONFIG.Common.rhel6-x86_64
+                   CONFIG.Common.rhel6-x86_64-debug
+                   CONFIG.rhel6-x86_64-debug.Common
+                   CONFIG.rhel6-x86_64-debug.rhel6-x86_64-debug
+                   CONFIG.rhel6-x86_64.Common
+                   CONFIG.rhel6-x86_64.rhel6-x86_64
+                   CONFIG.rhel6-x86_64.rhel6-x86_64-debug
+                   CONFIG_SITE.Common.rhel6-x86_64
+                   CONFIG_SITE.rhel6-x86_64-debug.rhel6-x86_64-debug
+                   CONFIG_SITE.rhel6-x86_64.Common
+                   CONFIG_SITE.rhel6-x86_64.RTEMS
+                   CONFIG_SITE.rhel6-x86_64.UnixCommon
+                   CONFIG_SITE.rhel6-x86_64.rhel6-x86_64
+                   CONFIG_SITE.rhel6-x86_64.vxWorks-68040
+                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603
+                   CONFIG_SITE.rhel6-x86_64.vxWorks-ppc603_long
+               Added new config files to <>/configure/os  directory to support linuxRT CROSS builds: 
+                   CONFIG.Common.linuxRT-arm_zynq
+                   CONFIG_SITE.Common.linuxRT-arm_zynq
+                   CONFIG.Common.linuxRT-i686
+                   CONFIG_SITE.Common.linuxRT-i686
+                   CONFIG.Common.linuxRT-x86_64
+                   CONFIG_SITE.Common.linuxRT-x86_64
+
+               Update: EPICS_SITE_VERSION = 0.1.0 ==> will append to EPICS version string at IOC runtime
+
