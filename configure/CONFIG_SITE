@@ -83,6 +83,7 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-microblaze
 #       linux-xscale_be
+#       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -113,17 +114,40 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #
 
 # Which target architectures to cross-compile for.
+# SLAC PCDS: If EPICS_HOST_ARCH is not set, derive it
+ifndef EPICS_HOST_ARCH
+EPICS_HOST_ARCH	= $(shell $(EPICS_BASE)/startup/EpicsHostArch)
+export EPICS_HOST_ARCH
+endif
+
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
 CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
+
+# RHEL6 currently supports linuxRT and RTEMS-beatnik cross compiles
+ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
+CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64
+CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik
+endif
+
+# RHEL5 currently supports linux-x86 (RHEL5 32bit) and RTEMS-beatnik cross compiles
+ifeq '$(EPICS_HOST_ARCH)' 'linux-x86_64'
+CROSS_COMPILER_TARGET_ARCHS	+= linux-x86
+CROSS_COMPILER_TARGET_ARCHS	+= RTEMS-beatnik
+endif
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
 #  architectures here.  If the combination is complicated,
 #  set CROSS_COMPILER_TARGET_ARCHS in the appropriate
 #  configure/os/CONFIG_SITE.<host>.Common files instead.
-CROSS_COMPILER_HOST_ARCHS=
+#CROSS_COMPILER_HOST_ARCHS=
+
+# PCDS build targets:
+#  host:	linux-x86    targets: RTEMS-beatnik linux-x86
+#  host:	linux-x86_64 targets: RTEMS-beatnik linux-x86 linux-x86_64
+#  host:	rhel6-x86_64 targets: RTEMS-beatnik rhel6-x86_64 linuxRT_glibc-x86_64
+CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
 
 #  The 'runtests', 'tapfiles' and 'junitfiles' make targets normally only run
 #  self-tests for the EPICS_HOST_ARCH architecture. If the host can execute
@@ -174,7 +198,7 @@ EPICS_SITE_VERSION =
 # For GNU compiler, use pipes rather than temporary files for
 #  communication between the various stages of compilation.
 #  Must be either YES or NO
-GCC_PIPE = NO
+GCC_PIPE = YES
 
 # Set RPATH when linking executables and libraries.
 #  Must be either YES, NO, or ORIGIN.  If you set this to NO you must also provide a
