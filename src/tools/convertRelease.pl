@@ -266,32 +266,13 @@ sub checkRelease {
         }
     }
 
-    my @modules = grep(!m/^(RULES|TOP|TEMPLATE_TOP)$/, @apps);
-    my $app = shift @modules;
-    my $latest = AbsPath($macros{$app});
-    my %paths = ($latest => $app);
-    foreach $app (@modules) {
-        my $path = AbsPath($macros{$app});
-        if ($path ne $latest && exists $paths{$path}) {
-            my $prev = $paths{$path};
-            print "\n" unless ($status);
-            print "This application's RELEASE file(s) define\n";
-            print "\t$app = $macros{$app}\n";
-            print "after but not adjacent to\n\t$prev = $macros{$prev}\n";
-            print "both of which resolve to $path\n"
-                if $path ne $macros{$app} || $path ne $macros{$prev};
-            $status = 2;
-        }
-        $paths{$path} = $app;
-        $latest = $path;
-    }
-    if ($status == 2) {
-        print "Module definitions that share paths must be grouped together.\n";
-        print "Either remove a definition, or move it to a line immediately\n";
-        print "above or below the other(s).\n";
-        print "Any non-module definitions belong in configure/CONFIG_SITE.\n";
-        $status = 1;
-    }
+    # For SLAC RELEASE files, commit 67097456 causes too many uneeded
+    # and unwanted errors.
+    # For example, if TPG_MODULE_VERSION happens to be the same as TPR_MODULE_VERSION
+    # Thus it has been removed here.
+    # commit 67097456, Andrew Johnson	2016-05-03
+    #	Added a test for macros w/ the same value that are not adjacent
+    #	to fix an issue w/ mixing Debian modules with privately-built applications.
 
     print "\n" if $status;
     exit $status;
