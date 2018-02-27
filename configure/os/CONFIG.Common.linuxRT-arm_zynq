@@ -1,0 +1,15 @@
+# CONFIG.Common.linuxRT-arm_zynq
+#
+# This file is maintained by the build community.
+#
+# Definitions for linuxRT-arm_zync target builds
+# linuxRT is really linux-rt with glibc produced by Till Strauman of
+# SLAC National Laboratories
+# Sites may override these definitions and add other definitions
+# in CONFIG_SITE.Common.linuxRT-arm_zynq
+#-------------------------------------------------------
+
+# Include definitions common to all linux-arm targets
+include $(CONFIG)/os/CONFIG.Common.linux-arm
+VALID_BUILDS = Ioc
+

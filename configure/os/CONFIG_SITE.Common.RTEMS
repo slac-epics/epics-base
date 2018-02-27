@@ -24,16 +24,51 @@
 #RTEMS_VERSION = 5
 #RTEMS_BASE = /usr/local/vw/rtems/rtems-5.1
 
-# Cross-compile toolchain in $(RTEMS_TOOLS)/bin
 #
-RTEMS_TOOLS = $(RTEMS_BASE)
+# Specify your desired command-line-input library
+#
+#EPICSCOMMANDLINE_LIBRARY = READLINE
+RTEMS_SITE_INSTALLDIR=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(SSRLAPPS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+CROSS_INCLUDES+= -I$(RTEMS_SITE_INSTALLDIR)/include
+CROSS_LDFLAGS += -L$(RTEMS_SITE_INSTALLDIR)/lib
+
+GNU_DIR=$(RTEMS_BASE)
+CCC = $(CC)
+#TS, 2/6/2002 re-allow using the gnu dir
+#because I put libraries common to multiple BSPs there
+#GNU_TARGET_LIB_DIR resolves to GNU_DIR/GNU_TARGET/lib
+CROSS_LDFLAGS = $(addprefix -L,$(GNU_TARGET_LIB_DIR))
+CROSS_LDFLAGS+= -L$(PROJECT_RELEASE)/lib
+ifdef RTEMS_SITE_INSTALLDIR
+CROSS_LDFLAGS+= -L$(RTEMS_SITE_INSTALLDIR)/lib
+endif
+#OPT_CFLAGS_YES = -g -O3
+#OPT_CXXFLAGS_YES = -g -O3
+
+# =====================================================================
+# Recommended by Till Strauman:
+# For Host Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V) -g
+OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V) -g
+
+OBJCOPY = $(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET)
+XSYMS = $(RTEMS_BASE)/bin/xsyms
+
+OP_SYS_CPPFLAGS =
+# rtemsall is now rtemsbsp, we use termcap, not ncurses
+#OP_SYS_LDLIBS = -lrtemsCom -lrtemsbsp -lrtemscpu -lbspExt -lcexp -lbfd -lopcodes -liberty -lregexp -ltecla_r -lm
+
+#no LDLIBS whatsoever - we now do dynamic loading
+override EXE = .obj
 
 # Link Generic System loadable objects instead of full executable.
 #
 # A GeSys object is similar to a shared library.  It can be (un)loaded
 # at runtime by the Generic System loader which is available as a
 # patch against RTEMS.
-USE_GESYS = NO
+USE_GESYS = YES
 
 # If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
 # network configuration you must uncomment and specify your Internet
@@ -43,6 +78,32 @@ USE_GESYS = NO
 
 # Select the command-line-input library to use
 #
-COMMANDLINE_LIBRARY = EPICS
+#COMMANDLINE_LIBRARY = EPICS
 #COMMANDLINE_LIBRARY = LIBTECLA
 #COMMANDLINE_LIBRARY = READLINE
+
+#OP_SYS_LDLIBS = -lrtemsCom
+OP_SYS_LDFLAGS = -Wl,-S
+
+LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
+LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
+
+# ===========================================================================================
+#
+# SSRLAPPS package. 
+# ===========================================================================================
+# Top location (for specific CPU and BSP):
+##SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
+
+# If anything, apps need the headers
+
+##OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
+
+# Very unlikely that they need a library from there, too
+# since things are usually contained in modules that are
+# run-time loaded prior to EPICS.
+
+#
+# If any application really needs a library 'foo' then
+# their Makefile should say:
+#
