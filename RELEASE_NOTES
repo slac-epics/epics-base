@@ -4,6 +4,41 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.16.1-1.0.0:	2018-02-28 Bruce Hill
+	R3.16.1-0.1.0 plus slac-changes plus lcls-changes
+	slac-changes:
+		Add a versionFile soft link to CONFIG_SITE for eco_tools
+		Till's fix for generalTimeGetEvent(), lp: #1747091
+		Sort DIRECTORY_TARGETS to avoid errors if 2 FILE_TYPEs have the same INSTALL directory.
+		Rework module dependency conflict error message for easier debugging.
+		Added -P option to caget and camonitor to show SLAC fiducial pulse ID.
+		Fixed camonitor server side relative timestamps bug
+		Disabled commit 67097456 which throws errors when macros w/ the same value are not adjacent.
+		Applying community patch patches/osiSockOptMcastLoop.patch
+		Fix seg fault when empty string is passed to caget or cainfo as the pvname parameter
+		Applied db-tpro-show-values.patch
+		Applied string-record-strncpy.patch to avoid dangerous strcpy calls
+		Applied non-rt-thread-priority-zero.patch to fix negative thread priority
+		Applied pv-name-in-ca-error-msgs.patch
+		Applied ca-sizes-in-error-msgs.patch
+		Applied epics-thread-show-linux-pids.patch so we can see linux pid in epicsThreadShow()
+		Applied active-scan-count-exceeded-error-msg.patch for better error msg on Active scan count exceeded
+		Applied convertRelease-diag.patch for new convertRelease option and better diagnostics
+		Applied osdThread-diag.patch for more verbose mlockall status.
+		Applied timestamp-before-writing-output.patch to update timestamp before processing outlinks:
+	lcls-changes:
+		Fixed RTEMS targets to USE_GESYS=YES. More info at the RELEASE_NOTES file. Bumping base version to R3.15.5-1.0.6
+		Adding protection at CONFIG_SITE to not do CROSS if EPICS_HOST_ARCH is not rhel6-x86_64.
+		Adding support for RTEMS-svgm
+		Fix at <>/configure/os/CONFIG_SITE.Common.linuxRT-* and CCACHE_DISABLE
+		Fixing issue with CCACHE and permissions at buildroot tmp folder. CCACHE_DISABLE flag added to the CONFIG_SITE files.
+		Changing buildroot version to buildroot-2016.11.1
+		CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282
+		Reverted the linuxRT buildroot path to an installed and working version.
+			Also reworked the linuxRT configure files to follow a more common approach, using T_A
+			and EPICS_HOST_ARCH where applicable to reduce differences between differnt linuxRT targets.
+		LCLS target arch support from R3.15.5-1.branch
+
 R3.16.1-0.1.0:	2018-02-15 Bruce Hill
 	R3.16.1 plus local slac build support
 		Add support for rhel6-x86_64 and rhel7-x86_64 target arches
