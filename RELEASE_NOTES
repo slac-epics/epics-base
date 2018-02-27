@@ -4,6 +4,9 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.7	Bruce Hill	2018-02-26
+	Bumped up NUM_TIME_EVENTS to 599 to allow more unused event numbers for TSE timing.
+
 R3.15.5-2.0.6	Bruce Hill	2018-1-24
 	Updated LINUXRT_BUILDROOT_VERSION from buildroot-2015.02 to buildroot-2016.11.1
 
