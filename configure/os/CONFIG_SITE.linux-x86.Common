@@ -7,3 +7,11 @@
 #CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040 solaris-sparc
 #CROSS_COMPILER_TARGET_ARCHS = vxWorks-68040
 #CROSS_COMPILER_TARGET_ARCHS = RTEMS-mvme2100 RTEMS-pc386 # RTEMS-mvme5500 RTEMS-mvme167
+
+# =====================================================================
+# Recommended by Till Strauman:
+# For Host Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES = -O3 -g
+OPT_CXXFLAGS_YES = -O3 -g

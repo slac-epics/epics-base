@@ -1,0 +1,8 @@
+# Location of linuxRT GNU ToolChain
+LINUX_RT_HOME=/u1/ernesto
+
+GNU_DIR=$(LINUX_RT_HOME)/host/$(EPICS_HOST_ARCH)/arm/usr
+
+# Cross Target Architecture
+GNU_TARGET=arm-linux
+

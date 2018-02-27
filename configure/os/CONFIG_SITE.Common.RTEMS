@@ -3,15 +3,58 @@
 # Site-specific information for all RTEMS targets
 #-------------------------------------------------------
 
-# Where to find RTEMS
+# Don't use the default after relocating RTEMS tool-chain and OS
+# things necessary were not being found properly.  Also, had to
+# to modify the Makefile.in for each BSP to change path for 
+# "prefix" and "exec_prefix"
+unexport GCC_EXEC_PREFIX
+
+#
+# If you're not using BOOTP/DHCP to pick up your IOC network configuration
+# you may need to specify your Internet Domain Name here
 #
 # APS:
-RTEMS_VERSION = 4.10.2
-RTEMS_BASE = /usr/local/vw/rtems/rtems-$(RTEMS_VERSION)
+#RTEMS_VERSION = 4.10.2
+#RTEMS_BASE = /usr/local/vw/rtems/rtems-$(RTEMS_VERSION)
 
-# Cross-compile toolchain in $(RTEMS_TOOLS)/bin
 #
-RTEMS_TOOLS = $(RTEMS_BASE)
+# Specify your desired command-line-input library
+#
+#EPICSCOMMANDLINE_LIBRARY = READLINE
+RTEMS_SITE_INSTALLDIR=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(SSRLAPPS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+CROSS_INCLUDES+= -I$(RTEMS_SITE_INSTALLDIR)/include
+CROSS_LDFLAGS += -L$(RTEMS_SITE_INSTALLDIR)/lib
+
+GNU_DIR=$(RTEMS_BASE)
+CCC = $(CC)
+#TS, 2/6/2002 re-allow using the gnu dir
+#because I put libraries common to multiple BSPs there
+#GNU_TARGET_LIB_DIR resolves to GNU_DIR/GNU_TARGET/lib
+CROSS_LDFLAGS = $(addprefix -L,$(GNU_TARGET_LIB_DIR))
+CROSS_LDFLAGS+= -L$(PROJECT_RELEASE)/lib
+ifdef RTEMS_SITE_INSTALLDIR
+CROSS_LDFLAGS+= -L$(RTEMS_SITE_INSTALLDIR)/lib
+endif
+#OPT_CFLAGS_YES = -g -O3
+#OPT_CXXFLAGS_YES = -g -O3
+
+# =====================================================================
+# Recommended by Till Strauman:
+# For Host Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES   = $(CFLAGS_OPTIMIZE_V) -g
+OPT_CXXFLAGS_YES = $(CFLAGS_OPTIMIZE_V) -g
+
+OBJCOPY = $(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET)
+XSYMS = $(RTEMS_BASE)/bin/xsyms
+
+OP_SYS_CPPFLAGS =
+# rtemsall is now rtemsbsp, we use termcap, not ncurses
+#OP_SYS_LDLIBS = -lrtemsCom -lrtemsbsp -lrtemscpu -lbspExt -lcexp -lbfd -lopcodes -liberty -lregexp -ltecla_r -lm
+
+#no LDLIBS whatsoever - we now do dynamic loading
+override EXE = .obj
 
 # Link Generic System loadable objects instead of full executable.
 #
@@ -20,14 +63,32 @@ RTEMS_TOOLS = $(RTEMS_BASE)
 # patch against RTEMS.
 USE_GESYS = NO
 
-# If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
-# network configuration you must uncomment and specify your Internet
-# Domain Name here
-#
-#OP_SYS_CFLAGS += -DRTEMS_NETWORK_CONFIG_DNS_DOMAINNAME=<domainname>
+#OP_SYS_LDLIBS = -lrtemsCom
+OP_SYS_LDFLAGS = -Wl,-S
 
-# Select the command-line-input library to use
+LINK.cpp = $(CCC) -nostdlib -Wl,-r -o $@ $(STATIC_LDFLAGS) $(PRODDIR_LDFLAGS) $(LDFLAGS)
+LINK.cpp += $(PROD_LDFLAGS) $(PROD_LD_OBJS) $(PROD_LD_RESS) $(PROD_LDLIBS)
+
+ 
+# ===========================================================================================
 #
-COMMANDLINE_LIBRARY = EPICS
-#COMMANDLINE_LIBRARY = LIBTECLA
-#COMMANDLINE_LIBRARY = READLINE
+# SSRLAPPS package. 
+# ===========================================================================================
+# Top location (for specific CPU and BSP):
+##SSRLAPPS= $(RTEMS_BASE)/ssrlApps/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(T_A:RTEMS-%=%) 
+
+# If anything, apps need the headers
+
+##OP_SYS_INCLUDES += -I$(SSRLAPPS)/include 
+
+# Very unlikely that they need a library from there, too
+# since things are usually contained in modules that are
+# run-time loaded prior to EPICS.
+
+#
+# If any application really needs a library 'foo' then
+# their Makefile should say:
+#
+# foo_DIR=$(SSRLAPPS_LIB)
+##SSRLAPPS_LIB=$(SSRLAPPS)/lib
+

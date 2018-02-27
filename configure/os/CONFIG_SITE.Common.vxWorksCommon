@@ -22,12 +22,44 @@ VXWORKS_VERSION = 6.9
 
 WIND_BASE = /usr/local/vw/vxWorks-$(VXWORKS_VERSION)
 #WIND_BASE = /ade/vxWorks/$(VXWORKS_VERSION)
+#WIND_BASE = /usr/local/lcls/vxWorks/$(VXWORKS_VERSION)
+WIND_BASE = /afs/slac/package/vxworks/devel/$(VXWORKS_VERSION)
+
+# ====================================================================
+# Added to support the new vxWorks 6.7 and 6.8
+# Unless we use "-DBSD=44" for osdSock.h, incorrect network interface
+# structure is assumed, and an incorrect list of interfaces is
+# constructed, then the EPICS_CA_{,AUTO_}ADDR_LIST behavior becomes
+# wrong.
+# =====================================================================
+#BSD_DEFINE_VERSION_6.7 = -DBSD=44
+##BSD_DEFINE_VERSION_6.8 = -DBSD=44
+##OP_BSD_DEFINE = $(BSD_DEFINE_VERSION_$(VXWORKS_VERSION))
+
+##OP_SYS_CPPFLAGS += -DvxWorks $(OP_BSD_DEFINE)
+##OP_SYS_CFLAGS += -fno-builtin $(OP_BSD_DEFINE)
+
+# For vxWorks 6.6 we just need:
+OP_SYS_CPPFLAGS += -DvxWorks
+OP_SYS_CFLAGS += -fno-builtin
+
+# =====================================================================
+
+#--------------------------------------------------
+# Optimization: Officially vxWorks only supports -O2 or less.
+# =====================================================================
+# Recommended by Till Strauman:
+# For Cross Builds.
+# Let's build with optimization but have debug symbols for debugging:
+# =====================================================================
+OPT_CFLAGS_YES = -O2 -g
+OPT_CXXFLAGS_YES = -O2 -g
 
 
 # WorkBench Version number, if you're using vxWorks 6.x
 
 #WORKBENCH_VERSION = 2.6
-#WORKBENCH_VERSION = 3.0
+WORKBENCH_VERSION = 3.0
 #WORKBENCH_VERSION = 3.2
 WORKBENCH_VERSION = 3.3
 

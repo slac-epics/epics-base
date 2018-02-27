@@ -83,6 +83,9 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
 #       linux-microblaze
 #       linux-xscale_be
+#       linuxRT-x86             (linux-rt with uClibc; buildroot; created by Till Strauman)
+#       linuxRT-x86_64          (linux-rt with uClibc; buildroot; created by Till Strauman)
+#       linuxRT-ppcP2020        (linux-rt with uClibc; buildroot; created by Till Strauman)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -115,8 +118,13 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 # Which target architectures to cross-compile for.
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
-CROSS_COMPILER_TARGET_ARCHS=
-#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
+#CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-68040
+#CROSS_COMPILER_TARGET_ARCHS=rt-linux
+
+#CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86 linuxRT-x86_64
+
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 vxWorks-ppc604_long vxWorks-mpc8540 vxWorks-ppc604_altivec linuxRT_glibc-x86_64 linuxRT_glibc-i686
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
