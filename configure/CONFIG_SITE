@@ -98,6 +98,8 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       RTEMS-pc686             (RTEMS 5)
 #       RTEMS-pc686-qemu        (RTEMS 5)
 #       RTEMS-qoriq_e500
+#       RTEMS-psim
+#       RTEMS-svgm
 #       RTEMS-uC5282
 #       RTEMS-xilinx-zynq-a9_qemu
 #       RTEMS-xilinx_zynq_zedboard
