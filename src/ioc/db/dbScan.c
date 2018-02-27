@@ -26,6 +26,7 @@
 #include "ellLib.h"
 #include "epicsEvent.h"
 #include "epicsExit.h"
+#include "epicsGeneralTime.h"
 #include "epicsInterrupt.h"
 #include "epicsMutex.h"
 #include "epicsPrint.h"
