@@ -232,7 +232,7 @@ static int generalTimeGetEventPriority(epicsTimeStamp *pDest, int eventNumber,
         printf("generalTimeGetEventPriority(eventNum=%d)\n", eventNumber);
 
     if ((eventNumber < 0) && (eventNumber != epicsTimeEventBestTime))
-        return status;
+        return S_time_badEvent;
 
     epicsMutexMustLock(gtPvt.eventListLock);
     for (ptp = (gtProvider *)ellFirst(&gtPvt.eventProviders);
