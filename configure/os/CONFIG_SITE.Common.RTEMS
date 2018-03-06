@@ -54,7 +54,7 @@ OP_SYS_CPPFLAGS =
 #OP_SYS_LDLIBS = -lrtemsCom -lrtemsbsp -lrtemscpu -lbspExt -lcexp -lbfd -lopcodes -liberty -lregexp -ltecla_r -lm
 
 #no LDLIBS whatsoever - we now do dynamic loading
-override EXE = .obj
+#override EXE = .obj
 
 # Link Generic System loadable objects instead of full executable.
 #
