@@ -7,7 +7,7 @@
 ####################################################
 # Where to find Alarm Handler files
 #vpath %.alhConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
-vpath %.alhConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH)) $(COMMON_DIR) 
+vpath %.alhConfig        $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
 vpath %.tpl-alh          $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
 vpath %.sub-alh 	     $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ALH))
 vpath %.alhsubstitutions $(USR_VPATH) $(GENERIC_SRC_DIRS)

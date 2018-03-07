@@ -6,9 +6,11 @@
 
 ####################################################
 # Where to find archive files
+vpath %.arConfig      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
 vpath %.archive       $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
-vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
-vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE)) $(COMMON_DIR)
+vpath %.tpl-arch      $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
+vpath %.sub-arch	  $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
+vpath %.arsubstitutions $(USR_VPATH) $(GENERIC_SRC_DIRS) $(dir $(ARCHIVE))
 
 # Install archive files here
 INSTALL_ARCHIVE = $(INSTALL_LOCATION)/archive
@@ -20,7 +22,7 @@ define  ARCHIVE_DIRS_template
 endef
 $(foreach top, $(RELEASE_TOPS), \
 	$(eval $(call ARCHIVE_DIRS_template,$(top)) ))
-ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(TOP)/archive $(RELEASE_ARCHIVE_DIRS)
+ARCHIVE_SEARCH_DIRS = . .. $(COMMON_DIR) $(SRC_DIRS) $(INSTALL_ARCHIVE) $(RELEASE_ARCHIVE_DIRS)
 ARCHIVE_INCLUDES = $(addprefix -I, $(ARCHIVE_SEARCH_DIRS))
 ARCHIVEFLAGS  = $($*_ARCHIVEFLAGS) $(USR_ARCHIVEFLAGS) $(ARCHIVE_INCLUDES)
 
@@ -54,6 +56,7 @@ $(INSTALL_ARCHIVE)/%:	%
 	@$(ECHO) "Installing archive file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
+$(COMMON_DIR)/%.archive: %.arsubstitutions
 $(COMMON_DIR)/%.archive: %.sub-arch
 	@$(RM) $(notdir $@)$(DEP)
 	$(MKMF) -m $(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
