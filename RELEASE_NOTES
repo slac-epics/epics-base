@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.1.0:	2018-03-06 from R3.15.5-1.branch
+	Updated RULES.archive to support foo.arsubstitutions and foo.arconfig.
+	Bumped up NUM_TIME_EVENTS to 599 to allow more unused event numbers for TSE timing.
+
 R3.15.5-1.0.10:	2017-12-08 from R3.15.5-1.branch
 	No src changes, just build related.
 	Cleaned up custom rules for Restore, alh, archive, and autosave.
