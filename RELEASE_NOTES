@@ -1,0 +1,7 @@
+#
+# Release Notes
+#
+dev-base-7.0:
+	This directory is for test and development.
+	It is subject to being updated and rebuilt at any time
+	and is not yet ready for production use.
