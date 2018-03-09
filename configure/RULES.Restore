@@ -35,8 +35,8 @@ SOURCE_RESTORES = $(wildcard $(file) $(SOURCE_RESTORES_bbb) )
 SOURCE_RESTORES_bbb = $(foreach dir, $(GENERIC_SRC_DIRS), $(SOURCE_RESTORES_aaa)  )
 SOURCE_RESTORES_aaa = $(addsuffix /$(file), $(dir) )
 
-# Generate INSTALL_RESTORES list
-INSTALL_RESTORES += $(addprefix $(INSTALL_RESTORE)/, $(notdir $(RESTORE)))
+# Generate INSTALL_RESTORE_LIST list
+INSTALL_RESTORE_LIST += $(addprefix $(INSTALL_RESTORE)/, $(notdir $(RESTORE)))
 
 ####################################################
 # Generate RESTORE_DEPENDS_FILES list
@@ -45,7 +45,7 @@ RESTORE_DEPENDS_FILES += $(addsuffix $(DEP), $(patsubst $(COMMON_DIR)/%,%,$(COMM
 ####################################################
 # Build targets
 
-install:        $(INSTALL_RESTORES)
+install:        $(INSTALL_RESTORE_LIST)
 
 build:          $(COMMON_RESTORES)
 
