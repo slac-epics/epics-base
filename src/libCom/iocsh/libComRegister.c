@@ -204,6 +204,20 @@ static void errlogCallFunc(const iocshArgBuf *args)
 {
     errlogPrintfNoConsole("%s\n", args[0].sval);
 }
+/* Add an errlog function callable from cexp() or vxWorks consoles */
+void errlog(const char * msg)
+{
+    errlogPrintfNoConsole("%s\n", msg);
+}
+
+/* errlogPrintfNoConsole */
+static const iocshArg errlogPrintfNoConsoleArg0 = { "message",iocshArgString};
+static const iocshArg * const errlogPrintfNoConsoleArgs[1] = {&errlogPrintfNoConsoleArg0};
+static const iocshFuncDef errlogPrintfNoConsoleFuncDef = {"errlogPrintfNoConsole",1,errlogPrintfNoConsoleArgs};
+static void errlogPrintfNoConsoleCallFunc(const iocshArgBuf *args)
+{
+    errlogPrintfNoConsole("%s\n", args[0].sval);
+}
 
 /* iocLogPrefix */
 static const iocshArg iocLogPrefixArg0 = { "prefix",iocshArgString};
