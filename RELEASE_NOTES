@@ -4,6 +4,17 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.8	Bruce Hill	2018-02-26
+	Modify generalTimeGetEventPriority() to allow eventNumber > 256.
+		eventNumbers between 0 and NUM_TIME_EVENTS will continue to get checked for advancing timestamps.
+		Support for eventNumbers > NUM_TIME_EVENTS will be up to the generalTime provider.
+	Revert "Bumped up NUM_TIME_EVENTS to 599 to allow more unused event numbers for TSE timing."
+	Fix ECHO definition to not match variables in MAKEFLAGS by using MFLAGS instead.
+	Cherry-picked M. Davidsaver bug fixes from 3.15
+		db: dbGet() ensure long string nil and actual string length
+		db: fix dbGet() for attributes as long string
+		libCom: revise ipAddrToAscii
+
 R3.15.5-2.0.7	Bruce Hill	2018-02-26
 	Bumped up NUM_TIME_EVENTS to 599 to allow more unused event numbers for TSE timing.
 
