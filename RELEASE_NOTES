@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.13: 2018-04-17 from R3.15.5-1.branch
+	Applied community patch as follow:
+	    patches/epicsGeneralTime.c.diff: epicsGeneralTime.c were made (fetch time provider's eventTime into a local copy) an inconsistency resulted.
+	    More details at: https://bugs.launchpad.net/epics-base/+bug/1747091
+
 R3.15.5-1.0.12:	2018-04-13 from R3.15.5-1.branch
 	Modify generalTimeGetEventPriority() to allow eventNumber > 256.
 		eventNumbers between 0 and NUM_TIME_EVENTS will continue to get checked for advancing timestamps.
