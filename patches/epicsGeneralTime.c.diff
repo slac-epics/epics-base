@@ -1,0 +1,19 @@
+*** src/libCom/osi/epicsGeneralTime.c.orig	2018-02-02 14:36:54.614902141 -0800
+--- src/libCom/osi/epicsGeneralTime.c	2018-02-02 14:37:46.713403172 -0800
+***************
+*** 269,275 ****
+                      }
+                  }
+              } else {
+!                 if (epicsTimeGreaterThanEqual(pDest,
+                          &gtPvt.eventTime[eventNumber])) {
+                      *pDest = ts;
+                      gtPvt.eventTime[eventNumber] = ts;
+--- 269,275 ----
+                      }
+                  }
+              } else {
+!                 if (epicsTimeGreaterThanEqual(&ts,
+                          &gtPvt.eventTime[eventNumber])) {
+                      *pDest = ts;
+                      gtPvt.eventTime[eventNumber] = ts;

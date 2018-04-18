@@ -270,7 +270,7 @@ static int generalTimeGetEventPriority(epicsTimeStamp *pDest, int eventNumber,
                     }
                 }
             } else {
-                if (epicsTimeGreaterThanEqual(pDest,
+                if (epicsTimeGreaterThanEqual(&ts,
                         &gtPvt.eventTime[eventNumber])) {
                     *pDest = ts;
                     gtPvt.eventTime[eventNumber] = ts;
