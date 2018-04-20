@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.16.1-2.0.1:	2018-04-19 Bruce Hill
+	Modify generalTimeGetEventPriority() to allow eventNumber > 256.
+	Fixed circular dependency bug in RULES.Db
+
 R3.16.1-2.0.0:	2018-02-26 Bruce Hill
 	R3.16.1-0.1.0 plus slac-changes plus pcds-changes
 	slac-changes:
