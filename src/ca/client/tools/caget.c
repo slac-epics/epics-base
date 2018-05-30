@@ -28,12 +28,13 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <epicsStdlib.h>
-#include <epicsString.h>
+#include "epicsStdlib.h"
+#include "epicsString.h"
 
-#include <alarm.h>
-#include <cadef.h>
-#include <epicsGetopt.h>
+#include "alarm.h"
+#include "cadef.h"
+#include "epicsGetopt.h"
+#include "epicsVersion.h"
 
 #include "tool_lib.h"
 
@@ -55,6 +56,7 @@ static void usage (void)
 {
     fprintf (stderr, "\nUsage: caget [options] <PV name> ...\n\n"
     "  -h: Help: Print this message\n"
+    "  -V: Version: Show EPICS and CA versions\n"
     "Channel Access options:\n"
     "  -w <sec>: Wait time, specifies CA timeout, default is %f second(s)\n"
     "  -c: Asynchronous get (default, uses ca_array_get_callback and waits for completion)\n"
@@ -393,10 +395,13 @@ int main (int argc, char *argv[])
 
     LINE_BUFFER(stdout);        /* Configure stdout buffering */
 
-    while ((opt = getopt(argc, argv, ":taiGcPnhsSe:f:g:l:#:d:0:w:p:F:")) != -1) {
+    while ((opt = getopt(argc, argv, ":taiGcPnhsSVe:f:g:l:#:d:0:w:p:F:")) != -1) {
         switch (opt) {
         case 'h':               /* Print usage */
             usage();
+            return 0;
+    	case 'V':
+			printf( "\nEPICS Version %s, CA Protocol version %s\n", EPICS_VERSION_STRING, ca_version() );
             return 0;
         case 'P':               /* Show Fiducial Pulse ID from timestamps */
             tsShowPulseId = 1;
