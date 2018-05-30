@@ -194,6 +194,10 @@ private:
     void exception (
         epicsGuard < epicsMutex > &, int status,
         const char *pContext, unsigned type, arrayElementCount count );
+    void exception (
+        epicsGuard < epicsMutex > &, int status, const char *pContext,
+		const char *pFileName, int lineNumber,
+		unsigned type, arrayElementCount count );
 	getCopy ( const getCopy & );
 	getCopy & operator = ( const getCopy & );
     void operator delete ( void * );
