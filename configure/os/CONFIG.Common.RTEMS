@@ -49,8 +49,8 @@ else
 #
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
 #RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
-RTEMS_PATCHLVL=rtems_p0
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+RTEMS_PATCHLVL=rtems_p2
+SSRLAPPS_PATCHLVL=ssrlApps_p7
 endif
 
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
