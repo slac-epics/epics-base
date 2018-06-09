@@ -11,13 +11,6 @@
 #  Sites may override definitions in os/CONFIG_SITE.Common.RTEMS
 #-------------------------------------------------------
 #
-# Where to find RTEMS
-#RTEMS_BASE=/opt/rtems-4.7
-#RTEMS_VERSION=4.7
-# T.S. 8/7/2002: cannot override this from CONFIG_SITE because of
-# the includes :-(
-# RTEMS_BASE=/afs/slac/package/rtems/4.6.2/host/@sys/
-#
 # NOTE RTEMS_BASE is now defined by the site specific
 #      RTEMS makefile 'rtems-version.cfg'
                      
@@ -32,23 +25,7 @@
 ifeq ($(T_A),RTEMS-mvme5500)
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
 else
-#RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
-# Also, change afs hard-coded path to the new path after relocating RTEMS
-# to NFS
-#
-# could use
-#
-# ifeq ($(wildcard /afs/slac/package/rtems)xx,xx)
-# RTEMS_SITE_TOP=<NFS-path>
-# else
-# RTEMS_SITE_TOP=<afs-path>
-# endif
-#
-# but I'm not sure if that causes problems with checkRelease
-# since checkRelease is pretty dumb...
-#
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
-#RTEMS_SITE_TOP=/usr/local/lcls/rtems/rtems-4.9.4/
 RTEMS_PATCHLVL=rtems_p2
 SSRLAPPS_PATCHLVL=ssrlApps_p7
 endif
