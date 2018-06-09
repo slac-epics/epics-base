@@ -22,9 +22,10 @@
 # Get RTEMS_BASE definition
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
-RTEMS_PATCHLVL=rtems_p2
-SSRLAPPS_PATCHLVL=ssrlApps_p7
+# Select RTEMS version and patch levels
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
+RTEMS_PATCHLVL=rtems_p1
+SSRLAPPS_PATCHLVL=ssrlApps_p2
 
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
