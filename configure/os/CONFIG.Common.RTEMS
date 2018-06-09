@@ -22,13 +22,9 @@
 # Get RTEMS_BASE definition
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
-ifeq ($(T_A),RTEMS-mvme5500)
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
-else
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
 RTEMS_PATCHLVL=rtems_p2
 SSRLAPPS_PATCHLVL=ssrlApps_p7
-endif
 
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
