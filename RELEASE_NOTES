@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.1.0:	2018-06-9 from R3.15.5-1.branch
+	Update from rtems/4.9.4 to 4.10.1, rtems_p1, and ssrlApps_p2
+
 R3.15.5-1.0.13: 2018-04-17 from R3.15.5-1.branch
 	Applied community patch as follow:
 	    patches/epicsGeneralTime.c.diff: epicsGeneralTime.c were made (fetch time provider's eventTime into a local copy) an inconsistency resulted.
