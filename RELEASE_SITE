@@ -1,0 +1,12 @@
+#==============================================================================
+# RELEASE_SITE Location of EPICS_SITE_TOP, EPICS_MODULES, and BASE_MODULE_VERSION
+# Run "gnumake clean uninstall install" in the application
+# top directory each time this file is changed.
+
+#==============================================================================
+BASE_MODULE_VERSION:=dev-base-7.0
+EPICS_BASE:=/afs/slac/g/lcls/epics/base/$(BASE_MODULE_VERSION)
+EPICS_MODULES:=/afs/slac/g/lcls/epics/$(BASE_MODULE_VERSION)/modules
+EPICS_SITE_TOP:=/afs/slac/g/lcls/epics
+BASE_SITE_TOP:=/afs/slac/g/lcls/epics/base
+#==============================================================================
