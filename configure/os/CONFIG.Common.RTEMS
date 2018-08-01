@@ -25,7 +25,7 @@
 # Select RTEMS version and patch levels
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
 RTEMS_PATCHLVL=rtems_p1
-SSRLAPPS_PATCHLVL=ssrlApps_p2
+SSRLAPPS_PATCHLVL=ssrlApps_p3
 
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
 RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
