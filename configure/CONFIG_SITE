@@ -27,6 +27,8 @@
 #	linux-ppc64            (GNU compiler used for host builds)
 #	linux-x86              (GNU compiler used for host builds)
 #	linux-x86_64           (GNU compiler used for host builds)
+#	rhel6-x86_64           (GNU compiler used for host builds)
+#	rhel7-x86_64           (GNU compiler used for host builds)
 #	solaris-sparc          (Sun compiler used for host builds)
 #	solaris-sparc-gnu      (GNU compiler used for host builds)
 #	solaris-sparc64        (Sun compiler used for host builds)
@@ -133,7 +135,7 @@ SHARED_LIBRARIES=YES
 
 # Build client objects statically.
 #  Must be either YES or NO.
-STATIC_BUILD=NO
+STATIC_BUILD=YES
 
 # Host build optimization.
 #  Must be either YES or NO.
