@@ -1,0 +1,34 @@
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86 b/configure/os/CONFIG_SITE.Common.linux-x86
+index 0718282..d7f4316 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86
++++ b/configure/os/CONFIG_SITE.Common.linux-x86
+@@ -22,10 +22,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
+diff --git a/configure/os/CONFIG_SITE.Common.linux-x86_64 b/configure/os/CONFIG_SITE.Common.linux-x86_64
+index 18fb297..ca4879f 100644
+--- a/configure/os/CONFIG_SITE.Common.linux-x86_64
++++ b/configure/os/CONFIG_SITE.Common.linux-x86_64
+@@ -22,10 +22,10 @@
+ # comment them all out to build without readline support.
+ 
+ # No other libraries needed (recent Fedora, Ubuntu etc.):
+-COMMANDLINE_LIBRARY = READLINE
++#COMMANDLINE_LIBRARY = READLINE
+ 
+ # Needs -lncurses (RHEL 5 etc.):
+-#COMMANDLINE_LIBRARY = READLINE_NCURSES
++COMMANDLINE_LIBRARY = READLINE_NCURSES
+ 
+ # Needs -lcurses (older versions)
+ #COMMANDLINE_LIBRARY = READLINE_CURSES
