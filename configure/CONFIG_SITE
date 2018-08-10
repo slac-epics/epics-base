@@ -98,7 +98,9 @@
 # Which target architectures to cross-compile for.
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
-CROSS_COMPILER_TARGET_ARCHS=
+#CROSS_COMPILER_TARGET_ARCHS=
+CROSS_COMPILER_TARGET_ARCHS=linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
+#CROSS_COMPILER_TARGET_ARCHS=vxWorks-ppc32
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host

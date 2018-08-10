@@ -12,7 +12,7 @@ GNU_TARGET = i386-rtems
 MUNCH_SUFFIX = .boot
 define MUNCH_CMD
 	$(RM) $*.bin
-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< $*.bin
+	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< temp.bin
 	$(BIN2BOOT) $@ 0x00097E00 \
 	    $(PROJECT_RELEASE)/lib/start16.bin 0x00097C00 0 $*.bin 0x00100000 0
 endef
@@ -22,7 +22,9 @@ include $(CONFIG)/os/CONFIG.Common.RTEMS
 #
 # Put text segment where it will work with etherboot
 #
-OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
+# Suggested by Till Strauman
+# Must be removed for CEXP/run-time loading:
+#OP_SYS_LDFLAGS += -Wl,-Ttext,0x100000
 
 # This check must appear after the above include
 ifeq ($(RTEMS_VERSION),5)

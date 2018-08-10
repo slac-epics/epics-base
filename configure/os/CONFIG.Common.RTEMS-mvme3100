@@ -4,7 +4,7 @@
 #
 # All RTEMS targets use the same Makefile fragment
 #
-EXE = .elf
+override EXE = .elf
 RTEMS_BSP = mvme3100
 RTEMS_TARGET_CPU = powerpc
 GNU_TARGET = powerpc-rtems
@@ -15,8 +15,9 @@ ARCH_DEP_CFLAGS += -DRTEMS_NETWORK_CONFIG_CLUSTER_SPACE=5120
 
 MUNCH_SUFFIX = .boot
 define MUNCH_CMD
-	$(RTEMS_TOOLS)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
+	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
 endef
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-beatnik
 
 include $(CONFIG)/os/CONFIG.Common.RTEMS
 
