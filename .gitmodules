@@ -1,27 +1,27 @@
 [submodule "modules/pvData"]
     path = modules/pvData
-    url = https://github.com/epics-base/pvDataCPP
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDataCPP.git
+    branch = github-master
 [submodule "modules/pvAccess"]
     path = modules/pvAccess
-    url = https://github.com/epics-base/pvAccessCPP
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/pvAccessCPP.git
+    branch = github-master
 [submodule "modules/normativeTypes"]
     path = modules/normativeTypes
-    url = https://github.com/epics-base/normativeTypesCPP
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/normativeTypesCPP.git
+    branch = github-master
 [submodule "modules/pvaClient"]
     path = modules/pvaClient
-    url = https://github.com/epics-base/pvaClientCPP
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/pvaClientCPP.git
+    branch = github-master
 [submodule "modules/pvDatabase"]
     path = modules/pvDatabase
-    url = https://github.com/epics-base/pvDatabaseCPP
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDatabaseCPP.git
+    branch = github-master
 [submodule "modules/pva2pva"]
     path = modules/pva2pva
-    url = https://github.com/epics-base/pva2pva
-    branch = master
+    url = /afs/slac/g/cd/swe/git/repos/package/epics/modules/pva2pva.git
+    branch = github-master
 [submodule ".ci"]
     path = .ci
     url = https://github.com/epics-base/ci-scripts
