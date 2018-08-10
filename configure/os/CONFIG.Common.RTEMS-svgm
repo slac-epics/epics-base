@@ -1,40 +1,33 @@
 #
-# Author: W. Eric Norum
-#         Canadian Light Source
-#         eric@cls.usask.ca
+# CONFIG.Common.RTEMS-svgm
+# Author: Till Straumann
+#	  SSRL
+#         strauman@slac.stanford.edu
 #
 # All RTEMS targets use the same Makefile fragment
 #
 override EXE=.elf
-RTEMS_BSP = uC5282
-RTEMS_TARGET_CPU = m68k
-GNU_TARGET=m68k-rtems
-ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
-#ARCH_DEP_CFLAGS += -DHAVE_MOTLOAD
+RTEMS_TARGET_CPU = powerpc
+GNU_TARGET       = powerpc-rtems
 
 MUNCH_SUFFIX = .boot
 MUNCHNAME = $(PRODNAME:%$(EXE)=%$(MUNCH_SUFFIX))
 define MUNCH_CMD
-	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< $@
+	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary $< $@
 endef
 
-CROSS_COMPILER_TARGET_ARCHS=RTEMS-uC5282
+CROSS_COMPILER_TARGET_ARCHS=RTEMS-svgm
 
 include $(CONFIG)/os/CONFIG.Common.RTEMS
-
 RTEMSSYMS=$(PRODNAME:%$(EXE)=%.sym)
 RTEMSIMGS=$(PRODNAME:%$(EXE)=%.bin)
 INSTALL_RTEMSSYMS=$(RTEMSSYMS:%=$(INSTALL_BIN)/%)
 INSTALL_RTEMSIMGS=$(RTEMSIMGS:%=$(INSTALL_BIN)/%)
+
+#OP_SYS_LDLIBS += -lbspExt
 
 %.sym: %$(EXE)
 	$(XSYMS) $^ $@
 
 %.bin: %$(EXE)
 	$(OBJCOPY) -Obinary $^ $@
-
-#
-# Must put this one so it shows up after the -m528x
-#
-OP_SYS_LDFLAGS += -m5200
-
