@@ -53,8 +53,8 @@ RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
 #RTEMS_PATCHLVL=rtems_p0
 RTEMS_PATCHLVL=rtems_p1
 
-#SSRLAPPS_PATCHLVL=ssrlApps_p3
-SSRLAPPS_PATCHLVL=ssrlApps_p2
+SSRLAPPS_PATCHLVL=ssrlApps_p3
+#SSRLAPPS_PATCHLVL=ssrlApps_p2
 endif
 
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
