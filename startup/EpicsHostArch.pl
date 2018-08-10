@@ -25,9 +25,18 @@ sub GetEpicsHostArch { # no args
     $arch=$Config{'archname'};
     if ($arch =~ /sun4-solaris/)        { return "solaris-sparc";
     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
-    } elsif ($arch =~ m/i[3-6]86-linux/){ return "linux-x86";
-    } elsif ($arch =~ m/x86_64-linux/)  { return "linux-x86_64";
     } elsif ($arch =~ m/arm-linux/)     { return "linux-arm";
+    } elsif ($arch =~ m/linux/)        {
+            my($kernel, $hostname, $release, $version, $cpu) = POSIX::uname();
+            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
+            if ($cpu =~ m/x86_64/)	{
+				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
+				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
+				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
+			}
+            else							{ return "unsupported"; }
     } elsif ($arch =~ m/MSWin32-x86/)   { return "win32-x86";
     } elsif ($arch =~ m/MSWin32-x64/)   { return "windows-x64";
     } elsif ($arch =~ m/cygwin/)        {
