@@ -256,13 +256,14 @@ menu%.h$(DEP): ../menu%.dbd
 	@$(DBEXPAND) -D $(DBDFLAGS) -o $(COMMONDEP_TARGET) $($*_DBD) > $@
 	@echo "$(COMMONDEP_TARGET): ../Makefile" >> $@
 
+# Specifying $(TEMPLATE_FILENAME) in the msi command line can screw up msi dependencies and expansion
 %.db$(RAW)$(DEP): %$(SUBST_SUFFIX)
 	@$(RM) $@
-	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< $(TEMPLATE_FILENAME) > $@
+	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< > $@
 
 %.db$(RAW)$(DEP): ../%$(SUBST_SUFFIX)
 	@$(RM) $@
-	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< $(TEMPLATE_FILENAME) > $@
+	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< > $@
 
 %.db$(RAW)$(DEP): %.template
 	@$(RM) $@
@@ -305,7 +306,7 @@ $(INSTALL_DB)/%$(SUBST_SUFFIX): %$(SUBST_SUFFIX)
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_DB)/%$(SUBST_SUFFIX): ../%$(SUBST_SUFFIX)
-	$(ECHO) "Installing substitutions file $@"
+	$(ECHO) "Installing db ../substitutions file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PRECIOUS: $(COMMON_DIR)/%$(SUBST_SUFFIX)
