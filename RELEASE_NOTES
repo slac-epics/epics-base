@@ -4,7 +4,12 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
-R3.15.5-2.0.8	Bruce Hill	2018-02-26
+R3.15.5-2.0.9	Bruce Hill	2018-08-22
+	Include epicsStdio.h in dbChannel.c so driver report output can be redirected from iocsh.
+		Fixes issue w/ R3.15.5 where some of the casr() output was not being redirected.
+	Fix another case where msi should not be run w/ a template filename as an argument.
+
+R3.15.5-2.0.8	Bruce Hill	2018-04-16
 	Modify generalTimeGetEventPriority() to allow eventNumber > 256.
 		eventNumbers between 0 and NUM_TIME_EVENTS will continue to get checked for advancing timestamps.
 		Support for eventNumbers > NUM_TIME_EVENTS will be up to the generalTime provider.
