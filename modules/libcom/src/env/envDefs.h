@@ -60,6 +60,25 @@ epicsShareExtern const ENV_PARAM EPICS_CAS_SERVER_PORT;
 epicsShareExtern const ENV_PARAM EPICS_CA_BEACON_PERIOD; /* deprecated */
 epicsShareExtern const ENV_PARAM EPICS_CAS_BEACON_PERIOD;
 epicsShareExtern const ENV_PARAM EPICS_CAS_BEACON_PORT;
+
+epicsShareExtern const ENV_PARAM EPICS_PVA_ADDR_LIST;
+epicsShareExtern const ENV_PARAM EPICS_PVA_AUTO_ADDR_LIST;
+epicsShareExtern const ENV_PARAM EPICS_PVA_BEACON_PERIOD;
+epicsShareExtern const ENV_PARAM EPICS_PVA_BROADCAST_PORT;
+epicsShareExtern const ENV_PARAM EPICS_PVA_CONN_TMO;
+epicsShareExtern const ENV_PARAM EPICS_PVA_DEBUG;
+epicsShareExtern const ENV_PARAM EPICS_PVA_MAX_ARRAY_BYTES;
+epicsShareExtern const ENV_PARAM EPICS_PVA_PROVIDER_NAMES;
+epicsShareExtern const ENV_PARAM EPICS_PVA_SERVER_PORT;
+
+epicsShareExtern const ENV_PARAM EPICS_PVAS_AUTO_BEACON_ADDR_LIST;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_BEACON_ADDR_LIST;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_BEACON_PERIOD;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_BROADCAST_PORT;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_MAX_ARRAY_BYTES;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_PROVIDER_NAMES;
+epicsShareExtern const ENV_PARAM EPICS_PVAS_SERVER_PORT;
+
 epicsShareExtern const ENV_PARAM EPICS_BUILD_COMPILER_CLASS;
 epicsShareExtern const ENV_PARAM EPICS_BUILD_OS_CLASS;
 epicsShareExtern const ENV_PARAM EPICS_BUILD_TARGET_ARCH;
