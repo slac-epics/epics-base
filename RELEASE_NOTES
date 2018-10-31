@@ -4,7 +4,7 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
-R7.0.1.2-DEV-0.1.0: 2018-10-30 from R7.0.1.2-DEV-branch
+R7.0.1.2-DEV-1.0.0: 2018-10-30 from R7.0.1.2-DEV-1.branch
 	Include epicsStdio.h so driver report output can be redirected from iocsh
 	Adding pvAccess env variables to envDefs.h
 	Merge branch 'github-7.0' into slac-merge-github-7.0
