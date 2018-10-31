@@ -1,0 +1,17 @@
+# ==============================================================================================================
+# Documenting changes that happen locally here at SLAC
+# Naming Convention: base-<community_version_string>-x.y.z
+# x.y.z; major, minor, bug fix locally respectively
+# Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
+# ==============================================================================================================
+R7.0.1.2-DEV-0.0.1: 2018-10-31 from R7.0.1.2-DEV-0.branch
+	Extended and cleaned up custom rules for Restore, alh, archive, and autosave files.
+	Merge branch 'github-7.0' into slac-merge-github-7.0
+	2018-10-20 Andrew Johnson, Add new 'depclean' make target at top level
+	2018-10-20 Andrew Johnson, Merge branch 'fixups/move_initHooks' into 7.0
+	2018-10-08 Michael Davidsaver, update PVD, PVA, and P2P
+	2018-09-25 Andrew Johnson, Restore the ability to write to mbbi/mbbo *VL fields
+	2018-09-20 Michael Davidsaver, update PVD/PVA
+	Hugo Slepicka Bump RTEMS patch to ssrlApps_p3.
+	Hugo Slepicka Add support for RTEMS and linuxRT.
+	Hugo Slepicka Apply patch patches/patch_epics_7_ncurses.patch to use ncurses instead of readline.
