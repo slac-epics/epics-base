@@ -4,7 +4,7 @@
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
 * EPICS BASE is distributed subject to a Software License Agreement found
-* in file LICENSE that is included with this distribution. 
+* in file LICENSE that is included with this distribution.
 \*************************************************************************/
 
 /* recWaveform.c - Record Support Routines for Waveform records */
@@ -97,18 +97,14 @@ static long init_record(struct dbCommon *pcommon, int pass)
     struct waveformRecord *prec = (struct waveformRecord *)pcommon;
     struct wfdset *pdset;
 
-    if (pass == 0){
+    if (pass == 0) {
         if (prec->nelm <= 0)
             prec->nelm = 1;
         if (prec->ftvl > DBF_ENUM)
             prec->ftvl = DBF_UCHAR;
         prec->bptr = callocMustSucceed(prec->nelm, dbValueSize(prec->ftvl),
             "waveform calloc failed");
-        if (prec->nelm == 1) {
-            prec->nord = 1;
-        } else {
-            prec->nord = 0;
-        }
+        prec->nord = (prec->nelm == 1);
         return 0;
     }
 
@@ -124,16 +120,18 @@ static long init_record(struct dbCommon *pcommon, int pass)
         recGblRecordError(S_dev_missingSup,(void *)prec,"wf: init_record");
         return S_dev_missingSup;
     }
-    if (! pdset->init_record) return 0;
+    if (!pdset->init_record)
+        return 0;
 
-    return (*pdset->init_record)(prec);
+    return pdset->init_record(prec);
 }
-
+
 static long process(struct dbCommon *pcommon)
 {
     struct waveformRecord *prec = (struct waveformRecord *)pcommon;
     struct wfdset *pdset = (struct wfdset *)(prec->dset);
-    unsigned char  pact=prec->pact;
+    unsigned char pact=prec->pact;
+    long status;
 
     if ((pdset==NULL) || (pdset->read_wf==NULL)) {
         prec->pact=TRUE;
@@ -141,13 +139,14 @@ static long process(struct dbCommon *pcommon)
         return S_dev_missingSup;
     }
 
-    if (pact && prec->busy) return 0;
+    if (pact && prec->busy)
+        return 0;
 
-    readValue(prec); /* read the new value */
-    if (!pact && prec->pact) return 0;
+    status = readValue(prec); /* read the new value */
+    if (!pact && prec->pact)
+        return 0;
 
     prec->udf = FALSE;
-    prec->pact = TRUE;
     recGblGetTimeStampSimm(prec, prec->simm, &prec->siol);
 
     monitor(prec);
@@ -156,26 +155,27 @@ static long process(struct dbCommon *pcommon)
     recGblFwdLink(prec);
 
     prec->pact=FALSE;
-    return 0;
+    return status;
 }
 
 static long special(DBADDR *paddr, int after)
 {
     waveformRecord *prec = (waveformRecord *)(paddr->precord);
-    int     special_type = paddr->special;
+    int special_type = paddr->special;
 
     switch(special_type) {
-    case(SPC_MOD):
+    case SPC_MOD:
         if (dbGetFieldIndex(paddr) == waveformRecordSIMM) {
             if (!after)
                 recGblSaveSimm(prec->sscn, &prec->oldsimm, prec->simm);
             else
-                recGblCheckSimm((dbCommon *)prec, &prec->sscn, prec->oldsimm, prec->simm);
-            return(0);
+                recGblCheckSimm((dbCommon *)prec, &prec->sscn, prec->oldsimm,
+                    prec->simm);
+            return 0;
         }
     default:
         recGblDbaddrError(S_db_badChoice, paddr, "waveform: special");
-        return(S_db_badChoice);
+        return S_db_badChoice;
     }
 }
 
@@ -205,12 +205,14 @@ static long get_array_info(DBADDR *paddr, long *no_elements, long *offset)
 static long put_array_info(DBADDR *paddr, long nNew)
 {
     waveformRecord *prec = (waveformRecord *) paddr->precord;
+    epicsUInt32 nord = prec->nord;
 
     prec->nord = nNew;
     if (prec->nord > prec->nelm)
         prec->nord = prec->nelm;
 
-    db_post_events(prec, &prec->nord, DBE_VALUE | DBE_LOG);
+    if (nord != prec->nord)
+        db_post_events(prec, &prec->nord, DBE_VALUE | DBE_LOG);
     return 0;
 }
 
@@ -223,7 +225,7 @@ static long get_units(DBADDR *paddr, char *units)
     switch (dbGetFieldIndex(paddr)) {
         case indexof(VAL):
             if (prec->ftvl == DBF_STRING || prec->ftvl == DBF_ENUM)
-                break; 
+                break;
         case indexof(HOPR):
         case indexof(LOPR):
             strncpy(units,prec->egu,DB_UNITS_SIZE);
@@ -323,15 +325,17 @@ static void monitor(waveformRecord *prec)
         db_post_events(prec, &prec->val, monitor_mask);
     }
 }
-
+
 static long readValue(waveformRecord *prec)
 {
     struct wfdset *pdset = (struct wfdset *) prec->dset;
     long status = 0;
 
     if (!prec->pact) {
-        status = recGblGetSimm((dbCommon *)prec, &prec->sscn, &prec->oldsimm, &prec->simm, &prec->siml);
-        if (status) return status;
+        status = recGblGetSimm((dbCommon *)prec, &prec->sscn, &prec->oldsimm,
+            &prec->simm, &prec->siml);
+        if (status)
+            return status;
     }
 
     switch (prec->simm) {
@@ -348,22 +352,27 @@ static long readValue(waveformRecord *prec)
         long nRequest = prec->nelm;
 
         recGblSetSevr(prec, SIMM_ALARM, prec->sims);
-        if (prec->pact || (prec->sdly < 0.)) {
+        if (prec->pact || (prec->sdly < 0)) {
             status = dbGetLink(&prec->siol, prec->ftvl, prec->bptr, 0, &nRequest);
-            if (status == 0) prec->udf = FALSE;
-            /* nord set only for db links: needed for old db_access */
-            if (!dbLinkIsConstant(&prec->siol)) {
+            if (status == 0)
+                prec->udf = FALSE;
+
+            if (nRequest != prec->nord) {
                 prec->nord = nRequest;
                 db_post_events(prec, &prec->nord, DBE_VALUE | DBE_LOG);
             }
             prec->pact = FALSE;
-        } else { /* !prec->pact && delay >= 0. */
+        }
+        else { /* !prec->pact && delay >= 0 */
             CALLBACK *pvt = prec->simpvt;
-            if (!pvt) {
-                pvt = calloc(1, sizeof(CALLBACK)); /* very lazy allocation of callback structure */
+
+            if (!pvt) { /* very lazy allocation of callback structure */
+                pvt = calloc(1, sizeof(CALLBACK));
                 prec->simpvt = pvt;
             }
-            if (pvt) callbackRequestProcessCallbackDelayed(pvt, prec->prio, prec, prec->sdly);
+            if (pvt)
+                callbackRequestProcessCallbackDelayed(pvt, prec->prio, prec,
+                    prec->sdly);
             prec->pact = TRUE;
         }
         break;
