@@ -6,6 +6,7 @@
 # All RTEMS targets use the same Makefile fragment
 #
 override EXE=.elf
+RTEMS_BSP = uC5282
 RTEMS_TARGET_CPU = m68k
 GNU_TARGET=m68k-rtems
 ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL

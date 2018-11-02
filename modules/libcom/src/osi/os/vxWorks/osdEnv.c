@@ -37,6 +37,11 @@ epicsShareFunc void epicsShareAPI epicsEnvSet (const char *name, const char *val
 {
     char *cp;
 
+    if (!name) {
+        printf ("Usage: epicsEnvSet \"name\", \"value\"\n");
+        return;
+    }
+
     iocshEnvClear(name);
     
     cp = mallocMustSucceed (strlen (name) + strlen (value) + 2, "epicsEnvSet");
@@ -49,6 +54,25 @@ epicsShareFunc void epicsShareAPI epicsEnvSet (const char *name, const char *val
             name, value, strerror (errno));
         free (cp);
     }
+}
+
+/*
+ * Unset an environment variable
+ * Basically destroy the name of that variable because vxWorks does not
+ * support to really unset an environment variable.
+ */
+
+epicsShareFunc void epicsShareAPI epicsEnvUnset (const char *name)
+{
+    char* var;
+
+    if (!name) return;
+    iocshEnvClear(name);
+    var = getenv(name);
+    if (!var) return;
+    var -= strlen(name);
+    var --;
+    *var = 0;
 }
 
 /*
