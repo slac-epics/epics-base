@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.1.2-rc1-1.0.1: 2018-11-5 from R7.0.1.2-rc1-1.branch
+	Fixed incorrect vpath in configure/RULES.Db
+
 R7.0.1.2-rc1-1.0.0: 2018-11-1 from R7.0.1.2-rc1-1.branch
 	Merge branch 'lp-7.0' into R7.0.1.2-rc1-1.branch
 	Sort DIRECTORY_TARGETS to avoid errors if 2 FILE_TYPEs have the same INSTALL directory.
