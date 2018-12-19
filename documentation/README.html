@@ -9,7 +9,7 @@
 <BODY>
 <CENTER>
 <H1>Installation Instructions</H1>
-<H2>EPICS Base Release 7.0.1.1</H2><BR>
+<H2>EPICS Base Release 7.0.2</H2><BR>
 </CENTER>
 <HR>
 <H3> Table of Contents</H3>
@@ -176,12 +176,11 @@
 
 <H4>base/startup directory - contains scripts to set environment and path</H4>
 <PRE>
-        EpicsHostArch       C shell script to set EPICS_HOST_ARCH env variable
-        EpicsHostArch.pl    Perl script to set EPICS_HOST_ARCH env variable
-        Site.profile        bourne shell script to set path and env variables
-        Site.cshrc          c shell script to set path and env variables
-        cygwin.bat          WIN32 bat file to set cygwin path and env variables
-        win32.bat           WIN32 bat file to set path and env variables
+        EpicsHostArch       Shell script to set EPICS_HOST_ARCH env variable
+        unix.csh            C shell script to set path and env variables
+        unix.sh             Bourne shell script to set path and env variables
+        win32.bat           Bat file example to configure win32-x86 target
+        windows.bat         Bat file example to configure windows-x64 target
 </PRE>
 
 <H4>base/configure directory - contains build definitions and rules</H4>

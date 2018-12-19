@@ -49,6 +49,7 @@ else
 #
 #RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
 RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
 
 #RTEMS_PATCHLVL=rtems_p0
 RTEMS_PATCHLVL=rtems_p1
@@ -57,12 +58,13 @@ SSRLAPPS_PATCHLVL=ssrlApps_p3
 #SSRLAPPS_PATCHLVL=ssrlApps_p2
 endif
 
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
-RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+#--------------------------------------------------
+# Set RTEMS_BSP from T_A if not already done
+RTEMS_BSP ?= $(subst RTEMS-,,$(T_A))
+
 #-------------------------------------------------------
 # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
-RTEMS_BSP=$(subst RTEMS-,,$(T_A))
+RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
@@ -110,7 +112,7 @@ CPPFLAGS += $(CONFORM_CPPFLAGS)\
  $(USR_CPPFLAGS) $(CMD_CPPFLAGS) $(ARCH_DEP_CPPFLAGS) $(OP_SYS_CPPFLAGS)\
  $(OP_SYS_INCLUDE_CPPFLAGS) $(CODE_CPPFLAGS)
 
-ECHO = @$(if $(findstring s,$(patsubst T_A=%,,$(MAKEFLAGS))),$(NOP),echo)
+ECHO = @$(if $(findstring s,$(MFLAGS)),$(NOP),echo)
 
 #--------------------------------------------------
 # Although RTEMS uses gcc, it wants to use gcc its own way

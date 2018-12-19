@@ -36,6 +36,7 @@ epicsShareFunc void epicsShareAPI epicsEnvSet (const char *name, const char *val
 {
     char *cp;
 
+    if (!name) return;
     iocshEnvClear(name);
     
 	cp = mallocMustSucceed (strlen (name) + strlen (value) + 2, "epicsEnvSet");
@@ -53,6 +54,18 @@ epicsShareFunc void epicsShareAPI epicsEnvSet (const char *name, const char *val
                 strerror (errno));
         free (cp);
 	}
+}
+
+/*
+ * Unset an environment variable
+ * Using putenv with a an existing name but without "=..." deletes
+ */
+
+epicsShareFunc void epicsShareAPI epicsEnvUnset (const char *name)
+{
+    iocshEnvClear(name);
+    if (getenv(name) != NULL)
+        putenv((char*)name);
 }
 
 /*

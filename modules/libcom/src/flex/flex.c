@@ -4,7 +4,7 @@
 * Copyright (c) 2002 The Regents of the University of California, as
 *     Operator of Los Alamos National Laboratory.
 * EPICS BASE is distributed subject to a Software License Agreement found
-* in file LICENSE that is included with this distribution. 
+* in file LICENSE that is included with this distribution.
 \*************************************************************************/
 /* flex - tool to generate fast lexical analyzers */
 
@@ -14,7 +14,7 @@
  *
  * This code is derived from software contributed to Berkeley by
  * Vern Paxson.
- * 
+ *
  * The United States Government has rights in this work pursuant
  * to contract no. DE-AC03-76SF00098 between the United States
  * Department of Energy and the University of California.
@@ -98,7 +98,6 @@ int num_backtracking, bol_needed;
 FILE *temp_action_file;
 FILE *backtrack_file;
 int end_of_buffer_state;
-char action_file_name[256>L_tmpnam?256:L_tmpnam];
 char **input_files;
 int num_input_files;
 char *program_name;
@@ -210,10 +209,7 @@ void flexend(int status)
 
 	else if ( fclose( temp_action_file ) )
 	    flexfatal( "error occurred when closing temporary action file" );
-
-	else if ( unlink( action_file_name ) )
-	    flexfatal( "error occurred when deleting temporary action file" );
-	}
+    }
 
     if ( status != 0 && outfile_created )
 	{
@@ -495,6 +491,13 @@ void flexinit(int argc, char **argv)
 		    /* stupid do-nothing deprecated option */
 		    break;
 
+		case 'o':
+		    if ( i != 1 )
+			flexerror( "-o flag must be given separately" );
+
+		    outfile = arg + i + 1;
+		    goto get_next_arg;
+
 		case 'p':
 		    performance_report = true;
 		    break;
@@ -591,14 +594,10 @@ get_next_arg: /* used by -C and -S flags in lieu of a "continue 2" control */
     if ( (skelfile = fopen( skelname, "r" )) == NULL )
 	lerrsf( "can't open skeleton file %s", skelname );
 
-    epicsTempName ( action_file_name, sizeof ( action_file_name ) );
-	if ( action_file_name[0] == '\0' )
+    if ( ( temp_action_file = epicsTempFile () ) == NULL )
     {
-	    lerrsf( "can't create temporary file name", "" );
+        lerrsf( "can't create temporary action file", "" );
     }
-
-    if ( ( temp_action_file = fopen ( action_file_name, "w" ) ) == NULL )
-	lerrsf( "can't open temporary action file %s", action_file_name );
 
     lastdfa = lastnfa = num_rules = numas = numsnpairs = tmpuses = 0;
     numecs = numeps = eps2 = num_reallocs = hshcol = dfaeql = totnst = 0;

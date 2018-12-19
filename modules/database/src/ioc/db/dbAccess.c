@@ -34,7 +34,7 @@
 #include "errlog.h"
 #include "errMdef.h"
 
-#define epicsExportSharedSymbols
+#include "epicsExport.h" /* #define epicsExportSharedSymbols */
 #include "caeventmask.h"
 #include "callback.h"
 #include "dbAccessDefs.h"
@@ -64,6 +64,9 @@
 
 epicsShareDef struct dbBase *pdbbase = 0;
 epicsShareDef volatile int interruptAccept=FALSE;
+
+epicsShareDef int dbAccessDebugPUTF = 0;
+epicsExportAddress(int, dbAccessDebugPUTF);
 
 /* Hook Routines */
 
@@ -447,22 +450,6 @@ int dbGetFieldIndex(const struct dbAddr *paddr)
 }
 
 /*
- *  Process a record if its scan field is passive.
- *     Will notify if processing is complete by callback.
- *       (only if you are interested in completion)
- */
-long dbScanPassive(dbCommon *pfrom, dbCommon *pto)
-{
-    /* if not passive just return success */
-    if (pto->scan != 0)
-        return 0;
-
-    if (pfrom && pfrom->ppn)
-        dbNotifyAdd(pfrom,pto);
-    return dbProcess(pto);
-}
-
-/*
  *   Process the record.
  *     1.  Check for breakpoints.
  *     2.  Check the process active flag (PACT).
@@ -527,7 +514,8 @@ long dbProcess(dbCommon *precord)
         unsigned short monitor_mask;
 
         if (*ptrace)
-            printf("%s: Active %s\n", context, precord->name);
+            printf("%s: dbProcess of Active '%s' with RPRO=%d\n",
+                context, precord->name, precord->rpro);
 
         /* raise scan alarm after MAX_LOCK times */
         if ((precord->stat == SCAN_ALARM) ||
@@ -556,7 +544,8 @@ long dbProcess(dbCommon *precord)
     /* if disabled check disable alarm severity and return success */
     if (precord->disa == precord->disv) {
         if (*ptrace)
-            printf("%s: Disabled %s\n", context, precord->name);
+            printf("%s: dbProcess of Disabled '%s'\n",
+                context, precord->name);
 
         /*take care of caching and notifyCompletion*/
         precord->rpro = FALSE;
@@ -593,7 +582,7 @@ long dbProcess(dbCommon *precord)
     }
 
     if (*ptrace)
-        printf("%s: Process %s\n", context, precord->name);
+        printf("%s: dbProcess of '%s'\n", context, precord->name);
 
     /* process record */
     status = prset->process(precord);
@@ -713,6 +702,18 @@ void dbInitEntryFromRecord(struct dbCommon *prec, DBENTRY *pdbentry)
     pdbentry->precnode = ppvt->recnode;
 }
 
+struct link* dbGetDevLink(struct dbCommon* prec)
+{
+    DBLINK *plink = 0;
+    DBENTRY entry;
+    dbInitEntryFromRecord(prec, &entry);
+    if(dbFindField(&entry, "INP")==0 || dbFindField(&entry, "OUT")==0) {
+        plink = (DBLINK*)entry.pfield;
+    }
+    dbFinishEntry(&entry);
+    return plink;
+}
+
 long dbValueSize(short dbr_type)
 {
     /* sizes for value associated with each DBR request type */
@@ -754,13 +755,22 @@ long dbBufferSize(short dbr_type, long options, long no_elements)
 }
 int dbLoadDatabase(const char *file, const char *path, const char *subs)
 {
+    if (!file) {
+        printf("Usage: dbLoadDatabase \"file\", \"path\", \"subs\"\n");
+        return -1;
+    }
     return dbReadDatabase(&pdbbase, file, path, subs);
 }
 
 int dbLoadRecords(const char* file, const char* subs)
 {
-    int status = dbReadDatabase(&pdbbase, file, 0, subs);
+    int status;
 
+    if (!file) {
+        printf("Usage: dbLoadRecords \"file\", \"subs\"\n");
+        return -1;
+    }
+    status = dbReadDatabase(&pdbbase, file, 0, subs);
     if (!status && dbLoadRecordsHook)
         dbLoadRecordsHook(file, subs);
     return status;
@@ -1040,7 +1050,7 @@ static long dbPutFieldLink(DBADDR *paddr,
         return S_db_badDbrtype;
     }
 
-    status = dbParseLink(pstring, pfldDes->field_type, &link_info, 0);
+    status = dbParseLink(pstring, pfldDes->field_type, &link_info);
     if (status)
         return status;
 
@@ -1213,8 +1223,8 @@ long dbPutField(DBADDR *paddr, short dbrType,
              precord->scan == 0 &&
              dbrType < DBR_PUT_ACKT)) {
             if (precord->pact) {
-                if (precord->tpro)
-                    printf("%s: Active %s\n",
+                if (dbAccessDebugPUTF && precord->tpro)
+                    printf("%s: dbPutField to Active '%s', setting RPRO=1\n",
                         epicsThreadGetNameSelf(), precord->name);
                 precord->rpro = TRUE;
             } else {
@@ -1347,4 +1357,3 @@ done:
     paddr->pfield = pfieldsave;
     return status;
 }
-

@@ -19,6 +19,7 @@
 #include "menuScan.h"
 #include "shareLib.h"
 #include "compilerDependencies.h"
+#include "devSup.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,15 +34,20 @@ extern "C" {
 #define MIN_PHASE           SHRT_MIN
 
 /*definitions for I/O Interrupt Scanning */
-struct ioscan_head;
-
-typedef struct ioscan_head *IOSCANPVT;
+/* IOSCANPVT now defined in devSup.h */
 typedef struct event_list *EVENTPVT;
 
 struct dbCommon;
 
 typedef void (*io_scan_complete)(void *usr, IOSCANPVT, int prio);
 typedef void (*once_complete)(void *usr, struct dbCommon*);
+
+typedef struct scanOnceQueueStats {
+    int size;
+    int numUsed;
+    int maxUsed;
+    int numOverflow;
+} scanOnceQueueStats;
 
 epicsShareFunc long scanInit(void);
 epicsShareFunc void scanRun(void);
@@ -58,6 +64,8 @@ epicsShareFunc double scanPeriod(int scan);
 epicsShareFunc int scanOnce(struct dbCommon *);
 epicsShareFunc int scanOnceCallback(struct dbCommon *, once_complete cb, void *usr);
 epicsShareFunc int scanOnceSetQueueSize(int size);
+epicsShareFunc int scanOnceQueueStatus(const int reset, scanOnceQueueStats *result);
+epicsShareFunc void scanOnceQueueShow(const int reset);
 
 /*print periodic lists*/
 epicsShareFunc int scanppl(double rate);
