@@ -32,7 +32,6 @@ print join('-', HostArch(), @ARGV), "\n";
 sub HostArch {
     my $arch = $Config{archname};
     for ($arch) {
-        return 'linux-x86_64'   if m/^x86_64-linux/;
         return 'linux-x86'      if m/^i[3-6]86-linux/;
         return 'linux-arm'      if m/^arm-linux/;
         return 'linux-aarch64'  if m/^aarch64-linux/;
@@ -52,6 +51,17 @@ sub HostArch {
             }
             die "$0: macOS CPU type '$cpu' not recognized\n";
         }
+
+    	if (m/linux/) {
+            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
+            if ($cpu =~ m/x86_64/)	{
+				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
+				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
+				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
+			}
+		}
 
         die "$0: Architecture '$arch' not recognized\n";
     }
