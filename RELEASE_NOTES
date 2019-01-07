@@ -4,6 +4,10 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.10	Bruce Hill	2019-01-07
+	Add -V flag to ca client tools to show EPICS and CA versions.
+	Added a getCopy::exception function to ca/client for more useful error msgs.
+
 R3.15.5-2.0.9	Bruce Hill	2018-08-22
 	Include epicsStdio.h in dbChannel.c so driver report output can be redirected from iocsh.
 		Fixes issue w/ R3.15.5 where some of the casr() output was not being redirected.
