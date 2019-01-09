@@ -11,7 +11,7 @@
 
 include $(CONFIG)/RULES_DIRS
 
-## PCDS moves the buildInstall, envPaths and other targets from
+## SLAC moves the buildInstall, envPaths and other targets from
 ## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
 ## be configured w/ or w/o RULES_DIRS
 include $(CONFIG)/RULES.ioc-targets

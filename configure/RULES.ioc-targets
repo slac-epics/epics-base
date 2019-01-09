@@ -26,7 +26,7 @@ endif
 # is set to the absolute pathname of INSTALL_LOCATION.
 # The ioc can use this to locate it's executables, db files, etc
 #
-# IOC_APPL_TOP was introduced by PCDS for templated ioc's
+# IOC_APPL_TOP was introduced by SLAC for templated ioc's
 # IOC_APPL_TOP gets set in the build files for templated
 # ioc's to the TOP for it's parent IOC build.
 # The build system and the ioc application use this to locate
@@ -39,13 +39,10 @@ endif
 cdCommands dllPath.bat relPaths.sh: \
     $(wildcard $(TOP)/configure/RELEASE*) \
     $(wildcard $(TOP)/configure/CONFIG*) $(INSTALL_BIN)\
-    $(wildcard $(TOP)/RELEASE_SITE)
+    $(wildcard $(TOP)/RELEASE_SITE) \
+    $(wildcard $(TOP)/RELEASE.local)
 ifeq ($(IOC_APPL_TOP),)
-ifeq ($(IOCS_APPL_TOP),)
-	$(CONVERTRELEASE) -a $(ARCH) $@
-else
 	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
-endif
 else
 	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
 endif
