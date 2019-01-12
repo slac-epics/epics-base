@@ -11,28 +11,14 @@
 
 include $(CONFIG)/RULES_DIRS
 
-build$(DIVIDER)$(ARCH) build: buildInstall
-install$(DIVIDER)$(ARCH) install: buildInstall
-$(ARCH): buildInstall
+## SLAC moves the buildInstall, envPaths and other targets from
+## here, RULES.ioc, to RULES.ioc-targets to allow the ioc-targets to
+## be configured w/ or w/o RULES_DIRS
+include $(CONFIG)/RULES.ioc-targets
 
-ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(strip $(ARCH)))
-    buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
-
-    clean$(DIVIDER)$(ARCH) clean:
-	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
-else
-    buildInstall$(DIVIDER)$(ARCH) buildInstall:
-    clean$(DIVIDER)$(ARCH) clean:
-endif
-
-cdCommands dllPath.bat relPaths.sh: \
-    $(wildcard $(TOP)/configure/RELEASE*) \
-    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
-	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
-
-envPaths: $(wildcard $(TOP)/configure/RELEASE*) \
-    $(wildcard $(TOP)/configure/CONFIG_SITE*) | $(INSTALL_BIN)
-	$(CONVERTRELEASE) -t $(IOCS_APPL_TOP) $@
-
-realclean:
-	$(RM) cdCommands envPaths dllPath.bat relPaths.sh
+## For traditional ioc target support, just include $(CONFIG)/RULES.ioc as before.
+## However, the following style of Makefile works better as it creates
+## O.Common and other O.* directories which allow you to build DB, REQ, and other
+## msi derived targets out of ioc leaf directories.
+## include $(CONFIG)/RULES
+## include $(CONFIG)/RULES.ioc-targets
