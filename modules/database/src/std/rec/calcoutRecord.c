@@ -235,7 +235,7 @@ static long process(struct dbCommon *pcommon)
     struct calcoutRecord *prec = (struct calcoutRecord *)pcommon;
     rpvtStruct *prpvt = prec->rpvt;
     int doOutput;
-	unsigned char    pact=prec->pact;
+    unsigned char    pact=prec->pact;
 
     if (!prec->pact) {
         prec->pact = TRUE;
@@ -252,11 +252,11 @@ static long process(struct dbCommon *pcommon)
         }
         checkAlarms(prec);
 
-	if ( !pact ) {
-	    /* Update the timestamp before writing output values so it
-	     * will be uptodate if any downstream records fetch it via TSEL */
-	    recGblGetTimeStamp(prec);
-	}
+        if ( !pact ) {
+            /* Update the timestamp before writing output values so it
+             * will be uptodate if any downstream records fetch it via TSEL */
+            recGblGetTimeStamp(prec);
+        }
         /* check for output link execution */
         switch (prec->oopt) {
         case calcoutOOPT_Every_Time:
@@ -278,7 +278,7 @@ static long process(struct dbCommon *pcommon)
             doOutput = (prec->val != 0.0);
             break;
         default:
-	    doOutput = 0;
+            doOutput = 0;
             break;
         }
         prec->pval = prec->val;
@@ -297,8 +297,8 @@ static long process(struct dbCommon *pcommon)
             }
         }
     } else { /* pact == TRUE */
-	/* Update timestamp again for asynchronous devices */
-	recGblGetTimeStamp(prec);
+        /* Update timestamp again for asynchronous devices */
+        recGblGetTimeStamp(prec);
 
         if (prec->dlya) {
             prec->dlya = 0;
