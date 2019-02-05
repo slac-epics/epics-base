@@ -130,6 +130,11 @@ CROSS_COMPILER_TARGET_ARCHS=
 ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
 CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64
 CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik
+CROSS_COMPILER_TARGET_ARCHS += linux-arm
+endif
+
+ifeq '$(EPICS_HOST_ARCH)' 'rhel7-x86_64'
+CROSS_COMPILER_TARGET_ARCHS += linux-arm
 endif
 
 # RHEL5 currently supports linux-x86 (RHEL5 32bit) and RTEMS-beatnik cross compiles
@@ -149,7 +154,7 @@ endif
 #  host:	linux-x86    targets: RTEMS-beatnik linux-x86
 #  host:	linux-x86_64 targets: RTEMS-beatnik linux-x86 linux-x86_64
 #  host:	rhel6-x86_64 targets: RTEMS-beatnik rhel6-x86_64 linuxRT_glibc-x86_64
-CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
+#CROSS_COMPILER_HOST_ARCHS		=	linux-x86_64 rhel6-x86_64
 
 #  The 'make runtests' and 'make tapfiles' build targets normally only run
 #  self-tests for the EPICS_HOST_ARCH architecture. If the host can execute
