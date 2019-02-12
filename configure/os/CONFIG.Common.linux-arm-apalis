@@ -1,0 +1,11 @@
+# CONFIG.Common.linux-arm-apalis
+#
+# Definitions for linux-arm-apalis target builds
+#-------------------------------------------------------
+
+# Include definitions common to all linux-arm targets
+include $(CONFIG)/os/CONFIG.Common.linux-arm
+
+# Setup READLINE
+COMMANDLINE_LIBRARY = READLINE
+

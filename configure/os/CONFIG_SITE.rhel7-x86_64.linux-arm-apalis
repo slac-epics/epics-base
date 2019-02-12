@@ -1,0 +1,7 @@
+# CONFIG_SITE.rhel7-x86_64.linux-arm-apalis
+#
+# Site specific settings for rhel7-x86_64 host - linux-arm-apalis target builds
+#-------------------------------------------------------
+
+# Inherit setting from linux-x86_64
+include $(CONFIG)/os/CONFIG_SITE.linux-x86_64.linux-arm-apalis

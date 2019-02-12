@@ -44,7 +44,13 @@ case $sysname in
             x86_64 )
                 ;; # $cpu is correct
             armv6l | armv7l )
-                cpu=arm ;;
+				cpu=arm
+				if [ -r /etc/os-release ]; then
+					source /etc/os-release
+					if [ "$NAME" = "Angstrom" ]; then
+						cpu=arm-apalis
+					fi
+				fi ;;
         esac
         echo ${os}-${cpu}${suffix}
         ;;

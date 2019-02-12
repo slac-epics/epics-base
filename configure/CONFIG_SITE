@@ -130,11 +130,10 @@ CROSS_COMPILER_TARGET_ARCHS=
 ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
 CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64
 CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik
-CROSS_COMPILER_TARGET_ARCHS += linux-arm
 endif
 
 ifeq '$(EPICS_HOST_ARCH)' 'rhel7-x86_64'
-CROSS_COMPILER_TARGET_ARCHS += linux-arm
+CROSS_COMPILER_TARGET_ARCHS += linux-arm-apalis
 endif
 
 # RHEL5 currently supports linux-x86 (RHEL5 32bit) and RTEMS-beatnik cross compiles
