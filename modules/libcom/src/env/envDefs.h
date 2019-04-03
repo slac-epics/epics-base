@@ -141,6 +141,16 @@ LIBCOM_API long epicsStdCall
     envPrtConfigParam(const ENV_PARAM *pParam);
 
 /**
+ * \brief Find an env configuration parameter by name
+ *
+ * \envVarName envVarName const ptr to parameter name.
+ * \return ptr to ENV_PARAM
+ * \return Pointer to the ENV_PARAM entry, or NULL if not found.
+ */
+LIBCOM_API const ENV_PARAM * epicsStdCall
+    envFindConfigParam( const char * envVarName );
+
+/**
  * \brief Get value of an inet addr config parameter.
  *
  * Gets the value of a configuration parameter and copies it into
