@@ -64,7 +64,11 @@ $(BUILD_ARCHS) : % : O.% O.Common
 $(ACTIONS) : % : $(foreach arch, $(BUILD_ARCHS), %$(DIVIDER)$(arch))
 
 $(buildDirs):
+ifeq ($(IOC_APPL_TOP),)
 	$(PERL) $(TOOLS)/makeMakefile.pl $@ $(TOP)/..
+else
+	$(PERL) $(TOOLS)/makeMakefile.pl $@ $(IOC_APPL_TOP)
+endif
 
 O.Common:
 	$(MKDIR) O.Common
