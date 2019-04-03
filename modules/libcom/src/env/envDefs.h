@@ -106,6 +106,7 @@ epicsShareFunc const char * epicsShareAPI
 	envGetConfigParamPtr(const ENV_PARAM *pParam);
 epicsShareFunc long epicsShareAPI 
 	envPrtConfigParam(const ENV_PARAM *pParam);
+epicsShareFunc const ENV_PARAM * envFindConfigParam( const char * envVarName );
 epicsShareFunc long epicsShareAPI 
 	envGetInetAddrConfigParam(const ENV_PARAM *pParam, struct in_addr *pAddr);
 epicsShareFunc long epicsShareAPI 

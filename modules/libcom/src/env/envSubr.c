@@ -24,6 +24,7 @@
 * QUICK REFERENCE
 * #include "envDefs.h"
 * ENV_PARAM	param;
+*  ENV_PARAM * envFindConfigParam(   envVarName           )
 *  char *envGetConfigParamPtr(       pParam			      )
 *  char *envGetConfigParam(          pParam,    bufDim,    pBuf       )
 *  long  envGetLongConfigParam(      pParam,    pLong                 )
@@ -49,6 +50,47 @@
 #include "envDefs.h"
 #include "epicsAssert.h"
 #include "osiSock.h"
+
+
+/*+/subr**********************************************************************
+* NAME  envFindConfigParam - Find an ENV_PARAM for the specified environment variable.
+*
+* DESCRIPTION
+*	Returns a pointer to an environment configuration parameter. 
+*	If the configuration parameter isn't found in the environment, 
+*	then a NULL pointer is returned.
+*
+* RETURNS
+*	pointer to the environment variable, or
+*	NULL if no environment configuration parameter was found
+*
+* EXAMPLES
+* 1.	Get a pointer to the ENV_PARAM for the EPICS-defined
+*   environment parameter EPICS_TS_NTP_INET.
+*
+*	#include "envDefs.h"
+*	const ENV_PARAM * pParam;
+*
+*	pParam = envFindConfigParam( "EPICS_TS_NTP_INET" );
+*	if (!pParam) {
+*		printf("No ENV_PARAM for EPICS_TS_NTP_INET\n" );
+*	}
+*
+*-*/
+const ENV_PARAM * envFindConfigParam( const char * envVarName )
+{
+	const ENV_PARAM **ppParam = env_param_list;
+
+	/* Find a match with one of the EPICS env vars */
+	while (*ppParam) {
+		if ( strcmp( envVarName, (*ppParam)->name ) == 0 ) {
+			return *ppParam;
+		}
+	ppParam++;
+	}
+
+	return 0;
+}
 
 
 /*+/subr**********************************************************************
