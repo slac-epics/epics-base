@@ -22,6 +22,7 @@
 #include "ellLib.h"
 #include "epicsPrint.h"
 #include "epicsString.h"
+#include "epicsThread.h"
 #include "errMdef.h"
 #include "freeList.h"
 #include "gpHash.h"
@@ -40,6 +41,9 @@
 
 /*global declarations*/
 epicsShareDef char *makeDbdDepends=0;
+
+epicsShareDef int dbLoadSuspendOnError=0;
+epicsExportAddress(int,dbLoadSuspendOnError);
 
 epicsShareDef int dbRecordsOnceOnly=0;
 epicsExportAddress(int,dbRecordsOnceOnly);
@@ -320,6 +324,9 @@ cleanup:
     if(my_buffer) free((void *)my_buffer);
     my_buffer = NULL;
     freeInputFileList();
+    if(status != 0 && dbLoadSuspendOnError) {
+        epicsThreadSuspendSelf();
+    }
     return(status);
 }
 
@@ -335,7 +342,7 @@ static int db_yyinput(char *buf, int max_size)
 {
     size_t  l,n;
     char	*fgetsRtn;
-    
+
     if(yyAbort) return(0);
     if(*my_buffer_ptr==0) {
 	while(TRUE) { /*until we get some input*/
@@ -348,13 +355,16 @@ static int db_yyinput(char *buf, int max_size)
 		    if (exp < 0) {
 			fprintf(stderr, "Warning: '%s' line %d has undefined macros\n",
 			    pinputFileNow->filename, pinputFileNow->line_num+1);
+                        if(dbLoadSuspendOnError) {
+                            epicsThreadSuspendSelf();
+                        }
 		    }
 		}
 	    } else {
 		fgetsRtn = fgets(my_buffer,MY_BUFFER_SIZE,pinputFileNow->fp);
 	    }
 	    if(fgetsRtn) break;
-	    if(fclose(pinputFileNow->fp)) 
+	    if(fclose(pinputFileNow->fp))
 		errPrintf(0,__FILE__, __LINE__,
 			"Closing file %s",pinputFileNow->filename);
 	    free((void *)pinputFileNow->filename);
@@ -505,7 +515,7 @@ static void dbRecordtypeFieldHead(char *name,char *type)
 {
     dbFldDes		*pdbFldDes;
     int			i;
-    
+
     if(duplicate) return;
     pdbFldDes = dbCalloc(1,sizeof(dbFldDes));
     allocTemp(pdbFldDes);
@@ -536,7 +546,7 @@ static short findOrAddGuiGroup(const char *name)
 static void dbRecordtypeFieldItem(char *name,char *value)
 {
     dbFldDes		*pdbFldDes;
-    
+
     if(duplicate) return;
     pdbFldDes = (dbFldDes *)getLastTemp();
     if(strcmp(name,"asl")==0) {
@@ -628,11 +638,11 @@ static void dbRecordtypeCdef(char *text) {
     dbText		*pdbCdef;
     tempListNode	*ptempListNode;
     dbRecordType	*pdbRecordType;
-    
+
     if (!pdbbase->loadCdefs || duplicate) return;
     ptempListNode = (tempListNode *)ellFirst(&tempList);
     pdbRecordType = ptempListNode->item;
-    
+
     pdbCdef = dbCalloc(1,sizeof(dbText));
     if (text[0] == ' ') text++;	/* strip leading space if present */
     pdbCdef->text = epicsStrDup(text);
@@ -691,7 +701,7 @@ static void dbRecordtypeBody(void)
 	if((field_type==DBF_STRING) && (pdbFldDes->size==0))
 	    fprintf(stderr,"recordtype(%s).%s size not specified\n",
 		pdbRecordType->name,pdbFldDes->name);
-	if((field_type==DBF_NOACCESS) && (pdbFldDes->extra==0)) 
+	if((field_type==DBF_NOACCESS) && (pdbFldDes->extra==0))
 	    fprintf(stderr,"recordtype(%s).%s extra not specified\n",
 		pdbRecordType->name,pdbFldDes->name);
     }
@@ -803,7 +813,7 @@ static void dbDriver(char *name)
     pgphentry = gphAdd(pdbbase->pgpHash,pdrvSup->name,&pdbbase->drvList);
     if(!pgphentry) {
 	yyerrorAbort("gphAdd failed");
-    } 
+    }
     pgphentry->userPvt = pdrvSup;
     ellAdd(&pdbbase->drvList,&pdrvSup->node);
 }
@@ -822,7 +832,7 @@ static void dbRegistrar(char *name)
     pgphentry = gphAdd(pdbbase->pgpHash,ptext->text,&pdbbase->registrarList);
     if(!pgphentry) {
 	yyerrorAbort("gphAdd failed");
-    } 
+    }
     pgphentry->userPvt = ptext;
     ellAdd(&pdbbase->registrarList,&ptext->node);
 }
@@ -861,7 +871,7 @@ static void dbVariable(char *name, char *type)
     pgphentry = gphAdd(pdbbase->pgpHash,pvar->name,&pdbbase->variableList);
     if(!pgphentry) {
 	yyerrorAbort("gphAdd failed");
-    } 
+    }
     pgphentry->userPvt = pvar;
     ellAdd(&pdbbase->variableList,&pvar->node);
 }
@@ -920,11 +930,11 @@ static void dbBreakBody(void)
     pnewbrkTable->paBrkInt = paBrkInt = dbCalloc(number, sizeof(brkInt));
     for (i=0; i<number; i++) {
 	char	*str;
-	
+
 	str = (char *)popFirstTemp();
 	(void) epicsScanDouble(str, &paBrkInt[i].raw);
 	free(str);
-	
+
 	str = (char *)popFirstTemp();
 	(void) epicsScanDouble(str, &paBrkInt[i].eng);
 	free(str);
@@ -1053,10 +1063,13 @@ static void dbRecordField(char *name,char *value)
     dbTranslateEscape(value, value);    /* yuck: in-place, but safe */
     status = dbPutString(pdbentry,value);
     if(status) {
-	epicsPrintf("Can't set \"%s.%s\" to \"%s\"\n",
+        epicsPrintf("Can't set \"%s.%s\" to \"%s\"\n",
                     dbGetRecordName(pdbentry), name, value);
-	yyerror(NULL);
-	return;
+        yyerror(NULL);
+        if(status != 0 && dbLoadSuspendOnError) {
+            epicsThreadSuspendSelf();
+        }
+        return;
     }
 }
 

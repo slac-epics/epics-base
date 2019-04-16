@@ -10,6 +10,7 @@ variable(atExitDebug,int)
 variable(asCaDebug,int)
 
 # Static database access variables
+variable(dbLoadSuspendOnError,int)
 variable(dbRecordsOnceOnly,int)
 variable(dbRecordsAbcSorted,int)
 variable(dbBptNotMonotonic,int)
