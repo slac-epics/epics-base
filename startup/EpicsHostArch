@@ -30,6 +30,9 @@ case $sysname in
 				os=rhel6 ;;
 			*el7* )
 				os=rhel7 ;;
+# MCB - This is a test kernel on RHEL7.
+			3.13.9 )
+				os=rhel7 ;;
 			2.6.35.13-rt )
 				os=linux ;;
 			3.14.12-rt9 | 3.18.11-rt7 )
