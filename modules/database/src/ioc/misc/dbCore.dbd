@@ -16,6 +16,7 @@ variable(CASDEBUG,int)
 variable(dbJLinkDebug,int)
 
 # Static database access variables
+variable(dbLoadSuspendOnError,int)
 variable(dbRecordsOnceOnly,int)
 variable(dbRecordsAbcSorted,int)
 variable(dbBptNotMonotonic,int)
