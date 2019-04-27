@@ -29,6 +29,19 @@ release.</p>
 
 <p>Description</p>
 
+<h3>Added dbLoadSuspendOnError control</h3>
+
+<p>When loading database files, unexpanded macros and syntax errors can
+result in one or more records not being loaded and a partly broken IOC.
+By setting dbLoadSuspendOnError to a non-zero value before loading the file,
+the IOC will suspend the main thread immediately after printing the error
+message or messages.   This makes it obvious that there was a problem with
+a db file and makes it easy to see the error messages.</p>
+
+<blockquote><pre>
+var dbLoadSuspendOnError 1      <i>iocsh</i>
+dbLoadSuspendOnError=1          <i>VxWorks</i>
+</pre></blockquote>
 -->
 
 <h3>Launchpad Bugs</h3>
