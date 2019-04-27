@@ -22,6 +22,7 @@
 #include "ellLib.h"
 #include "epicsPrint.h"
 #include "epicsString.h"
+#include "epicsThread.h"
 #include "errMdef.h"
 #include "freeList.h"
 #include "gpHash.h"
@@ -40,6 +41,9 @@
 
 /*global declarations*/
 epicsShareDef char *makeDbdDepends=0;
+
+epicsShareDef int dbLoadSuspendOnError=0;
+epicsExportAddress(int,dbLoadSuspendOnError);
 
 epicsShareDef int dbRecordsOnceOnly=0;
 epicsExportAddress(int,dbRecordsOnceOnly);
@@ -326,6 +330,9 @@ cleanup:
     if(my_buffer) free((void *)my_buffer);
     my_buffer = NULL;
     freeInputFileList();
+    if(status != 0 && dbLoadSuspendOnError) {
+        epicsThreadSuspendSelf();
+    }
     return(status);
 }
 
@@ -354,6 +361,9 @@ static int db_yyinput(char *buf, int max_size)
 		    if (exp < 0) {
 			fprintf(stderr, "Warning: '%s' line %d has undefined macros\n",
 			    pinputFileNow->filename, pinputFileNow->line_num+1);
+                        if(dbLoadSuspendOnError) {
+                            epicsThreadSuspendSelf();
+                        }
 		    }
 		}
 	    } else {
@@ -1138,6 +1148,10 @@ static void dbRecordField(char *name,char *value)
         epicsPrintf("Can't set \"%s.%s\" to \"%s\" %s\n",
             dbGetRecordName(pdbentry), name, value, msg);
         yyerror(NULL);
+        if(status != 0 && dbLoadSuspendOnError) {
+            epicsThreadSuspendSelf();
+        }
+		/* TODO: Find other dbLoad* error handling! */
         return;
     }
 }
