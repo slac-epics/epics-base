@@ -4,6 +4,13 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.11	2019-04-30 Bruce Hill
+	dbLoadSuspendOnError support
+	Add check for EPICS_HOST_ARCH in BUILD_ARCHS in RULES_ARCHS
+	Stop building linux-arm-apalis in R3.15.5-2.branch to avoid complicating
+		other builds. See R3.15.5-apalis-2.branch
+	Add support for rhel6 and rhel7 cross-compile of linux-arm-apalis
+
 R3.15.5-2.0.10	Bruce Hill	2019-01-07
 	Add -V flag to ca client tools to show EPICS and CA versions.
 	Added a getCopy::exception function to ca/client for more useful error msgs.
