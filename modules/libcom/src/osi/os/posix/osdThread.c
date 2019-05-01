@@ -590,8 +590,7 @@ static epicsThreadOSD *createImplicit(void)
             pthreadInfo->osiPriority =
                  (param.sched_priority - pcommonAttr->minPriority) * 100.0 /
                     (pcommonAttr->maxPriority - pcommonAttr->minPriority + 1);
-        }
-	}
+    }
 #endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
 
     status = pthread_setspecific(getpthreadInfo,(void *)pthreadInfo);
