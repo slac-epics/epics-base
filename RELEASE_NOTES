@@ -4,6 +4,16 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.2-1.0.1:	2019-04-30 Bruce Hill
+	Merge tag 'R7.0.2.2' into R7.0.2-2.branch
+	Add dbLoadSuspendOnError variable to suspend st.cmd on dbLoad related errors.
+	From R7.0.2.2 documentation/RELEASE_NOTES.html
+		submodule build RULES consolidated into new configure/RULES_MODULES
+		Drop CLOCK_MONOTONIC_RAW from posix/osdMonotonic.c
+	From R7.0.2.1 documentation/RELEASE_NOTES.html
+		Fixed DB_LINK processing loop breaking issue introduced in R7.0.2
+		Dropped support for deprecated dbGetFieldType() and dbGetLinkType()
+
 R7.0.2-1.0.0: 2018-12-19 from R7.0.2-1.branch
 	R7.0.2 EPICS Release plus the following SLAC patches:
 		Added pvAccess env variables to envDefs.h
