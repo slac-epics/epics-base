@@ -28,6 +28,7 @@ release.</p>
 
 <p>Description</p>
 
+-->
 <h3>Added dbLoadSuspendOnError control</h3>
 
 <p>When loading database files, unexpanded macros and syntax errors can
@@ -41,7 +42,17 @@ a db file and makes it easy to see the error messages.</p>
 var dbLoadSuspendOnError 1      <i>iocsh</i>
 dbLoadSuspendOnError=1          <i>VxWorks</i>
 </pre></blockquote>
--->
+
+<p>Default for dbLoadSuspendOnError is 0, no change to current behavior.
+When set to 1, the thread reading the st.cmd file is suspended on the following errors:</p>
+
+<ul>
+<li>db file syntax errors</li>
+<li>unexpanded macros</li>
+<li>invalid DTYP</li>
+<li>invalid enum name</li>
+<li>DESC or other string fields &gt; 40 char </li>
+</ul>
 
 <h3>Build System changes</h3>
 
