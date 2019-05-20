@@ -1151,7 +1151,6 @@ static void dbRecordField(char *name,char *value)
         if(status != 0 && dbLoadSuspendOnError) {
             epicsThreadSuspendSelf();
         }
-		/* TODO: Find other dbLoad* error handling! */
         return;
     }
 }
