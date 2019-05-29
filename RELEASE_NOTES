@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.2-1.0.2:	2019-05-16 Bruce Hill
+	Fix build errors from RULES_BUILD for duplicates in DIRECTORY_TARGETS
+	Minor comment fix in libcom/src/env/RULES
+
 R7.0.2-1.0.1:	2019-04-30 Bruce Hill
 	Merge tag 'R7.0.2.2' into R7.0.2-2.branch
 	Add dbLoadSuspendOnError variable to suspend st.cmd on dbLoad related errors.
