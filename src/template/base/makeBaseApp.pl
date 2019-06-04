@@ -437,7 +437,7 @@ sub FCopyTree {
     chdir $app_top;		# Sigh
     if (-d "$File::Find::name"
 	and ($dir = ReplaceFilename($File::Find::name))) {
-	print "Creating directory $dir\n" !(-d "$dir") and if $opt_d;
+	print "Creating directory $dir\n" and !(-d "$dir") if $opt_d;
 	mkpath($dir) unless (-d "$dir");
     } else {
 	CopyFile($File::Find::name);
