@@ -54,6 +54,13 @@ $(INSTALL_ARCHIVE)/%:	%
 	@$(ECHO) "Installing archive file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
+%.archive: %.sub-arch
+	@$(RM) $(notdir $@)$(DEP)
+	$(MKMF) -m $(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
+	@$(ECHO) "Inflating archive file from $<"
+	@$(RM) $@
+	$(MSI3_15) $(ARCHIVEFLAGS) -S$< > $@
+
 $(COMMON_DIR)/%.archive: %.sub-arch
 	@$(RM) $(notdir $@)$(DEP)
 	$(MKMF) -m $(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
