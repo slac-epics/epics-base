@@ -6,7 +6,7 @@
 
 # Unix command definitions
 CP = cp
-MV = mv
+MV = mv -f
 RM = rm -f
 MKDIR = mkdir -p
 RMDIR = rm -rf
