@@ -4,6 +4,12 @@
 # Reminder: Update EPICS_SITE_VERSION in configure/CONFIG_SITE
 #           before each release
 #
+R3.15.5-2.0.12	2019-06-14 Bruce Hill
+	Added Keenan Lang update to iocsh to disable echoing of comments beginning with #-
+	Additional kernel special cases added to EpicsHostArch
+	Define MV to mv -f so we can rebuild w/ different host arch.
+	Support for building archive and req files from ioc dirs
+
 R3.15.5-2.0.11	2019-04-30 Bruce Hill
 	dbLoadSuspendOnError support
 	Add check for EPICS_HOST_ARCH in BUILD_ARCHS in RULES_ARCHS
