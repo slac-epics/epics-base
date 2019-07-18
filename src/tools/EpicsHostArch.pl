@@ -26,10 +26,35 @@ use strict;
 use Config;
 use POSIX;
 
+use Config qw( config_sh myconfig );
+
+my( $suffix )="";
+my( $suffix )="-".$ARGV[0] if ($ARGV[0] ne "");
+
+my( $gccVers )=`gcc -dM -E - < /dev/null | egrep __VERSION__`;
+if ($gccVers =~ m/4.9.4/) { my( $gcc )="-gcc494";
+} else { my( $gcc )=""; }
+
 print join('-', HostArch(), @ARGV), "\n";
 
 sub HostArch {
-    my $arch = $Config{archname};
+    my( $arch ) = $Config{archname};
+    if ($arch =~ m/linux/)        {
+            my($kernel, $hostname, $release, $version, $cpu) = POSIX::uname();
+            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
+            if ($cpu =~ m/x86_64/)	{
+				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/2.6.35.13-rt/)  { return "linux-x86_64"; }
+				elsif ($release =~ m/3.14.12-rt9/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/3.18.11-rt7/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
+				elsif ($release =~ m/el7/)  { if ( my($gcc) = "-gcc494" ) { return "rhel7-gcc494-x86_64";
+					} else { return "rhel7-x86_64"; } }
+				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
+			}
+            else							{ return "unsupported"; }
+	} else {
     for ($arch) {
         return 'linux-x86_64'   if m/^x86_64-linux/;
         return 'linux-x86'      if m/^i[3-6]86-linux/;
@@ -51,5 +76,5 @@ sub HostArch {
         }
 
         die "$0: Architecture '$arch' not recognized\n";
-    }
+    } }
 }

@@ -18,6 +18,13 @@ else
     suffix=""
 fi
 
+gccVers=`gcc -dM -E - < /dev/null | egrep __VERSION__`
+case $gccVers in
+	*4.9.4* )
+	gcc=-gcc494 ;;
+	* )
+	gcc= ;;
+esac
 sysname=`uname`
 
 case $sysname in
@@ -46,7 +53,7 @@ case $sysname in
             armv6l | armv7l )
                 cpu=arm ;;
         esac
-        echo ${os}-${cpu}${suffix}
+        echo ${os}${gcc}-${cpu}${suffix}
         ;;
     Darwin )
         os=darwin

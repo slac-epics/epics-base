@@ -1,30 +1,46 @@
-eval 'exec perl -S $0 ${1+"$@"}'  # -*- Mode: perl -*-
-    if $running_under_some_shell; # EpicsHostArch.pl
+#!/usr/bin/env perl
 #*************************************************************************
-# Copyright (c) 2011 UChicago Argonne LLC, as Operator of Argonne
+# Copyright (c) 2018 UChicago Argonne LLC, as Operator of Argonne
 #     National Laboratory.
-# Copyright (c) 2002 The Regents of the University of California, as
-#     Operator of Los Alamos National Laboratory.
 # EPICS BASE is distributed subject to a Software License Agreement found
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-# Returns the Epics host architecture suitable
-# for assigning to the EPICS_HOST_ARCH variable
+# Returns an architecture name for EPICS_HOST_ARCH that should be
+# appropriate for the CPU that this version of Perl was built for.
+# Any arguments to the program will be appended with separator '-'
+# to allow flags like -gnu -debug and/or -static to be added.
+
+# Before Base has been built, use a command like this:
+#   bash$ export EPICS_HOST_ARCH=`perl src/tools/EpicsHostArch.pl`
+#
+# If Base is already built, use
+#   tcsh% setenv EPICS_HOST_ARCH `perl base/lib/perl/EpicsHostArch.pl`
+
+# If your architecture is not recognized by this script, please send
+# the output from running 'perl --version' to the EPICS tech-talk
+# mailing list to have it added.
+
+use strict;
 
 use Config;
 use POSIX;
 
 use Config qw( config_sh myconfig );
 
-$suffix="";
-$suffix="-".$ARGV[0] if ($ARGV[0] ne "");
+my( $suffix )="";
+my( $suffix )="-".$ARGV[0] if ($ARGV[0] ne "");
 
-$EpicsHostArch = GetEpicsHostArch();
+my( $gccVers )=`gcc -dM -E - < /dev/null | egrep __VERSION__`;
+if ($gccVers =~ m/4.9.4/) { my( $gcc )="-gcc494";
+} else { my( $gcc )=""; }
+
+#print join('-', HostArch(), @ARGV), "\n";
+my( $EpicsHostArch ) = HostArch();
 print "$EpicsHostArch$suffix";
 
-sub GetEpicsHostArch { # no args
-    $arch=$Config{'archname'};
+sub HostArch {
+    my( $arch ) = $Config{'archname'};
     #print "Config{'archname'}=".$arch."\n";
     if ($arch =~ /sun4-solaris/)        { return "solaris-sparc";
     } elsif ($arch =~ m/i86pc-solaris/) { return "solaris-x86";
@@ -39,7 +55,8 @@ sub GetEpicsHostArch { # no args
 				elsif ($release =~ m/3.18.11-rt7/)  { return "linuxRT-x86_64"; }
 				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
 				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
-				elsif ($release =~ m/el7/)  { return "rhel7-x86_64"; }
+				elsif ($release =~ m/el7/)  { if ( my($gcc) = "-gcc494" ) { return "rhel7-gcc494-x86_64";
+					} else { return "rhel7-x86_64"; } }
 				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
 			}
             else							{ return "unsupported"; }
