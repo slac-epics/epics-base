@@ -1,0 +1,7 @@
+# CONFIG_SITE.rhel7-gcc494-x86_64.rhel7-gcc494-x86_64
+#
+#
+# Site specific definitions for rhel7-gcc494-x86_64 host - rhel7-gcc494-x86_64 target builds
+#-------------------------------------------------------
+
+
