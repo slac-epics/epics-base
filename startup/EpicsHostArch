@@ -24,8 +24,11 @@ case $sysname in
     Linux )
         os=linux
         cpu=`uname -m`
-        release=`uname -r`
+        release=`uname -a`
 		case $release in
+			*Ubuntu* )
+				version=`cat /etc/issue | cut -d ' ' -f2 | tr -d .`
+				os="ubuntu${version}" ;;
 			*el6* )
 				os=rhel6 ;;
 			*el7* )
