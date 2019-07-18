@@ -1,0 +1,11 @@
+#  CONFIG.rhel7-gcc494-x86_64.rhel7-gcc494-x86_64
+#
+#
+# Definitions for rhel7-gcc494-x86_64 host - rhel7-gcc494-x86_64 target builds
+# Sites may override these definitions in CONFIG_SITE.rhel7-gcc494-x86_64.rhel7-gcc494-x86_64
+#-------------------------------------------------------
+
+# Include common gnu compiler definitions
+include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
+
+GNU_LIB = $(GNU_DIR)/lib64
