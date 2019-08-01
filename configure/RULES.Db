@@ -19,10 +19,10 @@ TEMPL_SUFFIX ?= .template
 vpath %.pm $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
 vpath %.pod $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
 vpath %.dbd $(USR_VPATH) $(SRC_DIRS) $(dir $(DBD))
-vpath %.db $(USR_VPATH) $(SRC_DIRS) $(dir $(DB)) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
-vpath %.vdb $(USR_VPATH) $(SRC_DIRS) $(dir $(DB)) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DBD)
+vpath %.db $(USR_VPATH) $(SRC_DIRS) $(dir $(DB)) $(COMMON_DIR)
+vpath %.vdb $(USR_VPATH) $(SRC_DIRS) $(dir $(DB)) $(COMMON_DIR)
 vpath %$(SUBST_SUFFIX) $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
-vpath %$(TEMPL_SUFFIX) $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR) $(INSTALL_DB) $(RELEASE_DIRS_DB)
+vpath %$(TEMPL_SUFFIX) $(USR_VPATH) $(SRC_DIRS) $(dir $(DB)) $(COMMON_DIR)
 vpath bpt%.data $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
 vpath %.acf $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
 vpath %.acs $(USR_VPATH) $(SRC_DIRS) $(COMMON_DIR)
@@ -266,13 +266,14 @@ menu%.h$(DEP): ../menu%.dbd
 	@$(DBEXPAND) -D $(DBDFLAGS) -o $(COMMONDEP_TARGET) $($*_DBD) > $@
 	@echo "$(COMMONDEP_TARGET): ../Makefile" >> $@
 
+# Specifying $(TEMPLATE_FILENAME) in the msi command line can screw up msi dependencies and expansion
 %.db$(DEP): %$(SUBST_SUFFIX)
 	@$(RM) $@
-	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< $(TEMPLATE_FILENAME) > $@
+	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< > $@
 
 %.db$(DEP): ../%$(SUBST_SUFFIX)
 	@$(RM) $@
-	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< $(TEMPLATE_FILENAME) > $@
+	$(MSI3_15) -D $(DBFLAGS) -o $(COMMONDEP_TARGET) -S$< > $@
 
 %.db$(DEP): %$(TEMPL_SUFFIX)
 	@$(RM) $@
@@ -309,7 +310,7 @@ $(INSTALL_DB)/%$(SUBST_SUFFIX): %$(SUBST_SUFFIX)
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 $(INSTALL_DB)/%$(SUBST_SUFFIX): ../%$(SUBST_SUFFIX)
-	$(ECHO) "Installing substitution file $@"
+	$(ECHO) "Installing db ../substitutions file $@"
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 .PRECIOUS: $(COMMON_DIR)/%$(SUBST_SUFFIX)
@@ -469,11 +470,11 @@ $(COMMON_DIR)/%.db: $(COMMON_DIR)/%.edf
 # MSI expansion command was
 #	$(MSI3_15) $(DBFLAGS) -S$< $(TEMPLATE_FILENAME) > msi.tmp
 # This is wrong for msi when both foo.template and foo.substitutions
-# are used as in many of the PCDS IOc's.
+# are used as in many of the SLAC IOC's.
 # Specifying foo.template in the command line as above
 # overrides the templates specified in the substitutions file.
 # 
-# PCDS changes it to
+# SLAC changes it to
 #   $(MSI3_15) $(DBFLAGS) -o $(notdir $@) -S$<
 # to allow both foo.template and foo.subsitutions to coexist.
 $(COMMON_DIR)/%.db: %$(SUBST_SUFFIX)
