@@ -29,7 +29,7 @@
 #include "postfix.h"
 #include "asLib.h"
 
-int asCheckClientIP;
+int asCheckClientIP = 1;
 
 static epicsMutexId asLock;
 #define LOCK epicsMutexMustLock(asLock)
