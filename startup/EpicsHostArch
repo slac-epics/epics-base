@@ -18,6 +18,17 @@ else
     suffix=""
 fi
 
+gccVers=""
+if [ -e "$(which gcc)" ]; then
+gccVers=`gcc -dM -E - < /dev/null | egrep __VERSION__`
+fi
+case $gccVers in
+	*4.9.4* )
+	gcc=-gcc494 ;;
+	* )
+	gcc= ;;
+esac
+
 sysname=`uname`
 
 case $sysname in
