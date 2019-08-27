@@ -48,13 +48,15 @@ else
 # since checkRelease is pretty dumb...
 #
 #RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.2/
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 
 #RTEMS_PATCHLVL=rtems_p0
-RTEMS_PATCHLVL=rtems_p1
+#RTEMS_PATCHLVL=rtems_p1
+RTEMS_PATCHLVL=rtems_p2
 
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+SSRLAPPS_PATCHLVL=ssrlApps_p0
+#SSRLAPPS_PATCHLVL=ssrlApps_p3
 #SSRLAPPS_PATCHLVL=ssrlApps_p2
 endif
 
