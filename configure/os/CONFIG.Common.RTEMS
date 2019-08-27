@@ -29,10 +29,36 @@
 # Get RTEMS_BASE definition
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
-# Select RTEMS version and patch levels
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
-RTEMS_PATCHLVL=rtems_p1
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+ifeq ($(T_A),RTEMS-mvme5500)
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
+else
+#RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
+# Also, change afs hard-coded path to the new path after relocating RTEMS
+# to NFS
+#
+# could use
+#
+# ifeq ($(wildcard /afs/slac/package/rtems)xx,xx)
+# RTEMS_SITE_TOP=<NFS-path>
+# else
+# RTEMS_SITE_TOP=<afs-path>
+# endif
+#
+# but I'm not sure if that causes problems with checkRelease
+# since checkRelease is pretty dumb...
+#
+#RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.2/
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
+
+#RTEMS_PATCHLVL=rtems_p0
+#RTEMS_PATCHLVL=rtems_p1
+RTEMS_PATCHLVL=rtems_p2
+
+SSRLAPPS_PATCHLVL=ssrlApps_p0
+#SSRLAPPS_PATCHLVL=ssrlApps_p3
+#SSRLAPPS_PATCHLVL=ssrlApps_p2
+endif
 
 #--------------------------------------------------
 # Set RTEMS_BSP from T_A if not already done
