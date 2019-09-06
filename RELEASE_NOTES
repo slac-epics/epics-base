@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.2-1.1.1:	2019-09-05 Hugo Slepicka
+	Fix EPICS_SITE_VER to show proper version
+
 R7.0.2-1.1.0:	2019-08-27 Hugo Slepicka
 	Change RTEMS to 4.10.2
 
