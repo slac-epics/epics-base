@@ -37,6 +37,10 @@ include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(RTEMS_BSP)/Mak
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
 
+# Fix MKDIR definition which gets stepped on in
+# $RTEMS_MAKEFILE_PATH/../../make/host.cfg
+MKDIR = mkdir -p
+
 #-------------------------------------------------------
 # RTEMS cross-development tools
 CC = $(RTEMS_TOOLS)/bin/$(CC_FOR_TARGET) $(GCCSPECS) -fasm
