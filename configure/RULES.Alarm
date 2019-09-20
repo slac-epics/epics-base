@@ -73,8 +73,8 @@ $(INSTALL_ALH)/%.alhsubstitutions: %.alhsubstitutions
 $(COMMON_DIR)/%.alhConfig: %.alhsubstitutions
 	@echo "Inflating alhConfig from $< using local rule"
 	@$(RM) $@
-	@echo "$(MSI) -S$< > $(@F) </dev/null"
-	@$(MSI) -I.. $(ALHFLAGS) -S$< </dev/null > $@
+	@echo "$(MSI3_15) -S$< > $(@F) </dev/null"
+	@$(MSI3_15) -I.. $(ALHFLAGS) -S$< </dev/null > $@
 
 $(INSTALL_ALH)/%.alhConfig: $(COMMON_DIR)/%.alhConfig
 	@echo "Installing alhConfig file $@"
