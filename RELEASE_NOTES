@@ -4,6 +4,13 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.2-1.1.3:   2019-09-24 Hugo Slepicka
+	Bump RTEMS patch level to rtems_p3
+	Add fix for MKDIR def getting stepped on by RTEMS makefiles
+	Update EpicsHostArch script to work on hosts without gcc
+	Shared lib rpath should not depend on whether or not static libs are also being built
+	Fix MSI macro to MSI3_15 in RULES.Alarm
+
 R7.0.2-1.1.2:   2019-09-08 Hugo Slepicka
 	Filter out rtems_debug.
 
