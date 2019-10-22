@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.2.0	Bruce Hill	2019-10-21
+	Update to RTEMS 4.10.2 rtems_p3 ssrlApps_p1
+
 R3.15.5-1.1.2	Bruce Hill	2018-08-22
 	Include epicsStdio.h in dbChannel.c so driver report output can be redirected from iocsh.
 		Fixes issue w/ R3.15.5 where some of the casr() output was not being redirected.
