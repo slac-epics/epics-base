@@ -23,19 +23,24 @@
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
 # Select RTEMS version and patch levels
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.1/
-RTEMS_PATCHLVL=rtems_p1
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.2/
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
+RTEMS_PATCHLVL=rtems_p3
+SSRLAPPS_PATCHLVL=ssrlApps_p1
+#--------------------------------------------------
+# Set RTEMS_BSP from T_A if not already done
+RTEMS_BSP ?= $(subst RTEMS-,,$(T_A))
 
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
-RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 #-------------------------------------------------------
 # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-#include $(RTEMS_BASE)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION)/$(subst RTEMS-,,$(T_A))/Makefile.inc
-RTEMS_BSP=$(subst RTEMS-,,$(T_A))
+RTEMS_MAKEFILE_PATH=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
 include $(RTEMS_MAKEFILE_PATH)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
+
+# Fix MKDIR definition which gets stepped on in
+# $RTEMS_MAKEFILE_PATH/../../make/host.cfg
+MKDIR = mkdir -p
 
 #-------------------------------------------------------
 # RTEMS cross-development tools
@@ -80,7 +85,7 @@ CPPFLAGS += $(CONFORM_CPPFLAGS)\
  $(USR_CPPFLAGS) $(CMD_CPPFLAGS) $(ARCH_DEP_CPPFLAGS) $(OP_SYS_CPPFLAGS)\
  $(OP_SYS_INCLUDE_CPPFLAGS) $(CODE_CPPFLAGS)
 
-ECHO = @$(if $(findstring s,$(patsubst T_A=%,,$(MAKEFLAGS))),$(NOP),echo)
+ECHO = @$(if $(findstring s,$(MFLAGS)),$(NOP),echo)
 
 #--------------------------------------------------
 # Although RTEMS uses gcc, it wants to use gcc its own way
