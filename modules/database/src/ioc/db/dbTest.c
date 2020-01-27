@@ -56,7 +56,7 @@ typedef struct msgBuff TAB_BUFFER;
 #   define MIN(x,y)  (((x) < (y)) ? (x) : (y))
 #endif
 #ifndef MAX
-#   define MAX(x,y)  (((x) < (y)) ? (x) : (y))
+#   define MAX(x,y)  (((x) > (y)) ? (x) : (y))
 #endif
 
 /* Local Routines */
@@ -712,7 +712,7 @@ long dbior(const char *pdrvName,int interest_level)
         for (pdevSup = (devSup *)ellFirst(&pdbRecordType->devList);
              pdevSup;
              pdevSup = (devSup *)ellNext(&pdevSup->node)) {
-            struct dset *pdset = pdevSup->pdset;
+            dset *pdset = pdevSup->pdset;
             const char *pname  = pdevSup->name;
 
             if (!pdset || !pname)

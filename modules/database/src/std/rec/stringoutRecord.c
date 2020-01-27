@@ -126,8 +126,7 @@ static long init_record(struct dbCommon *pcommon, int pass)
         if(status)
             return status;
     }
-
-    strncpy(prec->oval, prec->val, sizeof(prec->val));
+    strncpy(prec->oval, prec->val, sizeof(prec->oval));
     return 0;
 }
 
@@ -215,7 +214,7 @@ static void monitor(stringoutRecord *prec)
 
     if (strncmp(prec->oval, prec->val, sizeof(prec->val))) {
         monitor_mask |= DBE_VALUE | DBE_LOG;
-        strncpy(prec->oval, prec->val, sizeof(prec->val));
+        strncpy(prec->oval, prec->val, sizeof(prec->oval));
     }
 
     if (prec->mpst == stringoutPOST_Always)
@@ -248,9 +247,9 @@ static long writeValue(stringoutRecord *prec)
             status = dbPutLink(&prec->siol, DBR_STRING, &prec->val, 1);
             prec->pact = FALSE;
         } else { /* !prec->pact && delay >= 0. */
-            CALLBACK *pvt = prec->simpvt;
+            epicsCallback *pvt = prec->simpvt;
             if (!pvt) {
-                pvt = calloc(1, sizeof(CALLBACK)); /* very lazy allocation of callback structure */
+                pvt = calloc(1, sizeof(epicsCallback)); /* very lazy allocation of callback structure */
                 prec->simpvt = pvt;
             }
             if (pvt) callbackRequestProcessCallbackDelayed(pvt, prec->prio, prec, prec->sdly);

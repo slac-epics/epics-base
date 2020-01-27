@@ -45,20 +45,12 @@ static epicsThreadOnceId cacOnce = EPICS_THREAD_ONCE_INIT;
 
 const unsigned ca_client_context :: flushBlockThreshold = 0x58000;
 
-extern "C" void cacExitHandler ( void *)
-{
-    epicsThreadPrivateDelete ( caClientCallbackThreadId );
-    caClientCallbackThreadId = 0;
-    delete ca_client_context::pDefaultServiceInstallMutex;
-}
-
 // runs once only for each process
 extern "C" void cacOnceFunc ( void * )
 {
     caClientCallbackThreadId = epicsThreadPrivateCreate ();
     assert ( caClientCallbackThreadId );
     ca_client_context::pDefaultServiceInstallMutex = newEpicsMutex;
-    epicsAtExit ( cacExitHandler,0 );
 }
 
 extern epicsThreadPrivateId caClientContextId;
@@ -67,6 +59,8 @@ cacService * ca_client_context::pDefaultService = 0;
 epicsMutex * ca_client_context::pDefaultServiceInstallMutex;
 
 ca_client_context::ca_client_context ( bool enablePreemptiveCallback ) :
+    mutex(__FILE__, __LINE__),
+    cbMutex(__FILE__, __LINE__),
     createdByThread ( epicsThreadGetIdSelf () ),
     ca_exception_func ( 0 ), ca_exception_arg ( 0 ),
     pVPrintfFunc ( errlogVprintf ), fdRegFunc ( 0 ), fdRegArg ( 0 ),
@@ -481,7 +475,7 @@ int ca_client_context::pendIO ( const double & timeout )
     }
 
     int status = ECA_NORMAL;
-    epicsTime beg_time = epicsTime::getCurrent ();
+    epicsTime beg_time = epicsTime::getMonotonic ();
     double remaining = timeout;
 
     epicsGuard < epicsMutex > guard ( this->mutex );
@@ -499,7 +493,7 @@ int ca_client_context::pendIO ( const double & timeout )
             this->blockForEventAndEnableCallbacks ( this->ioDone, remaining );
         }
 
-        double delay = epicsTime::getCurrent () - beg_time;
+        double delay = epicsTime::getMonotonic () - beg_time;
         if ( delay < timeout ) {
             remaining = timeout - delay;
         }
@@ -528,7 +522,7 @@ int ca_client_context::pendEvent ( const double & timeout )
         return ECA_EVDISALLOW;
     }
 
-    epicsTime current = epicsTime::getCurrent ();
+    epicsTime current = epicsTime::getMonotonic ();
 
     {
         epicsGuard < epicsMutex > guard ( this->mutex );
@@ -569,7 +563,7 @@ int ca_client_context::pendEvent ( const double & timeout )
         this->noWakeupSincePend = true;
     }
 
-    double elapsed = epicsTime::getCurrent() - current;
+    double elapsed = epicsTime::getMonotonic() - current;
     double delay;
 
     if ( timeout > elapsed ) {

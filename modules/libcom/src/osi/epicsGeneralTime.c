@@ -78,6 +78,11 @@ static epicsThreadOnceId onceId = EPICS_THREAD_ONCE_INIT;
 
 static const char * const tsfmt = "%Y-%m-%d %H:%M:%S.%09f";
 
+/* defined in osiClockTime.c or osdTime.cpp */
+int osdTimeGetCurrent ( epicsTimeStamp *pDest );
+/* cleared if/when gtPvt.timeProviders contains more than the default osdTimeGetCurrent() */
+static int useOsdGetCurrent = 1;
+
 /* Implementation */
 
 static void generalTime_InitOnce(void *dummy)
@@ -102,6 +107,9 @@ int generalTimeGetExceptPriority(epicsTimeStamp *pDest, int *pPrio, int ignore)
 {
     gtProvider *ptp;
     int status = S_time_noProvider;
+
+    if(useOsdGetCurrent)
+        return osdTimeGetCurrent(pDest);
 
     generalTime_Init();
 
@@ -147,6 +155,9 @@ int epicsShareAPI epicsTimeGetCurrent(epicsTimeStamp *pDest)
     gtProvider *ptp;
     int status = S_time_noProvider;
     epicsTimeStamp ts;
+
+    if(useOsdGetCurrent)
+        return osdTimeGetCurrent(pDest);
 
     generalTime_Init();
 
@@ -202,6 +213,14 @@ int epicsShareAPI epicsTimeGetCurrent(epicsTimeStamp *pDest)
     }
 
     return status;
+}
+
+int epicsTimeGetMonotonic ( epicsTimeStamp * pDest )
+{
+    epicsUInt64 now = epicsMonotonicGet();
+    pDest->nsec = now%1000000000ul;
+    pDest->secPastEpoch = now/1000000000ul;
+    return 0;
 }
 
 int epicsTimeGetCurrentInt(epicsTimeStamp *pDest)
@@ -368,6 +387,11 @@ static void insertProvider(gtProvider *ptp, ELLLIST *plist, epicsMutexId lock)
         ellInsert(plist, &ptpref->node, &ptp->node);
     } else {
         ellAdd(plist, &ptp->node);
+    }
+
+    /* Check to see if we have more than just the OS default time source */
+    if(plist==&gtPvt.timeProviders && (ellCount(plist)!=1 || ptp->get.Time!=&osdTimeGetCurrent)) {
+        useOsdGetCurrent = 0;
     }
 
     epicsMutexUnlock(lock);

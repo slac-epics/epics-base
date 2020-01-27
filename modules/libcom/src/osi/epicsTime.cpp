@@ -38,7 +38,7 @@
 #include "epicsStdio.h"
 
 static const char pEpicsTimeVersion[] =
-    "@(#) " EPICS_VERSION_STRING ", Common Utilities Library " __DATE__;
+    "@(#) " EPICS_VERSION_STRING ", Common Utilities Library";
 
 //
 // useful public constants
@@ -205,9 +205,6 @@ epicsTime::epicsTime (const epicsTimeStamp &ts)
 epicsTime::epicsTime () :
     secPastEpoch(0u), nSec(0u) {}
 
-epicsTime::epicsTime (const epicsTime &t) :
-    secPastEpoch (t.secPastEpoch), nSec (t.nSec) {}
-
 epicsTime epicsTime::getCurrent ()
 {
     epicsTimeStamp current;
@@ -215,6 +212,13 @@ epicsTime epicsTime::getCurrent ()
     if (status) {
         throwWithLocation ( unableToFetchCurrentTime () );
     }
+    return epicsTime ( current );
+}
+
+epicsTime epicsTime::getMonotonic()
+{
+    epicsTimeStamp current;
+    epicsTimeGetMonotonic (&current); // can't fail
     return epicsTime ( current );
 }
 
@@ -955,7 +959,8 @@ extern "C" {
         try {
             local_tm_nano_sec tmns = epicsTime (*pSrc);
             *pDest = tmns.ansi_tm;
-            *pNSecDest = tmns.nSec;
+            if (pNSecDest)
+                *pNSecDest = tmns.nSec;
         }
         catch (...) {
             return S_time_conversion;
@@ -967,7 +972,8 @@ extern "C" {
         try {
             gm_tm_nano_sec gmtmns = epicsTime (*pSrc);
             *pDest = gmtmns.ansi_tm;
-            *pNSecDest = gmtmns.nSec;
+            if (pNSecDest)
+                *pNSecDest = gmtmns.nSec;
         }
         catch (...) {
             return S_time_conversion;

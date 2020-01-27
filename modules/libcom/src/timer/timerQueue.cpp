@@ -25,11 +25,12 @@ const double timerQueue :: exceptMsgMinPeriod = 60.0 * 5.0; // seconds
 epicsTimerQueue::~epicsTimerQueue () {}
 
 timerQueue::timerQueue ( epicsTimerQueueNotify & notifyIn ) :
+    mutex(__FILE__, __LINE__),
     notify ( notifyIn ), 
     pExpireTmr ( 0 ),  
     processThread ( 0 ), 
     exceptMsgTimeStamp ( 
-        epicsTime :: getCurrent () - exceptMsgMinPeriod ),
+        epicsTime :: getMonotonic () - exceptMsgMinPeriod ),
     cancelPending ( false )
 {
 }
@@ -48,7 +49,7 @@ void timerQueue ::
     char date[64];
     double delay;
     try {
-        epicsTime cur = epicsTime :: getCurrent ();
+        epicsTime cur = epicsTime :: getMonotonic ();
         delay = cur - this->exceptMsgTimeStamp;
         cur.strftime ( date, sizeof ( date ), 
                         "%a %b %d %Y %H:%M:%S.%f" );

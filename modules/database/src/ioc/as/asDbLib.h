@@ -12,11 +12,13 @@
 #ifndef INCdbAsLibh
 #define INCdbAsLibh
 
+#include <stdio.h>
+
 #include "callback.h"
 #include "shareLib.h"
 
 typedef struct {
-    CALLBACK	callback;
+    epicsCallback	callback;
     long	status;
 } ASDBCALLBACK;
 

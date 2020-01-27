@@ -601,6 +601,31 @@ all_done:
     return status;
 }
 
+long dbEntryToAddr(const DBENTRY *pdbentry, DBADDR *paddr)
+{
+    dbFldDes *pflddes = pdbentry->pflddes;
+    short dbfType = pflddes->field_type;
+
+    paddr->precord = pdbentry->precnode->precord;
+    paddr->pfield = pdbentry->pfield;
+    paddr->pfldDes = pflddes;
+    paddr->no_elements = 1;
+    paddr->field_type  = dbfType;
+    paddr->field_size  = pflddes->size;
+    paddr->special     = pflddes->special;
+    paddr->dbr_field_type = mapDBFToDBR[dbfType];
+
+    if (paddr->special == SPC_DBADDR) {
+        const rset *prset = dbGetRset(paddr);
+
+        /* Let record type modify paddr */
+        if (prset && prset->cvt_dbaddr) {
+            return prset->cvt_dbaddr(paddr);
+        }
+    }
+    return 0;
+}
+
 /*
  *  Fill out a database structure (*paddr) for
  *    a record given by the name "pname."
@@ -611,9 +636,7 @@ all_done:
 long dbNameToAddr(const char *pname, DBADDR *paddr)
 {
     DBENTRY dbEntry;
-    dbFldDes *pflddes;
     long status = 0;
-    short dbfType;
 
     if (!pname || !*pname || !pdbbase)
         return S_db_notFound;
@@ -628,46 +651,28 @@ long dbNameToAddr(const char *pname, DBADDR *paddr)
         status = dbGetAttributePart(&dbEntry, &pname);
     if (status) goto finish;
 
-    pflddes = dbEntry.pflddes;
-    dbfType = pflddes->field_type;
-
-    paddr->precord = dbEntry.precnode->precord;
-    paddr->pfield = dbEntry.pfield;
-    paddr->pfldDes = pflddes;
-    paddr->no_elements = 1;
-    paddr->field_type  = dbfType;
-    paddr->field_size  = pflddes->size;
-    paddr->special     = pflddes->special;
-    paddr->dbr_field_type = mapDBFToDBR[dbfType];
-
-    if (paddr->special == SPC_DBADDR) {
-        rset *prset = dbGetRset(paddr);
-
-        /* Let record type modify paddr */
-        if (prset && prset->cvt_dbaddr) {
-            status = prset->cvt_dbaddr(paddr);
-            if (status)
-                goto finish;
-            dbfType = paddr->field_type;
-        }
-    }
+    status = dbEntryToAddr(&dbEntry, paddr);
+    if (status) goto finish;
 
     /* Handle field modifiers */
     if (*pname++ == '$') {
+        short dbfType = paddr->field_type;
+
         /* Some field types can be accessed as char arrays */
         if (dbfType == DBF_STRING) {
             paddr->no_elements = paddr->field_size;
             paddr->field_type = DBF_CHAR;
             paddr->field_size = 1;
             paddr->dbr_field_type = DBR_CHAR;
-        } else if (dbfType >= DBF_INLINK && dbfType <= DBF_FWDLINK) {
+        }
+        else if (dbfType >= DBF_INLINK && dbfType <= DBF_FWDLINK) {
             /* Clients see a char array, but keep original dbfType */
             paddr->no_elements = PVLINK_STRINGSZ;
             paddr->field_size = 1;
             paddr->dbr_field_type = DBR_CHAR;
-        } else {
+        }
+        else {
             status = S_dbLib_fieldNotFound;
-            goto finish;
         }
     }
 
@@ -679,7 +684,7 @@ finish:
 void dbInitEntryFromAddr(struct dbAddr *paddr, DBENTRY *pdbentry)
 {
     struct dbCommon *prec = paddr->precord;
-    dbCommonPvt *ppvt = CONTAINER(prec, dbCommonPvt, common);
+    dbCommonPvt *ppvt = dbRec2Pvt(prec);
 
     memset((char *)pdbentry,'\0',sizeof(DBENTRY));
 
@@ -693,7 +698,7 @@ void dbInitEntryFromAddr(struct dbAddr *paddr, DBENTRY *pdbentry)
 
 void dbInitEntryFromRecord(struct dbCommon *prec, DBENTRY *pdbentry)
 {
-    dbCommonPvt *ppvt = CONTAINER(prec, dbCommonPvt, common);
+    dbCommonPvt *ppvt = dbRec2Pvt(prec);
 
     memset((char *)pdbentry,'\0',sizeof(DBENTRY));
 
@@ -1005,7 +1010,7 @@ devSup* dbDTYPtoDevSup(dbRecordType *prdes, int dtyp) {
     return (devSup *)ellNth(&prdes->devList, dtyp+1);
 }
 
-devSup* dbDSETtoDevSup(dbRecordType *prdes, struct dset *pdset) {
+devSup* dbDSETtoDevSup(dbRecordType *prdes, dset *pdset) {
     devSup *pdevSup = (devSup *)ellFirst(&prdes->devList);
     while (pdevSup) {
         if (pdset == pdevSup->pdset) return pdevSup;
@@ -1027,7 +1032,7 @@ static long dbPutFieldLink(DBADDR *paddr,
     struct link *plink = (struct link *)paddr->pfield;
     const char  *pstring = (const char *)pbuffer;
     struct dsxt *old_dsxt = NULL;
-    struct dset *new_dset = NULL;
+    dset *new_dset = NULL;
     struct dsxt *new_dsxt = NULL;
     devSup      *new_devsup = NULL;
     long        status;

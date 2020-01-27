@@ -7,7 +7,7 @@
 # in file LICENSE that is included with this distribution.
 #*************************************************************************
 
-TOP = ..
+TOP = ../../..
 include $(TOP)/configure/CONFIG
 
 PROD_LIBS += Com
@@ -217,8 +217,17 @@ epicsMessageQueueTest_SRCS += epicsMessageQueueTest.cpp
 testHarness_SRCS += epicsMessageQueueTest.cpp
 TESTS += epicsMessageQueueTest
 
+# we need to build this with debug symbols in all configurations
+# otherwise the test will not be able to lookup names and so fail
 TESTPROD_HOST += epicsStackTraceTest
 epicsStackTraceTest_SRCS += epicsStackTraceTest.c
+ifneq ($(findstring mingw,$(T_A)),)
+epicsStackTraceTest_CFLAGS_WIN32 += -g -O0
+epicsStackTraceTest_LDFLAGS_WIN32 += -g
+else
+epicsStackTraceTest_CFLAGS_WIN32 += -Zi
+epicsStackTraceTest_LDFLAGS_WIN32 += -DEBUG
+endif
 testHarness_SRCS += epicsStackTraceTest.c
 TESTS += epicsStackTraceTest
 
@@ -232,6 +241,11 @@ osiSockTest_SRCS += osiSockTest.c
 testHarness_SRCS += osiSockTest.c
 TESTS += osiSockTest
 
+TESTPROD_HOST += testexecname
+testexecname_SRCS += testexecname.c
+# no point in including in testHarness.  Not implemented for RTEMS/vxWorks.
+TESTS += testexecname
+
 ifeq ($(BUILD_CLASS),HOST)
 ifneq ($(OS_CLASS),WIN32)
 # This test can only be run on a build host, and is broken on Windows
@@ -240,6 +254,11 @@ yajl_test_SRCS += yajl_test.c
 TESTS += yajlTest
 endif
 endif
+
+TESTPROD_HOST += iocshTest
+iocshTest_SRCS += iocshTest.cpp
+TESTS += iocshTest
+TESTFILES += $(wildcard ../iocshTest*.cmd)
 
 # The testHarness runs all the test programs in a known working order.
 testHarness_SRCS += epicsRunLibComTests.c
@@ -255,8 +274,8 @@ TESTSPEC_RTEMS = libComTestHarness.boot; epicsRunLibComTests
 
 TESTSCRIPTS_HOST += $(TESTS:%=%.t)
 ifneq ($(filter $(T_A),$(CROSS_COMPILER_RUNTEST_ARCHS)),)
-TESTPROD_RTEMS = $(TESTPROD_HOST)
-TESTSCRIPTS_RTEMS += $(filter-out epicsUnitTestTest.t, $(TESTS:%=%.t))
+TESTPROD = $(TESTPROD_HOST)
+TESTSCRIPTS += $(filter-out epicsUnitTestTest.t, $(TESTS:%=%.t))
 endif
 
 
@@ -288,4 +307,18 @@ TESTPROD_HOST += cvtFastPerform
 cvtFastPerform_SRCS += cvtFastPerform.cpp
 testHarness_SRCS += cvtFastPerform.cpp
 
+ifeq ($(OS_CLASS),Linux)
+ifeq ($(USE_POSIX_THREAD_PRIORITY_SCHEDULING),YES)
+TESTPROD_HOST += nonEpicsThreadPriorityTest
+nonEpicsThreadPriorityTest_SRCS += nonEpicsThreadPriorityTest.cpp
+nonEpicsThreadPriorityTest_SYS_LIBS += $(POSIX_LDLIBS:-l%=%)
+testHarness_SRCS += nonEpicsThreadPriorityTest.cpp
+epicsRunLibComTests_CFLAGS += -DHAVE_PTHREAD_PRIORITY_SCHEDULING
+TESTS += nonEpicsThreadPriorityTest
+endif
+endif
+
 include $(TOP)/configure/RULES
+
+rtemsTestData.c : $(TESTFILES) $(TOOLS)/epicsMakeMemFs.pl
+	$(PERL) $(TOOLS)/epicsMakeMemFs.pl $@ epicsRtemsFSImage $(TESTFILES)

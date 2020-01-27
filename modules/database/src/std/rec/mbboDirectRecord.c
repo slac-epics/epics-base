@@ -51,7 +51,7 @@ static long special(DBADDR *, int);
 #define get_array_info NULL
 #define put_array_info NULL
 #define get_units NULL
-#define get_precision NULL
+static long get_precision(const DBADDR *, long *);
 #define get_enum_str NULL
 #define get_enum_strs NULL
 #define put_enum_str NULL
@@ -313,6 +313,16 @@ static long special(DBADDR *paddr, int after)
     return 0;
 }
 
+static long get_precision(const DBADDR *paddr,long *precision)
+{
+    mbboDirectRecord	*prec=(mbboDirectRecord *)paddr->precord;
+    if(dbGetFieldIndex(paddr)==mbboDirectRecordVAL)
+        *precision = prec->nobt;
+    else
+        recGblGetPrec(paddr,precision);
+    return 0;
+}
+
 static void monitor(mbboDirectRecord *prec)
 {
     epicsUInt16 events = recGblResetAlarms(prec);
@@ -365,9 +375,9 @@ static long writeValue(mbboDirectRecord *prec)
             status = dbPutLink(&prec->siol, DBR_ULONG, &prec->val, 1);
             prec->pact = FALSE;
         } else { /* !prec->pact && delay >= 0. */
-            CALLBACK *pvt = prec->simpvt;
+            epicsCallback *pvt = prec->simpvt;
             if (!pvt) {
-                pvt = calloc(1, sizeof(CALLBACK)); /* very lazy allocation of callback structure */
+                pvt = calloc(1, sizeof(epicsCallback)); /* very lazy allocation of callback structure */
                 prec->simpvt = pvt;
             }
             if (pvt) callbackRequestProcessCallbackDelayed(pvt, prec->prio, prec, prec->sdly);
