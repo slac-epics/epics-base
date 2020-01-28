@@ -4,7 +4,8 @@ LINUX_RT_HOME=/afs/slac/package/linuxRT
 #LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
 
 #LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
-LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
+#LINUXRT_BUILDROOT_VERSION=buildroot-2016.11.1
+LINUXRT_BUILDROOT_VERSION=buildroot-2019.08
 # Should be this so we can build linuxRT on rhel7,rhel8,... w/o installing rhel6 libs
 # GNU_DIR=$(LINUX_RT_HOME)/$(LINUXRT_BUILDROOT_VERSION)/host/$(EPICS_HOST_ARCH)/$(ARCH_CLASS)/usr
 export CCACHE_DISABLE=1
@@ -35,7 +36,7 @@ COMMANDLINE_LIBRARY = READLINE
 # =========================================================================
 # Valgrind support
 # =========================================================================
-VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
+VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.13.0
 VALGRIND_T_A=$(VALGRIND_TOP)/$(T_A)
 ifneq ($(wildcard $(VALGRIND_T_A)),)
 VALGRIND_INCLUDE=$(VALGRIND_T_A)/include
