@@ -1,24 +1,24 @@
 [submodule "modules/pvData"]
     path = modules/pvData
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDataCPP.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDataCPP.git
     branch = github-master
 [submodule "modules/pvAccess"]
     path = modules/pvAccess
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/pvAccessCPP.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/pvAccessCPP.git
     branch = github-master
 [submodule "modules/normativeTypes"]
     path = modules/normativeTypes
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/normativeTypesCPP.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/normativeTypesCPP.git
     branch = github-master
 [submodule "modules/pvaClient"]
     path = modules/pvaClient
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/pvaClientCPP.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/pvaClientCPP.git
     branch = github-master
 [submodule "modules/pvDatabase"]
     path = modules/pvDatabase
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDatabaseCPP.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/pvDatabaseCPP.git
     branch = github-master
 [submodule "modules/pva2pva"]
     path = modules/pva2pva
-    url = ssh://slepicka@mcclogin/afs/slac/g/cd/swe/git/repos/package/epics/modules/pva2pva.git
+	url = ssh:///afs/slac/g/cd/swe/git/repos/package/epics/modules/pva2pva.git
     branch = github-master
