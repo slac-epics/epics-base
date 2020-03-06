@@ -419,7 +419,7 @@ $(INSTALL_DBD)/%: ../%
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 define  DBD_INSTALLS_template
-$$(INSTALL_DBD)/$$(notdir $(1)) : $(1)
+$$(INSTALL_DBD)/$$(notdir $(1)): $(1)
 	$(ECHO) "Installing DBD_INSTALLS $$@"
 	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DBD)
 endef
@@ -526,7 +526,7 @@ $(INSTALL_DB)/%.db: $(COMMON_DIR)/%.db
 	@$(INSTALL) -d -m $(INSTALL_PERMISSIONS) $< $(@D)
 
 define  DB_INSTALLS_template
-$$(INSTALL_DB)/$$(notdir $(1)) : $(1)
+$$(INSTALL_DB)/$$(notdir $(1)): $(1)
 	$(ECHO) "Installing DB_INSTALLS $$@"
 	@$$(INSTALL) -d -m $$(INSTALL_PERMISSIONS) $$^ $$(INSTALL_DB)
 endef
