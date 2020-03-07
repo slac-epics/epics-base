@@ -60,7 +60,7 @@ case $sysname in
             armv6l | armv7l )
                 cpu=arm ;;
         esac
-        echo ${os}-${cpu}${suffix}
+        echo ${os}${gcc}-${cpu}${suffix}
         ;;
     Darwin )
         os=darwin
