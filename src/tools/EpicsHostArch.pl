@@ -93,6 +93,17 @@ sub HELP_MESSAGE {
 
 HELP_MESSAGE() if !getopts('hg:') || $opt_h;
 
+
+my( $gcc )="";
+my( $gccExe )=`which gcc`;
+my( $gccVers )='';
+if ( "$gccExe" ne "" ) {
+	$gccVers=`gcc -dM -E - < /dev/null | egrep __VERSION__`;
+	if ($gccVers =~ m/4.9.4/) { $gcc="-gcc494"; }
+	else { my( $gcc )=""; }
+}
+#print "gcc=$gcc\n";
+
 # Convert GNU-like architecture tuples (<cpu>-<system>)
 # to EPICS terminology (<system>-<cpu>)
 #
@@ -104,6 +115,23 @@ HELP_MESSAGE() if !getopts('hg:') || $opt_h;
 # - https://wiki.debian.org/Multiarch/Tuples
 sub toEpicsArch {
     my $arch = shift;
+    if ($arch =~ m/arm-linux/)     { return "linux-arm";
+    } elsif ($arch =~ m/linux/)        {
+            my($kernel, $hostname, $release, $version, $cpu) = POSIX::uname();
+            if ($cpu =~ m/i686/)			{ return "linux-x86";  }
+            if ($cpu =~ m/x86_64/)	{
+				if ($release =~ m/el5/)     { return "linux-x86_64";  }
+				elsif ($release =~ m/2.6.35.13-rt/)  { return "linux-x86_64"; }
+				elsif ($release =~ m/3.14.12-rt9/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/3.18.11-rt7/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/-rt/)  { return "linuxRT-x86_64"; }
+				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
+				elsif ($release =~ m/el7/)  { if ( $gcc eq "-gcc494" ) { return "rhel7-gcc494-x86_64";
+					} else { return "rhel7-x86_64"; } }
+				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
+			}
+            else							{ return "unsupported"; }
+	} else {
     for ($arch) {
         return 'linux-x86_64'   if m/^x86_64-linux/;
         return 'linux-x86'      if m/^i[3-6]86-linux/;
@@ -129,7 +157,7 @@ sub toEpicsArch {
                 "EPICS_HOST_ARCH=win32-x86-mingw  for a 32bit MinGW build.\n"
         }
         die "$0: Architecture '$arch' not recognized\n";
-    }
+    } }
 }
 
 my $arch;
