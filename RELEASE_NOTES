@@ -5,7 +5,7 @@
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
 
-R7.0.3.1-1.1.0: 2020-03-18 Hugo Slepicka
+R7.0.3.1-1.0.1: 2020-03-18 Hugo Slepicka
 	Adds the following SLAC src patches:
 		Added envFindConfigParam() function so iocAdmin client code can find ENV_PARAM instances.
 		Applied non-rt-thread-priority-zero.patch
