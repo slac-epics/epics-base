@@ -5,12 +5,13 @@
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
 
-R7.0.3.1-1.1.0:
+R7.0.3.1-1.1.0: 2020-03-18 Hugo Slepicka
 	Adds the following SLAC src patches:
 		Added envFindConfigParam() function so iocAdmin client code can find ENV_PARAM instances.
 		Applied non-rt-thread-priority-zero.patch
 		Set asCheckClientIP=1 so PVA access ctrl works w/ hostnames in acf.
 	Adds support for host build of rhel7 for gcc 4.9.4
+	Bumps RTEMS patch level to ssrlApps_p2 to fix an issue with the maximum number of threads.
 
 R7.0.3.1-1.0.0:	2020-02-06 Hugo Slepica
 	R7.0.3.1 EPICS Release plus SLAC config changes to support:
