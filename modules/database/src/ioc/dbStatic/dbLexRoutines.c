@@ -331,6 +331,7 @@ cleanup:
     my_buffer = NULL;
     freeInputFileList();
     if(status != 0 && dbLoadSuspendOnError) {
+        epicsPrintf("dbLoadSuspendOnError has been deprecated.\nPlease use iocsh \"on error ...\"" );
         epicsThreadSuspendSelf();
     }
     return(status);
