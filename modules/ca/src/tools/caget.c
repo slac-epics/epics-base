@@ -557,10 +557,12 @@ int main (int argc, char *argv[])
         pvs[n].name = argv[optind] ;       /* Copy PV names from command line */
 
     result = connect_pvs(pvs, nPvs);
+	if ( result != 0 )
+        fprintf ( stderr, "connect_pvs error: %s\n",
+            ca_message ( result ) );
 
                                 /* Read and print data */
-    if (!result)
-        result = caget(pvs, nPvs, request, format, type, count);
+	result |= caget(pvs, nPvs, request, format, type, count);
 
                                 /* Shut down Channel Access */
     ca_context_destroy();
