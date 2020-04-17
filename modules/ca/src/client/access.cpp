@@ -291,8 +291,11 @@ int epicsStdCall ca_create_channel (
      capri priority, chid * chanptr )
 {
     ca_client_context * pcac;
+	*chanptr = 0;
     int caStatus = fetchClientContext ( & pcac );
     if ( caStatus != ECA_NORMAL ) {
+        fprintf ( stderr, "ca_create_channel error: fetchClientContext failed: %s\n",
+            ca_message ( caStatus ) );
         return caStatus;
     }
 
@@ -328,15 +331,23 @@ int epicsStdCall ca_create_channel (
         // is called
     }
     catch ( cacChannel::badString & ) {
+        pcac->printFormated ( "ca_create_channel error %s: badString: %s\n",
+            name_str, ca_message ( caStatus ) );
         return ECA_BADSTR;
     }
     catch ( std::bad_alloc & ) {
+        pcac->printFormated ( "ca_create_channel error %s: badAlloc: %s\n",
+            name_str, ca_message ( caStatus ) );
         return ECA_ALLOCMEM;
     }
     catch ( cacChannel::badPriority & ) {
+        pcac->printFormated ( "ca_create_channel error %s: badPriority: %s\n",
+            name_str, ca_message ( caStatus ) );
         return ECA_BADPRIORITY;
     }
     catch ( cacChannel::unsupportedByService & ) {
+        pcac->printFormated ( "ca_create_channel error %s: unsupportedByService: %s\n",
+            name_str, ca_message ( caStatus ) );
         return ECA_UNAVAILINSERV;
     }
     catch ( std :: exception & except ) {
@@ -347,6 +358,8 @@ int epicsStdCall ca_create_channel (
         return ECA_INTERNAL;
     }
     catch ( ... ) {
+        fprintf ( stderr, "ca_create_channel error %s: ECA_INTERNAL: %s\n",
+            name_str, ca_message ( caStatus ) );
         return ECA_INTERNAL;
     }
 

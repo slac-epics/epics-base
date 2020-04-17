@@ -639,9 +639,9 @@ int create_pvs (pv* pvs, int nPvs, caCh *pCB)
 int connect_pvs (pv* pvs, int nPvs)
 {
     int returncode = create_pvs ( pvs, nPvs, 0);
+	/* Wait for channels to connect */
+	int result = ca_pend_io (caTimeout);
     if ( returncode == 0 ) {
-                            /* Wait for channels to connect */
-        int result = ca_pend_io (caTimeout);
         if (result == ECA_TIMEOUT)
         {
             if (nPvs > 1)
@@ -653,7 +653,10 @@ int connect_pvs (pv* pvs, int nPvs)
             }
             returncode = 1;
         }
-    }
+    } else {
+        fprintf ( stderr, "connect_pvs: create_pvs failed: %s\n",
+            ca_message ( returncode ) );
+	}
     return returncode;
 }
 
