@@ -222,8 +222,7 @@ int main (int argc, char *argv[])
     result = connect_pvs(pvs, nPvs);
 
                                 /* Print data */
-    if (!result)
-        result = cainfo(pvs, nPvs);
+	result |= cainfo(pvs, nPvs);
 
                                 /* Shut down Channel Access */
     ca_context_destroy();

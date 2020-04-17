@@ -651,6 +651,9 @@ int connect_pvs (pv* pvs, int nPvs)
             }
             returncode = 1;
         }
-    }
+    } else {
+        fprintf ( stderr, "connect_pvs: create_pvs failed: %s\n",
+            ca_message ( returncode ) );
+	}
     return returncode;
 }
