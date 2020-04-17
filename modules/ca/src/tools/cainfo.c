@@ -227,11 +227,16 @@ int main (int argc, char *argv[])
     for (n = 0; optind < argc; n++, optind++)
         pvs[n].name = argv[optind] ;       /* Copy PV names from command line */
 
-    result = connect_pvs(pvs, nPvs);
+	// Note: connect_pvs() prints it's own error msgs
+	// and returns 1 if not all of the pvs connected.
+	// As it's safe to call cainfo() below even if no pvs
+	// connected, there's no need to check it's return value,
+	// as we want to call cainfo() either way so valid
+	// PV connections print their cainfo results.
+    (void) connect_pvs(pvs, nPvs);
 
                                 /* Print data */
-    if (!result)
-        result = cainfo(pvs, nPvs);
+	result = cainfo(pvs, nPvs);
 
                                 /* Shut down Channel Access */
     ca_context_destroy();
