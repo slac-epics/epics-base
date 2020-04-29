@@ -332,22 +332,22 @@ int epicsShareAPI ca_create_channel (
         // is called
     }
     catch ( cacChannel::badString & ) {
-        fprintf ( stderr, "ca_create_channel error %s: badString: %s\n",
+        pcac->printFormated ( "ca_create_channel error %s: badString: %s\n",
             name_str, ca_message ( caStatus ) );
         return ECA_BADSTR;
     }
     catch ( std::bad_alloc & ) {
-        fprintf ( stderr, "ca_create_channel error %s: badAlloc: %s\n",
+        pcac->printFormated ( "ca_create_channel error %s: badAlloc: %s\n",
             name_str, ca_message ( caStatus ) );
         return ECA_ALLOCMEM;
     }
     catch ( cacChannel::badPriority & ) {
-        fprintf ( stderr, "ca_create_channel error %s: badPriority: %s\n",
+        pcac->printFormated ( "ca_create_channel error %s: badPriority: %s\n",
             name_str, ca_message ( caStatus ) );
         return ECA_BADPRIORITY;
     }
     catch ( cacChannel::unsupportedByService & ) {
-        fprintf ( stderr, "ca_create_channel error %s: unsupportedByService: %s\n",
+        pcac->printFormated ( "ca_create_channel error %s: unsupportedByService: %s\n",
             name_str, ca_message ( caStatus ) );
         return ECA_UNAVAILINSERV;
     }

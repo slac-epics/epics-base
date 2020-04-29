@@ -556,13 +556,16 @@ int main (int argc, char *argv[])
     for (n = 0; optind < argc; n++, optind++)
         pvs[n].name = argv[optind] ;       /* Copy PV names from command line */
 
-    result = connect_pvs(pvs, nPvs);
-	if ( result != 0 )
-        fprintf ( stderr, "connect_pvs error: %s\n",
-            ca_message ( result ) );
+	// Note: connect_pvs() prints it's own error msgs
+	// and returns 1 if not all of the pvs connected.
+	// As it's safe to call caget() below even if no pvs
+	// connected, there's no need to check it's return value,
+	// as we want to call caget() either way so valid
+	// PV connections print their caget results.
+    (void) connect_pvs(pvs, nPvs);
 
                                 /* Read and print data */
-	result |= caget(pvs, nPvs, request, format, type, count);
+	result = caget(pvs, nPvs, request, format, type, count);
 
                                 /* Shut down Channel Access */
     ca_context_destroy();
