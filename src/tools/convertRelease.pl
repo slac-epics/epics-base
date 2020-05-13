@@ -44,6 +44,7 @@ if ($opt_T) {
 } else {                # Find $top from current path
     # This approach only works inside iocBoot/* and configure/*
     $top = $cwd;
+    $top =~ s{ / cpuBoot .* $}{}x;
     $top =~ s{ / iocBoot .* $}{}x;
     $top =~ s{ / configure .* $}{}x;
 }
@@ -84,6 +85,32 @@ printMacros( 'macros from readReleaseFiles', \%macros ) if $opt_d;
 expandRelease(\%macros);
 printMacros( "macros after expandRelease", \%macros ) if $opt_d;
 
+my @cfgVars = ('TOP');   # Records the order of definitions in configuration files
+my %cfgMacros = (TOP => LocalPath($top));
+$cfgMacros{'INSTALL_LOCATION'} = LocalPath($top);
+if ( $outfile eq "cpuEnv.sh" )
+{
+	# Read cfgMacros and cfgVars from the CONFIG_SITE file(s)
+	if ( defined $arch ) {
+		$cfgMacros{'T_A'} = $arch;
+	}
+	my $rsfile = "$top/RELEASE_SITE";
+	readReleaseFiles($rsfile, \%cfgMacros, \@cfgVars, $arch);
+
+    my $cfgfile = "$top/configure/CONFIG_SITE";
+    readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+    $cfgfile = "$top/configure/CONFIG_SITE.$ENV{EPICS_HOST_ARCH}.Common";
+    readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+	if ( defined $arch )
+	{
+		$cfgfile = "$top/configure/CONFIG_SITE.Common.$arch";
+		readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+    	$cfgfile = "$top/configure/CONFIG_SITE.$ENV{EPICS_HOST_ARCH}.$arch";
+		readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+	}
+	expandRelease(\%cfgMacros);
+}
+
 # This is a perl switch statement:
 for ($outfile) {
     m/releaseTops/       and do { releaseTops();         last; };
@@ -92,6 +119,7 @@ for ($outfile) {
     m/ModuleDirs\.pm/    and do { moduleDirs();          last; };
     m/cdCommands/        and do { cdCommands();          last; };
     m/envPaths/          and do { envPaths();            last; };
+    m/cpuEnv\.sh/        and do { cpuEnv();              last; };
     m/checkRelease/      and do { checkRelease();        last; };
     die "Output file type \'$outfile\' not supported";
 }
@@ -113,6 +141,7 @@ Usage: convertRelease.pl [-a arch] [-d] [-T top] [-t ioctop] outfile
         *ModuleDirs.pm - generate a perl module adding lib/perl paths
         cdCommands - generate cd path strings for vxWorks IOCs
         envPaths - generate epicsEnvSet commands for other IOCs
+        cpuEnv.sh - generate bash shell env variable setup script for CPUs
         checkRelease - checks consistency with support modules
 	default TOP is current dir w/ iocBoot/* or configure/* stripped off
 EOF
@@ -206,6 +235,36 @@ sub cdCommands {
             if (-d $path);
         print OUT "${app_lc}bin = \"$iocpath/bin/$arch\"\n"
             if (-d "$path/bin/$arch");
+    }
+    close OUT;
+}
+
+#
+# Generate cpuEnv.sh file which sets env variables for bash shells.
+# Used by RULES.cpu to set environment variables for the directory
+# paths defined by macros in these 3 files, if they exist:
+# 	$(TOP)/RELEASE_SITE
+# 	$(TOP)/configure/CONFIG_SITE
+# 	$(TOP)/configure/CONFIG_SITE.$(EPICS_HOST_ARCH).Common
+# 	$(TOP)/configure/CONFIG_SITE.Common.$(T_A)
+# 	$(TOP)/configure/CONFIG_SITE.$(EPICS_HOST_ARCH).$(T_A)
+#
+sub cpuEnv {
+    my @includes = grep !m/^ (RULES | TEMPLATE_TOP) $/x, @cfgVars;
+    unlink($outfile);
+    open(OUT,">$outfile") or die "$! creating $outfile";
+
+    my $cpuBootSubDir = $cwd;
+    $cpuBootSubDir =~ s/^.*\///;  # cpuBootSubDirname is last component of directory name
+
+    print OUT "export CPU=$cpuBootSubDir\n";
+
+    foreach my $app (@includes) {
+		#print "cpuEnv: macro $app=$cfgMacros{$app}\n";
+        my $iocpath = my $path = $cfgMacros{$app};
+        $iocpath =~ s/^$root/$iocroot/o if ($opt_t);
+        $iocpath =~ s/([\\"])/\\$1/g; # escape back-slashes and double-quotes
+    	print OUT "export $app=$iocpath\n";
     }
     close OUT;
 }
