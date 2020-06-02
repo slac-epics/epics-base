@@ -5,6 +5,13 @@
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
 
+R7.0.3.1-1.0.2: 2020-06-01 Bruce Hill
+	FIX: caget not showing good values if one or more timeout.
+	Add RULES.cpu file and support for convertRelease.pl building cpuEnv.sh
+	Fix usage of convertRelease.pl args -t vs -T in RULES.ioc-targets
+	Restore - prefix for warnRelease target to fix CHECK_RELEASE=WARN
+	Add msg that dbLoadSuspendOnError is deprecated.
+
 R7.0.3.1-1.0.1: 2020-03-18 Hugo Slepicka
 	Adds the following SLAC src patches:
 		Added envFindConfigParam() function so iocAdmin client code can find ENV_PARAM instances.
