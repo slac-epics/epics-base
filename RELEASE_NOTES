@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.3: 2020-06-05 Bruce Hill
+    Rework cpuEnv support to only read CONFIG_SITE files when building cpuEnv.sh.
+    Also pre-populate cfgMacros dict w/ INSTALL_LOCATION as well as TOP.
+    These fixes avoid the undefined macro warnings that have been so annoying.
 
 R7.0.3.1-1.0.2: 2020-06-01 Bruce Hill
 	FIX: caget not showing good values if one or more timeout.
