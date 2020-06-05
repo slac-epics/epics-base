@@ -71,19 +71,8 @@ my $outfile = $ARGV[0];
 # TOP refers to this application
 my %macros = (TOP => LocalPath($top));
 my @apps   = ('TOP');   # Records the order of definitions in RELEASE file
-my @cfgVars = ('TOP');   # Records the order of definitions in configuration files
-my %cfgMacros = (TOP => LocalPath($top));
-$cfgMacros{'T_A'} = $arch;
 
 $ENV{MAKEFLAGS} = "";
-
-# Read the CONFIG_SITE file(s)
-my $rsfile = "$top/RELEASE_SITE";
-readReleaseFiles($rsfile, \%cfgMacros, \@cfgVars, $arch);
-my $cfgfile = "$top/configure/CONFIG_SITE";
-readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
-#readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
-expandRelease(\%cfgMacros);
 
 # Read the RELEASE file(s)
 my $relfile = "$top/configure/RELEASE";
@@ -91,6 +80,32 @@ die "Can't find $relfile" unless (-f $relfile);
 readReleaseFiles($relfile, \%macros, \@apps, $arch);
 expandRelease(\%macros);
 
+
+my @cfgVars = ('TOP');   # Records the order of definitions in configuration files
+my %cfgMacros = (TOP => LocalPath($top));
+$cfgMacros{'INSTALL_LOCATION'} = LocalPath($top);
+if ( $outfile eq "cpuEnv.sh" )
+{
+	# Read cfgMacros and cfgVars from the CONFIG_SITE file(s)
+	if ( defined $arch ) {
+		$cfgMacros{'T_A'} = $arch;
+	}
+	my $rsfile = "$top/RELEASE_SITE";
+	readReleaseFiles($rsfile, \%cfgMacros, \@cfgVars, $arch);
+
+    my $cfgfile = "$top/configure/CONFIG_SITE";
+    readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+    $cfgfile = "$top/configure/CONFIG_SITE.$ENV{EPICS_HOST_ARCH}.Common";
+    readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+	if ( defined $arch )
+	{
+		$cfgfile = "$top/configure/CONFIG_SITE.Common.$arch";
+		readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+    	$cfgfile = "$top/configure/CONFIG_SITE.$ENV{EPICS_HOST_ARCH}.$arch";
+		readReleaseFiles($cfgfile, \%cfgMacros, \@cfgVars, $arch);
+	}
+	expandRelease(\%cfgMacros);
+}
 
 # This is a perl switch statement:
 for ($outfile) {
@@ -221,13 +236,12 @@ sub cdCommands {
 # paths defined by macros in these 3 files, if they exist:
 # 	$(TOP)/RELEASE_SITE
 # 	$(TOP)/configure/CONFIG_SITE
+# 	$(TOP)/configure/CONFIG_SITE.$(EPICS_HOST_ARCH).Common
 # 	$(TOP)/configure/CONFIG_SITE.Common.$(T_A)
+# 	$(TOP)/configure/CONFIG_SITE.$(EPICS_HOST_ARCH).$(T_A)
 #
 sub cpuEnv {
-	#print "cpuEnv: apps=@apps\n";
-	#print "cpuEnv: cfgVars=@cfgVars\n";
     my @includes = grep !m/^ (RULES | TEMPLATE_TOP) $/x, @cfgVars;
-	#print "cpuEnv: includes=@includes\n";
     unlink($outfile);
     open(OUT,">$outfile") or die "$! creating $outfile";
 
@@ -262,7 +276,6 @@ sub envPaths {
     print OUT "epicsEnvSet(\"IOC\",\"$ioc\")\n";
 
     foreach my $app (@includes) {
-		#print "envPaths app=$app\n";
         my $iocpath = my $path = $macros{$app};
         $iocpath =~ s/^$root/$iocroot/o if ($opt_t);
         $iocpath =~ s/([\\"])/\\$1/g; # escape back-slashes and double-quotes
