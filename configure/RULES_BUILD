@@ -181,7 +181,7 @@ endif
 
 # Sort mkdir targets to remove duplicates & make parents first
 $(MKDIR_TARGETS):
-	$(MKDIR) -p $@
+	$(MKDIR) $@
 
 # Install LIB_INSTALLS libraries before linking executables
 $(TESTPRODNAME) $(PRODNAME): | $(INSTALL_LIB_INSTALLS)
