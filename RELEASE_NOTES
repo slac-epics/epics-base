@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.13.1:	2020-09-08 from R3.15.5-1.0.13 tag
+	Applied Add RULES.cpu file and support for convertRelease.pl building cpuEnv.sh with changes for R3.15.5-1.0.13 as requested by Kristi.
+
 R3.15.5-1.0.13: 2018-04-17 from R3.15.5-1.branch
 	Applied community patch as follow:
 	    patches/epicsGeneralTime.c.diff: epicsGeneralTime.c were made (fetch time provider's eventTime into a local copy) an inconsistency resulted.
