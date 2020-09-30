@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R3.15.5-1.0.13.2:	2020-09-30 from R3.15.5-1.0.13 tag
+	Applied Rework cpuEnv support to only read CONFIG_SITE files when building cpuEnv.sh.
+    	    Also pre-populate cfgMacros dict w/ INSTALL_LOCATION as well as TOP.
+    	    These fixes avoid the undefined macro warnings that have been so annoying.
+
 R3.15.5-1.0.13.1:	2020-09-08 from R3.15.5-1.0.13 tag
 	Applied Add RULES.cpu file and support for convertRelease.pl building cpuEnv.sh with changes for R3.15.5-1.0.13 as requested by Kristi.
 
