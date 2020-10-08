@@ -167,9 +167,11 @@ static long process(struct dbCommon *pcommon)
     }
 
     if ( !pact ) {
+        prec->udf = FALSE;
+
         /* Update the timestamp before writing output values so it
          * will be uptodate if any downstream records fetch it via TSEL */
-        recGblGetTimeStamp(prec);
+        recGblGetTimeStampSimm(prec, prec->simm, NULL);
     }
 
     status = writeValue(prec); /* write the data */
@@ -178,11 +180,8 @@ static long process(struct dbCommon *pcommon)
 
     if ( pact ) {
         /* Update timestamp again for asynchronous devices */
-        recGblGetTimeStamp(prec);
+        recGblGetTimeStampSimm(prec, prec->simm, NULL);
     }
-
-    prec->udf = FALSE;
-    recGblGetTimeStampSimm(prec, prec->simm, NULL);
 
     monitor(prec);
     /* process the forward scan link record */

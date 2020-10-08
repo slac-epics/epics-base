@@ -156,7 +156,7 @@ static long process(struct dbCommon *pcommon)
 
         /* Update the timestamp before writing output values so it
          * will be uptodate if any downstream records fetch it via TSEL */
-        recGblGetTimeStamp(prec);
+        recGblGetTimeStampSimm(prec, prec->simm, NULL);
 
         if (prec->nsev < INVALID_ALARM )
                 status=writeValue(prec); /* write the new value */
@@ -184,11 +184,9 @@ static long process(struct dbCommon *pcommon)
 	if ( !pact && prec->pact ) return(0);
 
 	prec->pact = TRUE;
-    recGblGetTimeStampSimm(prec, prec->simm, NULL);
-
     if ( pact ) {
         /* Update timestamp again for asynchronous devices */
-        recGblGetTimeStamp(prec);
+        recGblGetTimeStampSimm(prec, prec->simm, NULL);
     }
 
 	monitor(prec);
