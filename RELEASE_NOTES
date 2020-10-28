@@ -5,6 +5,13 @@
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
 
+R7.0.3.1-2.0.1:	2020-10-27 Bruce Hill
+	Patch record processing routines to update timestamp before processing outlinks
+	Remove -p argument to MKDIR in RULES_BUILD as it's already in the MKDIR variable
+	FIX: caget not showing good values if one or more timeout.
+	Fix convertRelease.pl generation of envPaths for templated IOCs
+	Add msg that dbLoadSuspendOnError is deprecated.
+
 R7.0.3.1-2.0.0:	2020-03-26 Bruce Hill
 	R7.0.3.1 EPICS Release plus SLAC config changes to support:
 		Adds support for host build of rhel7 for gcc 4.9.4
