@@ -40,7 +40,7 @@ case $sysname in
 				os=rhel6 ;;
 			*el7* )
 				os=rhel7 ;;
-			2.6.35.13-rt )
+			2.6.26.8-rt16 | 2.6.35.13-rt )
 				os=linux ;;
 			3.14.12-rt9 | 3.18.11-rt7 )
 				os=linuxRT ;;
@@ -54,7 +54,13 @@ case $sysname in
             x86_64 )
                 ;; # $cpu is correct
             armv6l | armv7l )
-                cpu=arm ;;
+				cpu=arm
+				if [ -r /etc/os-release ]; then
+					source /etc/os-release
+					if [ "$NAME" = "Angstrom" ]; then
+						cpu=arm-apalis
+					fi
+				fi ;;
         esac
         echo ${os}${gcc}-${cpu}${suffix}
         ;;
