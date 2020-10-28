@@ -54,7 +54,7 @@ $(INSTALL_ARCHIVE)/%:	%
 	@$(ECHO) "Installing archive file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
-$(COMMON_DIR)/%.archive: %.sub-arch
+$(COMMON_DIR)/%.archive %.archive: %.sub-arch
 	@$(RM) $(notdir $@)$(DEP)
 	$(MKMF) -m $(notdir $@)$(DEP) $(ARCHIVE_INCLUDES) $@ $< 
 	@$(ECHO) "Inflating archive file from $<"
