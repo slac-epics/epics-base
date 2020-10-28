@@ -51,7 +51,7 @@ $(INSTALL_AUTOSAVE)/%:	%
 	@$(ECHO) "Installing autosave file $@"
 	@$(INSTALL) -d -m 644 $< $(@D)
 
-$(COMMON_DIR)/%.req: %.sub-req
+$(COMMON_DIR)/%.req %.req: %.sub-req
 	@$(RM) $(notdir $@)$(DEP)
 	$(MKMF) -m $(notdir $@)$(DEP) $(AUTOSAVE_INCLUDES) $@ $< 
 	@$(ECHO) "Inflating autosave request from $<"
