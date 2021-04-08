@@ -34,8 +34,8 @@ endif
 # the executables, db files, etc
 #
 # While nearly the same, convertRelease needs to use the
-# -T option for IOCS_APPL_TOP and the
-# -t option for IOC_APPL_TOP
+# -t option for IOCS_APPL_TOP and the
+# -T option for IOC_APPL_TOP
 # to find the RELEASE* files
 cdCommands dllPath.bat relPaths.sh: \
     $(wildcard $(TOP)/configure/RELEASE*) \
@@ -43,14 +43,18 @@ cdCommands dllPath.bat relPaths.sh: \
     $(wildcard $(TOP)/RELEASE_SITE) \
     $(wildcard $(TOP)/RELEASE.local)
 ifeq ($(IOC_APPL_TOP),)
-	$(CONVERTRELEASE) -a $(ARCH) -T $(IOCS_APPL_TOP) $@
+	$(CONVERTRELEASE) -a $(ARCH) -t $(IOCS_APPL_TOP) $@
 else
-	$(CONVERTRELEASE) -a $(ARCH) -t $(IOC_APPL_TOP) $@
+	$(CONVERTRELEASE) -a $(ARCH) -T $(IOC_APPL_TOP) $@
 endif
 
 envPaths: $(wildcard $(TOP)/configure/RELEASE*) \
     $(wildcard $(TOP)/configure/CONFIG_SITE*) $(INSTALL_BIN)
-	$(CONVERTRELEASE) -T $(IOCS_APPL_TOP) $@
+ifeq ($(IOC_APPL_TOP),)
+	$(CONVERTRELEASE) -t $(IOCS_APPL_TOP) $@
+else
+	$(CONVERTRELEASE) -T $(IOC_APPL_TOP) $@
+endif
 
 realclean: ioc-targets_clean
 
