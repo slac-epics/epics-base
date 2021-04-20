@@ -4,6 +4,12 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.4: 2021-04-19 Bruce Hill
+	Michael Davidsaver fix: Revert "asCaStop() join worker thread"
+		Fixes bug that hangs during reload of ACF due to caput to READACF PV
+	Fix error in use of -T option for convertRelease
+	Build fix for templated IOC archive and request files
+
 R7.0.3.1-1.0.3: 2020-06-05 Bruce Hill
     Rework cpuEnv support to only read CONFIG_SITE files when building cpuEnv.sh.
     Also pre-populate cfgMacros dict w/ INSTALL_LOCATION as well as TOP.
