@@ -83,7 +83,7 @@ sub readRelease {
         }
 
         # Handle "<variable> = <path>" plus the := and ?= variants
-        my ($var, $op, $val) = m/^ ($MVAR) \s* ([?:]?=) \s* (.*) /x;
+        my ($var, $op, $val) = m/^ ($MVAR) \s* ([?:]?=) \s* (\S*) /x;
         if ($var ne '') {
             $var = 'TOP' if $var =~ m/^ INSTALL_LOCATION /x;
             if (exists $Rmacros->{$var}) {
