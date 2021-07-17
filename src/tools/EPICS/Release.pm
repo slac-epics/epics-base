@@ -59,7 +59,7 @@ sub readRelease {
         next if m/^ \s* $/x;    # Skip blank lines
 
         # Handle "<macro> = <path>" plus the := and ?= variants
-        my ($macro, $op, $val) = m/^ \s* (\w+) \s* ([?:]?=) \s* (.*) /x;
+        my ($macro, $op, $val) = m/^ \s* (\w+) \s* ([?:]?=) \s* (\S*) /x;
         if ($macro ne '') {
             $macro = 'TOP' if $macro =~ m/^ INSTALL_LOCATION /x;
             if (exists $Rmacros->{$macro}) {
