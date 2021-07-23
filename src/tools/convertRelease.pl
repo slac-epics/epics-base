@@ -249,6 +249,9 @@ sub cpuEnv {
     $cpuBootSubDir =~ s/^.*\///;  # cpuBootSubDirname is last component of directory name
 
     print OUT "export CPU=$cpuBootSubDir\n";
+	if ( defined $arch ) {
+		print OUT "export CPU_ARCH=$arch\n";
+	}
 
     foreach my $app (@includes) {
 		#print "cpuEnv: macro $app=$cfgMacros{$app}\n";
