@@ -15,7 +15,7 @@ build$(DIVIDER)$(ARCH) build: buildInstall
 install$(DIVIDER)$(ARCH) install: buildInstall
 $(ARCH): buildInstall
 
-ifeq ($(filter $(ARCH),$(BUILD_ARCHS)),$(strip $(ARCH)))
+ifeq ($(sort $(filter $(ARCH),$(BUILD_ARCHS))),$(strip $(ARCH)))
     buildInstall$(DIVIDER)$(ARCH) buildInstall: $(TARGETS)
 
     clean$(DIVIDER)$(ARCH) clean: cpu_clean
