@@ -4,6 +4,12 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.5: 2021-07-23 Bruce Hill
+	rhel7 hosts can now build linuxRT-x86_64 target arch.
+	Fix cpuEnv support in convertRelease.pl for gnu-make functions
+		in CONFIG_SITE files.
+	Also adds a new CPU_ARCH definition in the generated cpuEnv.sh file.
+
 R7.0.3.1-1.0.4: 2021-04-19 Bruce Hill
 	Michael Davidsaver fix: Revert "asCaStop() join worker thread"
 		Fixes bug that hangs during reload of ACF due to caput to READACF PV
