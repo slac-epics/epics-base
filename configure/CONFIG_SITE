@@ -124,6 +124,9 @@ ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
 CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
 CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
 endif
+ifeq '$(EPICS_HOST_ARCH)' 'rhel7-x86_64'
+CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64
+endif
 
 # If only some of your host architectures can compile the
 #  above CROSS_COMPILER_TARGET_ARCHS specify those host
