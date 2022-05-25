@@ -1209,40 +1209,43 @@ static HAG *asHagAdd(const char *hagName)
 static long asHagAddHost(HAG *phag,const char *host)
 {
     HAGNAME *phagname;
+	size_t i, len = strlen(host);
+	struct sockaddr_in addr;
+	epicsUInt32 ip;
 
     if (!phag) return 0;
-    if(!asCheckClientIP) {
-        size_t i, len = strlen(host);
-        phagname = asCalloc(1, sizeof(*phagname) + len);
-        for (i = 0; i < len; i++) {
-            phagname->host[i] = (char)tolower((int)host[i]);
-        }
 
-    } else {
-        struct sockaddr_in addr;
-        epicsUInt32 ip;
-
-        if(aToIPAddr(host, 0, &addr)) {
-            static const char unresolved[] = "unresolved:";
-
-            errlogPrintf("ACF: Unable to resolve host '%s'\n", host);
-
-            phagname = asCalloc(1, sizeof(*phagname) + sizeof(unresolved)-1+strlen(host));
-            strcpy(phagname->host, unresolved);
-            strcat(phagname->host, host);
-
-        } else {
-            ip = ntohl(addr.sin_addr.s_addr);
-            phagname = asCalloc(1, sizeof(*phagname) + 24);
-            epicsSnprintf(phagname->host, 24,
-                          "%u.%u.%u.%u",
-                          (ip>>24)&0xff,
-                          (ip>>16)&0xff,
-                          (ip>>8)&0xff,
-                          (ip>>0)&0xff);
-        }
-    }
+	phagname = asCalloc(1, sizeof(*phagname) + len);
+	for (i = 0; i < len; i++) {
+		phagname->host[i] = (char)tolower((int)host[i]);
+	}
     ellAdd(&phag->list, &phagname->node);
+
+	if(aToIPAddr(host, 0, &addr)) {
+		static const char unresolved[] = "unresolved:";
+
+		errlogPrintf("ACF: Unable to resolve host '%s'\n", host);
+
+		phagname = asCalloc(1, sizeof(*phagname) + sizeof(unresolved)-1+strlen(host));
+		strcpy(phagname->host, unresolved);
+		strcat(phagname->host, host);
+
+	} else {
+		ip = ntohl(addr.sin_addr.s_addr);
+		phagname = asCalloc(1, sizeof(*phagname) + 24);
+		epicsSnprintf(phagname->host, 24,
+					  "%u.%u.%u.%u",
+					  (ip>>24)&0xff,
+					  (ip>>16)&0xff,
+					  (ip>>8)&0xff,
+					  (ip>>0)&0xff);
+	}
+	if (strcmp( host, phagname->host ) != 0) {
+		ellAdd(&phag->list, &phagname->node);
+	}
+	else {
+		free(phagname);
+	}
     return 0;
 }
 
