@@ -1,0 +1,63 @@
+# ==============================================================================================================
+# Documenting changes that happen locally here at SLAC
+# Naming Convention: base-<community_version_string>-x.y.z
+# x.y.z; major, minor, bug fix locally respectively
+# Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
+# ==============================================================================================================
+R7.0.3.1-1.0.5: 2021-07-23 Bruce Hill
+	rhel7 hosts can now build linuxRT-x86_64 target arch.
+	Fix cpuEnv support in convertRelease.pl for gnu-make functions
+		in CONFIG_SITE files.
+	Also adds a new CPU_ARCH definition in the generated cpuEnv.sh file.
+
+R7.0.3.1-1.0.4: 2021-04-19 Bruce Hill
+	Michael Davidsaver fix: Revert "asCaStop() join worker thread"
+		Fixes bug that hangs during reload of ACF due to caput to READACF PV
+	Fix error in use of -T option for convertRelease
+	Build fix for templated IOC archive and request files
+
+R7.0.3.1-1.0.3: 2020-06-05 Bruce Hill
+    Rework cpuEnv support to only read CONFIG_SITE files when building cpuEnv.sh.
+    Also pre-populate cfgMacros dict w/ INSTALL_LOCATION as well as TOP.
+    These fixes avoid the undefined macro warnings that have been so annoying.
+
+R7.0.3.1-1.0.2: 2020-06-01 Bruce Hill
+	FIX: caget not showing good values if one or more timeout.
+	Add RULES.cpu file and support for convertRelease.pl building cpuEnv.sh
+	Fix usage of convertRelease.pl args -t vs -T in RULES.ioc-targets
+	Restore - prefix for warnRelease target to fix CHECK_RELEASE=WARN
+	Add msg that dbLoadSuspendOnError is deprecated.
+
+R7.0.3.1-1.0.1: 2020-03-18 Hugo Slepicka
+	Adds the following SLAC src patches:
+		Added envFindConfigParam() function so iocAdmin client code can find ENV_PARAM instances.
+		Applied non-rt-thread-priority-zero.patch
+		Set asCheckClientIP=1 so PVA access ctrl works w/ hostnames in acf.
+	Adds support for host build of rhel7 for gcc 4.9.4
+	Bumps RTEMS patch level to ssrlApps_p2 to fix an issue with the maximum number of threads.
+
+R7.0.3.1-1.0.0:	2020-02-06 Hugo Slepica
+	R7.0.3.1 EPICS Release plus SLAC config changes to support:
+		rhel6 and rhel7 target arches
+		custom rules for Restore, alh, archive, and autosave files
+		SLAC specific startup/EpicsHostArch
+		Added support for RTEMS and linuxRT.
+		Patch to use STATIC_BUILD.
+		Build with ncurses instead of readline.
+
+	Also applies the following SLAC src patches:
+		Add dbLoadSuspendOnError variable to suspend st.cmd on dbLoad related errors.
+		Added pvAccess env variables to envDefs.h
+		Use NUM_TIME_EVENTS instead of hard constants for dbScan.c event code.
+		Reverted convertRelease check for non-adjacent macros w/ the same value.
+		Added -P option to caget and camonitor to show SLAC fiducial pulse ID.
+		Add error number to rsrv mcast loopback error msg.
+		Fix seg fault on empty pvname to caget or cainfo
+		Default to async mode so casual use gets CA dynamic array sizing.
+		Applied db-tpro-show-values.patch
+		Applied ca-sizes-in-error-msgs.patch
+		Show linux pid's in epicsThreadShow()
+		Applied active-scan-count-exceeded-error-msg.patch
+		Applied convertRelease-diag.patch for new convertRelease option and better diagnostics
+		Applied osdThread-diag.patch for more verbose mlockall status.
+
