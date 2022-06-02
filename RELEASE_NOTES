@@ -1,0 +1,43 @@
+# ==============================================================================================================
+# Documenting changes that happen locally here at SLAC
+# Naming Convention: base-<community_version_string>-x.y.z
+# x.y.z; major, minor, bug fix locally respectively
+# Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
+# ==============================================================================================================
+
+R7.0.3.1-2.0.1:	2020-10-27 Bruce Hill
+	Patch record processing routines to update timestamp before processing outlinks
+	Remove -p argument to MKDIR in RULES_BUILD as it's already in the MKDIR variable
+	FIX: caget not showing good values if one or more timeout.
+	Fix convertRelease.pl generation of envPaths for templated IOCs
+	Add msg that dbLoadSuspendOnError is deprecated.
+
+R7.0.3.1-2.0.0:	2020-03-26 Bruce Hill
+	R7.0.3.1 EPICS Release plus SLAC config changes to support:
+		Adds support for host build of rhel7 for gcc 4.9.4
+		rhel6 and rhel7 target arches
+		custom rules for Restore, alh, archive, and autosave files
+		SLAC specific startup/EpicsHostArch
+		Added support for RTEMS and linuxRT.
+		Patch to use STATIC_BUILD.
+		Build with ncurses instead of readline.
+
+	Also applies the following SLAC src patches:
+		Added envFindConfigParam() function so iocAdmin client code can find ENV_PARAM instances.
+		Applied non-rt-thread-priority-zero.patch
+		Set asCheckClientIP=1 so PVA access ctrl works w/ hostnames in acf.
+		Add dbLoadSuspendOnError variable to suspend st.cmd on dbLoad related errors.
+		Added pvAccess env variables to envDefs.h
+		Use NUM_TIME_EVENTS instead of hard constants for dbScan.c event code.
+		Reverted convertRelease check for non-adjacent macros w/ the same value.
+		Added -P option to caget and camonitor to show SLAC fiducial pulse ID.
+		Add error number to rsrv mcast loopback error msg.
+		Fix seg fault on empty pvname to caget or cainfo
+		Default to async mode so casual use gets CA dynamic array sizing.
+		Applied db-tpro-show-values.patch
+		Applied ca-sizes-in-error-msgs.patch
+		Show linux pid's in epicsThreadShow()
+		Applied active-scan-count-exceeded-error-msg.patch
+		Applied convertRelease-diag.patch for new convertRelease option and better diagnostics
+		Applied osdThread-diag.patch for more verbose mlockall status.
+
