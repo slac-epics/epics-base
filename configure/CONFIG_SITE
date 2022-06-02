@@ -23,11 +23,11 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #  Currently Supporting:
 #	cygwin-x86             (cygwin compiler used for host builds)
 #	cygwin-x86_64          (cygwin compiler used for host builds)
-#	darwin-ppc             (PowerPC based Apple running OSX)
-#	darwin-ppcx86          (Universal binaries for both CPUs)
-#	darwin-x86             (Intel based Apple running OSX)
+#	darwin-aarch64         (M1 based Apple using CLANG compiler)
+#	darwin-x86             (Intel based Apple using CLANG compiler)
 #	freebsd-x86            (GNU compiler used for host builds)
 #	freebsd-x86_64         (GNU compiler used for host builds)
+#	linux-aarch64          (GNU compiler used for host builds)
 #	linux-arm              (GNU compiler used for host builds)
 #	linux-ppc              (GNU compiler used for host builds)
 #	linux-ppc64            (GNU compiler used for host builds)
@@ -59,7 +59,6 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #	windows-x64-debug      (MS Visual C++ compiler with debug option for host builds)
 
 
-#  EPICS_HOST_ARCH is a required environment variable
 #  Do not set EPICS_HOST_ARCH in this file. 
 #  Use base/startup files to set EPICS_HOST_ARCH or 
 #  provide EPICS_HOST_ARCH on the GNU make command line.
@@ -70,24 +69,12 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 
 #       ios-arm                 (darwin-x86 host)
 #       ios-386                 (darwin-x86 host)
-#       linux-386               (linux-x86 host)
-#       linux-486               (linux-x86 host)
-#       linux-586               (linux-x86 host)
-#       linux-686               (linux-x86 host)
 #       linux-arm               (linux-x86 or -x86_64 host)
-#       linux-arm_eb            (linux-x86 host)
-#       linux-arm_el            (linux-x86 host)
-#       linux-athlon            (linux-x86 host)
-#       linux-cris              (Axis GNU crosscompiler on linux-x86 host)
-#       linux-cris_v10          (Axis GNU crosscompiler on linux-x86 host)
-#       linux-cris_v32          (Axis GNU crosscompiler on linux-x86 host)
+#       linux-aarch64           (linux-x86_64 host)
 #       linux-microblaze
 #       linux-xscale_be
 #       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       vxWorks-486
-#       vxWorks-68040
-#       vxWorks-68040lc
-#       vxWorks-68060
 #       vxWorks-pentium
 #       vxWorks-ppc32           (32-bit PowerPC CPUs with full FPU)
 #       vxWorks-ppc32sf         (32-bit PowerPC CPUs without FPU)
@@ -98,18 +85,20 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       vxWorks-ppc604_altivec
 #       vxWorks-mpc8540
 #       vxWorks-mpc8548
-#       RTEMS-at91rm9200ek
+#       RTEMS-beagleboneblack
 #       RTEMS-beatnik
-#       RTEMS-gen68360
-#       RTEMS-mcp750
-#       RTEMS-mvme167
 #       RTEMS-mvme2100
 #       RTEMS-mvme2700
 #       RTEMS-mvme3100
 #       RTEMS-mvme5500
-#       RTEMS-pc386
-#       RTEMS-psim
+#       RTEMS-pc386             (RTEMS 4)
+#       RTEMS-pc386-qemu        (RTEMS 4)
+#       RTEMS-pc686             (RTEMS 5)
+#       RTEMS-pc686-qemu        (RTEMS 5)
+#       RTEMS-qoriq_e500
 #       RTEMS-uC5282
+#       RTEMS-xilinx-zynq-a9_qemu
+#       RTEMS-xilinx_zynq_zedboard
 #       win32-x86-mingw         (linux-x86 or -x86_64 host)
 #
 
@@ -187,13 +176,21 @@ CROSS_WARN=YES
 #  different location then uncomment and set this.
 #INSTALL_LOCATION=<fullpathname>
 
+# The location from which files placed in INSTALL_LOCATION will actually run.
+# This path is compiled into executables, and so should be an absolute.
+#  May be used to achieve the effect of autotools.  eg.
+#   ./configure --prefix=<FINAL_LOCATION>
+#   make DESTDIR=<INSTALL_LOCATION>
+# Defaults to the absolute expansion of $(INSTALL_LOCATION)
+#FINAL_LOCATION=
+
 # Use POSIX thread priority scheduling (if available).
 #  Must be either YES or NO
 USE_POSIX_THREAD_PRIORITY_SCHEDULING = YES
 
 # Site version number, if set will append '-' and this string to the
 #  EPICS version number string that is reported by many tools.
-EPICS_SITE_VERSION = 2.0.0
+EPICS_SITE_VERSION =
 
 # For GNU compiler, use pipes rather than temporary files for
 #  communication between the various stages of compilation.
