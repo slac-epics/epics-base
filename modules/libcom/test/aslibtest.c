@@ -7,11 +7,13 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "osiSock.h"
 
 #include <testMain.h>
 #include <epicsUnitTest.h>
 
 #include <errSymTbl.h>
+#include <epicsStdio.h>
 #include <epicsString.h>
 #include <osiFileName.h>
 #include <errlog.h>
@@ -74,7 +76,7 @@ static void testSyntaxErrors(void)
     eltc(1);
 }
 static const char hostname_config[] = ""
-        "HAG(foo) {localhost}\n"
+        "HAG(foo) {localhost,myHostName}\n"
         "ASG(DEFAULT) {RULE(0, NONE)}\n"
         "ASG(ro) {RULE(0, NONE)RULE(1, READ) {HAG(foo)}}\n"
         "ASG(rw) {RULE(1, WRITE) {HAG(foo)}}\n"
@@ -82,13 +84,18 @@ static const char hostname_config[] = ""
 
 static void testHostNames(void)
 {
+    struct sockaddr_in addr;
+    epicsUInt32 ip;
+    char    localhostIP[24];
+
     testDiag("testHostNames()");
     asCheckClientIP = 0;
 
     testOk1(asInitMem(hostname_config, NULL)==0);
+    /* now resolved to hostnames along w/ IPs */
 
     setUser("testing");
-    setHost("localhost");
+    setHost("myHostName");
     asAsl = 0;
 
     testAccess("invalid", 0);
@@ -96,12 +103,28 @@ static void testHostNames(void)
     testAccess("ro", 1);
     testAccess("rw", 3);
 
-    setHost("127.0.0.1");
-
-    testAccess("invalid", 0);
-    testAccess("DEFAULT", 0);
-    testAccess("ro", 0);
-    testAccess("rw", 0);
+    if(aToIPAddr("localhost", 0, &addr)) {
+        errlogPrintf("ACF: Unable to resolve localhost\n");
+        strcat(localhostIP, "unresolved");
+        setHost("127.121.122.123");
+        testAccess("invalid", 0);
+        testAccess("DEFAULT", 0);
+        testAccess("ro", 0);
+        testAccess("rw", 0);
+    } else {
+        ip = ntohl(addr.sin_addr.s_addr);
+        epicsSnprintf(localhostIP, 24,
+                      "%u.%u.%u.%u",
+                      (ip>>24)&0xff,
+                      (ip>>16)&0xff,
+                      (ip>>8)&0xff,
+                      (ip>>0)&0xff);
+        setHost(localhostIP);
+        testAccess("invalid", 0);
+        testAccess("DEFAULT", 0);
+        testAccess("ro", 1);
+        testAccess("rw", 3);
+    }
 
     setHost("guaranteed.invalid.");
 
@@ -113,28 +136,49 @@ static void testHostNames(void)
 
 static void testUseIP(void)
 {
+    struct sockaddr_in addr;
+    epicsUInt32 ip;
+    char    localhostIP[24];
+
     testDiag("testUseIP()");
     asCheckClientIP = 1;
 
     /* still host names in .acf */
     testOk1(asInitMem(hostname_config, NULL)==0);
-    /* now resolved to IPs */
+    /* now resolved to hostnames along w/ IPs */
 
     setUser("testing");
-    setHost("localhost"); /* will not match against resolved IP */
+    setHost("localhost");
     asAsl = 0;
-
-    testAccess("invalid", 0);
-    testAccess("DEFAULT", 0);
-    testAccess("ro", 0);
-    testAccess("rw", 0);
-
-    setHost("127.0.0.1");
 
     testAccess("invalid", 0);
     testAccess("DEFAULT", 0);
     testAccess("ro", 1);
     testAccess("rw", 3);
+
+    if(aToIPAddr("localhost", 0, &addr)) {
+        errlogPrintf("ACF: Unable to resolve localhost\n");
+        setHost("unresolved");
+
+        testAccess("invalid", 0);
+        testAccess("DEFAULT", 0);
+        testAccess("ro", 0);
+        testAccess("rw", 0);
+    } else {
+        ip = ntohl(addr.sin_addr.s_addr);
+        epicsSnprintf(localhostIP, 24,
+                      "%u.%u.%u.%u",
+                      (ip>>24)&0xff,
+                      (ip>>16)&0xff,
+                      (ip>>8)&0xff,
+                      (ip>>0)&0xff);
+        setHost(localhostIP);
+
+        testAccess("invalid", 0);
+        testAccess("DEFAULT", 0);
+        testAccess("ro", 1);
+        testAccess("rw", 3);
+    }
 
     setHost("guaranteed.invalid.");
 
