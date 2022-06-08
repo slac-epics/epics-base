@@ -5,7 +5,11 @@
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
 
-R7.0.6.1-2.0.0:	
+R7.0.6.1-2.0.1:	2022-06-08 Bruce Hill
+	Modified aslibtest to convert all hostnames to IP addr before testing access.
+	Update aslibtest for consistency w/ including both hostname and ip addr in AS HAG.
+
+R7.0.6.1-2.0.0: 2022-06-01 Bruce Hill
 	R7.0.6.1 EPICS Release plus SLAC config changes to support:
 		Adds support for host build of rhel7 for gcc 4.9.4
 		rhel6 and rhel7 target arches
