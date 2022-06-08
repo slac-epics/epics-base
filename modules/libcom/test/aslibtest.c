@@ -545,10 +545,31 @@ static void setUser(const char *name)
 /**
  * Set the hostname for the authorization tests
  */
-static void setHost(const char *name)
+static void setHost(const char *hostName)
 {
     free(asHost);
-    asHost = epicsStrDup(name);
+    if ( ! asCheckClientIP ) {
+		asHost = epicsStrDup(hostName);
+	} else {
+		// With asCheckClientIP, all client names are derived from network connection
+		// For this test, we'll use aToIPAddr
+		struct sockaddr_in addr;
+		if(aToIPAddr(hostName, 0, &addr)) {
+			errlogPrintf("setHost: Unable to resolve %s\n", hostName);
+			asHost = epicsStrDup("0.0.0.0");
+		} else {
+			char    hostIP[24];
+			epicsUInt32 ip;
+			ip = ntohl(addr.sin_addr.s_addr);
+			epicsSnprintf(hostIP, 24,
+						  "%u.%u.%u.%u",
+						  (ip>>24)&0xff,
+						  (ip>>16)&0xff,
+						  (ip>>8)&0xff,
+						  (ip>>0)&0xff);
+			asHost = epicsStrDup(hostIP);
+		}
+	}
 }
 
 /**
@@ -621,8 +642,9 @@ static void testHostNames(void)
 
     if(aToIPAddr("localhost", 0, &addr)) {
         errlogPrintf("ACF: Unable to resolve localhost\n");
-        strcat(localhostIP, "unresolved");
-        setHost("127.121.122.123");
+        //strcpy(localhostIP, "unresolved");
+        //setHost(localhostIP);
+        setHost("unresolved");
         testAccess("invalid", 0);
         testAccess("DEFAULT", 0);
         testAccess("ro", 0);
@@ -664,13 +686,14 @@ static void testUseIP(void)
     /* now resolved to hostnames along w/ IPs */
 
     setUser("testing");
-    setHost("localhost");
+	setHost("myHostName");
     asAsl = 0;
+	asDump(0,0,1);
 
     testAccess("invalid", 0);
     testAccess("DEFAULT", 0);
-    testAccess("ro", 1);
-    testAccess("rw", 3);
+    testAccess("ro", 0);
+    testAccess("rw", 0);
 
     if(aToIPAddr("localhost", 0, &addr)) {
         errlogPrintf("ACF: Unable to resolve localhost\n");
@@ -680,6 +703,12 @@ static void testUseIP(void)
         testAccess("DEFAULT", 0);
         testAccess("ro", 0);
         testAccess("rw", 0);
+
+		setHost("localhost");
+		testAccess("invalid", 0);
+		testAccess("DEFAULT", 0);
+		testAccess("ro", 0);
+		testAccess("rw", 0);
     } else {
         ip = ntohl(addr.sin_addr.s_addr);
         epicsSnprintf(localhostIP, 24,
@@ -694,6 +723,12 @@ static void testUseIP(void)
         testAccess("DEFAULT", 0);
         testAccess("ro", 1);
         testAccess("rw", 3);
+
+		setHost("localhost");
+		testAccess("invalid", 0);
+		testAccess("DEFAULT", 0);
+		testAccess("ro", 1);
+		testAccess("rw", 3);
     }
 
     setHost("guaranteed.invalid.");
@@ -827,7 +862,7 @@ static void testFutureProofParser(void)
 
 MAIN(aslibtest)
 {
-    testPlan(64);
+    testPlan(66);
     testSyntaxErrors();
     testFutureProofParser();
     testHostNames();
