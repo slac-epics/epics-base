@@ -1221,7 +1221,7 @@ static long asHagAddHost(HAG *phag,const char *host)
     ellAdd(&phag->list, &phagname->node);
 
 	if(aToIPAddr(host, 0, &addr)) {
-		static const char unresolved[] = "unresolved:";
+		static const char unresolved[] = "unresolved.";
 
 		errlogPrintf("ACF: Unable to resolve host '%s'\n", host);
 
