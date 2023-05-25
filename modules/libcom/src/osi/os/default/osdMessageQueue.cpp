@@ -352,8 +352,7 @@ myReceive(epicsMessageQueueId pmsg, void *message, unsigned int size,
 
     epicsMutexUnlock(pmsg->mutex);
 
-    if (threadNode.eventSent && (threadNode.size <= size) &&
-        status == epicsEventOK)
+    if (threadNode.eventSent && (threadNode.size <= size))
         return threadNode.size;
     return -1;
 }
