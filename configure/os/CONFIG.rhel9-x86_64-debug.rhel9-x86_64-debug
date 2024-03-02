@@ -1,0 +1,11 @@
+# CONFIG.rhel9-x86_64-debug.rhel9-x86_64-debug
+#
+# Definitions for rhel9-x86_64 host - rhel9-x86_64 target build with debug compiler flags
+# Sites may override these definitions in CONFIG_SITE.rhel9-x86_64-debug.rhel9-x86_64-debug
+#-------------------------------------------------------
+
+include $(CONFIG)/os/CONFIG.rhel9-x86_64.rhel9-x86_64
+
+# Removes -O optimization and adds -g compile option
+HOST_OPT=NO
+

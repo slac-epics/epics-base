@@ -54,6 +54,7 @@ sub HostArch {
 				elsif ($release =~ m/el6/)  { return "rhel6-x86_64"; }
 				elsif ($release =~ m/el7/)  { if ( $gcc eq "-gcc494" ) { return "rhel7-gcc494-x86_64";
 					} else { return "rhel7-x86_64"; } }
+				elsif ($release =~ m/el9/)  { return "rhel9-x86_64"; }
 				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
 			}
             else							{ return "unsupported"; }
