@@ -34,8 +34,9 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #	linux-x86              (GNU compiler used for host builds)
 #	linux-x86_64           (GNU compiler used for host builds)
 #	rhel6-x86_64           (GNU compiler used for host builds)
-#	rhel7-x86_64           (GNU compiler used for host builds)
-#	rhel9-x86_64           (GNU compiler used for host builds)
+#	rhel7-x86_64           (GNU compiler used for host builds) (Also used for CentOS7)
+#	rhel8-x86_64           (GNU compiler used for host builds)
+#	rhel9-x86_64           (GNU compiler used for host builds) (Also used for Rocky9)
 #	solaris-sparc          (Sun compiler used for host builds)
 #	solaris-sparc-gnu      (GNU compiler used for host builds)
 #	solaris-sparc64        (Sun compiler used for host builds)
@@ -111,7 +112,7 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
 CROSS_COMPILER_TARGET_ARCHS=
-ifeq '$(EPICS_HOST_ARCH)' 'rhel6-x86_64'
+ifeq ($(filter $(EPICS_HOST_ARCH),rhel6-x86_64 rhel7-x86_64 rhel8-x86_64 rhel9-x86_64),$(EPICS_HOST_ARCH))
 CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
 CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
 endif
