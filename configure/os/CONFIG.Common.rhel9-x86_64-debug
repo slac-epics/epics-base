@@ -1,0 +1,10 @@
+# CONFIG.Common.rhel9-x86_64-debug
+#
+# Definitions for rhel9-x86_64 with debug compiler flags
+# Sites may override these definitions in CONFIG_SITE.Common.rhel9-x86_64-debug
+#-------------------------------------------------------
+
+# Include definitions common to all rhel9-x86_64  target archs
+include $(CONFIG)/os/CONFIG.Common.rhel9-x86_64
+
+HOST_OPT=NO
