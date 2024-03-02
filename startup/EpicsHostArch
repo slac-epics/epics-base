@@ -44,6 +44,8 @@ case $sysname in
 				os=rhel6 ;;
 			*el7* )
 				os=rhel7 ;;
+			*el9* )
+				os=rhel9 ;;
 			2.6.35.13-rt )
 				os=linux ;;
 			3.14.12-rt9 | 3.18.11-rt7 )
