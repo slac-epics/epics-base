@@ -1,0 +1,10 @@
+# CONFIG.rhel8-x86_64.Common
+#
+# Definitions for rhel8-x86_64 host builds
+# Sites may override these definitions in CONFIG_SITE.rhel8-x86_64.Common
+#-------------------------------------------------------
+
+#Include definitions common to unix hosts
+include $(CONFIG)/os/CONFIG.UnixCommon.Common
+
+WIND_HOST_TYPE = x86-linux
