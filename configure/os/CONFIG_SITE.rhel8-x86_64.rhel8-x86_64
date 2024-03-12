@@ -1,0 +1,5 @@
+# CONFIG_SITE.rhel8-x86_64.rhel8-x86_64
+#
+# Site specific definitions for rhel8-x86_64 host - rhel8-x86_64 target builds
+#-------------------------------------------------------
+
