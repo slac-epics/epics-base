@@ -1,6 +1,6 @@
 # Location of linuxRT GNU ToolChain
 #LINUX_RT_HOME=/nfs/slac/g/lcls/build/linuxRT
-LINUX_RT_HOME=/afs/slac/package/linuxRT
+LINUX_RT_HOME=$(SLAC_PACKAGE_TOP)/linuxRT
 #LINUX_RT_HOME=/afs/slac/g/lcls/package/linuxRT
 
 #LINUXRT_BUILDROOT_VERSION=buildroot-2015.02
@@ -35,7 +35,7 @@ COMMANDLINE_LIBRARY = READLINE
 # =========================================================================
 # Valgrind support
 # =========================================================================
-VALGRIND_TOP=/afs/slac/g/lcls/package/valgrind/3.10.1
+VALGRIND_TOP=$(SLAC_PACKAGE_TOP)/valgrind/3.10.1
 VALGRIND_T_A=$(VALGRIND_TOP)/$(T_A)
 ifneq ($(wildcard $(VALGRIND_T_A)),)
 VALGRIND_INCLUDE=$(VALGRIND_T_A)/include
