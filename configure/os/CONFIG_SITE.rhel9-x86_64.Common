@@ -1,0 +1,5 @@
+# CONFIG_SITE.rhel9-x86_64.Common
+#
+# Site override definitions for rhel9-x86_64 host builds
+#-------------------------------------------------------
+
