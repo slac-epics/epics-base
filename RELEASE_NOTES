@@ -4,6 +4,26 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.2-2.0.2:	2024-03-18 Jeremy Lorelli, Mike Browne, Bruce Hill
+	Added support for Rocky 9, RHEL9, and RHEL8
+	Remove unneeded condition from myReceive to avoid message loss.
+	Add fix for MKDIR def getting stepped on by RTEMS makefiles.
+	Add missing FILE_TYPE for RESTORE files.
+	Fix MSI macro to MSI3_15 in RULES.Alarm
+	Add EpicsHostArch support for 2.6.26.8-rt16 and arm-apalis
+	Fixed scoping error on gccVers
+	Shared lib rpath should not depend on whether or not static libs are also being built.
+	Update EpicsHostArch scripts to work on hosts w/o gcc
+	Remove stale TODO comment re dbLoad error handling.
+	Fix convertRelease.pl generation of envPaths for templated IOCs
+	Added gcc494 dependencies to LD_LIBRARY_PATH for rhel7-gcc494-x86_64
+	Add support for building rhel7-gcc494-x86_64
+	Define MV to mv -f so we can rebuild w/ different host arch.
+	Support for building archive and req files from ioc dirs
+	Disable support for linux-arm.  Now built in it's own base release as linux-arm-apalis.
+	Fix build errors from RULES_BUILD for duplicates in DIRECTORY_TARGETS
+	Added list of detected errors for dbLoadSuspendOnError feature.
+
 R7.0.2-2.0.1:	2019-04-30 Bruce Hill
 	Merge tag 'R7.0.2.2' into R7.0.2-2.branch
 	Add dbLoadSuspendOnError variable to suspend st.cmd on dbLoad related errors.
