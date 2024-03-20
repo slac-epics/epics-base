@@ -4,6 +4,13 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+7.0.3.1-1.0.7: 2024-03-14 Jeremy Lorelli
+	New tagging scheme used for this release. 'R' prefix has been removed.
+	Added support for the following host architectures: rhel8-x86_64, rhel9-x86_64
+	Enabled RTEMS and LinuxRT cross targets on rhel7, rhel8 and rhel9
+	Introduced SLAC_PACKAGE_TOP to define package locations for Valgrind, RTEMS, LinuxRT, etc.
+		This can be changed in CONFIG_SITE.local
+
 R7.0.3.1-1.0.5: 2021-07-23 Bruce Hill
 	rhel7 hosts can now build linuxRT-x86_64 target arch.
 	Fix cpuEnv support in convertRelease.pl for gnu-make functions
