@@ -148,6 +148,10 @@ CROSS_COMPILER_RUNTEST_ARCHS=
 #    SHARED_LIBRARIES = NO  and STATIC_BUILD = YES
 SHARED_LIBRARIES=YES
 
+# Defines the TOP location of packages required by SLAC's EPICS.
+# Defaults to old location on AFS, override this in CONFIG_SITE.local
+SLAC_PACKAGE_TOP=/afs/slac/package
+
 # Build client objects statically.
 #  Must be either YES or NO.
 STATIC_BUILD=YES

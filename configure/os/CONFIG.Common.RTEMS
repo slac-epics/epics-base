@@ -30,7 +30,7 @@
 -include $(CONFIG)/os/CONFIG_SITE.Common.RTEMS
 
 ifeq ($(T_A),RTEMS-mvme5500)
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.6.2/
+RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/4.6.2/
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
 else
 #RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
@@ -49,7 +49,7 @@ else
 # since checkRelease is pretty dumb...
 #
 #RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
-RTEMS_SITE_TOP=/afs/slac/package/rtems/4.10.2/
+RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/4.10.2/
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 
 #RTEMS_PATCHLVL=rtems_p0
