@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.8: 2024-09-18 Jeremy Lorelli
+    Migrated SLAC epics-base to GitHub; updated submodule URLs
+    Added new make variables in CONFIG_SITE that encapsulate various SLAC targets.
+    i.e. CROSS_COMPILER_TARGET_VME, CROSS_COMPILER_TARGET_LINUXRT, etc.
+
 7.0.3.1-1.0.7: 2024-03-14 Jeremy Lorelli
 	New tagging scheme used for this release. 'R' prefix has been removed.
 	Added support for the following host architectures: rhel8-x86_64, rhel9-x86_64
