@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-2.0.2: 2024-09-18 Jeremy Lorelli
+    Build support for RHEL8 and 9
+    Remove unneeded condition from myReceive to avoid message loss.
 
 R7.0.3.1-2.0.1:	2020-10-27 Bruce Hill
 	Patch record processing routines to update timestamp before processing outlinks
