@@ -118,13 +118,19 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       win32-x86-mingw         (linux-x86 or -x86_64 host)
 #
 
+# Below are some variables that define different targets we use at SLAC. These variables can be used as shorthand to
+#  enable/disable certain targets in modules.
+CROSS_COMPILER_TARGET_VME       = RTEMS-svgm RTEMS-beatnik RTEMS-mvme3100
+CROSS_COMPILER_TARGET_RTEMS    := $(CROSS_COMPILER_TARGET_VME) RTEMS-uC5282
+CROSS_COMPILER_TARGET_LINUXRT   = linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
+CROSS_COMPILER_TARGET_ALL      := $(CROSS_COMPILER_TARGET_LINUXRT) $(CROSS_COMPILER_TARGET_RTEMS)
+
 # Which target architectures to cross-compile for.
 #  Definitions in configure/os/CONFIG_SITE.<host>.Common
 #  may override this setting.
 CROSS_COMPILER_TARGET_ARCHS=
 ifeq ($(filter $(EPICS_HOST_ARCH),rhel6-x86_64 rhel7-x86_64 rhel8-x86_64 rhel9-x86_64),$(EPICS_HOST_ARCH))
-CROSS_COMPILER_TARGET_ARCHS += linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
-CROSS_COMPILER_TARGET_ARCHS += RTEMS-beatnik RTEMS-mvme3100 RTEMS-uC5282 RTEMS-svgm
+CROSS_COMPILER_TARGET_ARCHS += $(CROSS_COMPILER_TARGET_ALL)
 endif
 
 # If only some of your host architectures can compile the
