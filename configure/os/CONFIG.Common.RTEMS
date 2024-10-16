@@ -54,11 +54,13 @@ RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
 
 #RTEMS_PATCHLVL=rtems_p0
 #RTEMS_PATCHLVL=rtems_p1
-RTEMS_PATCHLVL=rtems_p3
+#RTEMS_PATCHLVL=rtems_p3
+RTEMS_PATCHLVL=rtems_p4
 
 #SSRLAPPS_PATCHLVL=ssrlApps_p1
 #SSRLAPPS_PATCHLVL=ssrlApps_p3
-SSRLAPPS_PATCHLVL=ssrlApps_p2
+#SSRLAPPS_PATCHLVL=ssrlApps_p2
+SSRLAPPS_PATCHLVL=ssrlApps_p3
 endif
 
 #--------------------------------------------------
