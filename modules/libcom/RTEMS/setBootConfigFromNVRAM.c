@@ -168,7 +168,7 @@ applyNetConfig(const struct boot_net_config *cfg,
 
 #endif /* HAVE_MOTLOAD || HAVE_PPCBUG || __mcf528x__ */
 
-#if defined(HAVE_MOTLOAD)
+#if defined(HAVE_MOTLOAD) && defined(RTEMS_LEGACY_STACK)
 
 /*
  * Motorola MOTLOAD NVRAM Access
@@ -315,7 +315,7 @@ setBootConfigFromNVRAM(char *ntp_server_ip, size_t ntp_server_ip_size)
     return 0;
 }
 
-#elif defined(HAVE_PPCBUG)
+#elif defined(HAVE_PPCBUG) && defined(RTEMS_LEGACY_STACK)
 /*
  * Motorola PPCBUG NVRAM Access
  */
@@ -417,7 +417,7 @@ setBootConfigFromNVRAM(char *ntp_server_ip, size_t ntp_server_ip_size)
     return 0;
 }
 
-#elif defined(__mcf528x__)
+#elif defined(__mcf528x__) && defined(RTEMS_LEGACY_STACK)
 
 static char *
 env(const char *parm, const char *defaultValue)
