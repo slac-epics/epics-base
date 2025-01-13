@@ -92,7 +92,7 @@ splitNfsMountPath(char *nfsString)
     }
 }
 
-#if defined(HAVE_MOTLOAD)
+#if defined(HAVE_MOTLOAD) && defined(RTEMS_LEGACY_STACK)
 
 /*
  * Motorola MOTLOAD NVRAM Access
@@ -220,7 +220,7 @@ setBootConfigFromNVRAM(void)
         epicsEnvSet("TZ", cp);
 }
 
-#elif defined(HAVE_PPCBUG)
+#elif defined(HAVE_PPCBUG) && defined(RTEMS_LEGACY_STACK)
 /*
  * Motorola PPCBUG NVRAM Access
  */
@@ -320,7 +320,7 @@ setBootConfigFromNVRAM(void)
     splitRtemsBsdnetBootpCmdline();
 }
 
-#elif defined(__mcf528x__)
+#elif defined(__mcf528x__) && defined(RTEMS_LEGACY_STACK)
 
 static char *
 env(const char *parm, const char *defaultValue)
