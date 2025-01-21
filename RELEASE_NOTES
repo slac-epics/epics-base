@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.6.1-1.0.2: 2024-01-21 Jeremy Lorelli
+    Add rhel9 and rhel8 targets
+
 R7.0.6.1-1.0.1: 2022-06-08 Bruce Hill
 	Modified aslibtest to convert all hostnames to IP addr before testing access.
 	Update aslibtest for consistency w/ including both hostname and ip addr in AS HAG.
