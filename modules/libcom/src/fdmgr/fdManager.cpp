@@ -19,8 +19,6 @@
 // 1) This library is not thread safe
 //
 
-#include <algorithm>
-
 #define instantiateRecourceLib
 #define epicsExportSharedSymbols
 #include "epicsAssert.h"
@@ -28,19 +26,26 @@
 #include "fdManager.h"
 #include "locationException.h"
 
-using std :: max;
-
-epicsShareDef fdManager fileDescriptorManager;
-
-static const unsigned mSecPerSec = 1000u;
-static const unsigned uSecPerSec = 1000u * mSecPerSec;
-
 #ifdef FDMGR_USE_POLL
+#ifdef _WIN32
+#define poll WSAPoll
+#endif
+
 static const int PollEvents[] = { // must match fdRegType 
     POLLRDNORM | POLLRDBAND | POLLIN | POLLHUP | POLLERR,
     POLLWRBAND | POLLWRNORM | POLLOUT | POLLERR,
     POLLPRI};
 #endif
+
+#ifdef FDMGR_USE_SELECT
+#include <algorithm>
+using std :: max;
+#endif
+
+fdManager fileDescriptorManager;
+
+static const unsigned mSecPerSec = 1000u;
+static const unsigned uSecPerSec = 1000u * mSecPerSec;
 
 //
 // fdManager::fdManager()
