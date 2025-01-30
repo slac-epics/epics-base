@@ -73,7 +73,7 @@ struct fdManagerPrivate {
     // Set to fdreg when in call back
     // and nill otherwise
     //
-    fdReg * pCBReg;
+    volatile fdReg * pCBReg;
     fdManager & owner;
 
     explicit fdManagerPrivate(fdManager & owner);
@@ -83,7 +83,7 @@ struct fdManagerPrivate {
 fdManagerPrivate::fdManagerPrivate(fdManager & owner) :
     sleepQuantum(epicsThreadSleepQuantum()),
     processInProg(false),
-    pCBReg(0), owner(owner)
+    pCBReg(NULL), owner(owner)
 {}
 
 inline void fdManagerPrivate::lazyInitTimerQueue ()
@@ -237,8 +237,10 @@ epicsShareFunc void fdManager::process (double delay)
                 while (priv->pollfds[i].fd != iter->getFD() ||
                     priv->pollfds[i].events != PollEvents[iter->getType()])
                 {
+                    errlogPrintf("fdManager: skipping (removed?) pollfd %d (expected %d)\n", priv->pollfds[i].fd, iter->getFD());
                     i++; // skip pollfd of removed items
                     if (i >= ioPending) { // skip unknown (inserted?) items
+                        errlogPrintf("fdManager: skipping (inserted?) item %d\n", iter->getFD());
                         iter = tmp;
                         tmp++;
                         if (!iter.valid()) break;
@@ -399,6 +401,7 @@ void fdManager::installReg (fdReg &reg)
     if ( status != 0 ) {
         throwWithLocation ( fdInterestSubscriptionAlreadyExits () );
     }
+//    errlogPrintf("fdManager::adding fd %d\n", reg.getFD());
 }
 
 //
@@ -443,6 +446,7 @@ void fdManager::removeReg (fdReg &regIn)
     FD_CLR(regIn.getFD(), &priv->fdSets[regIn.getType()]);
 #endif
 
+//    errlogPrintf("fdManager::removing fd %d\n", regIn.getFD());
 }
 
 //
