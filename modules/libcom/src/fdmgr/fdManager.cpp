@@ -57,7 +57,7 @@ struct fdManagerPrivate {
     tsDLList < fdReg > activeList;
     resTable < fdReg, fdRegId > fdTbl;
     const double sleepQuantum;
-    epicsTimerQueuePassive * pTimerQueue;
+    epics::auto_ptr <epicsTimerQueuePassive> pTimerQueue;
     bool processInProg;
 
 #ifdef FDMGR_USE_POLL
@@ -82,14 +82,14 @@ struct fdManagerPrivate {
 
 fdManagerPrivate::fdManagerPrivate(fdManager & owner) :
     sleepQuantum(epicsThreadSleepQuantum()),
-    pTimerQueue(0), processInProg(false),
+    processInProg(false),
     pCBReg(0), owner(owner)
 {}
 
 inline void fdManagerPrivate::lazyInitTimerQueue ()
 {
-    if (!pTimerQueue) {
-        pTimerQueue = & epicsTimerQueuePassive::create(owner);
+    if (!pTimerQueue.get()) {
+        pTimerQueue.reset(&epicsTimerQueuePassive::create(owner));
     }
 }
 
@@ -139,7 +139,6 @@ epicsShareFunc fdManager::~fdManager()
         pReg->state = fdReg::limbo;
         pReg->destroy();
     }
-    delete priv->pTimerQueue;
     osiSockRelease();
 }
 
