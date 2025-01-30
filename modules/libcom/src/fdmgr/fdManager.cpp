@@ -76,7 +76,7 @@ struct fdManagerPrivate {
     fdReg * pCBReg;
     fdManager & owner;
 
-    fdManagerPrivate(fdManager & owner);
+    explicit fdManagerPrivate(fdManager & owner);
     void lazyInitTimerQueue();
 };
 
