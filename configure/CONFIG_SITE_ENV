@@ -94,4 +94,4 @@ EPICS_IOC_LOG_FILE_LIMIT=1000000
 
 # Set to 'YES' to call abort() rather than suspend the current thread
 # when an assert() fails
-EPICS_ABORT_ON_ASSERT=NO
+EPICS_ABORT_ON_ASSERT=YES
