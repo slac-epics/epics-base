@@ -28,7 +28,7 @@
 # Specify your desired command-line-input library
 #
 #EPICSCOMMANDLINE_LIBRARY = READLINE
-RTEMS_SITE_INSTALLDIR=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(SSRLAPPS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/
+RTEMS_SITE_INSTALLDIR=$(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(SSRLAPPS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION_SUFFIX)/$(RTEMS_BSP)/
 CROSS_INCLUDES+= -I$(RTEMS_SITE_INSTALLDIR)/include
 CROSS_LDFLAGS += -L$(RTEMS_SITE_INSTALLDIR)/lib
 
@@ -71,7 +71,9 @@ override EXE = .obj
 # A GeSys object is similar to a shared library.  It can be (un)loaded
 # at runtime by the Generic System loader which is available as a
 # patch against RTEMS.
+ifeq ($(RTEMS_VERSION),4)
 USE_GESYS = YES
+endif
 
 # If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
 # network configuration you must uncomment and specify your Internet
