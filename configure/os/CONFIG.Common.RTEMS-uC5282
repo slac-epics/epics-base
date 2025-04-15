@@ -16,6 +16,11 @@ ARCH_DEP_CFLAGS += -DMY_DO_BOOTP=NULL
 ARCH_DEP_CXXFLAGS_5 = -std=c++98
 ARCH_DEP_CXXFLAGS += $(ARCH_DEP_CXXFLAGS_$(RTEMS_VERSION))
 
+# Workaround for BUG in m68k GCC toolchain. This is not defined properly for uC5282 in newlib.h. Without this macro,
+# most of the C math library prototypes are not defined, and ieeefp.h will generate errors.
+ARCH_DEP_CFLAGS += -D_LDBL_EQ_DBL=1
+ARCH_DEP_CXXFLAGS += -D_LDBL_EQ_DBL=1
+
 MUNCH_SUFFIX = .boot
 define MUNCH_CMD
 	$(RTEMS_BASE)/bin/$(OBJCOPY_FOR_TARGET) -O binary -R .comment -S $< $@
