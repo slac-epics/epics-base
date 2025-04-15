@@ -1,0 +1,4 @@
+# CONFIG.Common.RTEMS7-uC5282
+
+RTEMS_VERSION = 7
+include $(CONFIG)/os/CONFIG.Common.RTEMS-uC5282
