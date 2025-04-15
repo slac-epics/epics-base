@@ -27,39 +27,47 @@ ifneq ($(CONFIG),$(TOP)/configure)
 -include $(TOP)/configure/CONFIG_SITE.Common.RTEMS
 endif
 
-ifeq ($(T_A),RTEMS-mvme5500)
-RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/4.6.2/
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/i386_linux2x/
-else
-#RTEMS_MAKEFILE_PATH=/afs/slac/package/rtems/4.7/target/ssrlApps/config
-# Also, change afs hard-coded path to the new path after relocating RTEMS
-# to NFS
-#
-# could use
-#
-# ifeq ($(wildcard /afs/slac/package/rtems)xx,xx)
-# RTEMS_SITE_TOP=<NFS-path>
-# else
-# RTEMS_SITE_TOP=<afs-path>
-# endif
-#
-# but I'm not sure if that causes problems with checkRelease
-# since checkRelease is pretty dumb...
-#
-#RTEMS_SITE_TOP=/afs/slac/package/rtems/4.9.4/
-RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/4.10.2/
-RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26/
+#-------------------------------------------------
+# SLAC CHANGES
+#-------------------------------------------------
 
-#RTEMS_PATCHLVL=rtems_p0
-#RTEMS_PATCHLVL=rtems_p1
-#RTEMS_PATCHLVL=rtems_p3
-RTEMS_PATCHLVL=rtems_p4
-
-#SSRLAPPS_PATCHLVL=ssrlApps_p1
-#SSRLAPPS_PATCHLVL=ssrlApps_p3
-#SSRLAPPS_PATCHLVL=ssrlApps_p2
-SSRLAPPS_PATCHLVL=ssrlApps_p3
+# Default to RTEMS 4
+ifndef RTEMS_VERSION
+RTEMS_VERSION = 4
 endif
+
+# --- RTEMS 4 ---
+ifeq ($(RTEMS_VERSION),4)
+
+RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/4.10.2
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/amd64_linux26
+
+RTEMS_PATCHLVL=rtems_p4
+SSRLAPPS_PATCHLVL=ssrlApps_p3
+
+# RTEMS 4.X does not use a version suffix on the target name (i.e. powerpc-rtems7)
+RTEMS_VERSION_SUFFIX=
+
+endif
+
+# --- RTEMS 7 ---
+ifeq ($(RTEMS_VERSION),7)
+
+RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/7.0-devel
+RTEMS_BASE=$(RTEMS_SITE_TOP)/host/linux-x86_64
+
+RTEMS_PATCHLVL=rtems
+SSRLAPPS_PATCHLVL=
+
+# Tool version suffix (i.e. powerpc-rtems7)
+RTEMS_VERSION_SUFFIX=$(RTEMS_VERSION)
+
+endif
+
+#-------------------------------------------------
+# END SLAC CHANGES
+#-------------------------------------------------
+
 #--------------------------------------------------
 # Set RTEMS_BSP and GNU_TARGET if not already done
 RTEMS_BSP ?= $(subst RTEMS-,,$(T_A))
@@ -67,7 +75,7 @@ GNU_TARGET ?= $(RTEMS_TARGET_CPU)-rtems
 
 #-------------------------------------------------------
 # Pick up the RTEMS tool/path definitions from the RTEMS BSP directory.
-include $(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems/$(RTEMS_BSP)/Makefile.inc
+include $(RTEMS_SITE_TOP)/target/$(RTEMS_PATCHLVL)/$(RTEMS_TARGET_CPU)-rtems$(RTEMS_VERSION_SUFFIX)/$(RTEMS_BSP)/Makefile.inc
 include $(RTEMS_CUSTOM)
 include $(CONFIG.CC)
 

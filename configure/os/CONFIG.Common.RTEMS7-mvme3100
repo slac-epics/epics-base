@@ -1,0 +1,4 @@
+# CONFIG.Common.RTEMS7-mvme3100
+
+RTEMS_VERSION = 7
+include $(CONFIG)/os/CONFIG.Common.RTEMS-mvme3100
