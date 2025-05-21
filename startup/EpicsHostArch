@@ -34,7 +34,8 @@ case $sysname in
         release=`uname -a`
 		case $release in
 			*Ubuntu* )
-				version=`cat /etc/issue | cut -d ' ' -f2 | tr -d .`
+				. /etc/os-release
+				version=`echo $VERSION_ID | tr -d .`
 				os="ubuntu${version}" ;;
 			*el6* )
 				os=rhel6 ;;
