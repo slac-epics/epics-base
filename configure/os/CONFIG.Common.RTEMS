@@ -44,19 +44,16 @@ SSRLAPPS_PATCHLVL=ssrlApps_p3
 
 else
 
-# RTEMS 6:
-RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/6.1-devel
+# RTEMS 7:
+RTEMS_SITE_TOP=$(SLAC_PACKAGE_TOP)/rtems/7.0-devel
 RTEMS_BASE=$(RTEMS_SITE_TOP)/host/linux-x86_64
 
-RTEMS_VERSION=6
+RTEMS_VERSION=7
 RTEMS_PATCHLVL=rtems
 SSRLAPPS_PATCHLVL=
 
 # RTEMS 4.X does not use a version suffix on target (i.e. powerpc-rtems6)
 RTEMS_VERSION_SUFFIX=$(RTEMS_VERSION)
-
-# Enable libbsd networking stack
-RTEMS_BSD_NETWORKING=yes
 
 endif
 

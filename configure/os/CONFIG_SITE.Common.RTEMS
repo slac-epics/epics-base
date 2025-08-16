@@ -71,9 +71,7 @@ override EXE = .obj
 # A GeSys object is similar to a shared library.  It can be (un)loaded
 # at runtime by the Generic System loader which is available as a
 # patch against RTEMS.
-ifeq ($(RTEMS_VERSION),4)
 USE_GESYS = YES
-endif
 
 # If you're using neither BOOTP/DHCP nor FLASH to pick up your IOC
 # network configuration you must uncomment and specify your Internet
