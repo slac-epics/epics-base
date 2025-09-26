@@ -4,6 +4,11 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.6.1-1.0.3: 2025-09-XX Jeremy Lorelli
+    Backport fdManager changes from upstream EPICS base.
+        This switches fdManager to use poll() on all supported platforms, which
+        should help resolve issues with limited fdset size with select().
+
 R7.0.6.1-1.0.2: 2024-01-21 Jeremy Lorelli
     Add rhel9 and rhel8 targets
 
