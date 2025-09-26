@@ -19,6 +19,16 @@
 #ifndef fdManagerH_included
 #define fdManagerH_included
 
+#include <memory>
+namespace epics {
+#if __cplusplus>=201103L
+template<typename T>
+using auto_ptr = std::unique_ptr<T>;
+#else
+using std::auto_ptr;
+#endif
+}
+
 #include "shareLib.h" // reset share lib defines
 #include "tsDLList.h"
 #include "resourceLib.h"
@@ -70,41 +80,29 @@ private:
 //
 // file descriptor manager
 //
-class fdManager : public epicsTimerQueueNotify {
+class epicsShareClass fdManager : public epicsTimerQueueNotify {
 public:
     //
     // exceptions
     //
     class fdInterestSubscriptionAlreadyExits {};
 
-    epicsShareFunc fdManager ();
-    epicsShareFunc virtual ~fdManager ();
-    epicsShareFunc void process ( double delay ); // delay parameter is in seconds
+    fdManager ();
+    virtual ~fdManager ();
+    void process ( double delay ); // delay parameter is in seconds
 
     // returns NULL if the fd is unknown
-    epicsShareFunc class fdReg *lookUpFD (const SOCKET fd, const fdRegType type);
+    class fdReg *lookUpFD (const SOCKET fd, const fdRegType type);
 
     epicsTimer & createTimer ();
 
 private:
-    tsDLList < fdReg > regList;
-    tsDLList < fdReg > activeList;
-    resTable < fdReg, fdRegId > fdTbl;
-    const double sleepQuantum;
-    fd_set * fdSetsPtr;
-    epicsTimerQueuePassive * pTimerQueue;
-    SOCKET maxFD;
-    bool processInProg;
-    //
-    // Set to fdreg when in call back
-    // and nill otherwise
-    //
-    fdReg * pCBReg; 
+    epics::auto_ptr <struct fdManagerPrivate> priv;
+
     void reschedule ();
     double quantum ();
     void installReg (fdReg &reg);
     void removeReg (fdReg &reg);
-    void lazyInitTimerQueue ();
     fdManager ( const fdManager & );
     fdManager & operator = ( const fdManager & );
     friend class fdReg;
@@ -185,19 +183,6 @@ inline resTableIndex fdRegId::hash () const
     // proper size after it is returned to the resource class
     //
     return hashid;
-}
-
-inline void fdManager::lazyInitTimerQueue () 
-{
-    if ( ! this->pTimerQueue ) {
-        this->pTimerQueue = & epicsTimerQueuePassive::create ( *this );
-    }
-}
-
-inline epicsTimer & fdManager::createTimer () 
-{
-    this->lazyInitTimerQueue ();
-    return this->pTimerQueue->createTimer ();
 }
 
 #endif // fdManagerH_included
