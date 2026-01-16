@@ -4,6 +4,9 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.10: 2026-01-16 Jeremy Lorelli
+	Add rhel10-x86_64 target
+
 R7.0.3.1-1.0.9: 2025-05-22 Jeremy Lorelli
     Use /etc/os-release in EpicsHostArch for Ubuntu
 
