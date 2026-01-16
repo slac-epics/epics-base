@@ -20,7 +20,7 @@ fi
 
 gccVers=""
 if [ -e "$(which gcc)" ]; then
-gccVers=`gcc -dM -E - < /dev/null | egrep __VERSION__`
+gccVers=`gcc -dM -E - < /dev/null | grep -E __VERSION__`
 fi
 case $gccVers in
 	*4.9.4* )
@@ -47,6 +47,8 @@ case $sysname in
 				os=rhel7 ;;
 			*el9* )
 				os=rhel9 ;;
+			*el10* )
+				os=rhel10 ;;
 			2.6.35.13-rt )
 				os=linux ;;
 			*el8* )
