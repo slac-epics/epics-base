@@ -1,0 +1,10 @@
+#  CONFIG.rhel10-x86_64.rhel10-x86_64
+#
+# Definitions for rhel10-x86_64 host - rhel10-x86_64 target builds
+# Sites may override these definitions in CONFIG_SITE.rhel10-x86_64.rhel10-x86_64
+#-------------------------------------------------------
+
+# Include common gnu compiler definitions
+include $(CONFIG)/os/CONFIG.linux-x86.linux-x86
+
+GNU_LIB = $(GNU_DIR)/lib64
