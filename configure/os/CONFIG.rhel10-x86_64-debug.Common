@@ -1,0 +1,12 @@
+# CONFIG.rhel10-x86_64-debug.Common
+#
+# Definitions for rhel10-x86_64 debug with debug compiler flags
+# Sites may override these definitions in CONFIG_SITE.rhel10-x86_64-debug.Common
+#-------------------------------------------------------
+
+#Include definitions common to rhel10-x86_64 hosts
+include $(CONFIG)/os/CONFIG.rhel10-x86_64.Common
+
+# Make all crosscompiler builds debug builds
+#CROSS_OPT=NO
+
