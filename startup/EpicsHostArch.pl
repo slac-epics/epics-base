@@ -30,7 +30,7 @@ my( $gcc )="";
 my( $gccExe )=`which gcc`;
 my( $gccVers )='';
 if ( "$gccExe" ne "" ) {
-	$gccVers=`gcc -dM -E - < /dev/null | egrep __VERSION__`;
+	$gccVers=`gcc -dM -E - < /dev/null | grep -E __VERSION__`;
 	if ($gccVers =~ m/4.9.4/) { $gcc="-gcc494"; }
 	else { my( $gcc )=""; }
 }
@@ -56,6 +56,7 @@ sub HostArch {
 					} else { return "rhel7-x86_64"; } }
 				elsif ($release =~ m/el8/)  { return "rhel8-x86_64"; }
 				elsif ($release =~ m/el9/)  { return "rhel9-x86_64"; }
+				elsif ($release =~ m/el10/)  { return "rhel10-x86_64"; }
 				elsif ($release =~ m/2.6.26.1/)  { return "linux-x86_64"; }
 			}
             else							{ return "unsupported"; }

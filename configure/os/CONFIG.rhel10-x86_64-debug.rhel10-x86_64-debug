@@ -1,0 +1,11 @@
+# CONFIG.rhel10-x86_64-debug.rhel10-x86_64-debug
+#
+# Definitions for rhel10-x86_64 host - rhel10-x86_64 target build with debug compiler flags
+# Sites may override these definitions in CONFIG_SITE.rhel10-x86_64-debug.rhel10-x86_64-debug
+#-------------------------------------------------------
+
+include $(CONFIG)/os/CONFIG.rhel10-x86_64.rhel10-x86_64
+
+# Removes -O optimization and adds -g compile option
+HOST_OPT=NO
+
