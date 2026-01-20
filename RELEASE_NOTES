@@ -4,6 +4,10 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.6.1-1.0.3: 2025-01-20 Jeremy Lorelli
+	Add rhel10 target
+	Add support for rhel10 in the EPICS host arch scripts
+
 R7.0.6.1-1.0.2: 2024-01-21 Jeremy Lorelli
     Add rhel9 and rhel8 targets
 
