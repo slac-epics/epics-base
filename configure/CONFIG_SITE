@@ -110,7 +110,9 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 
 # Below are some variables that define different targets we use at SLAC. These variables can be used as shorthand to
 #  enable/disable certain targets in modules.
-CROSS_COMPILER_TARGET_VME       = RTEMS-svgm RTEMS-beatnik RTEMS-mvme3100
+CROSS_COMPILER_TARGET_VME       = RTEMS-beatnik RTEMS-mvme3100
+# FIXME: Re-enable when build is fixed
+#CROSS_COMPILER_TARGET_VME      += RTEMS-svgm
 CROSS_COMPILER_TARGET_RTEMS    := $(CROSS_COMPILER_TARGET_VME) RTEMS-uC5282
 CROSS_COMPILER_TARGET_LINUXRT   = linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
 CROSS_COMPILER_TARGET_ALL      := $(CROSS_COMPILER_TARGET_LINUXRT) $(CROSS_COMPILER_TARGET_RTEMS)
