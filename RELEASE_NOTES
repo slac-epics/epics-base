@@ -4,6 +4,16 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.12: 2026-09-02 Marcio Donadio
+	- Support for buildroot-2025.02-x86_64. EPICS base will build a directory
+      buildroot-2025_02-x86_64 and support modules and IOC application will
+      follow the same idea.
+    - Created a buildroot-2019.08-x86_64 architecture, which is identical to
+      linuxRT-x86_64. This allows for different versions of Buildroot to
+      coexist, increasing flexibility.
+    - linuxRT will be kept for compatibility, but won't be upgraded.
+      It will always refer to Buildroot 2019.
+
 R7.0.3.1-1.0.11: 2026-01-21 Jeremy Lorelli
 	Update pvAccess submodule to fix resource leak
 
