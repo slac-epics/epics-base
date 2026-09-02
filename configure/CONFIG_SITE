@@ -89,6 +89,8 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #       linuxRT-x86_64          (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       linuxRT-i686            (i686-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       linuxRT-arm_zynq        (arm-buildroot-linux-gnueabi: cross w/PREEMPT_RT patch; from linux-x86_64 host)
+#       buildroot-2019_08-x86_64 (identical to linuxRT-x86_64. Exists to create a separate directory during build)
+#       buildroot-2025_02-x86_64 (x86_64-buildroot-linux-gnu: cross w/PREEMPT_RT patch; from linux-x86_64 host)
 #       vxWorks-486
 #       vxWorks-68040
 #       vxWorks-68040lc
@@ -123,7 +125,7 @@ INSTALL_CMD = $(INSTALL_LOCATION)/db
 #  enable/disable certain targets in modules.
 CROSS_COMPILER_TARGET_VME       = RTEMS-svgm RTEMS-beatnik RTEMS-mvme3100
 CROSS_COMPILER_TARGET_RTEMS    := $(CROSS_COMPILER_TARGET_VME) RTEMS-uC5282
-CROSS_COMPILER_TARGET_LINUXRT   = linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
+CROSS_COMPILER_TARGET_LINUXRT   = buildroot-2025_02-x86_64 buildroot-2019_08-x86_64 linuxRT-x86_64 linuxRT-i686 linuxRT-arm_zynq
 CROSS_COMPILER_TARGET_ALL      := $(CROSS_COMPILER_TARGET_LINUXRT) $(CROSS_COMPILER_TARGET_RTEMS)
 
 # Which target architectures to cross-compile for.

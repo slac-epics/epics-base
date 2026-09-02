@@ -1,0 +1,18 @@
+# CONFIG.Common.buildroot-2025_02-x86_64
+#
+# This file is maintained by the TID-ID-CSE department at SLAC.
+#
+# Definitions for buildroot-2025_02-x86_64 target builds.
+# The buildroot-2025_02 target is really linux-rt with glibc initially produced
+# by Till Strauman at SLAC National Laboratories and later maintained by the
+# TID-ID-CSE department.
+# Sites may override these definitions and add other definitions
+# in CONFIG_SITE.Common.buildroot-2025_02-x86_64
+#-------------------------------------------------------
+
+# Include definitions common to all Unix targets
+include $(CONFIG)/os/CONFIG.Common.linuxCommon
+VALID_BUILDS = Ioc
+ARCH_CLASS = x86_64
+ARCH_DEP_CPPFLAGS += -D_X86_64_
+
