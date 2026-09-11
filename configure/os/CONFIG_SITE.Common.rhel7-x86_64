@@ -40,5 +40,3 @@ COMMANDLINE_LIBRARY = READLINE_NCURSES
 OPT_CFLAGS_YES += -g
 OPT_CXXFLAGS_YES += -g
 
-# Support Package Architecture
-PKG_ARCH=x86_64-rhel7-gcc48-opt
