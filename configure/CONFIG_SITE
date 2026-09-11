@@ -212,5 +212,12 @@ LINKER_USE_RPATH = YES
 # All root directories are considered to be the same.
 LINKER_ORIGIN_ROOT = $(INSTALL_LOCATION)
 
+# Subdirectory for target-specific package locations.
+# In most cases, this will match T_A, but it may be overridden as necessary by files
+# in configure/os/CONFIG_SITE.Common.$(T_A)
+ifdef T_A
+PKG_ARCH = $(T_A)
+endif
+
 # Overrides for the settings above may appear in a CONFIG_SITE.local file
 -include $(CONFIG)/CONFIG_SITE.local
