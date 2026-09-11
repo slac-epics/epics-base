@@ -26,6 +26,11 @@ STATIC_BUILD=YES
 OPT_CFLAGS_YES = -O3 -g
 OPT_CXXFLAGS_YES = -O3 -g
 
+# =====================================================================
+# Package arch
+# =====================================================================
+PKG_ARCH=$(LINUXRT_BUILDROOT_VERSION)-arm_zynq
+
 # =================================================
 # Add support for readline: used by
 # EPICS IOC Shell for command line history, etc...
