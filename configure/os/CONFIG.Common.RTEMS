@@ -147,6 +147,11 @@ OS_CLASS = RTEMS
 # Operating system compile & link flags
 OP_SYS_CFLAGS += -D__LINUX_ERRNO_EXTENSIONS__
 
+# FIXME: Remove once EPICS base+modules compile w/C23
+ifeq ($(RTEMS_VERSION),7)
+USR_CFLAGS += -std=gnu17
+endif
+
 # Has RTEMS been built with the internal legacy stack?
 ifeq ($(RTEMS_LEGACY_NETWORKING_INTERNAL),yes)
 RTEMS_HAS_NETWORKING = yes
