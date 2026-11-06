@@ -101,6 +101,7 @@ typedef struct client {
   unsigned              recvBytesToDrain;
   unsigned              priority;
   char                  disconnect; /* disconnect detected */
+  char                  *sssb; // scalar string scratch buffer
 } client;
 
 /* Channel state shows which struct client list a
