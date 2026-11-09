@@ -4,6 +4,14 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-1.0.14: 2026-11-09 Jeremy Lorelli
+    - This update addresses high severity CVEs in EPICS-base
+    - Security fixes in CA server:
+        - Applied upstream commits from epics-base#949
+        - Applied upstream commits from epics-base#934
+    - pvDataCPP Security Fixes:
+        - Applied upstream commits from pvDataCPP#109
+
 R7.0.3.1-1.0.13: 2026-09-17 Jeremy Lorelli
     - Provide a default definition of PKG_ARCH instead of requiring downstream modules/IOCs to provide it.
     - Added -S (stringify) option to pvget, emulating the behavior of the caget -S option for waveforms.
