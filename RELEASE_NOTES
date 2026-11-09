@@ -4,6 +4,20 @@
 # x.y.z; major, minor, bug fix locally respectively
 # Incrementing, "y" indicates that we have made minor modification to the original EPICS Community Release.
 # ==============================================================================================================
+R7.0.3.1-2.0.3: 2026-11-09 Jeremy Lorelli
+    Added support for RHEL10
+    Fixed issue where EpicsHostArch was attempting to parse /etc/issue
+    Applied security fixes from upstream:
+        - epics-base#949
+        - epics-base#934
+    Applied changes to pvAccess
+        - Fixed resource leak due to beacons never getting freed
+        - Added support for -S option in pvget (strigify, just like caget -S)
+    Applied changes to pvData
+        - Supporting changes for resource leak fix
+        - Supporting changes for pvget -S option
+        - Fixed security issues (pvDataCPP#109)
+
 R7.0.3.1-2.0.2: 2024-09-18 Jeremy Lorelli
     Build support for RHEL8 and 9
     Remove unneeded condition from myReceive to avoid message loss.
